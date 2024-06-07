@@ -146,8 +146,8 @@ public:
 
         cubeShader->Set("projection", m_CameraController.GetProjectionMatrix());
         cubeShader->Set("view", m_CameraController.GetViewMatrix());
-        cubeShader->Set("objectColor", {0.0f, 0.0f, 1.0f});
-        cubeShader->Set("lightColor", {1.0f, 1.0f, 1.0f});
+        cubeShader->Set("objectColor", m_ObjectColor);
+        cubeShader->Set("lightColor", m_LightColor);
 
         glm::mat4 model = glm::mat4(1.0f);
         cubeShader->Set("model", model);
@@ -167,9 +167,10 @@ public:
     }
 
     void UIRender() override {
-        // ImGui::Begin("Settings");
-        // ImGui::ColorEdit3("Color", glm::value_ptr(m_Color));
-        // ImGui::End();
+        ImGui::Begin("Settings");
+        ImGui::ColorEdit3("Object", glm::value_ptr(m_ObjectColor));
+        ImGui::ColorEdit3("Light", glm::value_ptr(m_LightColor));
+        ImGui::End();
     }
 
 private:
@@ -188,6 +189,10 @@ private:
 
     glm::vec4 testColor = {0.0f, 0.0f, 1.0f, 1.0f};
     glm::vec3 lightPos = {1.2f, 1.0f, 2.0f};
+
+    glm::vec3 m_ObjectColor = {0.0f, 0.0f, 1.0f};
+    glm::vec3 m_LightColor = {1.0f, 1.0f, 1.0f};
+
 };
 
 class UIApplication : public Application{
