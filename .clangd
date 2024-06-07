@@ -1,0 +1,7 @@
+If:
+  PathMatch: test_package/.*
+  CompileFlags:
+    CompilationDatabase: .
+Else:
+  CompileFlags:
+    CompilationDatabase: .
