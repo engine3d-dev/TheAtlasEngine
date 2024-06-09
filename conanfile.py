@@ -8,13 +8,10 @@ class engine3dRecipe(ConanFile):
     name = "engine3d"
     version = "1.0"
     package_type = "library"
-
-    # Optional metadata
-    # license = "<Put the package license here>"
-    # author = "<Put your name here> <And your email here>"
-    # url = "<Package recipe repository url here, for issues about the package>"
-    # description = "<Description of engine3d package here>"
-    # topics = ("<Put some tag here>", "<here>", "<and here>")
+    license = "Apache-2.0"
+    homepage = "https://github.com/engine3d-dev/engine3d"
+    description = "Multipurpose 3D engine"
+    topics = ("Engine", "Graphics", "Animations", "Simulations")
 
     # Binary configuration
     settings = "os", "compiler", "build_type", "arch"
@@ -22,7 +19,7 @@ class engine3dRecipe(ConanFile):
     default_options = {"shared": False, "fPIC": True}
 
     # Sources are located in the same place as this recipe, copy them to the recipe
-    exports_sources = "CMakeLists.txt", "src/CMakeLists.txt", "src/engine3d/*", "engine3d/*", "engine3d/Core/*", "engine3d/Event/*"
+    exports_sources = "CMakeLists.txt", "src/CMakeLists.txt", "src/engine3d/*", "engine3d/*", "engine3d/Core/*", "engine3d/Event/*", "Editor/CMakeLists.txt", "Editor/*"
 
     def requirements(self):
         self.tool_requires("cmake/3.27.1")
@@ -33,8 +30,8 @@ class engine3dRecipe(ConanFile):
         self.requires("glm/1.0.1", transitive_headers=True)
         self.requires("yaml-cpp/0.8.0", transitive_headers=True)
         self.requires("box2d/2.4.1", transitive_headers=True)
+        # self.requires("assimp/5.4.1")
         # self.requires("joltphysics/3.0.1", transitive_headers=True)
-        # self.requires("assimp/5.2.2")
 
     def config_options(self):
         if self.settings.os == "Windows":
@@ -69,17 +66,8 @@ class engine3dRecipe(ConanFile):
         copy(self, pattern="*.dylib", src=self.build_folder, dst=os.path.join(self.package_folder, "lib"), keep_path=False)
         cmake = CMake(self)
         cmake.install()
-    # def package(self):
-    #     copy(self, "LICENSE", dst=os.path.join(
-    #         self.package_folder, "licenses"), src=self.source_folder)
-    #     copy(self, "*.h", dst=os.path.join(self.package_folder, "engine3d"),
-    #          src=os.path.join(self.source_folder, "engine3d"))
-    #     copy(self, "*.hpp", dst=os.path.join(self.package_folder,
-    #          "engine3d"), src=os.path.join(self.source_folder, "engine3d"))
 
     def package_info(self):
-        # self.cpp_info.
-        # self.cpp_info.set_property("cmake_target_name", "libhal::stm32f1")
         self.cpp_info.set_property("cmake_target_name", "engine3d::engine3d")
         self.cpp_info.libs = ["engine3d"]
         self.cpp_info.includedirs = ['./', './engine3d']  # Ordered list of include paths
