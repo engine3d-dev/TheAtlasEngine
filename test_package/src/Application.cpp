@@ -4,13 +4,13 @@
 #include <Engine3D/Scene/OrthographicCameraController.h>
 #include <vector>
 
-namespace Engine3D{
+namespace engine3d{
 class ExampleLayer : public Layer{
 public:
     ExampleLayer() : Layer("Sandbox Layer"), m_CameraController() {}
 
     //! @note  Attach() will be used to initiate our world
-    void Attach() override {
+    void BeginPlay() override {
         Pipeline::SetClearColor({0.05f, 0.05f, 0.05f, 1.0f});
         // m_CameraController = OrthographicCameraController();
         // float vertices[] = {
@@ -128,7 +128,7 @@ public:
 
     }
 
-    void Detach() override {}
+    void EndPlay() override {}
 
     void UpdateEvent(Event& event) override {
         m_CameraController.OnEvent(event);
