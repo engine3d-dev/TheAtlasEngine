@@ -2,7 +2,7 @@
 #include <engine3d/Core/core.h>
 #include <engine3d/Graphics/Buffer.h>
 
-namespace Engine3D{
+namespace engine3d{
     class OpenGLVertexBuffer : public VertexBuffer{
     public:
         OpenGLVertexBuffer(const void* data, size_t size);

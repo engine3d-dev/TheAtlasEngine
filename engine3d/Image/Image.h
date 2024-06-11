@@ -2,7 +2,7 @@
 #include <engine3d/Core/core.h>
 #include <string>
 
-namespace Engine3D{
+namespace engine3d{
 
     /**
      * @class Image

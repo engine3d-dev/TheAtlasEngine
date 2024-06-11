@@ -2,7 +2,7 @@
 #include <engine3d/Core/core.h>
 #include "glm/glm.hpp"
 
-namespace Engine3D{
+namespace engine3d{
     //! @note Meshes
     class Vertex{
         glm::vec3 Position;

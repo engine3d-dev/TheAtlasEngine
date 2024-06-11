@@ -1,7 +1,7 @@
 #pragma once
 #include <engine3d/Core/core.h>
 
-namespace Engine3D{
+namespace engine3d{
 
     /**
      * @name EnvironmentMap

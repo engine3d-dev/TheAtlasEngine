@@ -2,7 +2,7 @@
 #include <engine3d/Core/core.h>
 #include "glm/glm.hpp"
 
-namespace Engine3D{
+namespace engine3d{
     enum class API : uint8_t {
         UNSUPPORTED,
         OPENGL,

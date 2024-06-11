@@ -2,7 +2,7 @@
 #include <engine3d/Core/core.h>
 #include <engine3d/Scene/Camera.h>
 
-namespace Engine3D{
+namespace engine3d{
     class OrthographicCamera : public Camera{
     public:
         OrthographicCamera(float left, float right, float bottom, float top);

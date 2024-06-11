@@ -2,7 +2,7 @@
 #include <engine3d/Core/Application.h>
 #include <engine3d/Core/UI/UILayer.h>
 
-namespace Engine3D{
+namespace engine3d{
 
     /**
      * @name NOTES -- For UILayer/UIWidgets

@@ -2,7 +2,7 @@
 #include <engine3d/Core/core.h>
 #include <engine3d/Graphics/Buffer.h>
 
-namespace Engine3D{
+namespace engine3d{
     /**
      * @name VertexArray.h
      * @note API-agnostic implementations and naming convention functions

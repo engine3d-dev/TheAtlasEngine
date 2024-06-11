@@ -1,7 +1,7 @@
 #include <engine3d/engine3dPrecompiledHeader.h>
 #include <engine3d/OpenGL/OpenGLVertexArray.h>
 
-namespace Engine3D{
+namespace engine3d{
 
     static GLenum ShaderDataTypeToBaseConversion(ShaderData_t type){
         switch(type){

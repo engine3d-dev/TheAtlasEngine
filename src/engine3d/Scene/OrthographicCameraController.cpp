@@ -1,7 +1,7 @@
 #include <engine3d/engine3dPrecompiledHeader.h>
 #include <engine3d/Scene/OrthographicCameraController.h>
 
-namespace Engine3D{
+namespace engine3d{
     glm::mat4 projection = glm::mat4(1.0f);
     glm::mat4 view = glm::mat4(1.0f);
     glm::mat4 model = glm::mat4(1.0f);

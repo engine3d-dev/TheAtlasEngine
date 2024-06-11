@@ -2,7 +2,7 @@
 #include <engine3d/Core/Layer.h>
 
 
-namespace Engine3D{
+namespace engine3d{
 
     /**
      * 
@@ -15,8 +15,8 @@ namespace Engine3D{
     */
     class UILayer : public Layer{
     private:
-        void Attach() override;
-        void Detach() override;
+        void BeginPlay() override;
+        void EndPlay() override;
 
         void UpdateLayer(Timestep ts) override;
         void UpdateEvent(Event& event) override;

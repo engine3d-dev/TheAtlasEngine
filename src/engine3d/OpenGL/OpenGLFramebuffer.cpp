@@ -1,7 +1,7 @@
 #include <engine3d/engine3dPrecompiledHeader.h>
 #include <engine3d/OpenGL/OpenGLFramebuffer.h>
 
-namespace Engine3D{
+namespace engine3d{
     static const uint32_t g_MaxFramebufferSize = 8192;
 
     static GLenum TextureTarget(bool multisample){

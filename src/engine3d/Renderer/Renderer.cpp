@@ -1,7 +1,7 @@
 #include <engine3d/engine3dPrecompiledHeader.h>
 #include <engine3d/Renderer/Renderer.h>
 
-namespace Engine3D{
+namespace engine3d{
     // void Renderer::RenderPass(Ref<VertexArray>& vao){
     //     vao->ApplyResource();
     //     glDrawElements(GL_TRIANGLES, vao->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);

@@ -4,7 +4,7 @@
 #include <engine3d/Event/KeyCodes.h>
 #include <sstream>
 
-namespace Engine3D{
+namespace engine3d{
     
     class ENGINE_API KeyEvent : public Event{
     public:

@@ -1,7 +1,7 @@
 #pragma once
 #include <chrono>
 
-namespace Engine3D{
+namespace engine3d{
 	class Timer{
 	public:
 		Timer(){

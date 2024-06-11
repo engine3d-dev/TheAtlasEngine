@@ -2,7 +2,7 @@
 #include <engine3d/Core/core.h>
 #include <engine3d/Graphics/SwapChain.h>
 
-namespace Engine3D{
+namespace engine3d{
     class OpenGLSwapChain : public SwapChains{
     public:
         OpenGLSwapChain();

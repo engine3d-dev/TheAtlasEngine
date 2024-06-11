@@ -2,7 +2,7 @@
 #include <engine3d/Event/InputPoll.h>
 
 
-namespace Engine3D{
+namespace engine3d{
     bool InputPoll::IsKeyPressed(KeyCode keycode){
         auto window = static_cast<GLFWwindow *>(Application::Get().GetNativeWindow());
 

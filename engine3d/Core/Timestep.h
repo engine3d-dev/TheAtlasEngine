@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Engine3D{
+namespace engine3d{
 
     // Timestep
     // - Helper class

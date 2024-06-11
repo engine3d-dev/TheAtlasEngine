@@ -1,7 +1,7 @@
 #include <engine3d/Core/EngineLogger.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-namespace Engine3D{
+namespace engine3d{
     std::shared_ptr<spdlog::logger> EngineLogger::coreLogger;
     std::shared_ptr<spdlog::logger> EngineLogger::clientLogger;
 

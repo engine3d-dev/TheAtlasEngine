@@ -2,7 +2,7 @@
 #include <engine3d/Graphics/VertexArray.h>
 #include <vector>
 
-namespace Engine3D{
+namespace engine3d{
     class OpenGLVertexArray : public VertexArray{
     public:
         OpenGLVertexArray();

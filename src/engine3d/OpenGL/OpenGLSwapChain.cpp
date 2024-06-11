@@ -2,7 +2,7 @@
 #include <engine3d/OpenGL/OpenGLSwapChain.h>
 
 
-namespace Engine3D{
+namespace engine3d{
     OpenGLSwapChain::OpenGLSwapChain(){}
 
     void OpenGLSwapChain::CurrentSwapChainPresent(){

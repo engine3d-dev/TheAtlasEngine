@@ -1,7 +1,7 @@
 #include <engine3d/engine3dPrecompiledHeader.h>
 #include <engine3d/Core/EntryPoint.h>
 
-namespace Engine3D{
+namespace engine3d{
     extern Application* CreateApplication();
 #if _WIN32
     int Main(int argc, char** argv){
@@ -23,5 +23,5 @@ namespace Engine3D{
 };
 
 int main(int argc, char** argv){
-    return Engine3D::Main(argc, argv);
+    return engine3d::Main(argc, argv);
 }

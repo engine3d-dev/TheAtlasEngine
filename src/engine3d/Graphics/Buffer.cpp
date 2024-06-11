@@ -2,7 +2,7 @@
 #include <engine3d/Graphics/Buffer.h>
 #include <engine3d/OpenGL/OpenGLBuffer.h>
 
-namespace Engine3D{
+namespace engine3d{
     // **********************************************
     //               [ Vertex Buffer ]
     // **********************************************

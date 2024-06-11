@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 
-namespace Engine3D{
+namespace engine3d{
 	typedef enum class KeyCode : uint16_t {
 		// From glfw3.h
 		Space               = 32,
@@ -138,128 +138,128 @@ namespace Engine3D{
 }
 
 // From glfw3.h
-#define ENGINE_KEY_SPACE           ::Engine3D::Key::Space
-#define ENGINE_KEY_APOSTROPHE      ::Engine3D::Key::Apostrophe    /* ' */
-#define ENGINE_KEY_COMMA           ::Engine3D::Key::Comma         /* , */
-#define ENGINE_KEY_MINUS           ::Engine3D::Key::Minus         /* - */
-#define ENGINE_KEY_PERIOD          ::Engine3D::Key::Period        /* . */
-#define ENGINE_KEY_SLASH           ::Engine3D::Key::Slash         /* / */
-#define ENGINE_KEY_0               ::Engine3D::Key::D0
-#define ENGINE_KEY_1               ::Engine3D::Key::D1
-#define ENGINE_KEY_2               ::Engine3D::Key::D2
-#define ENGINE_KEY_3               ::Engine3D::Key::D3
-#define ENGINE_KEY_4               ::Engine3D::Key::D4
-#define ENGINE_KEY_5               ::Engine3D::Key::D5
-#define ENGINE_KEY_6               ::Engine3D::Key::D6
-#define ENGINE_KEY_7               ::Engine3D::Key::D7
-#define ENGINE_KEY_8               ::Engine3D::Key::D8
-#define ENGINE_KEY_9               ::Engine3D::Key::D9
-#define ENGINE_KEY_SEMICOLON       ::Engine3D::Key::Semicolon     /* ; */
-#define ENGINE_KEY_EQUAL           ::Engine3D::Key::Equal         /* = */
-#define ENGINE_KEY_A               ::Engine3D::Key::A
-#define ENGINE_KEY_B               ::Engine3D::Key::B
-#define ENGINE_KEY_C               ::Engine3D::Key::C
-#define ENGINE_KEY_D               ::Engine3D::Key::D
-#define ENGINE_KEY_E               ::Engine3D::Key::E
-#define ENGINE_KEY_F               ::Engine3D::Key::F
-#define ENGINE_KEY_G               ::Engine3D::Key::G
-#define ENGINE_KEY_H               ::Engine3D::Key::H
-#define ENGINE_KEY_I               ::Engine3D::Key::I
-#define ENGINE_KEY_J               ::Engine3D::Key::J
-#define ENGINE_KEY_K               ::Engine3D::Key::K
-#define ENGINE_KEY_L               ::Engine3D::Key::L
-#define ENGINE_KEY_M               ::Engine3D::Key::M
-#define ENGINE_KEY_N               ::Engine3D::Key::N
-#define ENGINE_KEY_O               ::Engine3D::Key::O
-#define ENGINE_KEY_P               ::Engine3D::Key::P
-#define ENGINE_KEY_Q               ::Engine3D::Key::Q
-#define ENGINE_KEY_R               ::Engine3D::Key::R
-#define ENGINE_KEY_S               ::Engine3D::Key::S
-#define ENGINE_KEY_T               ::Engine3D::Key::T
-#define ENGINE_KEY_U               ::Engine3D::Key::U
-#define ENGINE_KEY_V               ::Engine3D::Key::V
-#define ENGINE_KEY_W               ::Engine3D::Key::W
-#define ENGINE_KEY_X               ::Engine3D::Key::X
-#define ENGINE_KEY_Y               ::Engine3D::Key::Y
-#define ENGINE_KEY_Z               ::Engine3D::Key::Z
-#define ENGINE_KEY_LEFT_BRACKET    ::Engine3D::Key::LeftBracket   /* [ */
-#define ENGINE_KEY_BACKSLASH       ::Engine3D::Key::Backslash     /* \ */
-#define ENGINE_KEY_RIGHT_BRACKET   ::Engine3D::Key::RightBracket  /* ] */
-#define ENGINE_KEY_GRAVE_ACCENT    ::Engine3D::Key::GraveAccent   /* ` */
-#define ENGINE_KEY_WORLD_1         ::Engine3D::Key::World1        /* non-US #1 */
-#define ENGINE_KEY_WORLD_2         ::Engine3D::Key::World2        /* non-US #2 */
+#define ENGINE_KEY_SPACE           ::engine3d::Key::Space
+#define ENGINE_KEY_APOSTROPHE      ::engine3d::Key::Apostrophe    /* ' */
+#define ENGINE_KEY_COMMA           ::engine3d::Key::Comma         /* , */
+#define ENGINE_KEY_MINUS           ::engine3d::Key::Minus         /* - */
+#define ENGINE_KEY_PERIOD          ::engine3d::Key::Period        /* . */
+#define ENGINE_KEY_SLASH           ::engine3d::Key::Slash         /* / */
+#define ENGINE_KEY_0               ::engine3d::Key::D0
+#define ENGINE_KEY_1               ::engine3d::Key::D1
+#define ENGINE_KEY_2               ::engine3d::Key::D2
+#define ENGINE_KEY_3               ::engine3d::Key::D3
+#define ENGINE_KEY_4               ::engine3d::Key::D4
+#define ENGINE_KEY_5               ::engine3d::Key::D5
+#define ENGINE_KEY_6               ::engine3d::Key::D6
+#define ENGINE_KEY_7               ::engine3d::Key::D7
+#define ENGINE_KEY_8               ::engine3d::Key::D8
+#define ENGINE_KEY_9               ::engine3d::Key::D9
+#define ENGINE_KEY_SEMICOLON       ::engine3d::Key::Semicolon     /* ; */
+#define ENGINE_KEY_EQUAL           ::engine3d::Key::Equal         /* = */
+#define ENGINE_KEY_A               ::engine3d::Key::A
+#define ENGINE_KEY_B               ::engine3d::Key::B
+#define ENGINE_KEY_C               ::engine3d::Key::C
+#define ENGINE_KEY_D               ::engine3d::Key::D
+#define ENGINE_KEY_E               ::engine3d::Key::E
+#define ENGINE_KEY_F               ::engine3d::Key::F
+#define ENGINE_KEY_G               ::engine3d::Key::G
+#define ENGINE_KEY_H               ::engine3d::Key::H
+#define ENGINE_KEY_I               ::engine3d::Key::I
+#define ENGINE_KEY_J               ::engine3d::Key::J
+#define ENGINE_KEY_K               ::engine3d::Key::K
+#define ENGINE_KEY_L               ::engine3d::Key::L
+#define ENGINE_KEY_M               ::engine3d::Key::M
+#define ENGINE_KEY_N               ::engine3d::Key::N
+#define ENGINE_KEY_O               ::engine3d::Key::O
+#define ENGINE_KEY_P               ::engine3d::Key::P
+#define ENGINE_KEY_Q               ::engine3d::Key::Q
+#define ENGINE_KEY_R               ::engine3d::Key::R
+#define ENGINE_KEY_S               ::engine3d::Key::S
+#define ENGINE_KEY_T               ::engine3d::Key::T
+#define ENGINE_KEY_U               ::engine3d::Key::U
+#define ENGINE_KEY_V               ::engine3d::Key::V
+#define ENGINE_KEY_W               ::engine3d::Key::W
+#define ENGINE_KEY_X               ::engine3d::Key::X
+#define ENGINE_KEY_Y               ::engine3d::Key::Y
+#define ENGINE_KEY_Z               ::engine3d::Key::Z
+#define ENGINE_KEY_LEFT_BRACKET    ::engine3d::Key::LeftBracket   /* [ */
+#define ENGINE_KEY_BACKSLASH       ::engine3d::Key::Backslash     /* \ */
+#define ENGINE_KEY_RIGHT_BRACKET   ::engine3d::Key::RightBracket  /* ] */
+#define ENGINE_KEY_GRAVE_ACCENT    ::engine3d::Key::GraveAccent   /* ` */
+#define ENGINE_KEY_WORLD_1         ::engine3d::Key::World1        /* non-US #1 */
+#define ENGINE_KEY_WORLD_2         ::engine3d::Key::World2        /* non-US #2 */
 
 /* Function keys */
-#define ENGINE_KEY_ESCAPE          ::Engine3D::Key::Escape
-#define ENGINE_KEY_ENTER           ::Engine3D::Key::Enter
-#define ENGINE_KEY_TAB             ::Engine3D::Key::Tab
-#define ENGINE_KEY_BACKSPACE       ::Engine3D::Key::Backspace
-#define ENGINE_KEY_INSERT          ::Engine3D::Key::Insert
-#define ENGINE_KEY_DELETE          ::Engine3D::Key::Delete
-#define ENGINE_KEY_RIGHT           ::Engine3D::Key::Right
-#define ENGINE_KEY_LEFT            ::Engine3D::Key::Left
-#define ENGINE_KEY_DOWN            ::Engine3D::Key::Down
-#define ENGINE_KEY_UP              ::Engine3D::Key::Up
-#define ENGINE_KEY_PAGE_UP         ::Engine3D::Key::PageUp
-#define ENGINE_KEY_PAGE_DOWN       ::Engine3D::Key::PageDown
-#define ENGINE_KEY_HOME            ::Engine3D::Key::Home
-#define ENGINE_KEY_END             ::Engine3D::Key::End
-#define ENGINE_KEY_CAPS_LOCK       ::Engine3D::Key::CapsLock
-#define ENGINE_KEY_SCROLL_LOCK     ::Engine3D::Key::ScrollLock
-#define ENGINE_KEY_NUM_LOCK        ::Engine3D::Key::NumLock
-#define ENGINE_KEY_PRINT_SCREEN    ::Engine3D::Key::PrintScreen
-#define ENGINE_KEY_PAUSE           ::Engine3D::Key::Pause
-#define ENGINE_KEY_F1              ::Engine3D::Key::F1
-#define ENGINE_KEY_F2              ::Engine3D::Key::F2
-#define ENGINE_KEY_F3              ::Engine3D::Key::F3
-#define ENGINE_KEY_F4              ::Engine3D::Key::F4
-#define ENGINE_KEY_F5              ::Engine3D::Key::F5
-#define ENGINE_KEY_F6              ::Engine3D::Key::F6
-#define ENGINE_KEY_F7              ::Engine3D::Key::F7
-#define ENGINE_KEY_F8              ::Engine3D::Key::F8
-#define ENGINE_KEY_F9              ::Engine3D::Key::F9
-#define ENGINE_KEY_F10             ::Engine3D::Key::F10
-#define ENGINE_KEY_F11             ::Engine3D::Key::F11
-#define ENGINE_KEY_F12             ::Engine3D::Key::F12
-#define ENGINE_KEY_F13             ::Engine3D::Key::F13
-#define ENGINE_KEY_F14             ::Engine3D::Key::F14
-#define ENGINE_KEY_F15             ::Engine3D::Key::F15
-#define ENGINE_KEY_F16             ::Engine3D::Key::F16
-#define ENGINE_KEY_F17             ::Engine3D::Key::F17
-#define ENGINE_KEY_F18             ::Engine3D::Key::F18
-#define ENGINE_KEY_F19             ::Engine3D::Key::F19
-#define ENGINE_KEY_F20             ::Engine3D::Key::F20
-#define ENGINE_KEY_F21             ::Engine3D::Key::F21
-#define ENGINE_KEY_F22             ::Engine3D::Key::F22
-#define ENGINE_KEY_F23             ::Engine3D::Key::F23
-#define ENGINE_KEY_F24             ::Engine3D::Key::F24
-#define ENGINE_KEY_F25             ::Engine3D::Key::F25
+#define ENGINE_KEY_ESCAPE          ::engine3d::Key::Escape
+#define ENGINE_KEY_ENTER           ::engine3d::Key::Enter
+#define ENGINE_KEY_TAB             ::engine3d::Key::Tab
+#define ENGINE_KEY_BACKSPACE       ::engine3d::Key::Backspace
+#define ENGINE_KEY_INSERT          ::engine3d::Key::Insert
+#define ENGINE_KEY_DELETE          ::engine3d::Key::Delete
+#define ENGINE_KEY_RIGHT           ::engine3d::Key::Right
+#define ENGINE_KEY_LEFT            ::engine3d::Key::Left
+#define ENGINE_KEY_DOWN            ::engine3d::Key::Down
+#define ENGINE_KEY_UP              ::engine3d::Key::Up
+#define ENGINE_KEY_PAGE_UP         ::engine3d::Key::PageUp
+#define ENGINE_KEY_PAGE_DOWN       ::engine3d::Key::PageDown
+#define ENGINE_KEY_HOME            ::engine3d::Key::Home
+#define ENGINE_KEY_END             ::engine3d::Key::End
+#define ENGINE_KEY_CAPS_LOCK       ::engine3d::Key::CapsLock
+#define ENGINE_KEY_SCROLL_LOCK     ::engine3d::Key::ScrollLock
+#define ENGINE_KEY_NUM_LOCK        ::engine3d::Key::NumLock
+#define ENGINE_KEY_PRINT_SCREEN    ::engine3d::Key::PrintScreen
+#define ENGINE_KEY_PAUSE           ::engine3d::Key::Pause
+#define ENGINE_KEY_F1              ::engine3d::Key::F1
+#define ENGINE_KEY_F2              ::engine3d::Key::F2
+#define ENGINE_KEY_F3              ::engine3d::Key::F3
+#define ENGINE_KEY_F4              ::engine3d::Key::F4
+#define ENGINE_KEY_F5              ::engine3d::Key::F5
+#define ENGINE_KEY_F6              ::engine3d::Key::F6
+#define ENGINE_KEY_F7              ::engine3d::Key::F7
+#define ENGINE_KEY_F8              ::engine3d::Key::F8
+#define ENGINE_KEY_F9              ::engine3d::Key::F9
+#define ENGINE_KEY_F10             ::engine3d::Key::F10
+#define ENGINE_KEY_F11             ::engine3d::Key::F11
+#define ENGINE_KEY_F12             ::engine3d::Key::F12
+#define ENGINE_KEY_F13             ::engine3d::Key::F13
+#define ENGINE_KEY_F14             ::engine3d::Key::F14
+#define ENGINE_KEY_F15             ::engine3d::Key::F15
+#define ENGINE_KEY_F16             ::engine3d::Key::F16
+#define ENGINE_KEY_F17             ::engine3d::Key::F17
+#define ENGINE_KEY_F18             ::engine3d::Key::F18
+#define ENGINE_KEY_F19             ::engine3d::Key::F19
+#define ENGINE_KEY_F20             ::engine3d::Key::F20
+#define ENGINE_KEY_F21             ::engine3d::Key::F21
+#define ENGINE_KEY_F22             ::engine3d::Key::F22
+#define ENGINE_KEY_F23             ::engine3d::Key::F23
+#define ENGINE_KEY_F24             ::engine3d::Key::F24
+#define ENGINE_KEY_F25             ::engine3d::Key::F25
 
 /* Keypad */
-#define ENGINE_KEY_KP_0            ::Engine3D::Key::KP0
-#define ENGINE_KEY_KP_1            ::Engine3D::Key::KP1
-#define ENGINE_KEY_KP_2            ::Engine3D::Key::KP2
-#define ENGINE_KEY_KP_3            ::Engine3D::Key::KP3
-#define ENGINE_KEY_KP_4            ::Engine3D::Key::KP4
-#define ENGINE_KEY_KP_5            ::Engine3D::Key::KP5
-#define ENGINE_KEY_KP_6            ::Engine3D::Key::KP6
-#define ENGINE_KEY_KP_7            ::Engine3D::Key::KP7
-#define ENGINE_KEY_KP_8            ::Engine3D::Key::KP8
-#define ENGINE_KEY_KP_9            ::Engine3D::Key::KP9
-#define ENGINE_KEY_KP_DECIMAL      ::Engine3D::Key::KPDecimal
-#define ENGINE_KEY_KP_DIVIDE       ::Engine3D::Key::KPDivide
-#define ENGINE_KEY_KP_MULTIPLY     ::Engine3D::Key::KPMultiply
-#define ENGINE_KEY_KP_SUBTRACT     ::Engine3D::Key::KPSubtract
-#define ENGINE_KEY_KP_ADD          ::Engine3D::Key::KPAdd
-#define ENGINE_KEY_KP_ENTER        ::Engine3D::Key::KPEnter
-#define ENGINE_KEY_KP_EQUAL        ::Engine3D::Key::KPEqual
+#define ENGINE_KEY_KP_0            ::engine3d::Key::KP0
+#define ENGINE_KEY_KP_1            ::engine3d::Key::KP1
+#define ENGINE_KEY_KP_2            ::engine3d::Key::KP2
+#define ENGINE_KEY_KP_3            ::engine3d::Key::KP3
+#define ENGINE_KEY_KP_4            ::engine3d::Key::KP4
+#define ENGINE_KEY_KP_5            ::engine3d::Key::KP5
+#define ENGINE_KEY_KP_6            ::engine3d::Key::KP6
+#define ENGINE_KEY_KP_7            ::engine3d::Key::KP7
+#define ENGINE_KEY_KP_8            ::engine3d::Key::KP8
+#define ENGINE_KEY_KP_9            ::engine3d::Key::KP9
+#define ENGINE_KEY_KP_DECIMAL      ::engine3d::Key::KPDecimal
+#define ENGINE_KEY_KP_DIVIDE       ::engine3d::Key::KPDivide
+#define ENGINE_KEY_KP_MULTIPLY     ::engine3d::Key::KPMultiply
+#define ENGINE_KEY_KP_SUBTRACT     ::engine3d::Key::KPSubtract
+#define ENGINE_KEY_KP_ADD          ::engine3d::Key::KPAdd
+#define ENGINE_KEY_KP_ENTER        ::engine3d::Key::KPEnter
+#define ENGINE_KEY_KP_EQUAL        ::engine3d::Key::KPEqual
 
-#define ENGINE_KEY_LEFT_SHIFT      ::Engine3D::Key::LeftShift
-#define ENGINE_KEY_LEFT_CONTROL    ::Engine3D::Key::LeftControl
-#define ENGINE_KEY_LEFT_ALT        ::Engine3D::Key::LeftAlt
-#define ENGINE_KEY_LEFT_SUPER      ::Engine3D::Key::LeftSuper
-#define ENGINE_KEY_RIGHT_SHIFT     ::Engine3D::Key::RightShift
-#define ENGINE_KEY_RIGHT_CONTROL   ::Engine3D::Key::RightControl
-#define ENGINE_KEY_RIGHT_ALT       ::Engine3D::Key::RightAlt
-#define ENGINE_KEY_RIGHT_SUPER     ::Engine3D::Key::RightSuper
-#define ENGINE_KEY_MENU            ::Engine3D::Key::Menu
+#define ENGINE_KEY_LEFT_SHIFT      ::engine3d::Key::LeftShift
+#define ENGINE_KEY_LEFT_CONTROL    ::engine3d::Key::LeftControl
+#define ENGINE_KEY_LEFT_ALT        ::engine3d::Key::LeftAlt
+#define ENGINE_KEY_LEFT_SUPER      ::engine3d::Key::LeftSuper
+#define ENGINE_KEY_RIGHT_SHIFT     ::engine3d::Key::RightShift
+#define ENGINE_KEY_RIGHT_CONTROL   ::engine3d::Key::RightControl
+#define ENGINE_KEY_RIGHT_ALT       ::engine3d::Key::RightAlt
+#define ENGINE_KEY_RIGHT_SUPER     ::engine3d::Key::RightSuper
+#define ENGINE_KEY_MENU            ::engine3d::Key::Menu

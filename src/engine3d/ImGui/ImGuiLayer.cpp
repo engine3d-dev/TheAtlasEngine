@@ -3,7 +3,7 @@
 #include <engine3d/ImGui/ImGuiLayer.h>
 #include <GLFW/glfw3.h>
 
-namespace Engine3D{
+namespace engine3d{
 
     ImGuiLayer::ImGuiLayer() : Layer("ImGui Layer") {}
 

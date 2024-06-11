@@ -2,7 +2,7 @@
 // #include <engine3d/Event/Event.h>
 // #include <engine3d/Event/InputPoll.h>
 
-// namespace Engine3D{
+// namespace engine3d{
 //     // MouseMovedEvent
 //     // (x,y) - is the location of the mouse
 //     class ENGINE_API MouseMovedEvent : public Event {
@@ -133,7 +133,7 @@
 #include <engine3d/Event/MouseCodes.h>
 #include <sstream>
 
-namespace Engine3D{
+namespace engine3d{
     class ENGINE_API MouseMovedEvent : public Event{
     public:
         MouseMovedEvent(float x, float y) : mouseX(x), mouseY(y) {};

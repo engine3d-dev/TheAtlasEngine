@@ -2,7 +2,7 @@
 #include <engine3d/Core/core.h>
 #include <engine3d/Graphics/Framebuffer.h>
 
-namespace Engine3D{
+namespace engine3d{
     class OpenGLFramebuffer : public Framebuffer {
     public:
         OpenGLFramebuffer(const FramebufferMetaData& framebufferMetaData);

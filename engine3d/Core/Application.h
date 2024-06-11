@@ -8,7 +8,7 @@
 #include "glm/glm.hpp"
 // #include <fmt/fmt.h>
 
-namespace Engine3D{
+namespace engine3d{
 
     // Application::SetName("Engine3D")
     // Application::SetSize(w, h);

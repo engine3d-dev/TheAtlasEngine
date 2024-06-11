@@ -2,7 +2,7 @@
 #include <engine3d/Graphics/Shader.h>
 #include <engine3d/OpenGL/OpenGLShader.h>
 
-namespace Engine3D{
+namespace engine3d{
     Ref<Shader> Shader::Create(const std::filesystem::path& vertex, const std::filesystem::path& fragment){
         switch(Pipeline::CurrentAPI()){
             case API::OPENGL: return CreateRef<OpenGLShader>(vertex, fragment);

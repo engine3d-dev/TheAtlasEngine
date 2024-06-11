@@ -2,7 +2,7 @@
 #include <engine3d/Image/Image.h>
 #include <engine3d/Image/stb_image.h>
 
-namespace Engine3D{
+namespace engine3d{
     Image::Image(int w, int h) : width(w), height(h) {
         isImageLoadedSuccessfully = true;
     }

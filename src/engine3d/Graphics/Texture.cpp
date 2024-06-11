@@ -2,7 +2,7 @@
 #include <engine3d/Graphics/Texture.h>
 #include <engine3d/OpenGL/OpenGLTexture.h>
 
-namespace Engine3D{
+namespace engine3d{
 
     Ref<Texture2D> Texture2D::Create(const std::string& filename){
         switch (Pipeline::CurrentAPI()){

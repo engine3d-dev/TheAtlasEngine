@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <GLFW/glfw3.h>
 
-namespace Engine3D{
+namespace engine3d{
     class OpenGLShader : public Shader{
     public:
         OpenGLShader(const std::filesystem::path& vertex, const std::filesystem::path& fragment);

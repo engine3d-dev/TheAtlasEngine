@@ -1,7 +1,7 @@
 #include <engine3d/engine3dPrecompiledHeader.h>
 #include <engine3d/Core/Window.h>
 
-namespace Engine3D{
+namespace engine3d{
     static void GLFWErrorCallback(int error, const char* description){
         CoreLogError("GLFWErrorCallback MSG --- (Error Code -> {}): {}", error, description);
         assert(false);
@@ -24,7 +24,7 @@ namespace Engine3D{
 
         //! @note Hinting to OpenGL by specifying what OpenGL Version to enable
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, true);
 

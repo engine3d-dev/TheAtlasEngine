@@ -2,7 +2,7 @@
 #include <engine3d/Graphics/Framebuffer.h>
 #include <engine3d/OpenGL/OpenGLFramebuffer.h>
 
-namespace Engine3D{
+namespace engine3d{
 
     Ref<Framebuffer> Framebuffer::Create(const FramebufferMetaData& framebufferMetaData){
         switch(Pipeline::CurrentAPI()){

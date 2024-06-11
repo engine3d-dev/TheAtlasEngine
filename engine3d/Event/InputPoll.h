@@ -4,7 +4,7 @@
 #include <engine3d/Event/MouseCodes.h>
 #include "glm/glm.hpp"
 
-namespace Engine3D{
+namespace engine3d{
     class ENGINE_API InputPoll{
     public:
 

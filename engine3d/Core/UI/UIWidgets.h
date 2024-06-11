@@ -3,7 +3,7 @@
 #include <engine3d/Core/imgui/imgui.h>
 #include <string>
 
-namespace Engine3D{
+namespace engine3d{
     /**
      * @name UI
      * @note UI helper functions and UI-related API's for creating effective UI's widgets

@@ -1,7 +1,7 @@
 #include <engine3d/engine3dPrecompiledHeader.h>
 #include <engine3d/Core/Layer.h>
 
-namespace Engine3D{
+namespace engine3d{
     Layer::Layer(const std::string& name) : m_DebugName(name){}
 
     Layer::~Layer(){}

@@ -3,7 +3,7 @@
 #include <engine3d/Core/Layer.h>
 
 
-namespace Engine3D{
+namespace engine3d{
 
     class ImGuiLayer : public Layer{
     public:
@@ -26,9 +26,9 @@ namespace Engine3D{
 
     private:
 
-        void Attach() override;
+        void BeginPlay() override;
 
-        void Detach() override;
+        void EndPlay() override;
 
         void UpdateEvent(Event& event) override;
 

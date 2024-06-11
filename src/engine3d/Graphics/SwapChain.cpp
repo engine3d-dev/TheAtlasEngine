@@ -2,7 +2,7 @@
 #include <engine3d/Graphics/SwapChain.h>
 
 
-namespace Engine3D{
+namespace engine3d{
     Ref<SwapChains> SwapChains::InitiateSwapChain(){
         switch (Pipeline::CurrentAPI()){
         case API::OPENGL:

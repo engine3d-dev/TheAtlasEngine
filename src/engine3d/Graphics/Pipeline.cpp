@@ -1,7 +1,7 @@
 #include <engine3d/engine3dPrecompiledHeader.h>
 #include <engine3d/Graphics/Pipeline.h>
 
-namespace Engine3D{
+namespace engine3d{
     //! @note Setting our current API defaulted to OpenGL
     static API g_CurrentAPI = API::OPENGL;
     static PipelineSettings g_Properties;

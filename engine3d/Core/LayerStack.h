@@ -3,7 +3,7 @@
 #include <engine3d/Core/Layer.h>
 
 
-namespace Engine3D{
+namespace engine3d{
 
     // Essentially LayerStack is a wrapper of std::vectors of Layers
     // using vector so we can iterate over.

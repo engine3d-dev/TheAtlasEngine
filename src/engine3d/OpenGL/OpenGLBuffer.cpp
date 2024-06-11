@@ -1,7 +1,7 @@
 #include <engine3d/engine3dPrecompiledHeader.h>
 #include <engine3d/OpenGL/OpenGLBuffer.h>
 
-namespace Engine3D{
+namespace engine3d{
     // **********************************************
     //               [ Vertex Buffer ]
     // **********************************************

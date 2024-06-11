@@ -4,7 +4,7 @@
 #include <engine3d/Core/Timestep.h>
 #include "glm/glm.hpp"
 
-namespace Engine3D{
+namespace engine3d{
     /**
      * @name Camera
      * @note There are a few types of camera, Editor, World, Scene, and Camera Component

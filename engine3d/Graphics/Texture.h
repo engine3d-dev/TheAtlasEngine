@@ -2,7 +2,7 @@
 #include <engine3d/Core/core.h>
 #include <GLFW/glfw3.h>
 
-namespace Engine3D{
+namespace engine3d{
 
     class Texture2D{
     public:

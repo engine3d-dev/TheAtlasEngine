@@ -3,7 +3,7 @@
 #include <engine3d/Core/UI/UIWidgets.h>
 #include <engine3d/Graphics/Framebuffer.h>
 
-namespace Engine3D{
+namespace engine3d{
     static glm::vec2 g_ViewportSizeBounds[1];
     static glm::vec2 g_ViewportSize;
 

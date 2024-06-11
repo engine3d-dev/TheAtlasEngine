@@ -3,7 +3,7 @@
 #include <engine3d/Event/Event.h>
 #include <engine3d/Core/Timestep.h>
 
-namespace Engine3D{
+namespace engine3d{
 
     // Layer interface
     // - Shouldn't have names (but only if its used for debugging)
@@ -39,10 +39,10 @@ namespace Engine3D{
 
         //! @note These are client-implementation functions to be handled by the client.
         //! @note When pushing onto the Layer Stack we attach it
-        virtual void Attach() = 0;
+        virtual void BeginPlay() = 0;
 
         //! @note Pop of thhe layer stack is for detaching (like shhutdown)
-        virtual void Detach() = 0;
+        virtual void EndPlay() = 0;
 
         //! @note Updating the layer is updated when the application calls onUpdate
         virtual void UpdateLayer(Timestep ts) = 0;

@@ -1,7 +1,7 @@
 #include <engine3d/engine3dPrecompiledHeader.h>
 #include <engine3d/Scene/OrthographicCamera.h>
 
-namespace Engine3D{
+namespace engine3d{
     OrthographicCamera::OrthographicCamera(const CameraData& data) {
         // m_TransformationMatrix.view = glm::mat4(1.0);
         // m_TransformationMatrix.projection = glm::mat4(glm::ortho(m_Data.left, m_Data.right, m_Data.down, m_Data.up, -1.0f, 1.0f));

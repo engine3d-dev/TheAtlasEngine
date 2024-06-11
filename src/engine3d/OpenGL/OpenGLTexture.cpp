@@ -1,7 +1,7 @@
 #include <engine3d/engine3dPrecompiledHeader.h>
 #include <engine3d/OpenGL/OpenGLTexture.h>
 
-namespace Engine3D{
+namespace engine3d{
     OpenGLTexture2D::OpenGLTexture2D(uint32_t w, uint32_t h) : m_Image(w, h){
         m_Image.SetVerticalOnLoad(true);
         m_Width = w;

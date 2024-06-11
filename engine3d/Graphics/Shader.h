@@ -3,7 +3,7 @@
 #include <filesystem>
 #include "glm/glm.hpp"
 
-namespace Engine3D{
+namespace engine3d{
     /**
      * @name Shader
      * @note Our client API will call these functions

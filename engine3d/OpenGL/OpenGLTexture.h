@@ -3,7 +3,7 @@
 #include <engine3d/Graphics/Texture.h>
 #include <engine3d/Image/Image.h>
 
-namespace Engine3D{
+namespace engine3d{
     class OpenGLTexture2D : public Texture2D {
     public:
         OpenGLTexture2D(const std::string& filename);

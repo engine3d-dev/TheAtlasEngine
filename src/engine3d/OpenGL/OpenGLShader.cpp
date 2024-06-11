@@ -1,7 +1,7 @@
 #include <engine3d/engine3dPrecompiledHeader.h>
 #include <engine3d/OpenGL/OpenGLShader.h>
 
-namespace Engine3D{
+namespace engine3d{
 
     static GLenum ShaderTypeFromString(const std::string& type){
         if(type == "vertex") return GL_VERTEX_SHADER;

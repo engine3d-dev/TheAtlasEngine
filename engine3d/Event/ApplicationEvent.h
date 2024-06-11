@@ -2,7 +2,7 @@
 // #include <engine3d/Event/Event.h>
 // #include <sstream>
 
-// namespace Engine3D{
+// namespace engine3d{
 //     // Basically we assign to which event which
 //     //  Handling events for resizing the window.
 //     class ENGINE_API WindowResizeEvent : public Event{
@@ -114,7 +114,7 @@
 #include <engine3d/Event/Event.h>
 #include <sstream>
 
-namespace Engine3D{
+namespace engine3d{
 
     class WindowResizeEvent : public Event{
     public:

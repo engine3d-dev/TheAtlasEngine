@@ -6,7 +6,7 @@
 #include <functional>
 
 class GLFWwindow;
-namespace Engine3D{
+namespace engine3d{
 
     struct WindowProperties{
         WindowProperties(const std::string& t="Engine3D", uint32_t w = 1600, uint32_t h = 900) : title(t), width(w), height(h) {}

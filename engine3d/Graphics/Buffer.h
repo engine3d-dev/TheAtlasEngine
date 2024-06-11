@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-namespace Engine3D{
+namespace engine3d{
     /**
      * @name Buffer.h
      * @note API-agnostic implementations and naming convention functions

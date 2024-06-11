@@ -2,7 +2,7 @@
 #include <engine3d/Core/core.h>
 #include <vector>
 
-namespace Engine3D{
+namespace engine3d{
 
     enum class TextureFormat{
         None = 0,

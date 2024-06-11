@@ -1,7 +1,7 @@
 #include <engine3d/engine3dPrecompiledHeader.h>
 #include <engine3d/Core/LayerStack.h>
 
-namespace Engine3D{
+namespace engine3d{
     LayerStack::LayerStack(){
     }
 

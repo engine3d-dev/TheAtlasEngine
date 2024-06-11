@@ -2,7 +2,7 @@
 #include <engine3d/Graphics/VertexArray.h>
 #include <engine3d/OpenGL/OpenGLVertexArray.h>
 
-namespace Engine3D{
+namespace engine3d{
     Ref<VertexArray> VertexArray::Create(){
         switch(Pipeline::CurrentAPI()){
             case API::OPENGL: return CreateRef<OpenGLVertexArray>();

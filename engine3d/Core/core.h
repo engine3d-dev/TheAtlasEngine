@@ -4,7 +4,7 @@
 #include <type_traits>
 #include <cassert>
 
-namespace Engine3D{
+namespace engine3d{
     #ifdef ENGINE_PLATFORM_WINDOWS
         #ifdef ENGINE_BUILD_DLL
             #define ENGINE_API __declspec(dllexport)
