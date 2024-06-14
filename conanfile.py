@@ -19,18 +19,24 @@ class engine3dRecipe(ConanFile):
     default_options = {"shared": False, "fPIC": True}
 
     # Sources are located in the same place as this recipe, copy them to the recipe
-    exports_sources = "CMakeLists.txt", "src/CMakeLists.txt", "src/engine3d/*", "engine3d/*", "engine3d/Core/*", "engine3d/Event/*", "Editor/CMakeLists.txt", "Editor/*"
+    exports_sources = "CMakeLists.txt", "src/CMakeLists.txt", "Editor/CMakeLists.txt", "src/*", "engine3d/*", "Editor/*"
 
     def requirements(self):
         self.tool_requires("cmake/3.27.1")
         self.requires("glfw/3.4", transitive_headers=True)
-        self.requires("glad/0.1.36", transitive_headers=True)
+        # self.requires("glad/0.1.36", transitive_headers=True)
         self.requires("fmt/10.2.1", transitive_headers=True)
         self.requires("spdlog/1.14.1", transitive_headers=True)
         self.requires("glm/1.0.1", transitive_headers=True)
         self.requires("yaml-cpp/0.8.0", transitive_headers=True)
         self.requires("box2d/2.4.1", transitive_headers=True)
+        self.requires("opengl/system", transitive_headers=True)
+
+        # Vulkan-related headers and includes packages
+        self.requires("vulkan-headers/1.3.268.0", transitive_headers=True)
+        # self.requires("directx-headers/1.610.2", transitive_headers=True)
         # self.requires("assimp/5.4.1")
+        # self.requires("joltphysics/3.0.1", transitive_headers=True)
         # self.requires("joltphysics/3.0.1", transitive_headers=True)
 
     def config_options(self):

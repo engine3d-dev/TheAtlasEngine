@@ -16,13 +16,20 @@ set(
 
     ${ENGINE_INCLUDE_NAME}/Core/Layer.cpp
     ${ENGINE_INCLUDE_NAME}/Core/LayerStack.cpp
+
     ${ENGINE_INCLUDE_NAME}/ImGui/ImGuiLayer.cpp
+    ${ENGINE_INCLUDE_NAME}/Core/UI/UILayer.cpp
+
     ${ENGINE_INCLUDE_NAME}/Core/UI/UILayer.cpp
     ${ENGINE_INCLUDE_NAME}/Image/stb_image.cpp
 
     ${ENGINE_INCLUDE_NAME}/Image/stb_image.cpp
     ${ENGINE_INCLUDE_NAME}/Image/Image.cpp
 
+    # glad.c
+    ${ENGINE_INCLUDE_NAME}/Core/glad/glad.c
+
+    # imgui src
     ${ENGINE_INCLUDE_NAME}/Core/imgui/imgui_demo.cpp
     ${ENGINE_INCLUDE_NAME}/Core/imgui/imgui_tables.cpp
     ${ENGINE_INCLUDE_NAME}/Core/imgui/imgui.cpp
@@ -30,6 +37,7 @@ set(
     ${ENGINE_INCLUDE_NAME}/Core/imgui/imgui_widgets.cpp
     ${ENGINE_INCLUDE_NAME}/Core/imgui/backends/imgui_impl_glfw.cpp
     ${ENGINE_INCLUDE_NAME}/Core/imgui/backends/imgui_impl_opengl3.cpp
+
 
     # Graphics Includes
     ${ENGINE_INCLUDE_NAME}/Graphics/Pipeline.cpp
@@ -65,12 +73,19 @@ set(
     ../${ENGINE_INCLUDE_NAME}/Core/Layer.h
     ../${ENGINE_INCLUDE_NAME}/Core/LayerStack.h
 
+    ../${ENGINE_INCLUDE_NAME}/ImGui/ImGuiLayer.h
+    ../${ENGINE_INCLUDE_NAME}/Core/UI/UILayer.h
+
     # Event handlers
     ../${ENGINE_INCLUDE_NAME}/Event/ApplicationEvent.h
     ../${ENGINE_INCLUDE_NAME}/Event/Event.h
     ../${ENGINE_INCLUDE_NAME}/Event/KeyEvent.h
     ../${ENGINE_INCLUDE_NAME}/Event/MouseEvent.h
     ../${ENGINE_INCLUDE_NAME}/Event/InputPoll.h
+
+    # glad includes
+    ../${ENGINE_INCLUDE_NAME}/Core/glad/glad.h
+    ../${ENGINE_INCLUDE_NAME}/Core/KHR/khrplatform.h
 
     # imgui includes
     ../${ENGINE_INCLUDE_NAME}/Core/imgui/imconfig.h
@@ -84,9 +99,6 @@ set(
     ../${ENGINE_INCLUDE_NAME}/Core/imgui/backends/imgui_impl_opengl2.h
     ../${ENGINE_INCLUDE_NAME}/Core/imgui/backends/imgui_impl_opengl3_loader.h
     ../${ENGINE_INCLUDE_NAME}/Core/imgui/backends/imgui_impl_opengl3.h
-
-
-
 
     ../${ENGINE_INCLUDE_NAME}/Graphics/Pipeline.h
     ../${ENGINE_INCLUDE_NAME}/Graphics/Buffer.h

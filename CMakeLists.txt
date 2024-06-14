@@ -1,10 +1,12 @@
 cmake_minimum_required(VERSION 3.15)
-project(engine3d CXX)
+project(engine3d C CXX)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "") # works (in creating the compile_commands.json file)
 
+find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
-find_package(glad REQUIRED)
+find_package(VulkanHeaders REQUIRED)
+# find_package(glad REQUIRED)
 find_package(glm REQUIRED)
 find_package(fmt REQUIRED)
 find_package(spdlog REQUIRED)
@@ -16,44 +18,56 @@ find_package(box2d REQUIRED)
 # find_package(assimp REQUIRED)
 
 add_subdirectory(src)
+add_subdirectory(Editor)
+add_subdirectory(VulkanRenderer)
 
+target_include_directories(${PROJECT_NAME} PUBLIC ${GLM_INCLUDE_DIR})
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${GLM_INCLUDE_DIR})
+# This will run the build doing -j which is building at full capacity.
+# TODO - Should probably have this be disabled by default and have this be a flag set through conan.
+# add_custom_target(my_parallel_build
+#                       COMMAND ${CMAKE_COMMAND} --build -j
+#                       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+#                       COMMENT "My parallel build with 5 cores")
 
-# Before we copy compile_commands.json to .vscode
-# Making sure we should make sure if that dir already exists in the root of the projects directory
-set(VSCODE_DIR "./")
-# if(NOT EXISTS ${VSCODE_DIR})
-#     file(MAKE_DIRECTORY ${VSCODE_DIR})
-# endif()
+# Copy to source directory
+add_custom_target(
+    copy-compile-commands ALL
+    DEPENDS
+        ${CMAKE_SOURCE_DIR}/compile_commands.json
+)
 
-
-# Creating a customize command specific for copying the compile_commands.json to users .vscode directory
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_LIST_DIR}/compile_commands.json
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         ${CMAKE_BINARY_DIR}/compile_commands.json
-        ${CMAKE_CURRENT_LIST_DIR}/.vscode/compile_commands.json
+        ${CMAKE_CURRENT_LIST_DIR}/compile_commands.json
     DEPENDS
     # Unlike "proper" targets like executables and libraries, 
     # custom command / target pairs will not set up source
     # file dependencies, so we need to list file explicitly here
     generate-compile-commands
-    ./compile_commands.json
+    ${CMAKE_BINARY_DIR}/compile_commands.json
 )
 
 # Generate the compilation commands. Necessary so cmake knows where it came
 # from and if for some reason you delete it.
 add_custom_target(generate-compile-commands
     DEPENDS
-        ./compile_commands.json
+        ${CMAKE_BINARY_DIR}/compile_commands.json
 )
+
+add_custom_command(
+    OUTPUT ${CMAKE_BINARY_DIR}/compile_commands.json
+    COMMAND ${CMAKE_COMMAND} -B${CMAKE_BINARY_DIR} -S${CMAKE_SOURCE_DIR}
+    )
 
 target_link_libraries(
     ${PROJECT_NAME}
-    PRIVATE
+    PUBLIC
     glfw
-    glad::glad
+    ${OPENGL_LIBRARIES}
+    vulkan-headers::vulkan-headers
     glm::glm
     fmt::fmt
     spdlog::spdlog
