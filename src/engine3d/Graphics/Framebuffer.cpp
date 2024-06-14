@@ -15,9 +15,21 @@ namespace engine3d{
         return nullptr;
     }
 
-    void Framebuffer::ApplyResources(){}
+    void Framebuffer::ApplyResources(){
+        ApplyCurrentBoundState();
+    }
 
-    void Framebuffer::ReleaseResources(){}
+    void Framebuffer::ReleaseResources(){
+        ReleaseCurrentBoundState();
+    }
+
+    uint32_t Framebuffer::GetColorAttachmentId() {
+        return HasColorAttachmentID();
+    }
+
+    uint32_t Framebuffer::GetDepthAttachmentId(){
+        return HasDepthAttachmentID();
+    }
 
     int Framebuffer::ReadPixel(uint32_t attachmentIdx, int x, int y){
         return GetPixelData(attachmentIdx, x, y);
@@ -35,8 +47,8 @@ namespace engine3d{
         return OpenGLFramebuffer::GetMaxFramebufferSize();
     }
 
-    // void Framebuffer::Resize(Ref<Framebuffer>&& framebuffer, int x, int y) {
-
-    // }
+    void Framebuffer::Resize(uint32_t w, uint32_t h){
+        // ResizeFramebuffer(w, h);
+    }
 
 };

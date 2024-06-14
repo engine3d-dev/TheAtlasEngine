@@ -19,15 +19,23 @@ namespace engine3d{
 
         const FramebufferMetaData& GetFramebufferData() const override;
 
+        uint32_t HasColorAttachmentID() override;
+        uint32_t HasDepthAttachmentID() override;
+
+        // void ResizeFramebuffer(uint32_t w, uint32_t h) override;
+
     private:
         void Invalidate();
 
     private:
         uint32_t m_Id;
+        uint32_t m_TextureId;
+
+        uint32_t m_ColorAttachment, m_DepthAttachment;
         FramebufferMetaData m_FramebufferMetaData;
-        std::vector<TextureFormat> m_AttachmentsFormats;
-        uint32_t m_AttachmentIndex = 0;
-        std::vector<FramebufferTextureMetaData> m_ColorAttachments;
-        FramebufferTextureMetaData m_DepthAttachmentData = TextureFormat::None;
+        // std::vector<TextureFormat> m_AttachmentsFormats;
+        // uint32_t m_AttachmentIndex = 0;
+        // std::vector<FramebufferTextureMetaData> m_ColorAttachments;
+        // FramebufferTextureMetaData m_DepthAttachmentData = TextureFormat::None;
     };
 };

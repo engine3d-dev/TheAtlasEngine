@@ -54,7 +54,12 @@ namespace engine3d{
 
         uint32_t GetAttachmentID(uint32_t idx = 0) const;
 
+        uint32_t GetColorAttachmentId();
+
+        uint32_t GetDepthAttachmentId();
+
         // static void Resize(Ref<Framebuffer>&& framebuffer, int x, int y);
+        void Resize(uint32_t w, uint32_t h);
 
         static int MaxFramebufferSize();
 
@@ -64,6 +69,10 @@ namespace engine3d{
         virtual int GetPixelData(uint32_t attachmentIdx, int x, int y) = 0;
         virtual void ClearAttachmentData(uint32_t attachmentIdx, int data) = 0;
         virtual uint32_t GetPixelAttachmentID(uint32_t index = 0) const = 0;
+        virtual uint32_t HasColorAttachmentID() = 0;
+        virtual uint32_t HasDepthAttachmentID() = 0;
+
+        // virtual void ResizeFramebuffer(uint32_t w, uint32_t h) = 0;
 
         virtual const FramebufferMetaData& GetFramebufferData() const = 0;
     };
