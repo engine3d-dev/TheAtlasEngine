@@ -21,14 +21,16 @@
 #include <thread>
 
 // OpenGL includes
-#ifndef __gl__h
-#include <glad/glad.h>
-#endif
+// #ifndef __gl__h
+// #include <glad/glad.h>
+// #include <engine3d/Core/glad/glad.h>
+// #endif
+#include <engine3d/Core/glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
-#include "glm/glm.hpp"
+#include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -45,10 +47,10 @@
 
 //! @note Physics-related includes
 // @note box2D related includes
-// #include <box2d/box2d.h>
-// #include <box2d/b2_body.h>
-// #include <box2d/b2_fixture.h>
-// #include <box2d/b2_polygon_shape.h>
+#include <box2d/box2d.h>
+#include <box2d/b2_body.h>
+#include <box2d/b2_fixture.h>
+#include <box2d/b2_polygon_shape.h>
 #include <yaml-cpp/yaml.h>
 
 //! @note Engine3D Includes
