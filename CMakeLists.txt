@@ -5,6 +5,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "") # works (in creating the
 
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
+find_package(Vulkan REQUIRED)
 find_package(VulkanHeaders REQUIRED)
 # find_package(glad REQUIRED)
 find_package(glm REQUIRED)
@@ -19,7 +20,7 @@ find_package(box2d REQUIRED)
 
 add_subdirectory(src)
 add_subdirectory(Editor)
-add_subdirectory(VulkanRenderer)
+# add_subdirectory(VulkanRenderer)
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${GLM_INCLUDE_DIR})
 
@@ -67,6 +68,7 @@ target_link_libraries(
     PUBLIC
     glfw
     ${OPENGL_LIBRARIES}
+    Vulkan::Vulkan
     vulkan-headers::vulkan-headers
     glm::glm
     fmt::fmt
