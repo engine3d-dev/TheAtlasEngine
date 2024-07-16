@@ -112,11 +112,11 @@
 
 // #include "imgui.h"
 // #include <imgui/imgui.h>
-#include <engine3d/Core/imgui/imgui.h>
+#include <engine3d/Core/third_party/imgui/imgui.h>
 #ifndef IMGUI_DISABLE
 // #include "imgui_impl_opengl3.h"
 // #include <imgui/backends/imgui_impl_opengl3.h>
-#include <engine3d/Core/imgui/backends/imgui_impl_opengl3.h>
+#include <engine3d/Core/third_party/imgui/backends/imgui_impl_opengl3.h>
 #include <stdio.h>
 #include <stdint.h>     // intptr_t
 #if defined(__APPLE__)
@@ -169,7 +169,7 @@
 #define IMGL3W_IMPL
 // #include "imgui_impl_opengl3_loader.h"
 // #include <imgui/backends/imgui_impl_opengl3_loader.h>
-#include <engine3d/Core/imgui/backends/imgui_impl_opengl3_loader.h>
+#include <engine3d/Core/third_party/imgui/backends/imgui_impl_opengl3_loader.h>
 #endif
 
 // Vertex arrays are not supported on ES2/WebGL1 unless Emscripten which uses an extension

@@ -31,10 +31,10 @@ Index of this file:
 #endif
 
 // #include "imgui.h"
-#include <engine3d/Core/imgui/imgui.h>
+#include <engine3d/Core/third_party/imgui/imgui.h>
 #ifndef IMGUI_DISABLE
 // #include "imgui_internal.h"
-#include <engine3d/Core/imgui/imgui_internal.h>
+#include <engine3d/Core/third_party/imgui/imgui_internal.h>
 #ifdef IMGUI_ENABLE_FREETYPE
 #include "misc/freetype/imgui_freetype.h"
 #endif
@@ -124,7 +124,7 @@ namespace IMGUI_STB_NAMESPACE
 #include IMGUI_STB_RECT_PACK_FILENAME
 #else
 // #include "imstb_rectpack.h"
-#include <engine3d/Core/imgui/imstb_rectpack.h>
+#include <engine3d/Core/third_party/imgui/imstb_rectpack.h>
 #endif
 #endif
 
@@ -149,7 +149,7 @@ namespace IMGUI_STB_NAMESPACE
 #include IMGUI_STB_TRUETYPE_FILENAME
 #else
 // #include "imstb_truetype.h"
-#include <engine3d/Core/imgui/imstb_truetype.h>
+#include <engine3d/Core/third_party/imgui/imstb_truetype.h>
 #endif
 #endif
 #endif // IMGUI_ENABLE_STB_TRUETYPE

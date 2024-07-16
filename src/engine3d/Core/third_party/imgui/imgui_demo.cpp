@@ -95,7 +95,7 @@ Index of this file:
 #endif
 
 // #include "imgui.h"
-#include <engine3d/Core/imgui/imgui.h>
+#include <engine3d/Core/third_party/imgui/imgui.h>
 #ifndef IMGUI_DISABLE
 
 // System includes

@@ -964,10 +964,10 @@ CODE
 #endif
 
 // #include "imgui.h"
-#include <engine3d/Core/imgui/imgui.h>
+#include <engine3d/Core/third_party/imgui/imgui.h>
 #ifndef IMGUI_DISABLE
 // #include "imgui_internal.h"
-#include <engine3d/Core/imgui/imgui_internal.h>
+#include <engine3d/Core/third_party/imgui/imgui_internal.h>
 
 // System includes
 #include <stdio.h>      // vsnprintf, sscanf, printf

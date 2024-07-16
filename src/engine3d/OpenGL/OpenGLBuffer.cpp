@@ -6,15 +6,18 @@ namespace engine3d{
     //               [ Vertex Buffer ]
     // **********************************************
     OpenGLVertexBuffer::OpenGLVertexBuffer(const void* data, size_t size){
-        glGenBuffers(1, &m_Id);
+        glCreateBuffers(1, &m_Id);
         ApplyCurrentBoundState();
         glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+
+        ReleaseCurrentBoundState();
     }
 
     OpenGLVertexBuffer::OpenGLVertexBuffer(size_t size){
-        glGenBuffers(1, &m_Id);
+        glCreateBuffers(1, &m_Id);
         ApplyCurrentBoundState();
         glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
+        ReleaseCurrentBoundState();
     }
 
     OpenGLVertexBuffer::~OpenGLVertexBuffer(){
@@ -49,7 +52,8 @@ namespace engine3d{
     //                 [ Index Buffer ]
     // **********************************************
     OpenGLIndexBuffer::OpenGLIndexBuffer(const void* indices, size_t count) : m_Count(count) {
-        glGenBuffers(1, &m_Id);
+        // glGenBuffers(1, &m_Id);
+        glCreateBuffers(1, &m_Id);
         ApplyCurrentBoundState();
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, count, indices, GL_STATIC_DRAW);
     }

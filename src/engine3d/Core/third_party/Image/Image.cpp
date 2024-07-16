@@ -1,6 +1,6 @@
-#include <engine3d/engine3dPrecompiledHeader.h>
-#include <engine3d/Image/Image.h>
-#include <engine3d/Image/stb_image.h>
+#include <engine3d/Core/Engine3DPrecompiledHeader.h>
+#include <engine3d/Core/third_party/Image/Image.h>
+#include <engine3d/Core/third_party/Image/stb_image.h>
 
 namespace engine3d{
     Image::Image(int w, int h) : width(w), height(h) {

@@ -33,7 +33,6 @@ namespace engine3d{
 
     void Pipeline::SetClearColor(const glm::vec4& color){
         g_Properties.m_WindowRefreshFrameColor = color;
-        glClearColor(g_Properties.m_WindowRefreshFrameColor.r, g_Properties.m_WindowRefreshFrameColor.g, g_Properties.m_WindowRefreshFrameColor.b, g_Properties.m_WindowRefreshFrameColor.a);
     }
 
     glm::vec2 Pipeline::GetViewportSize() { return g_Properties.m_ViewportSize; }
@@ -44,6 +43,7 @@ namespace engine3d{
     }
 
     void Pipeline::RefreshFrame(){
+        glClearColor(g_Properties.m_WindowRefreshFrameColor.r, g_Properties.m_WindowRefreshFrameColor.g, g_Properties.m_WindowRefreshFrameColor.b, g_Properties.m_WindowRefreshFrameColor.a);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 };

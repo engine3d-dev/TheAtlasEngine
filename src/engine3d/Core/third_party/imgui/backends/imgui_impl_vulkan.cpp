@@ -78,10 +78,12 @@
 //  2016-08-27: Vulkan: Fix Vulkan example for use when a depth buffer is active.
 
 /* #include "imgui.h" */
-#include <imgui/imgui.h>
+// #include <imgui/imgui.h>
+#include <engine3d/Core/third_party/imgui/imgui.h>
 #ifndef IMGUI_DISABLE
 /* #include "imgui_impl_vulkan.h" */
-#include <imgui/backends/imgui_impl_vulkan.h>
+// #include <imgui/backends/imgui_impl_vulkan.h>
+#include <engine3d/Core/third_party/imgui/backends/imgui_impl_vulkan.h>
 #include <stdio.h>
 
 // Visual Studio warnings

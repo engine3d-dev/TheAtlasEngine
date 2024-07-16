@@ -1,30 +1,33 @@
-#include <engine3d/engine3dPrecompiledHeader.h>
-#include <engine3d/Core/Layer.h>
+#include <Core/Layer.h>
+
 
 namespace engine3d{
-    Layer::Layer(const std::string& name) : m_DebugName(name){}
-
-    Layer::~Layer(){}
+    static std::string g_LayerName = "Default Name String";
+    Layer::Layer(const std::string& name) {
+        g_LayerName = name;
+    }
 
     void Layer::OnAttach(){
-        Attach();
+        BeginPlay();
     }
 
     void Layer::OnDetach(){
-        Detach();
+        EndPlay();
+    }
+
+    void Layer::OnUpdate(float ts){
+        UpdateFrame(ts);
     }
 
     void Layer::OnEvent(Event& event){
         UpdateEvent(event);
     }
 
-    void Layer::OnUpdate(Timestep ts){
-        UpdateLayer(ts);
-    }
-
     void Layer::OnUIRender(){
-        UIRender();
+        UpdateUI();
     }
 
-    std::string Layer::GetName() const { return m_DebugName; }
+    std::string Layer::GetLayerString() const { return g_LayerName; }
+
+    // std::string Layer::ExtractLayerDebugName() const { return g_LayerName; }
 };

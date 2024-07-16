@@ -28,7 +28,8 @@ namespace engine3d{
     }
     
     OpenGLVertexArray::OpenGLVertexArray(){
-        glGenVertexArrays(1, &m_Id);
+        // glGenVertexArrays(1, &m_Id);
+        glCreateVertexArrays(1,&m_Id);
         ApplyCurrentBoundState();
     }
 

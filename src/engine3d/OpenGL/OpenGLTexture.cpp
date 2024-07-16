@@ -38,7 +38,8 @@ namespace engine3d{
         }
 
         //! @note In Windows change to this ---- glTextureStorage2D(GL_TEXTURE_2D, 0, _internalFormat, _width, _height);
-        glGenTextures(1, &m_Id);
+        // glGenTextures(1, &m_Id);
+        glCreateTextures(GL_TEXTURE_2D, 1, &m_Id);
 
         ApplyCurrentBoundState();
         //! @note Setting our textures processing our image parameters

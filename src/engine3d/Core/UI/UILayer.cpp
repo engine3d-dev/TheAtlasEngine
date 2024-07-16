@@ -7,12 +7,12 @@ namespace engine3d{
     static glm::vec2 g_ViewportSizeBounds[1];
     static glm::vec2 g_ViewportSize;
 
-    void UILayer::Attach(){
+    void UILayer::BeginPlay(){
         // m_IsViewportHovered = false;
         // m_IsViewportFocused = false;
     }
 
-    void UILayer::Detach(){}
+    void UILayer::EndPlay(){}
 
     void UILayer::UpdateLayer(Timestep ts){
         auto& currentApplication = Application::Get();
