@@ -1,26 +1,13 @@
 #pragma once
 #include <memory>
-#include <engine3d/Core/core.h>
+#include <engine3d/Core/Core.h>
 // #include <spdlog/spdlog.h>
 // #include <spdlog/fmt/ostr.h>
 #include "fmt/os.h"
 #include "fmt/ostream.h"
-
-// #include "spdlog/async.h"
-// #include "spdlog/async_logger-inl.h"
-// #include "spdlog/async_logger.h"
-// #include "spdlog/cfg/argv.h"
-// #include "spdlog/cfg/env.h"
-// #include "spdlog/cfg/helpers-inl.h"
-// #include "spdlog/cfg/helpers.h"
-// #include "spdlog/common-inl.h"
-// #include "spdlog/common.h"
-// #include "spdlog/details/backtracer-inl.h"
-// #include "spdlog/details/backtracer.h"
 #include "spdlog/spdlog.h"
 
 namespace engine3d{
-
     class ENGINE_API EngineLogger{
     public:
         EngineLogger();
@@ -61,6 +48,7 @@ namespace engine3d{
         static std::shared_ptr<spdlog::logger> clientLogger;
     };
 };
+
 
 // ------------ Core logs ------------
 

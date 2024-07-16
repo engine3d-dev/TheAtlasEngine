@@ -2,25 +2,16 @@
 
 namespace engine3d{
 
-    // Timestep
-    // - Helper class
-    class Timestep{
+    class Timerstep{
     public:
-        Timestep(float time = 0.f) : _time(time) {}
+        Timerstep(float time = 0.f) : m_Time(time) {}
 
-        float getSeconds() const { return _time; }
+        float Seconds() const { return m_Time; }
 
-        float getMilliseconds() const { return _time * 1000.0f; }
+        float Milliseconds() const { return m_Time * 1000.0f; }
 
-        // This just returns a _time that is converted into a float
-        // Basically allowing to use this as a float
-        operator float() const { return _time; }
-		
-		// friend std::ostream& operator<<(std::ostream& outs, const Timestep& step){
-		// 	return outs << step._time;
-		// }
-
+        operator float() const { return m_Time; }
     private:
-        float _time;
+        float m_Time;
     };
 };

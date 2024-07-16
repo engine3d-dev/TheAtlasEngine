@@ -1,48 +1,25 @@
 #pragma once
-#include <engine3d/Core/core.h>
+#include <engine3d/Core/Core.h>
 #include <string>
-#include <cstdint>
-#include <engine3d/Event/Event.h>
-#include <functional>
+#include <GLFW/glfw3.h>
 
-class GLFWwindow;
 namespace engine3d{
-
     struct WindowProperties{
-        WindowProperties(const std::string& t="Engine3D", uint32_t w = 1600, uint32_t h = 900) : title(t), width(w), height(h) {}
-
-        std::string title;
-        uint32_t width, height;
-        bool vsyncEnabled;
-        std::function<void(Event& event)> callback;
+        std::string title="Default";
+        uint32_t width=0, height=0;
     };
 
-    //! @note This will act as our main viewport window
-    //! @note Client can modify the window name by doing something like:
-    class ENGINE_API Window{
-        Window(const WindowProperties& properties = WindowProperties());
-        using EventCallbackFn = std::function<void(Event& event)>;
+    class Window{
     public:
-        ~Window();
+        Window(const std::string& title, uint32_t w, uint32_t h);
+        GLFWwindow* NativeWindow();
 
-        void OnUpdate();
+        bool IsWindowShutdown() const;
 
-        void Shutdown();
-        
-        void SetName(const std::string& title);
-        uint32_t GetWidth() const;
-        uint32_t GetHeight() const;
+        void UpdateEvent();
 
-        void SetEventCallback(const EventCallbackFn& callback);
-        void SetVSync(bool enabled);
-        bool IsVSyncEnabled() const;
-
-        void* GetNativeWindow() const;
-
-        static Window* Create(const WindowProperties& props = WindowProperties());
-
-    private:
-        GLFWwindow* m_windowHandler;
-        WindowProperties m_properties;
+        static WindowProperties GetProperties();
+    public:
+        GLFWwindow* m_WindowInstance;
     };
 };

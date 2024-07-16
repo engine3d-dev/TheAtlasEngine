@@ -1,6 +1,6 @@
 #pragma once
-#include <engine3d/Core/core.h>
-#include <engine3d/Core/imgui/imgui.h>
+#include <engine3d/Core/internal/Core.h>
+#include <engine3d/Core/third_party/imgui/imgui.h>
 #include <string>
 
 namespace engine3d{

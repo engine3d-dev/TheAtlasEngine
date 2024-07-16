@@ -1,5 +1,5 @@
 #pragma once
-#include <engine3d/Core/core.h>
+#include <engine3d/Core/internal/Core.h>
 #include <engine3d/Graphics/Buffer.h>
 
 namespace engine3d{
