@@ -61,7 +61,12 @@ add_custom_target(generate-compile-commands
 add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/compile_commands.json
     COMMAND ${CMAKE_COMMAND} -B${CMAKE_BINARY_DIR} -S${CMAKE_SOURCE_DIR}
-    )
+)
+
+if(MSVC)
+    target_compile_options(${PROJECT_NAME} PUBLIC "/NOD")
+    target_link_options(${PROJECT_NAME} PUBLIC "/INCREMENTAL")
+endif(MSVC)
 
 target_link_libraries(
     ${PROJECT_NAME}
