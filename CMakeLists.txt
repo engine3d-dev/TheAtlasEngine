@@ -63,10 +63,12 @@ add_custom_command(
     COMMAND ${CMAKE_COMMAND} -B${CMAKE_BINARY_DIR} -S${CMAKE_SOURCE_DIR}
 )
 
-if(MSVC)
-    target_compile_options(${PROJECT_NAME} PUBLIC "/NOD")
+# This is used because if we do not have this users systems may give them a linked error with oldnames.lib
+# Usage - used to suppress that lld-link error and use the defaulted linked .library
+if(MSVC AND WIN32)
+    target_compile_options(${PROJECT_NAME} PUBLIC "/Z1" "/NOD")
     target_link_options(${PROJECT_NAME} PUBLIC "/INCREMENTAL")
-endif(MSVC)
+endif(MSVC AND WIN32)
 
 target_link_libraries(
     ${PROJECT_NAME}
