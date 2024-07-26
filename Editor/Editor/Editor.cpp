@@ -15,9 +15,9 @@ namespace engine3d{
     }
 
     void EditorApplication::InitiateEditor(){
-        EngineLogger::Initialize();
-        m_Pipeline.InitializeVulkan();
-        m_VulkDevice.InitializeVulkanDevices();
+        m_Pipeline.InitializePipeline();
+        // m_VulkDevice.InitializeDevice();
+        // m_VulkDevice.InitializeVulkanDevices();
 
         //! @note Initially we will have our actual rendering and everything engine-related in EngineLayer
         //! @note UILayer is where all of the UI-related stuff are done.
@@ -29,16 +29,16 @@ namespace engine3d{
     }
 
     void EditorApplication::ShutdownEditor(){
-        m_Pipeline.CleanVulkanPipeline();
-        m_VulkDevice.CleanupVulkanDevice();
+        // m_Pipeline.CleanVulkanPipeline();
+        m_Pipeline.CleanupPipeline();
+        // m_VulkDevice.CleanupDevice();
     }
 
     void EditorApplication::RunEditor(){
 
-        while(!glfwWindowShouldClose(VulkanPipeline::GetCurrentWindow())){
+        while(!glfwWindowShouldClose(vk::VulkanPipeline::GetCurrentWindow())){
             m_LastFrameTime = (float)glfwGetTime();
             Timerstep ts = m_LastFrameTime;
-            // m_Layers[0]->OnUpdate(ts);
 
             for(const auto& layer : m_Layers){
                 layer->OnUpdate(ts);

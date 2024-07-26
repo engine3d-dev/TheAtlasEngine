@@ -51,6 +51,7 @@ set(
 
 set(
     all_src
+    ${ENGINE_INCLUDE_NAME}/Core/backend/internal/Core.cpp
     ${ENGINE_INCLUDE_NAME}/Core/Event/InputPoll.cpp
     
     # ====================================================================================

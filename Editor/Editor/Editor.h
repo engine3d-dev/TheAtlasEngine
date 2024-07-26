@@ -23,7 +23,7 @@ namespace engine3d{
         //! @note Editor application, Engine, UI Layer.
         std::array<Layer *, 1> m_Layers;
         float m_LastFrameTime = 0.0f;
-        VulkanPipeline m_Pipeline;
-        VulkanDevice m_VulkDevice;
+        vk::VulkanPipeline m_Pipeline;
+        vk::VulkanDevice m_VulkDevice;
     };
 };

@@ -2,7 +2,6 @@
 #include <vulkan/vulkan.h>
 #include <vulkan/vulkan_core.h>
 #include <string>
-#include <vector>
 
 struct GLFWwindow;
 namespace engine3d{
@@ -11,50 +10,35 @@ namespace engine3d{
         uint32_t width, height;
         std::string title;
     };
-
-    /**
-    * @name Vulkan.h
-    * @note Uses for instantiating our vulkan API
-    * @note These are properties that will be used throughout our vulkan's backend
-    * @note Instantiating when we initiate the logical/physical devices.
-    */
+    
     struct VulkanProperties{
-        VkInstance instance;
-        VkDebugUtilsMessengerEXT debugMessenger;
-        VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-        VkDevice logicalDevice;
-        VkQueue graphicsQueue;
-        VkQueue presentQueue;
-        VkSurfaceKHR surface;
-        VkSwapchainKHR swapChain;
-        std::vector<VkImage> swapchainImages;
-        VkFormat swapChainImageFormat;
-        VkExtent2D swapChainExtent;
+        VkSurfaceKHR surface = VK_NULL_HANDLE;
+        VkInstance instance = VK_NULL_HANDLE;
+        VkDebugUtilsMessengerEXT debugMessenger = VK_NULL_HANDLE;
         WindowApplicationProperties windowProperties;
-        GLFWwindow* glfwWindowInstance; // our current window instance.
+        GLFWwindow* glfwWindowInstance;
     };
 
-    class VulkanPipeline{
-    public:
-        //! @note Used for instantiating our Vulkan API
-        void InitializeVulkan();
+    namespace vk{
+        /**
+        * @name Vulkan.h
+        * @note Uses for instantiating our vulkan API
+        * @note These are properties that will be used throughout our vulkan's backend
+        * @note Instantiating when we initiate the logical/physical devices.
+        */
+        class VulkanPipeline{
+        public:
+            // ~VulkanPipeline();
+            void InitializePipeline();
+            void CleanupPipeline();
+            static GLFWwindow* GetCurrentWindow();
+            static VulkanProperties& GetVulkanProperties();
 
-        //! @note Cleanup operation making sure vulkan is closing properly
-        void CleanVulkanPipeline();
+        private:
+            //! @note Debug callback requires validatoin layers and debug utils to be enabled in extensions as it is not part of the vulkan core.
+            void CreateDebugMessenger();
+            void CreateSurface();
 
-        //! @note Use is for knowing if our vulkan API has been enabled.
-        //! @note Getting our properties for the vulkan pipeline.
-        static VulkanProperties& GetVulkanProperties();
-        static GLFWwindow* GetCurrentWindow();
-        static bool EnableValidationLayer();
-        static std::vector<const char*> ValidationLayers();
-        static WindowApplicationProperties GetWindowData();
-        static std::vector<const char*> DeviceExtensions();
-
-    private:
-        //! @note Setting up Vulkan Instnace
-        void SetupVulkanInstance();
-
-        void SetupDebugMessenger();
+        };
     };
 };
