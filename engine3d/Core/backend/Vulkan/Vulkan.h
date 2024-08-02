@@ -11,6 +11,8 @@ namespace engine3d{
         std::string title;
     };
     
+    //! @note TODO -- Would be better to rename VulkanProperties to VulkanContext
+    //! @note Since this is really what it is doing
     struct VulkanProperties{
         VkSurfaceKHR surface = VK_NULL_HANDLE;
         VkInstance instance = VK_NULL_HANDLE;
@@ -28,7 +30,6 @@ namespace engine3d{
         */
         class VulkanPipeline{
         public:
-            // ~VulkanPipeline();
             void InitializePipeline();
             void CleanupPipeline();
             static GLFWwindow* GetCurrentWindow();

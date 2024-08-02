@@ -3,11 +3,6 @@
 #include <vector>
 
 namespace engine3d{
-    /**
-    @name VulkanDevice
-    @note Abstracting how we handle physical, logical devices and queue familties
-    @note Checks for driver compatibilities, device suitability checks, and available queue families
-    */
     namespace vk{
         struct PhysicalDevice{
             VkPhysicalDevice device; // usage is to read/write or creating our actual physical object representation of our physical device
@@ -18,17 +13,20 @@ namespace engine3d{
             VkSurfaceCapabilitiesKHR surfaceCapabilities;
             VkPhysicalDeviceMemoryProperties memoryProperties;
             std::vector<VkPresentModeKHR> presentModes;
+            VkPhysicalDeviceFeatures phsicalDeviceFeatures;
         };
 
         /**
          * @name VulkanPhysicalDevice
+         * @note Abstraction of how we interact with our current physical device
+         * @note Checks for driver compatibilities, device suitability checks, and available queue families
+         * 
          * @note Used to expose what queue families are presented on your specific GPU.
          * @note In vulkan you submid draw instructions as command buffers in queues
          * @note Queues have queue families that represent different workloads the physical device exposes to you (the application developer)
-         * @note TODO -- having a way of knowing how many queues and queue families are in our system, and features they have.
          * 
          * 
-         * @note Presentation Modes (and diff types)
+         * @name Requirements that would be looked for within on our current physical device hardware (GPU)
          * @name Presentation Mode Topic
          * @note Mentioned more when doing swap chains
          * @note Typically in OpenGL handles double buffering by doing glfwSwapBuffers
@@ -43,12 +41,35 @@ namespace engine3d{
             //! @note Function is used to also check if our current device supports presenting.
             //! @note Something to consider is based on num of queues, size of memory, or present all devices to devs from a GUI. 
             uint32_t SelectDevice(VkQueueFlags ReqQueueFlag_t, bool IsSupportPresent);
+
+            VkPhysicalDevice Selected();
+            VkBool32 IsGeometryShaderSupported();
+            VkBool32 IsTesselationSupported();
+        private:
+            // VkPhysicalDevice Selected();
+            PhysicalDevice SelectedDevice();
         private:
             std::vector<PhysicalDevice> m_PhysicalDevices;
             int m_DeviceIdx = 0; // index to selected device
         };
 
-        class VulkanLogicalDevice{};
+        /**
+         * @name Vulkan Logical Device
+         * @note [instance] -> [physical device] -> [logical device]
+         * @note logical device in Vulkan means we do not interact to the physical hardware device,but the driver.
+         * @note 
+        */
+        class VulkanLogicalDevice{
+        public:
+            void InitializeLogicalDevice();
+            void CleanupLogicalDevice();
+
+        private:
+            VulkanPhysicalDevice m_PhysicalDevice;
+            uint32_t m_queueFamily;
+            VkDevice m_Device;
+        };
+
         /**
          * @name VulkanDevice
          * @note Represent our abstraction layers for physical and logical devices that are dealt within Vulkan
@@ -60,17 +81,9 @@ namespace engine3d{
 
             //! @note Cleaning up making sure things get deallocated cleanly (if there are any)
             void CleanupDevice();
-            
-            //! @note Selected is the device that we want to use for engine3d.
-            const PhysicalDevice Selected();
         private:
-            VulkanPhysicalDevice m_PhysicalDevice;
-            uint32_t m_queueFamily; // Getting our queue family on our current selected device.
+            VulkanLogicalDevice m_LogicalDevice;
         };
-
-        /**
-         * @name VulkanDevice{};
-        */
         // class VulkanDevice{};
     };
 };

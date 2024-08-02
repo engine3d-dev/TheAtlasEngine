@@ -140,6 +140,7 @@ namespace engine3d{
                 }
 
                 CoreLogInfo("Num heap types {}", m_PhysicalDevices[i].memoryProperties.memoryHeapCount);
+                vkGetPhysicalDeviceFeatures(m_PhysicalDevices[i].device, &m_PhysicalDevices[i].phsicalDeviceFeatures);
 
 
                 //! @note What will iterate through our queue families
@@ -230,15 +231,95 @@ namespace engine3d{
             return 0;
        }
 
-        void VulkanDevice::InitializeDevice(){
+        VkPhysicalDevice VulkanPhysicalDevice::Selected(){
+            if(m_DeviceIdx < 0){
+                CoreLogError("Physical device not selected!");
+            }
+
+            return m_PhysicalDevices[m_DeviceIdx].device;
+        }
+
+        PhysicalDevice VulkanPhysicalDevice::SelectedDevice(){
+            if(m_DeviceIdx < 0){
+                CoreLogError("Physical device not selected!");
+            }
+
+            return m_PhysicalDevices[m_DeviceIdx];
+        }
+
+        VkBool32 VulkanPhysicalDevice::IsGeometryShaderSupported(){
+            return SelectedDevice().phsicalDeviceFeatures.geometryShader;
+        }
+
+        VkBool32 VulkanPhysicalDevice::IsTesselationSupported(){
+            return SelectedDevice().phsicalDeviceFeatures.tessellationShader;
+        }
+
+        void VulkanLogicalDevice::InitializeLogicalDevice(){
             m_PhysicalDevice.InitializePhysicalDevice();
             //! @note Selecting our graphics device and enable our presentation mode.
             m_queueFamily = m_PhysicalDevice.SelectDevice(VK_QUEUE_GRAPHICS_BIT, true);
+            
+            float qPriorities[] = {1.0f};
+
+            //! @note Each device queue family create info references to a single queue family.
+            VkDeviceQueueCreateInfo qInfo = {
+                .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+                .pNext = nullptr,
+                .flags = 0,
+                .queueFamilyIndex = m_queueFamily, // queue family index per family
+                .queueCount = 1, // num of queues from queue family
+                .pQueuePriorities = &qPriorities[0] // foreach queue of priorities from 1.0 to 0.0
+            };
+
+            //! @note Initiating Physical device data attributes
+            std::vector<const char*> deviceExtensions = {
+                VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+                VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME
+            };
+
+            VkPhysicalDeviceFeatures physicalDevFeatures = {0};
+            physicalDevFeatures.geometryShader = VK_TRUE;
+            physicalDevFeatures.tessellationShader = VK_TRUE;
+
+            VkDeviceCreateInfo deviceCreateInfo = {
+                .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+                .pNext = nullptr,
+                .flags = 0,
+                .queueCreateInfoCount = 1,
+                .pQueueCreateInfos = &qInfo,
+                .enabledLayerCount = 0,
+                .ppEnabledLayerNames = nullptr,
+                .enabledExtensionCount = (uint32_t)deviceExtensions.size(),
+                .ppEnabledExtensionNames = deviceExtensions.data(),
+                .pEnabledFeatures = &physicalDevFeatures
+            };
+
+            //! @note Checking if our physical device supports geometry/tesselation shaders
+            if(!m_PhysicalDevice.IsGeometryShaderSupported()){
+                CoreLogError("Geometry Shader not supported!");
+            }
+
+            if(!m_PhysicalDevice.IsTesselationSupported()){
+                CoreLogError("Tesselelation Shader not supported!");
+            }
+
+            VkResult res = vkCreateDevice(m_PhysicalDevice.Selected(), &deviceCreateInfo, nullptr, &m_Device);
+
+            if(res != VK_SUCCESS){
+                CoreLogError("vkCreateDevice Error in VulkanDevice::InitializeDevice()!");
+            }
+        }
+
+        void VulkanLogicalDevice::CleanupLogicalDevice(){
+        }
+
+        void VulkanDevice::InitializeDevice(){
+            m_LogicalDevice.InitializeLogicalDevice();
         }
 
         void VulkanDevice::CleanupDevice(){
-            m_PhysicalDevice.CleanupPhysicalDevice();
-            // vkDestroyDevice(g_physicalDevices.device, nullptr);
+            m_LogicalDevice.CleanupLogicalDevice();
         }
     }
 };
