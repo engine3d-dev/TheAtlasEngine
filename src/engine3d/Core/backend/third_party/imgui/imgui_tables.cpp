@@ -195,12 +195,12 @@ Index of this file:
 #endif
 
 // #include "imgui.h"
-// #include <engine3d/Core/third_party/imgui/imgui.h>
-#include <engine3d/Core/third_party/imgui/imgui.h>
+// #include <engine3d/Core/backend/third_party/imgui/imgui.h>
+#include <engine3d/Core/backend/third_party/imgui/imgui.h>
 #ifndef IMGUI_DISABLE
 // #include "imgui_internal.h"
-// #include <engine3d/Core/third_party/imgui/imgui_internal.h>
-#include <engine3d/Core/third_party/imgui/imgui_internal.h>
+// #include <engine3d/Core/backend/third_party/imgui/imgui_internal.h>
+#include <engine3d/Core/backend/third_party/imgui/imgui_internal.h>
 
 // System includes
 #include <stdint.h>     // intptr_t

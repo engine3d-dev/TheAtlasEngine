@@ -7,8 +7,8 @@ include_directories(
 
 set(
     all_headers
-    ../${ENGINE_INCLUDE_NAME}/Core/third_party/Image/stb_image.h
-    ../${ENGINE_INCLUDE_NAME}/Core/third_party/Image/Image.h
+    ../${ENGINE_INCLUDE_NAME}/Core/backend/third_party/Image/stb_image.h
+    ../${ENGINE_INCLUDE_NAME}/Core/backend/third_party/Image/Image.h
 
     # Event-base handlers
     ../${ENGINE_INCLUDE_NAME}/Core/Event/ApplicationEvent.h
@@ -20,20 +20,20 @@ set(
     # ====================================================================================
     # Third-Party Libraries
     # ====================================================================================
-    ../${ENGINE_INCLUDE_NAME}/Core/third_party/glad/glad.h
-    ../${ENGINE_INCLUDE_NAME}/Core/third_party/glad/KHR/khrplatform.h
-    ../${ENGINE_INCLUDE_NAME}/Core/third_party/imgui/imconfig.h
-    ../${ENGINE_INCLUDE_NAME}/Core/third_party/imgui/imgui_internal.h
-    ../${ENGINE_INCLUDE_NAME}/Core/third_party/imgui/imgui.h
-    ../${ENGINE_INCLUDE_NAME}/Core/third_party/imgui/imstb_rectpack.h
-    ../${ENGINE_INCLUDE_NAME}/Core/third_party/imgui/imstb_textedit.h
-    ../${ENGINE_INCLUDE_NAME}/Core/third_party/imgui/imstb_truetype.h
+    ../${ENGINE_INCLUDE_NAME}/Core/backend/third_party/glad/glad.h
+    ../${ENGINE_INCLUDE_NAME}/Core/backend/third_party/glad/KHR/khrplatform.h
+    ../${ENGINE_INCLUDE_NAME}/Core/backend/third_party/imgui/imconfig.h
+    ../${ENGINE_INCLUDE_NAME}/Core/backend/third_party/imgui/imgui_internal.h
+    ../${ENGINE_INCLUDE_NAME}/Core/backend/third_party/imgui/imgui.h
+    ../${ENGINE_INCLUDE_NAME}/Core/backend/third_party/imgui/imstb_rectpack.h
+    ../${ENGINE_INCLUDE_NAME}/Core/backend/third_party/imgui/imstb_textedit.h
+    ../${ENGINE_INCLUDE_NAME}/Core/backend/third_party/imgui/imstb_truetype.h
 
-    ../${ENGINE_INCLUDE_NAME}/Core/third_party/imgui/backends/imgui_impl_glfw.h
-    ../${ENGINE_INCLUDE_NAME}/Core/third_party/imgui/backends/imgui_impl_opengl2.h
-    ../${ENGINE_INCLUDE_NAME}/Core/third_party/imgui/backends/imgui_impl_opengl3_loader.h
-    ../${ENGINE_INCLUDE_NAME}/Core/third_party/imgui/backends/imgui_impl_opengl3.h
-    ../${ENGINE_INCLUDE_NAME}/Core/third_party/imgui/backends/imgui_impl_vulkan.h
+    ../${ENGINE_INCLUDE_NAME}/Core/backend/third_party/imgui/backends/imgui_impl_glfw.h
+    ../${ENGINE_INCLUDE_NAME}/Core/backend/third_party/imgui/backends/imgui_impl_opengl2.h
+    ../${ENGINE_INCLUDE_NAME}/Core/backend/third_party/imgui/backends/imgui_impl_opengl3_loader.h
+    ../${ENGINE_INCLUDE_NAME}/Core/backend/third_party/imgui/backends/imgui_impl_opengl3.h
+    ../${ENGINE_INCLUDE_NAME}/Core/backend/third_party/imgui/backends/imgui_impl_vulkan.h
     # ====================================================================================
     # ====================================================================================
     # ====================================================================================
@@ -57,17 +57,17 @@ set(
     # ====================================================================================
     # Third-Party Dependencies!
     # ====================================================================================
-    ${ENGINE_INCLUDE_NAME}/Core/third_party/Image/stb_image.cpp
-    ${ENGINE_INCLUDE_NAME}/Core/third_party/Image/Image.cpp
-    ${ENGINE_INCLUDE_NAME}/Core/third_party/glad/glad.c
-    ${ENGINE_INCLUDE_NAME}/Core/third_party/imgui/imgui_demo.cpp
-    ${ENGINE_INCLUDE_NAME}/Core/third_party/imgui/imgui_tables.cpp
-    ${ENGINE_INCLUDE_NAME}/Core/third_party/imgui/imgui.cpp
-    ${ENGINE_INCLUDE_NAME}/Core/third_party/imgui/imgui_draw.cpp
-    ${ENGINE_INCLUDE_NAME}/Core/third_party/imgui/imgui_widgets.cpp
-    ${ENGINE_INCLUDE_NAME}/Core/third_party/imgui/backends/imgui_impl_glfw.cpp
-    ${ENGINE_INCLUDE_NAME}/Core/third_party/imgui/backends/imgui_impl_opengl3.cpp
-    ${ENGINE_INCLUDE_NAME}/Core/third_party/imgui/backends/imgui_impl_vulkan.cpp
+    ${ENGINE_INCLUDE_NAME}/Core/backend/third_party/Image/stb_image.cpp
+    ${ENGINE_INCLUDE_NAME}/Core/backend/third_party/Image/Image.cpp
+    ${ENGINE_INCLUDE_NAME}/Core/backend/third_party/glad/glad.c
+    ${ENGINE_INCLUDE_NAME}/Core/backend/third_party/imgui/imgui_demo.cpp
+    ${ENGINE_INCLUDE_NAME}/Core/backend/third_party/imgui/imgui_tables.cpp
+    ${ENGINE_INCLUDE_NAME}/Core/backend/third_party/imgui/imgui.cpp
+    ${ENGINE_INCLUDE_NAME}/Core/backend/third_party/imgui/imgui_draw.cpp
+    ${ENGINE_INCLUDE_NAME}/Core/backend/third_party/imgui/imgui_widgets.cpp
+    ${ENGINE_INCLUDE_NAME}/Core/backend/third_party/imgui/backends/imgui_impl_glfw.cpp
+    ${ENGINE_INCLUDE_NAME}/Core/backend/third_party/imgui/backends/imgui_impl_opengl3.cpp
+    ${ENGINE_INCLUDE_NAME}/Core/backend/third_party/imgui/backends/imgui_impl_vulkan.cpp
 
     # ====================================================================================
     # ====================================================================================

@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <engine3d/Core/third_party/glad/glad.h>
+#include <engine3d/Core/backend/third_party/glad/glad.h>
 
 static void* get_proc(const char *namez);
 

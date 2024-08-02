@@ -22,5 +22,12 @@ namespace engine3d{
 
         //! @note Used for checking what presentation mode that is being in use
         std::string VkPresentModeToString(const VkPresentModeKHR& modes);
+
+        std::string VkFormatToString(const VkFormat& format);
+
+        std::string VkColorspaceToString(const VkColorSpaceKHR& colorspace);
+
+        std::string VkMemoryPropertyFlagToString(const VkMemoryPropertyFlags& flags);
+
     }; // end of vulkan namespace
 };

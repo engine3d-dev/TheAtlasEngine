@@ -25,7 +25,7 @@
 // #include <glad/glad.h>
 // #include <engine3d/Core/glad/glad.h>
 // #endif
-#include <engine3d/Core/third_party/glad/glad.h>
+// #include <engine3d/Core/backend/third_party/glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #define GLM_ENABLE_EXPERIMENTAL
@@ -40,10 +40,11 @@
 // #include <imgui/imgui.h>
 // #include <imgui/backends/imgui_impl_opengl3.h>
 // #include <imgui/backends/imgui_impl_glfw.h>
-#include <engine3d/Core/third_party/imgui/imgui.h>
-#include <engine3d/Core/third_party/imgui/backends/imgui_impl_opengl3.h>
-#include <engine3d/Core/third_party/imgui/backends/imgui_impl_glfw.h>
+#include <engine3d/Core/backend/third_party/imgui/imgui.h>
+#include <engine3d/Core/backend/third_party/imgui/backends/imgui_impl_opengl3.h>
+#include <engine3d/Core/backend/third_party/imgui/backends/imgui_impl_glfw.h>
 // #include <ImGuizmo/ImGuizmo.h>
+#include <engine3d/Core/backend/third_party/ImGuizmo/ImGuizmo.h>
 
 //! @note Physics-related includes
 // @note box2D related includes
@@ -59,8 +60,8 @@
 #include <engine3d/Core/Event/InputPoll.h>
 // #include <engine3d/Core/Timer.h>
 // #include <engine3d/Core/Timestep.h>
-#include <engine3d/Core/third_party/Image/stb_image.h>
-#include <engine3d/Core/third_party/Image/Image.h>
+#include <engine3d/Core/backend/third_party/Image/stb_image.h>
+#include <engine3d/Core/backend/third_party/Image/Image.h>
 
 #include <engine3d/Core/Event/Event.h>
 #include <engine3d/Core/Event/KeyEvent.h>

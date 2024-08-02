@@ -37,8 +37,15 @@ namespace engine3d{
         */
         class VulkanPhysicalDevice{
         public:
-
+            void InitializePhysicalDevice();
+            void CleanupPhysicalDevice();
+            //! @note Choosing if there are multiple devices
+            //! @note Function is used to also check if our current device supports presenting.
+            //! @note Something to consider is based on num of queues, size of memory, or present all devices to devs from a GUI. 
+            uint32_t SelectDevice(VkQueueFlags ReqQueueFlag_t, bool IsSupportPresent);
         private:
+            std::vector<PhysicalDevice> m_PhysicalDevices;
+            int m_DeviceIdx = 0; // index to selected device
         };
 
         class VulkanLogicalDevice{};
@@ -53,17 +60,17 @@ namespace engine3d{
 
             //! @note Cleaning up making sure things get deallocated cleanly (if there are any)
             void CleanupDevice();
-
-            //! @note Choosing if there are multiple devices
-            //! @note Function is used to also check if our current device supports presenting.
-            //! @note Something to consider is based on num of queues, size of memory, or present all devices to devs from a GUI. 
-            uint32_t SelectDevice(VkQueueFlags ReqQueueFlag_t, bool IsSupportPresent);
             
             //! @note Selected is the device that we want to use for engine3d.
             const PhysicalDevice Selected();
         private:
-            std::vector<PhysicalDevice> m_PhysicalDevices;
-            int m_DeviceIdx = 0; // index to selected device
+            VulkanPhysicalDevice m_PhysicalDevice;
+            uint32_t m_queueFamily; // Getting our queue family on our current selected device.
         };
+
+        /**
+         * @name VulkanDevice{};
+        */
+        // class VulkanDevice{};
     };
 };
