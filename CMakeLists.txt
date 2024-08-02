@@ -67,7 +67,6 @@ add_custom_command(
 # Usage - used to suppress that lld-link error and use the defaulted linked .library
 if(MSVC)
     target_compile_options(${PROJECT_NAME} PUBLIC "/Z1" "/NOD")
-    target_link_options(${PROJECT_NAME} PUBLIC "/INCREMENTAL")
 endif(MSVC)
 
 target_link_libraries(

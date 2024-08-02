@@ -1,9 +1,9 @@
 #include "UILayer.h"
-#include "engine3d/Core/backend/Vulkan/Vulkan.h"
+#include <engine3d/Core/backend/Vulkan/Vulkan.h>
 #include <engine3d/Core/EngineLogger.h>
-#include <engine3d/Core/third_party/imgui/backends/imgui_impl_glfw.h>
-#include <engine3d/Core/third_party/imgui/imgui.h>
-#include <engine3d/Core/third_party/imgui/backends/imgui_impl_vulkan.h>
+#include <engine3d/Core/backend/third_party/imgui/backends/imgui_impl_glfw.h>
+#include <engine3d/Core/backend/third_party/imgui/imgui.h>
+#include <engine3d/Core/backend/third_party/imgui/backends/imgui_impl_vulkan.h>
 
 namespace engine3d{
     UILayer::UILayer() : Layer("UILayer") {}
@@ -18,10 +18,10 @@ namespace engine3d{
         // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
         // ImGui::StyleColorsDark();
 
-        // ImGui_ImplGlfw_InitForVulkan(VulkanPipeline::GetCurrentWindow(), true);
         // ImGui_ImplVulkan_NewFrame();
         // ImGui_ImplGlfw_NewFrame();
         // ImGui::NewFrame();
+        // ImGui_ImplGlfw_InitForVulkan(vk::VulkanPipeline::GetCurrentWindow(), false);
     }
 
     void UILayer::EndPlay(){
