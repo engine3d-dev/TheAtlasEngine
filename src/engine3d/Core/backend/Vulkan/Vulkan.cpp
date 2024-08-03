@@ -156,6 +156,10 @@ namespace engine3d{
         GLFWwindow* VulkanPipeline::GetCurrentWindow(){
             return g_properties.glfwWindowInstance;
         }
+
+        VkInstance VulkanPipeline::GetVkInstance(){ return g_properties.instance; }
+
+        VkSurfaceKHR VulkanPipeline::GetVkSurface(){ return g_properties.surface; }
     };
 
 };

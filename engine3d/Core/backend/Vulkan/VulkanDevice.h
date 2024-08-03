@@ -4,7 +4,7 @@
 
 namespace engine3d{
     namespace vk{
-        struct PhysicalDevice{
+        struct PhysicalDeviceAttribute{
             VkPhysicalDevice device; // usage is to read/write or creating our actual physical object representation of our physical device
             VkPhysicalDeviceProperties deviceProperties; // which is a structure that represent the properties about our GPU
             std::vector<VkQueueFamilyProperties> queueFamProperties; // for each device there might be different queue families properties
@@ -42,14 +42,22 @@ namespace engine3d{
             //! @note Something to consider is based on num of queues, size of memory, or present all devices to devs from a GUI. 
             uint32_t SelectDevice(VkQueueFlags ReqQueueFlag_t, bool IsSupportPresent);
 
+            static VkSurfaceCapabilitiesKHR GetSurfaceCapabilities();
+            static std::vector<VkPresentModeKHR> GetPresentationModes();
+            static std::vector<VkSurfaceFormatKHR> GetSurfaceFormats();
             VkPhysicalDevice Selected();
             VkBool32 IsGeometryShaderSupported();
             VkBool32 IsTesselationSupported();
+
+            VkSurfaceCapabilitiesKHR SurfaceCapabilities();
+            std::vector<VkSurfaceFormatKHR> SurfaceFormats();
+            std::vector<VkPresentModeKHR> PresentationModes();
+
         private:
             // VkPhysicalDevice Selected();
-            PhysicalDevice SelectedDevice();
+            PhysicalDeviceAttribute SelectedDevice();
         private:
-            std::vector<PhysicalDevice> m_PhysicalDevices;
+            std::vector<PhysicalDeviceAttribute> m_PhysicalDevices;
             int m_DeviceIdx = 0; // index to selected device
         };
 
@@ -64,8 +72,11 @@ namespace engine3d{
             void InitializeLogicalDevice();
             void CleanupLogicalDevice();
 
+            VkDevice LogicalDeviceInstance();
+
+            //! @note Value that stores index to the queue family
+            uint32_t& QueueFamily();
         private:
-            VulkanPhysicalDevice m_PhysicalDevice;
             uint32_t m_queueFamily;
             VkDevice m_Device;
         };
@@ -81,8 +92,11 @@ namespace engine3d{
 
             //! @note Cleaning up making sure things get deallocated cleanly (if there are any)
             void CleanupDevice();
-        private:
-            VulkanLogicalDevice m_LogicalDevice;
+
+            static VkPhysicalDevice GetVkPhysicalDeviceInstance();
+            static VkDevice GetVkLogicalDeviceInstance();
+            static VulkanPhysicalDevice GetPhysicalDevice();
+            static VulkanLogicalDevice GetLogicalDevice();
         };
         // class VulkanDevice{};
     };

@@ -20,7 +20,9 @@
 
 namespace engine3d{
     namespace vk{
-        // static PhysicalDevice g_physicalDevices;
+        static VulkanPhysicalDevice g_PhysicalDevice;
+        static VulkanLogicalDevice g_LogicalDevice;
+
         /**
          * @note The process that i learned when trying to check if physical devices are available is first check based on the size count of the devices.
          * @note Then set the data to receive those properties to nullptr.
@@ -239,7 +241,7 @@ namespace engine3d{
             return m_PhysicalDevices[m_DeviceIdx].device;
         }
 
-        PhysicalDevice VulkanPhysicalDevice::SelectedDevice(){
+        PhysicalDeviceAttribute VulkanPhysicalDevice::SelectedDevice(){
             if(m_DeviceIdx < 0){
                 CoreLogError("Physical device not selected!");
             }
@@ -255,10 +257,29 @@ namespace engine3d{
             return SelectedDevice().phsicalDeviceFeatures.tessellationShader;
         }
 
+        VkSurfaceCapabilitiesKHR VulkanPhysicalDevice::SurfaceCapabilities(){ return SelectedDevice().surfaceCapabilities; }
+
+        std::vector<VkPresentModeKHR> VulkanPhysicalDevice::PresentationModes(){ return SelectedDevice().presentModes; }
+
+        std::vector<VkSurfaceFormatKHR> VulkanPhysicalDevice::SurfaceFormats(){ return SelectedDevice().surfaceFormats; }
+
+        VkSurfaceCapabilitiesKHR VulkanPhysicalDevice::GetSurfaceCapabilities(){
+            return g_PhysicalDevice.SurfaceCapabilities();
+        }
+
+        std::vector<VkSurfaceFormatKHR> VulkanPhysicalDevice::GetSurfaceFormats(){ return g_PhysicalDevice.SurfaceFormats(); }
+
+        std::vector<VkPresentModeKHR> VulkanPhysicalDevice::GetPresentationModes(){
+            return g_PhysicalDevice.PresentationModes();
+        }
+
+
+
+
         void VulkanLogicalDevice::InitializeLogicalDevice(){
-            m_PhysicalDevice.InitializePhysicalDevice();
+            g_PhysicalDevice.InitializePhysicalDevice();
             //! @note Selecting our graphics device and enable our presentation mode.
-            m_queueFamily = m_PhysicalDevice.SelectDevice(VK_QUEUE_GRAPHICS_BIT, true);
+            m_queueFamily = g_PhysicalDevice.SelectDevice(VK_QUEUE_GRAPHICS_BIT, true);
             
             float qPriorities[] = {1.0f};
 
@@ -296,15 +317,15 @@ namespace engine3d{
             };
 
             //! @note Checking if our physical device supports geometry/tesselation shaders
-            if(!m_PhysicalDevice.IsGeometryShaderSupported()){
+            if(!g_PhysicalDevice.IsGeometryShaderSupported()){
                 CoreLogError("Geometry Shader not supported!");
             }
 
-            if(!m_PhysicalDevice.IsTesselationSupported()){
+            if(!g_PhysicalDevice.IsTesselationSupported()){
                 CoreLogError("Tesselelation Shader not supported!");
             }
 
-            VkResult res = vkCreateDevice(m_PhysicalDevice.Selected(), &deviceCreateInfo, nullptr, &m_Device);
+            VkResult res = vkCreateDevice(g_PhysicalDevice.Selected(), &deviceCreateInfo, nullptr, &m_Device);
 
             if(res != VK_SUCCESS){
                 CoreLogError("vkCreateDevice Error in VulkanDevice::InitializeDevice()!");
@@ -314,12 +335,35 @@ namespace engine3d{
         void VulkanLogicalDevice::CleanupLogicalDevice(){
         }
 
+        VkDevice VulkanLogicalDevice::LogicalDeviceInstance(){ return m_Device; }
+
+        uint32_t& VulkanLogicalDevice::QueueFamily(){ return m_queueFamily; }
+
         void VulkanDevice::InitializeDevice(){
-            m_LogicalDevice.InitializeLogicalDevice();
+            g_LogicalDevice.InitializeLogicalDevice();
         }
 
         void VulkanDevice::CleanupDevice(){
-            m_LogicalDevice.CleanupLogicalDevice();
+            g_LogicalDevice.CleanupLogicalDevice();
         }
+
+        VkPhysicalDevice VulkanDevice::GetVkPhysicalDeviceInstance(){
+            return g_PhysicalDevice.Selected();
+        }
+
+        VkDevice VulkanDevice::GetVkLogicalDeviceInstance(){
+            return g_LogicalDevice.LogicalDeviceInstance();
+        }
+
+        VulkanPhysicalDevice VulkanDevice::GetPhysicalDevice() {
+            return g_PhysicalDevice;
+        }
+
+        VulkanLogicalDevice VulkanDevice::GetLogicalDevice() {
+            return g_LogicalDevice;
+        }
+
+
+
     }
 };

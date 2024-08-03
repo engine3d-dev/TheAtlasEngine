@@ -17,6 +17,8 @@ namespace engine3d{
     void EditorApplication::InitiateEditor(){
         m_Pipeline.InitializePipeline();
         m_VulkDevice.InitializeDevice();
+        m_Swapchain.InitializeSwaphchain();
+        // m_Swapchain.InitializeSwaphchain();
 
         //! @note Initially we will have our actual rendering and everything engine-related in EngineLayer
         //! @note UILayer is where all of the UI-related stuff are done.
@@ -30,6 +32,7 @@ namespace engine3d{
     void EditorApplication::ShutdownEditor(){
         m_Pipeline.CleanupPipeline();
         m_VulkDevice.CleanupDevice();
+        // m_Swapchain.CleanupSwapchain();
     }
 
     void EditorApplication::RunEditor(){

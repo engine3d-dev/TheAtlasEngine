@@ -45,6 +45,7 @@ set(
     # backend/Vulkan Sources
     ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/Vulkan.h
     ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/VulkanDevice.h
+    ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/VulkanSwapchain.h
     # ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/VulkanSurface.h
     # ../${ENGINE_INCLUDE_NAME}/Core/internal/platforms/Win32Application.h
 )
@@ -90,6 +91,7 @@ set(
     # backend/Vulkan Sources
     ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/Vulkan.cpp
     ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/VulkanDevice.cpp
+    ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/VulkanSwapchain.cpp
     # ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/VulkanSurface.cpp
 
 )

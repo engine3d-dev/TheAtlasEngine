@@ -3,6 +3,7 @@
 #include <engine3d/Core/BaseApplication.h>
 #include <engine3d/Core/backend/Vulkan/Vulkan.h>
 #include <engine3d/Core/backend/Vulkan/VulkanDevice.h>
+#include <engine3d/Core/backend/Vulkan/VulkanSwapchain.h>
 #include <engine3d/Core/Layer.h>
 #include <array>
 
@@ -25,5 +26,6 @@ namespace engine3d{
         float m_LastFrameTime = 0.0f;
         vk::VulkanPipeline m_Pipeline;
         vk::VulkanDevice m_VulkDevice;
+        vk::VulkanSwapchain m_Swapchain;
     };
 };

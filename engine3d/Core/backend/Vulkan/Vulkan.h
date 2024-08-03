@@ -33,6 +33,8 @@ namespace engine3d{
             void InitializePipeline();
             void CleanupPipeline();
             static GLFWwindow* GetCurrentWindow();
+            static VkInstance GetVkInstance();
+            static VkSurfaceKHR GetVkSurface();
             static VulkanProperties& GetVulkanProperties();
 
         private:
