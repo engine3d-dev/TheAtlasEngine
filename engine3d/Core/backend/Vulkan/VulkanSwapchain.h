@@ -20,14 +20,15 @@ namespace engine3d{
         */
         class VulkanSwapchain{
         public:
-            // explicit VulkanSwapchain();
             ~VulkanSwapchain();
             void InitializeSwaphchain();
 
+            static uint32_t GetImagesSize();
+            static VkImage GetImage(uint32_t index);
+            static VkSwapchainKHR& GetVkSwapchainInstance();
+
         private:
-            VkSwapchainKHR m_Swapchain;
-            std::vector<VkImage> m_Images; // images stored in this swapchain that can be used during presentation mode
-            std::vector<VkImageView> m_ImageViews; // In vulkan we cant access directly to images, instead we need to create image views to access our images in our swapchain. Gives access to subset of our images
+            // VkSwapchainKHR m_Swapchain;
         };
     }; // end of vk namespace
 };

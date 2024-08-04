@@ -6,6 +6,10 @@
 #include <vulkan/vulkan_core.h>
 
 namespace engine3d::vk{
+    VkSwapchainKHR g_Swapchain;
+    static std::vector<VkImage> g_Images; // images stored in this swapchain that can be used during presentation mode
+    static std::vector<VkImageView> g_ImageViews; // In vulkan we cant access directly to images, instead we need to create image views to access our images in our swapchain. Gives access to subset of our images
+            
     //! @note We go through our selected surface formats
     //! @note Checking for both the srgb formats and srgb non linear color space.
     //! @note If these aren't found in our selected surface formats and colorspaces then we use the default in our surface formats.
@@ -80,11 +84,11 @@ namespace engine3d::vk{
     }
 
     VulkanSwapchain::~VulkanSwapchain(){
-        for(int i = 0; i < m_ImageViews.size(); i++){
-            vkDestroyImageView(VulkanDevice::GetVkLogicalDeviceInstance(), m_ImageViews[i], nullptr);
+        for(int i = 0; i < g_Images.size(); i++){
+            vkDestroyImageView(VulkanDevice::GetVkLogicalDeviceInstance(), g_ImageViews[i], nullptr);
         }
 
-        vkDestroySwapchainKHR(VulkanDevice::GetVkLogicalDeviceInstance(),m_Swapchain, nullptr);
+        vkDestroySwapchainKHR(VulkanDevice::GetVkLogicalDeviceInstance(),g_Swapchain, nullptr);
         vkDestroyDevice(VulkanDevice::GetVkLogicalDeviceInstance(),nullptr);
 
         //! @note TODO -- Move this in either Vulkan.h or VulkanDevice.h that handles VkSurfaceKHR
@@ -124,30 +128,30 @@ namespace engine3d::vk{
             .clipped = true,
         };
 
-        VkResult res = vkCreateSwapchainKHR(VulkanDevice::GetVkLogicalDeviceInstance(), &swapchainCreateInfo, nullptr, &m_Swapchain);
+        VkResult res = vkCreateSwapchainKHR(VulkanDevice::GetVkLogicalDeviceInstance(), &swapchainCreateInfo, nullptr, &g_Swapchain);
 
         if(res != VK_SUCCESS){
             CoreLogError("vkCreateSwapchainKHR error, was unsuccessful!");
         }
-        else{
-            CoreLogInfo("vkCreateSwapchainKHR was created successful!");
-        }
+        // else{
+        //     CoreLogInfo("vkCreateSwapchainKHR was created successful!");
+        // }
 
         uint32_t swapchainImagesCount = 0;
-        res = vkGetSwapchainImagesKHR(VulkanDevice::GetVkLogicalDeviceInstance(), m_Swapchain, &swapchainImagesCount, nullptr);
+        res = vkGetSwapchainImagesKHR(VulkanDevice::GetVkLogicalDeviceInstance(), g_Swapchain, &swapchainImagesCount, nullptr);
 
         if(res != VK_SUCCESS){
             CoreLogError("vkGetSwapchainImagesKHR Error (1)");
         }
-        else{
-            CoreLogInfo("Swapchain\t\tNumber of Images {}", swapchainImagesCount);
-        }
+        // else{
+        //     CoreLogInfo("Swapchain\t\tNumber of Images {}", swapchainImagesCount);
+        // }
 
-        m_Images.resize(swapchainImagesCount);
-        m_ImageViews.resize(swapchainImagesCount);
+        g_Images.resize(swapchainImagesCount);
+        g_ImageViews.resize(swapchainImagesCount);
 
         //! @note Getting all of the handles for our images
-        res = vkGetSwapchainImagesKHR(VulkanDevice::GetVkLogicalDeviceInstance(), m_Swapchain, &swapchainImagesCount, m_Images.data());
+        res = vkGetSwapchainImagesKHR(VulkanDevice::GetVkLogicalDeviceInstance(), g_Swapchain, &swapchainImagesCount, g_Images.data());
 
         if(res != VK_SUCCESS){
             CoreLogError("vkGetSwapchainImagesKHR Error (2)");
@@ -157,7 +161,18 @@ namespace engine3d::vk{
         int mipLevels = 1;
 
         for(uint32_t i = 0; i < swapchainImagesCount; i++){
-            m_ImageViews[i] = CreateImageView(m_Images[i], surfaceFormat.format, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_VIEW_TYPE_2D, layerCount, mipLevels);
+            g_ImageViews[i] = CreateImageView(g_Images[i], surfaceFormat.format, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_VIEW_TYPE_2D, layerCount, mipLevels);
         }
     }
-};
+
+    VkSwapchainKHR& VulkanSwapchain::GetVkSwapchainInstance(){
+        return g_Swapchain;
+    }
+
+    VkImage VulkanSwapchain::GetImage(uint32_t index){
+        return g_Images[index];
+    }
+
+    uint32_t VulkanSwapchain::GetImagesSize() { return g_Images.size(); }
+
+}; // end of engine3d::vk namespace

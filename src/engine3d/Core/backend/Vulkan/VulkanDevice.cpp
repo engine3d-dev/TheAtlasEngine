@@ -15,9 +15,6 @@
 #include <vulkan/vulkan_win32.h>
 #include <vulkan/vulkan_core.h>
 
-//! @note Testing joltphysics
-// #include "Jolt/AABBTree/AABBTreeBuilder.h"
-
 namespace engine3d{
     namespace vk{
         static VulkanPhysicalDevice g_PhysicalDevice;
@@ -45,7 +42,6 @@ namespace engine3d{
 
             // VkResult r = vkEnumeratePhysicalDevices(g_physicalDevices.device, &devicesCount, m_PhysicalDevices.data());
             res = vkEnumeratePhysicalDevices(VulkanPipeline::GetVulkanProperties().instance, &devicesCount, devices.data());
-
             if(res != VK_SUCCESS){
                 CoreLogError("vkEnumeratePhysicalDevices Error (2) = {}", VkResultToString(res));
             }
@@ -59,15 +55,17 @@ namespace engine3d{
                 m_PhysicalDevices[i].device = dev;
                 vkGetPhysicalDeviceProperties(m_PhysicalDevices[i].device, &m_PhysicalDevices[i].deviceProperties);
 
-                CoreLogInfo("Device Name {}", m_PhysicalDevices[i].deviceProperties.deviceName);
                 uint32_t apiVer = m_PhysicalDevices[i].deviceProperties.apiVersion;
-                CoreLogInfo("API Version: {}.{}.{}.{}", VK_API_VERSION_VARIANT(apiVer), VK_API_VERSION_MAJOR(apiVer), VK_API_VERSION_MINOR(apiVer), VK_API_VERSION_PATCH(apiVer));
-
                 uint32_t numQFamilies = 0;
 
                 //! @note What first sets our physical device handler
                 vkGetPhysicalDeviceQueueFamilyProperties(dev, &numQFamilies, nullptr);
+
+            #ifdef ENGINE_DEBUG_BUILD
+                CoreLogInfo("Device Name {}", m_PhysicalDevices[i].deviceProperties.deviceName);
+                CoreLogInfo("API Version: {}.{}.{}.{}", VK_API_VERSION_VARIANT(apiVer), VK_API_VERSION_MAJOR(apiVer), VK_API_VERSION_MINOR(apiVer), VK_API_VERSION_PATCH(apiVer));
                 CoreLogInfo("Count of Family Queues: {}", numQFamilies);
+            #endif
 
                 m_PhysicalDevices[i].queueFamProperties.resize(numQFamilies);
                 m_PhysicalDevices[i].queueSupportPresent.resize(numQFamilies);
@@ -82,22 +80,22 @@ namespace engine3d{
                 // ============================================================================
                 // ============================================================================
                 // ============================================================================
-
                 for(uint32_t q = 0; q < numQFamilies; q++){
                     const VkQueueFamilyProperties& qFamProperties = m_PhysicalDevices[i].queueFamProperties[q];
-                    CoreLogInfo("\t\tFamiy {} Num Queues: {} ", q, qFamProperties.queueCount);
                     VkQueueFlags flags = qFamProperties.queueFlags;
-                    CoreLogInfo("\t\tGFX {}, Compute {}, Transfer {}, Sparse Binding {}", (flags & VK_QUEUE_GRAPHICS_BIT) ? "Yes" : "No", (flags & VK_QUEUE_COMPUTE_BIT) ? "Yes" : "No", (flags & VK_QUEUE_TRANSFER_BIT) ? "Yes" : "No", (flags & VK_QUEUE_SPARSE_BINDING_BIT) ? "Yes" : "No");
 
                     res = vkGetPhysicalDeviceSurfaceSupportKHR(dev, q, VulkanPipeline::GetVulkanProperties().surface, &(m_PhysicalDevices[i].queueSupportPresent[q]));
+                #ifdef ENGINE_DEBUG_BUILD
+                    CoreLogInfo("\t\tFamiy {} Num Queues: {} ", q, qFamProperties.queueCount);
+                    CoreLogInfo("\t\tGFX {}, Compute {}, Transfer {}, Sparse Binding {}", (flags & VK_QUEUE_GRAPHICS_BIT) ? "Yes" : "No", (flags & VK_QUEUE_COMPUTE_BIT) ? "Yes" : "No", (flags & VK_QUEUE_TRANSFER_BIT) ? "Yes" : "No", (flags & VK_QUEUE_SPARSE_BINDING_BIT) ? "Yes" : "No");
                     if(res != VK_SUCCESS){
                         CoreLogError("vkGetPhysicalDeviceSurfaceSupporKHR Error = {}", VkResultToString(res));
                     }
+                #endif
                 }
 
                 uint32_t formatsCount = 0; // NumFormats
                 res = vkGetPhysicalDeviceSurfaceFormatsKHR(dev, VulkanPipeline::GetVulkanProperties().surface, &formatsCount, nullptr);
-
                 if(res != VK_SUCCESS){
                     CoreLogError("vkGetPhysicalDeviceSurfaceFormatsKHR (1) Error = {}", VkResultToString(res));
                 }
@@ -109,20 +107,24 @@ namespace engine3d{
                     CoreLogError("vkGetPhysicalDeviceSurfaceFormatsKHR (2) Error = {}", VkResultToString(res));
                 }
 
+            #ifdef ENGINE_DEBUG_BUILD
                 for(uint32_t j = 0; j < formatsCount; j++){
                     const VkSurfaceFormatKHR& surfaceFormat = m_PhysicalDevices[i].surfaceFormats[j];
                     CoreLogInfo("\t\tFormat {} color space {}", VkFormatToString(surfaceFormat.format), VkColorspaceToString(surfaceFormat.colorSpace));
                 }
+            #endif
 
                 res = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(dev, VulkanPipeline::GetVulkanProperties().surface, &(m_PhysicalDevices[i].surfaceCapabilities));
                 if(res != VK_SUCCESS){
                     CoreLogInfo("vkGetPhysicalDeviceSurfaceCapabilitiesKHR Error = {}", VkResultToString(res));
                 }
-
-                CoreLogInfo("Image Usage Flag {}", VkImageUsageFlagsToString(m_PhysicalDevices[i].surfaceCapabilities.supportedUsageFlags));
+                // else{
+                //     CoreLogInfo("Image Usage Flag {}", VkImageUsageFlagsToString(m_PhysicalDevices[i].surfaceCapabilities.supportedUsageFlags));
+                // }
 
                 uint32_t presentModesCount = 0;
                 res = vkGetPhysicalDeviceSurfacePresentModesKHR(dev, VulkanPipeline::GetVulkanProperties().surface, &presentModesCount, nullptr);
+
                 if(res != VK_SUCCESS){
                     CoreLogInfo("vkGetPhysicalDeviceSurfacePresentModesKHR (1) Error = {}", VkResultToString(res));
                 }
@@ -132,6 +134,7 @@ namespace engine3d{
                     CoreLogInfo("vkGetPhysicalDeviceSurfacePresentModesKHR (2) Error = {}", VkResultToString(res));
                 }
 
+            #ifdef ENGINE_DEBUG_BUILD
                 CoreLogInfo("Number of Presentation Modes {}", presentModesCount);
 
                 vkGetPhysicalDeviceMemoryProperties(dev, &(m_PhysicalDevices[i].memoryProperties));
@@ -142,69 +145,8 @@ namespace engine3d{
                 }
 
                 CoreLogInfo("Num heap types {}", m_PhysicalDevices[i].memoryProperties.memoryHeapCount);
+            #endif
                 vkGetPhysicalDeviceFeatures(m_PhysicalDevices[i].device, &m_PhysicalDevices[i].phsicalDeviceFeatures);
-
-
-                //! @note What will iterate through our queue families
-                //! @note We can check if queue families accept transfers
-                // for(uint32_t q = 0; q < numQFamilies; i++){
-                //     CoreLogWarn("Debugging for-loop! (1)");
-                //     //! @note Gives us the properties for our family properties.
-                //     const VkQueueFamilyProperties& queueFamProperties = m_PhysicalDevices[i].queueFamProperties[q];
-                //     CoreLogWarn("Debugging for-loop! (2)");
-                //     CoreLogInfo("Family {} Num Queues: {}", q, queueFamProperties.queueCount);
-                //     CoreLogWarn("Debugging for-loop! (3)");
-                //     VkQueueFlags flags = queueFamProperties.queueFlags;
-
-                //     CoreLogInfo("GFX {}, Compute {}, Transfer {}, Sparse Binding {}", (flags & VK_QUEUE_GRAPHICS_BIT) ? "Yes" : "No", (flags & VK_QUEUE_COMPUTE_BIT) ? "Yes" : "No", (flags & VK_QUEUE_TRANSFER_BIT) ? "Yes" : "No", (flags & VK_QUEUE_SPARSE_BINDING_BIT) ? "Yes" : "No");
-
-                //     res = vkGetPhysicalDeviceSurfaceSupportKHR(dev, q, VulkanPipeline::GetVulkanProperties().surface, &(m_PhysicalDevices[i].queueSupportPresent[q]));
-                    
-                //     if(res != VK_SUCCESS){
-                //         CoreLogError("vkGetPhysicalDeviceSurfaceSupportKHR (1) Error in VulkanDevice on line {}", __LINE__);
-                //     }
-                // }
-
-                // //! @note Getting our surface formats
-                // //! @note Checking if we even have any available
-                // uint32_t numFormats = 0;
-                // res = vkGetPhysicalDeviceSurfaceFormatsKHR(dev, VulkanPipeline::GetVulkanProperties().surface, &numFormats, nullptr);
-
-                // if(res != VK_SUCCESS){
-                //     CoreLogError("vkGetPhysicalDeviceSurfaceSupportKHR (2) Error in VulkanDevice on line {}", __LINE__);
-                // }
-
-                // if(numFormats > 0){
-                //     CoreLogError("vkGetPhysicalDeviceSurfaceSupportKHR (2) Error in VulkanDevice on line {}", __LINE__);
-                //     return;
-                // }
-                
-                // m_PhysicalDevices[i].surfaceFormats.resize(numFormats);
-
-                // res = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(dev, VulkanPipeline::GetVulkanProperties().surface, &(m_PhysicalDevices[i].surfaceCapabilities));
-
-                // if(res != VK_SUCCESS){
-                //     CoreLogError("vkGetPhysicalDeviceSurfaceCapabilitiesKHR Error in VulkanDevice on line {}", __LINE__);
-                // }
-
-                // CoreLogInfo("Image usage flags {}", VkImageUsageFlagsToString(m_PhysicalDevices[i].surfaceCapabilities.supportedUsageFlags));
-
-                // //! @note Checking for presentation mode support
-                // uint32_t numPresentModes = 0;
-                // res = vkGetPhysicalDeviceSurfacePresentModesKHR(dev, VulkanPipeline::GetVulkanProperties().surface, &numPresentModes, nullptr);
-
-                // if(res != VK_SUCCESS){
-                //     CoreLogError("vkGetPhysicalDeviceSurfacePresentModesKHR Error in VulkanDevice on line {}", __LINE__);
-                // }
-
-                // if(numPresentModes > 0){
-                //     CoreLogError("vkGetPhysicalDeviceSurfacePresentModesKHR (2) Error in VulkanDevice on line {}", __LINE__);
-                //     return;
-                // }
-
-                // m_PhysicalDevices[i].presentModes.resize(numPresentModes);
-
-                // res = vkGetPhysicalDeviceSurfacePresentModesKHR(dev, VulkanPipeline::GetVulkanProperties().surface, &numPresentModes, m_PhysicalDevices[i].presentModes.data());
             }
        }
 
@@ -223,13 +165,13 @@ namespace engine3d{
                     if((qFamProperties.queueFlags & ReqQueueFlag_t) and ((bool)m_PhysicalDevices[i].queueSupportPresent[j] == IsSupportPresent)){
                         m_DeviceIdx = i;
                         int queueFam = j;
-                        CoreLogInfo("Using GFX Device {} and Queue Family {}", m_DeviceIdx, queueFam);
+                        // CoreLogInfo("Using GFX Device {} and Queue Family {}", m_DeviceIdx, queueFam);
                         return queueFam; // queue family tells us if our device supports the following flag bits (go to the definition to see what's supported)
                     }
                 }
             }
 
-            CoreLogError("Required queue type {} and supports present {} was not found!", ReqQueueFlag_t, IsSupportPresent);
+            // CoreLogError("Required queue type {} and supports present {} was not found!", ReqQueueFlag_t, IsSupportPresent);
             return 0;
        }
 
@@ -327,9 +269,11 @@ namespace engine3d{
 
             VkResult res = vkCreateDevice(g_PhysicalDevice.Selected(), &deviceCreateInfo, nullptr, &m_Device);
 
+        #ifdef ENGINE_DEBUG_BUILD
             if(res != VK_SUCCESS){
                 CoreLogError("vkCreateDevice Error in VulkanDevice::InitializeDevice()!");
             }
+        #endif
         }
 
         void VulkanLogicalDevice::CleanupLogicalDevice(){

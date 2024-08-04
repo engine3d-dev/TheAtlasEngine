@@ -4,6 +4,8 @@
 #include <engine3d/Core/backend/Vulkan/Vulkan.h>
 #include <engine3d/Core/backend/Vulkan/VulkanDevice.h>
 #include <engine3d/Core/backend/Vulkan/VulkanSwapchain.h>
+#include <engine3d/Core/backend/Vulkan/VulkanCommandBuffer.h>
+#include <engine3d/Core/backend/Vulkan/VulkanCommandQueue.h>
 #include <engine3d/Core/Layer.h>
 #include <array>
 
@@ -27,5 +29,7 @@ namespace engine3d{
         vk::VulkanPipeline m_Pipeline;
         vk::VulkanDevice m_VulkDevice;
         vk::VulkanSwapchain m_Swapchain;
+        vk::VulkanCommandBuffer m_CmdBuffer;
+        vk::VulkanCommandQueue m_CmdQueue;
     };
 };
