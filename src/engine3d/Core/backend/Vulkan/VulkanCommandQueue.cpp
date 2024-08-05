@@ -38,7 +38,6 @@ namespace engine3d::vk{
         //! @note Creating semaphores
         m_RenderCompleteSemaphore = make_semaphore(VulkanDevice::GetVkLogicalDeviceInstance());
         m_PresentCompleteSemaphore = make_semaphore(VulkanDevice::GetVkLogicalDeviceInstance());
-
     }
 
     //! @note This function returns the index of our image. Getting our next image.
@@ -80,7 +79,7 @@ namespace engine3d::vk{
     }
 
     void VulkanCommandQueue::SubmitSync(VkCommandBuffer buffer){
-        VkPipelineStageFlags waitFlags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+        // VkPipelineStageFlags waitFlags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 
         VkSubmitInfo submissionInfo = {
             .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,

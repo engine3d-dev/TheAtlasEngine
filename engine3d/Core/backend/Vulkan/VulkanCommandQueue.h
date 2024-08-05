@@ -1,7 +1,4 @@
 #pragma once
-#include <functional>
-#include <vector>
-// #include <Core/backend/Vulkan/VulkanCommandBuffer.h>
 #include <vulkan/vulkan_core.h>
 
 namespace engine3d{
@@ -9,6 +6,10 @@ namespace engine3d{
         /**
          * @name Vulkan Command Queue
          * @note This queue will be used to submit command buffers through
+        * @note There are the process of submitting an image through the command buffer queue
+        * @param AcquireImage - getting an index to free image N.
+        * @param SubmitCommand - Submitting a command buffer to render to image N.
+        * @param Presentation - Presenting image N
         */
         class VulkanCommandQueue{
         public:
@@ -16,7 +17,12 @@ namespace engine3d{
             VulkanCommandQueue(uint32_t queueIdx);
             // void Submit(std::function<void()>& attribute);
             uint32_t AcquireNextImage();
-
+            
+            /**
+             * @note Difference between SubmitAsync and SubmitSync
+             * @param SubmitAsync just means that we have sempahores waiting to send a signal to indicate that the rendering/pressentations finished
+             * @param SubmitSync means that we do not have any waiting semaphores
+            */
             void SubmitSync(VkCommandBuffer buffer);
             void SubmitAsync(VkCommandBuffer buffer);
 
@@ -27,8 +33,8 @@ namespace engine3d{
             void WaitIdle();
         private:
             VkQueue m_CmdQueue = VK_NULL_HANDLE;
-            VkSemaphore m_RenderCompleteSemaphore; // signal when rendering complete
-            VkSemaphore m_PresentCompleteSemaphore; // signal when presentation's completed
+            VkSemaphore m_RenderCompleteSemaphore = VK_NULL_HANDLE; // signal when rendering complete
+            VkSemaphore m_PresentCompleteSemaphore = VK_NULL_HANDLE; // signal when presentation's completed
         };
     };
 };

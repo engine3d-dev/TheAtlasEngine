@@ -51,10 +51,11 @@ namespace engine3d{
                 layer->OnUpdate(ts);
             }
 
-            // render scene
+            // Clearing screen
             uint32_t idx = m_CmdQueue.AcquireNextImage();
             m_CmdQueue.SubmitAsync(m_CmdBuffer[idx]);
             m_CmdQueue.Presentation(idx);
+            m_CmdQueue.WaitIdle();
 
             for(const auto& layer : m_Layers){
                 layer->OnUIRender();

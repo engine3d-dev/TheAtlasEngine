@@ -34,14 +34,6 @@ namespace engine3d{
 
             void RecordCommandBuffers();
 
-            /** 
-             * @note There are the process of submitting an image through the command buffer queue
-             * @param AcquireImage - getting an index to free image N.
-             * @param SubmitCommand - Submitting a command buffer to render to image N.
-             * @param Presentation - Presenting image N
-            */
-            void SubmitCommandBuffers();
-
             VkCommandBuffer operator[](uint32_t idx);
 
         private:
