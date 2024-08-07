@@ -8,8 +8,8 @@ extern void Engine3DInitializeCore();
 */
 int Main(int argc, char** argv){
     Engine3DInitializeCore();
+    ConsoleLogInfo("Initiating Win32 supported platform");
     engine3d::EditorApplication* editor = new engine3d::EditorApplication();
-    CoreLogInfo("Initiating Win32 supported platform");
     editor->RunEditor();
     return 0;
 }

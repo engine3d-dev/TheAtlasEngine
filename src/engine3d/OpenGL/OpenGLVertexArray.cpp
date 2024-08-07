@@ -6,7 +6,7 @@ namespace engine3d{
     static GLenum ShaderDataTypeToBaseConversion(ShaderData_t type){
         switch(type){
             case ShaderData_t::None:
-                CoreLogWarn("No datatype was entered in ShaderDataTypeToBaseConversion()");
+                ConsoleLogWarn("No datatype was entered in ShaderDataTypeToBaseConversion()");
                 assert(false);
                 break;
             case ShaderData_t::Float: return GL_FLOAT;
@@ -22,7 +22,7 @@ namespace engine3d{
             case ShaderData_t::Bool: return GL_BOOL;
         }
         
-        CoreLogWarn("No datatype was entered in ShaderDataTypeToBaseConversion()");
+        ConsoleLogWarn("No datatype was entered in ShaderDataTypeToBaseConversion()");
         assert(false);
         return 0;
     }

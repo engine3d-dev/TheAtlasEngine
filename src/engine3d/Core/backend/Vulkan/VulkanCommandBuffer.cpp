@@ -38,10 +38,10 @@ namespace engine3d::vk{
         };
 
         if(vkAllocateCommandBuffers(VulkanDevice::GetVkLogicalDeviceInstance(), &commandBufAllocInfo, m_CommandBuffers.data()) != VK_SUCCESS){
-            CoreLogError("vkAllocateCommandBuffers error because was unsuccessful in VulkanCommandBuffer.cpp: VulkanCommandBuffer::VulkanCommandBuffer()!");
+            ConsoleLogError("vkAllocateCommandBuffers error because was unsuccessful in VulkanCommandBuffer.cpp: VulkanCommandBuffer::VulkanCommandBuffer()!");
         }
 
-        CoreLogInfo("VulkanCmdBuffer initiated!");
+        ConsoleLogInfo("VulkanCmdBuffer initiated!");
     }
 
     VulkanCommandBuffer::~VulkanCommandBuffer(){
@@ -57,14 +57,14 @@ namespace engine3d::vk{
 
         VkResult res = vkBeginCommandBuffer(commandBuffer, &beginInfo);
         if(res != VK_SUCCESS){
-            CoreLogError("vkBeginCommandBuffer error message is ==> {}", VkResultToString(res));
+            ConsoleLogError("vkBeginCommandBuffer error message is ==> {}", VkResultToString(res));
         }
     }
 
     void VulkanCommandBuffer::End(VkCommandBuffer buffer){
         VkResult res = vkEndCommandBuffer(buffer);
         if(res != VK_SUCCESS){
-            CoreLogError("vkEndCommandBuffer errored message is {}", VkResultToString(res));
+            ConsoleLogError("vkEndCommandBuffer errored message is {}", VkResultToString(res));
         }
     }
 
@@ -160,10 +160,10 @@ namespace engine3d::vk{
         //     End(m_CommandBuffers[i]);
         // }
 
-        CoreLogInfo("VkCommandBuffer Recorded!");
+        ConsoleLogInfo("VkCommandBuffer Recorded!");
     }
 
-    VkCommandBuffer VulkanCommandBuffer::operator[](uint32_t idx){
+    VkCommandBuffer& VulkanCommandBuffer::operator[](uint32_t idx){
         return m_CommandBuffers[idx];
     }
 };

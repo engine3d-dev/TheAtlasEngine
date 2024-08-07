@@ -17,6 +17,8 @@ namespace engine3d{
             VulkanCommandQueue(uint32_t queueIdx);
             // void Submit(std::function<void()>& attribute);
             uint32_t AcquireNextImage();
+
+            void ResetCommandBufferToEnqueue();
             
             /**
              * @note Difference between SubmitAsync and SubmitSync
@@ -31,10 +33,16 @@ namespace engine3d{
             //! @note Should check if we're idle.
             //! @note Means to hang until command queue are done with our images stored
             void WaitIdle();
+
+            void WaitIdleFence();
         private:
             VkQueue m_CmdQueue = VK_NULL_HANDLE;
             VkSemaphore m_RenderCompleteSemaphore = VK_NULL_HANDLE; // signal when rendering complete
             VkSemaphore m_PresentCompleteSemaphore = VK_NULL_HANDLE; // signal when presentation's completed
+
+            VkFence m_RenderCompleteFence = VK_NULL_HANDLE;
+            VkFence m_PresentCompleteFence = VK_NULL_HANDLE;
+            VkFence m_RenderFence;
         };
     };
 };

@@ -23,21 +23,55 @@ namespace engine3d::vk{
 
         //! @note Then validating if the creation of the semaphore object was valid.
         if(res != VK_SUCCESS){
-            CoreLogError("vkCreateSemaphore error message is {}", VkResultToString(res));
+            ConsoleLogError("vkCreateSemaphore error message is {}", VkResultToString(res));
         }
 
         return semaphore;
+    }
+
+    static VkFence make_fence(VkDevice device){
+        VkFence fence;
+        VkFenceCreateInfo createInfo = {
+            .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = VK_FENCE_CREATE_SIGNALED_BIT,
+        };
+
+        VkResult res = vkCreateFence(device, &createInfo, nullptr, &fence);
+
+        if(res != VK_SUCCESS){
+            ConsoleLogError("vkCreateFence errored message was\t\t{}", VkResultToString(res));
+        }
+
+        return  fence;
     }
 
     VulkanCommandQueue::VulkanCommandQueue(uint32_t queueIdx){
         //! @note Fetching the queue's handler
         vkGetDeviceQueue(VulkanDevice::GetVkLogicalDeviceInstance(), VulkanDevice::GetLogicalDevice().QueueFamily(), queueIdx, &m_CmdQueue);
 
-        CoreLogInfo("Queue Initiated!");
+        //! @note Added fence information in replacement of vkWaitIdle
+        VkFenceCreateInfo createInfo = {
+            .sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = VK_FENCE_CREATE_SIGNALED_BIT
+        };
+
+        VkResult res = vkCreateFence(VulkanDevice::GetVkLogicalDeviceInstance(), &createInfo, nullptr, &m_RenderFence);
+
+        if(res != VK_SUCCESS){
+            ConsoleLogError("vkCreateFence errored message presented was\t\t{}", VkResultToString(res));
+            return;
+        }
+
+        ConsoleLogInfo("Queue Initiated!");
 
         //! @note Creating semaphores
         m_RenderCompleteSemaphore = make_semaphore(VulkanDevice::GetVkLogicalDeviceInstance());
         m_PresentCompleteSemaphore = make_semaphore(VulkanDevice::GetVkLogicalDeviceInstance());
+
+        m_RenderCompleteFence = make_fence(VulkanDevice::GetVkLogicalDeviceInstance());
+        m_PresentCompleteFence = make_fence(VulkanDevice::GetVkLogicalDeviceInstance());
     }
 
     //! @note This function returns the index of our image. Getting our next image.
@@ -46,11 +80,15 @@ namespace engine3d::vk{
         VkResult res = vkAcquireNextImageKHR(VulkanDevice::GetVkLogicalDeviceInstance(), VulkanSwapchain::GetVkSwapchainInstance(), std::numeric_limits<uint32_t>::max(), m_PresentCompleteSemaphore, nullptr, &imageIdx);
 
         if(res != VK_SUCCESS){
-            CoreLogError("vkAcquireNextImageKHR error message {}", VkResultToString(res));
+            ConsoleLogError("vkAcquireNextImageKHR error message {}", VkResultToString(res));
         }
 
         return imageIdx;
     }
+
+    // void VulkanCommandQueue::ResetCommandBufferToEnqueue(){
+
+    // }
 
     void VulkanCommandQueue::SubmitAsync(VkCommandBuffer buffer){
 
@@ -71,15 +109,14 @@ namespace engine3d::vk{
             .pSignalSemaphores = &m_RenderCompleteSemaphore
         };
 
-        VkResult res = vkQueueSubmit(m_CmdQueue, 1, &submissionInfo, nullptr);
+        VkResult res = vkQueueSubmit(m_CmdQueue, 1, &submissionInfo, m_RenderCompleteFence);
 
         if(res != VK_SUCCESS){
-            CoreLogError("vkQueueSubmit submission ERROR message = {}", VkResultToString(res));
+            ConsoleLogError("vkQueueSubmit submission ERROR message = {}", VkResultToString(res));
         }
     }
 
     void VulkanCommandQueue::SubmitSync(VkCommandBuffer buffer){
-        // VkPipelineStageFlags waitFlags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 
         VkSubmitInfo submissionInfo = {
             .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
@@ -96,11 +133,12 @@ namespace engine3d::vk{
         VkResult res = vkQueueSubmit(m_CmdQueue, 1, &submissionInfo, nullptr);
 
         if(res != VK_SUCCESS){
-            CoreLogError("vkQueueSubmit submission ERROR message = {}", VkResultToString(res));
+            ConsoleLogError("vkQueueSubmit submission ERROR message = {}", VkResultToString(res));
         }
     }
 
     //! @note function to present our data to the display
+    //! @note TODO -- Have an abstraction away from VulkanCommandQueue to VulkanPresentation.
     void VulkanCommandQueue::Presentation(uint32_t imgIdx){
         VkPresentInfoKHR presentInfo = {
             .sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
@@ -115,12 +153,23 @@ namespace engine3d::vk{
         VkResult res = vkQueuePresentKHR(m_CmdQueue, &presentInfo);
 
         if(res != VK_SUCCESS){
-            CoreLogError("vkQueuePresentKHR errored message = {}", VkResultToString(res));
+            ConsoleLogError("vkQueuePresentKHR errored message = {}", VkResultToString(res));
         }
     }
 
     void VulkanCommandQueue::WaitIdle(){
         vkQueueWaitIdle(m_CmdQueue);
+    }
+
+    void VulkanCommandQueue::WaitIdleFence(){
+        // vkResetCommandBuffer
+        vkWaitForFences(VulkanDevice::GetVkLogicalDeviceInstance(), 1, &m_RenderCompleteFence, true, 1000000000);
+        vkResetFences(VulkanDevice::GetVkLogicalDeviceInstance(), 1, &m_RenderCompleteFence);
+
+        vkWaitForFences(VulkanDevice::GetVkLogicalDeviceInstance(), 1, &m_PresentCompleteFence, true, 1000000000);
+        vkResetFences(VulkanDevice::GetVkLogicalDeviceInstance(), 1, &m_PresentCompleteFence);
+
+
     }
 
 };

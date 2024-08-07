@@ -10,7 +10,7 @@ namespace engine3d{
         default: break;
         }
 
-        CoreLogError("Texture2D::Create Error --- API enabled is unsupported!");
+        ConsoleLogError("Texture2D::Create Error --- API enabled is unsupported!");
         assert(false);
         return nullptr;
     }
@@ -21,7 +21,7 @@ namespace engine3d{
         default: break;
         }
 
-        CoreLogError("Texture2D::Create Error --- API enabled is unsupported!");
+        ConsoleLogError("Texture2D::Create Error --- API enabled is unsupported!");
         assert(false);
         return nullptr;
     }

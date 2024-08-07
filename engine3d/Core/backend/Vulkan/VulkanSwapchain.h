@@ -21,14 +21,17 @@ namespace engine3d{
         class VulkanSwapchain{
         public:
             ~VulkanSwapchain();
+
+            //! @note Initiating our vulkan swapchain.
             void InitializeSwaphchain();
 
+            //! @note Getting our image/image view from our swapchain
             static uint32_t GetImagesSize();
-            static VkImage GetImage(uint32_t index);
-            static VkSwapchainKHR& GetVkSwapchainInstance();
+            static VkImage& GetImage(uint32_t index);
+            static VkImageView& GetImageView(uint32_t index);
 
-        private:
-            // VkSwapchainKHR m_Swapchain;
+            //! @note Fetch the swapchain handler
+            static VkSwapchainKHR& GetVkSwapchainInstance();
         };
     }; // end of vk namespace
 };

@@ -7,14 +7,14 @@ namespace engine3d{
         switch(Pipeline::CurrentAPI()){
             case API::OPENGL: return CreateRef<OpenGLVertexArray>();
             default:
-                CoreLogError("API either not supported or enabled correctly");
-                CoreLogError("Error is in VertexArray::Create");
+                ConsoleLogError("API either not supported or enabled correctly");
+                ConsoleLogError("Error is in VertexArray::Create");
                 assert(false);
                 return nullptr;
         }
 
-        CoreLogError("API either not supported or enabled correctly");
-        CoreLogError("Error is in VertexArray::Create");
+        ConsoleLogError("API either not supported or enabled correctly");
+        ConsoleLogError("Error is in VertexArray::Create");
         assert(false);
         return nullptr;
     }

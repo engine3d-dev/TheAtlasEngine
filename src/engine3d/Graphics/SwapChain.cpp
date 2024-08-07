@@ -7,12 +7,12 @@ namespace engine3d{
         switch (Pipeline::CurrentAPI()){
         case API::OPENGL:
         default:
-            CoreLogError("API enabled is not supported, returning nullptr for InitiateSwapChain()");
+            ConsoleLogError("API enabled is not supported, returning nullptr for InitiateSwapChain()");
             Render_Core_Assert(false);
             return nullptr;
         }
 
-        CoreLogError("API enabled is not supported, returning nullptr for InitiateSwapChain()");
+        ConsoleLogError("API enabled is not supported, returning nullptr for InitiateSwapChain()");
         Render_Core_Assert(false);
         return nullptr;
     }

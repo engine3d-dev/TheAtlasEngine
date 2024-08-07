@@ -9,7 +9,7 @@ namespace engine3d{
     UILayer::UILayer() : Layer("UILayer") {}
 
     void UILayer::BeginPlay(){
-        CoreLogInfo("UILayer::BeginPlay function called in class {}", Layer::GetLayerString());
+        ConsoleLogInfo("UILayer::BeginPlay function called in class {}", Layer::GetLayerString());
         // ImGui_ImplGlfw_NewFrame();
         // IMGUI_CHECKVERSION();
         // ImGui::CreateContext();
@@ -25,7 +25,7 @@ namespace engine3d{
     }
 
     void UILayer::EndPlay(){
-        // CoreLogInfo("UILayer::EndPlay function called in class {}", Layer::GetLayerString());
+        // ConsoleLogInfo("UILayer::EndPlay function called in class {}", Layer::GetLayerString());
         // ImGui_ImplVulkan_Shutdown();
         // ImGui_ImplGlfw_Shutdown();
         // ImGui::DestroyContext();
@@ -33,11 +33,11 @@ namespace engine3d{
 
     void UILayer::UpdateFrame(float ts){
         // ImGui::Render();
-        // CoreLogInfo("UILayer::UpdateFrame(float) function called in class {}", Layer::GetLayerString());
+        // ConsoleLogInfo("UILayer::UpdateFrame(float) function called in class {}", Layer::GetLayerString());
     }
 
     void UILayer::UpdateEvent(Event& event){
-        // CoreLogInfo("UILayer::UpdateEvent(Event&) function called in class {}", Layer::GetLayerString());
+        // ConsoleLogInfo("UILayer::UpdateEvent(Event&) function called in class {}", Layer::GetLayerString());
     }
 
     void UILayer::UpdateUI(){

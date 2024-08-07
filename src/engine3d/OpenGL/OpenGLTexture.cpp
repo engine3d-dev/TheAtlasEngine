@@ -19,7 +19,7 @@ namespace engine3d{
 
     OpenGLTexture2D::OpenGLTexture2D(const std::string& filename) : m_Image(filename) {
         if(!m_Image.IsLoaded()){
-            CoreLogWarn("Image was not able to load to be used as texture!");
+            ConsoleLogWarn("Image was not able to load to be used as texture!");
         }
 
         m_Image.SetVerticalOnLoad(true);

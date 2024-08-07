@@ -7,7 +7,7 @@ namespace engine3d{
         if(type == "vertex") return GL_VERTEX_SHADER;
         if(type == "fragment" || type == "pixel") return GL_FRAGMENT_SHADER;
 
-        CoreLogWarn("ShaderTypeToString returns no enum type");
+        ConsoleLogWarn("ShaderTypeToString returns no enum type");
         assert(false);
         return 0;
     }
@@ -53,7 +53,7 @@ namespace engine3d{
         }
 
         m_Name = GetShaderFileName(vertex.string());
-        CoreLogInfo("Shader Name == {} being loaded", m_Name);
+        ConsoleLogInfo("Shader Name == {} being loaded", m_Name);
 
         //! @note Indicating that we want to use our shader the moment we load them
         CompileShaders(shaderSources);
@@ -64,7 +64,7 @@ namespace engine3d{
         auto shaderSources = LoadFromSingleFile(generateSource);
 
         m_Name = GetShaderFileName(singleShaderSource.string());
-        CoreLogInfo("Shader Name == {} being loaded", m_Name);
+        ConsoleLogInfo("Shader Name == {} being loaded", m_Name);
 
         CompileShaders(shaderSources);
     }
@@ -80,7 +80,7 @@ namespace engine3d{
         std::ifstream ins(filename, std::ios::in | std::ios::binary);
 
         if(!ins){
-            CoreLogError("Could not load shader named {}", filename);
+            ConsoleLogError("Could not load shader named {}", filename);
             assert(false);
         }
 
@@ -143,8 +143,8 @@ namespace engine3d{
                 
                 glDeleteShader(shader);
 
-                CoreLogError("{} Shader compilation failure! (In Shader.cpp)", ShaderTypeToString(type));
-                CoreLogError("{}", infoLog.data());
+                ConsoleLogError("{} Shader compilation failure! (In Shader.cpp)", ShaderTypeToString(type));
+                ConsoleLogError("{}", infoLog.data());
 				// assert(false);
                 break;
             }
@@ -173,8 +173,8 @@ namespace engine3d{
                 glDeleteShader(shaderID);
             }
 
-            CoreLogError("Shader link failure!");
-            CoreLogError("{}", infoLog.data());
+            ConsoleLogError("Shader link failure!");
+            ConsoleLogError("{}", infoLog.data());
 			// assert(false);
             return;
 		}

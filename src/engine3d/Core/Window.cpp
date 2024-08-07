@@ -7,7 +7,7 @@ namespace engine3d{
 
     Window::Window(const std::string& title, uint32_t w, uint32_t h){
         if(!glfwInit()){
-            CoreLogError("GLFWInit() called had failed!");
+            ConsoleLogError("GLFWInit() called had failed!");
             return;
         }
 
@@ -18,7 +18,7 @@ namespace engine3d{
         m_WindowInstance = glfwCreateWindow((int)w, (int)h, title.c_str(),nullptr, nullptr);
 
         if(!m_WindowInstance){
-            CoreLogError("m_WindowInstance could not work because it is nullptr!");
+            ConsoleLogError("m_WindowInstance could not work because it is nullptr!");
             return;
         }
     }

@@ -1,105 +1,52 @@
 #pragma once
 #include <memory>
 #include <engine3d/Core/Core.h>
-// #include <spdlog/spdlog.h>
-// #include <spdlog/fmt/ostr.h>
-#include "fmt/os.h"
-#include "fmt/ostream.h"
-#include "spdlog/spdlog.h"
+#include <fmt/os.h>
+#include <fmt/ostream.h>
+#include <spdlog/spdlog.h>
 
 namespace engine3d{
-    class ENGINE_API EngineLogger{
+    /**
+     * @name ConsoleEngineLogger
+     * @note Engine3D's console logger to write to the console instead of specifying the UI-type of widget to upload logging information to
+     * @note TODO --- Adding a way to indicate to the logger to supply a type of ui identifier
+     * @note Reason - is if users wanted have a way of knowing to t
+    */
+    class ConsoleEngineLogger{
     public:
-        EngineLogger();
-        ~EngineLogger();
+        //! @note Used for initiating this console logger across engine3d supplying the pattern and application to dedicate log messages to
+        static void InitializeConsoleLogger(const std::string name, const std::string& pattern="%^[%T] %n: %v%$");
 
-        static void Initialize();
-
-        // If either CoreLogger or client is nullptr
-        // Then we should automatically terminate the app.
-        // This is because if we continue, we will segfault due to the CoreLogger/ClientLogger not being initialized
-        static bool isLoggerInit() {
-            return (coreLogger == nullptr || clientLogger == nullptr);
-        }
-
-        inline static std::shared_ptr<spdlog::logger>& GetCoreLogger(){
-            if(EngineLogger::isLoggerInit()){
-                // spdlog::fatal("EngineLogger::Init() needs to be called!\nEngineLogger::Init() returns a nullptr");
-                spdlog::log(spdlog::level::critical, "EngineLogger::Init() needs to be called!\n");
-                std::terminate();
-            }
-            return coreLogger;
-        }
-
-        inline static std::shared_ptr<spdlog::logger>& GetClientLogger() {
-            if(EngineLogger::isLoggerInit()){
-                // Logger::fatal("EngineLogger::Init() needs to be called!\n");
-                spdlog::log(spdlog::level::critical, "EngineLogger::Init() needs to be called!\n");
-                std::terminate();
-            }
-            
-            return clientLogger;
-        }
-
+        static Ref<spdlog::logger> GetLoggerInstance();
     private:
-        // static std::shared_ptr<Logger::Log> CoreLogger;
-        // static std::shared_ptr<Logger::Log> ClientLogger;
-        static std::shared_ptr<spdlog::logger> coreLogger;
-        static std::shared_ptr<spdlog::logger> clientLogger;
+        static Ref<spdlog::logger> m_ConsoleLogger;
     };
 };
 
 
-// ------------ Core logs ------------
-
+//! @note Console Loggers (These are loggers that write specifically to the console, terminal console)
+//! @note TODO --- Specify that engine3d will have it's own console terminal that these will be written to.
 template<typename... T>
-inline void CoreLogTrace(spdlog::format_string_t<T...> fmt, T&&... args) {
-    engine3d::EngineLogger::GetCoreLogger()->trace(fmt, std::forward<T>(args)...);
+inline void ConsoleLogTrace(spdlog::format_string_t<T...> fmt, T&&... args){
+    engine3d::ConsoleEngineLogger::GetLoggerInstance()->trace(fmt, std::forward<T>(args)...);
 }
 
 template<typename... T>
-inline void CoreLogInfo(spdlog::format_string_t<T...> fmt, T&&... args) {
-    engine3d::EngineLogger::GetCoreLogger()->info(fmt, std::forward<T>(args)...);
+inline void ConsoleLogWarn(spdlog::format_string_t<T...> fmt, T&&... args){
+    engine3d::ConsoleEngineLogger::GetLoggerInstance()->warn(fmt, std::forward<T>(args)...);
 }
 
 template<typename... T>
-inline void CoreLogWarn(spdlog::format_string_t<T...> fmt, T &&...args) {
-    engine3d::EngineLogger::GetCoreLogger()->warn(fmt, std::forward<T>(args)...);
+inline void ConsoleLogInfo(spdlog::format_string_t<T...> fmt, T&&... args){
+    engine3d::ConsoleEngineLogger::GetLoggerInstance()->info(fmt, std::forward<T>(args)...);
 }
 
 template<typename... T>
-inline void CoreLogError(spdlog::format_string_t<T...> fmt, T &&...args) {
-    engine3d::EngineLogger::GetCoreLogger()->error(fmt, std::forward<T>(args)...);
+inline void ConsoleLogError(spdlog::format_string_t<T...> fmt, T&&... args){
+    engine3d::ConsoleEngineLogger::GetLoggerInstance()->error(fmt, std::forward<T>(args)...);
 }
 
 template<typename... T>
-inline void CoreLogFatal(spdlog::format_string_t<T...> fmt, T &&...args) {
-    // engine3d::EngineLogger::GetCoreLogger()->fatal(fmt, std::forward<T>(args)...);
-    engine3d::EngineLogger::GetCoreLogger()->critical(fmt, std::forward<T>(args)...);
-}
-
-// ------------ Client logs ------------
-template<typename... T>
-inline void ClientLogTrace(spdlog::format_string_t<T...> fmt, T &&...args) {
-    engine3d::EngineLogger::GetClientLogger()->trace(fmt, std::forward<T>(args)...);
-}
-
-template<typename... T>
-inline void ClientLogInfo(spdlog::format_string_t<T...> fmt, T &&...args) {
-    engine3d::EngineLogger::GetClientLogger()->info(fmt, std::forward<T>(args)...);
-}
-
-template<typename... T>
-inline void ClientLogWarn(spdlog::format_string_t<T...> fmt, T &&...args) {
-    engine3d::EngineLogger::GetClientLogger()->warn(fmt, std::forward<T>(args)...);
-}
-
-template<typename... T>
-inline void ClientLogError(spdlog::format_string_t<T...> fmt, T &&...args) {
-    engine3d::EngineLogger::GetClientLogger()->error(fmt, std::forward<T>(args)...);
-}
-
-template<typename... T>
-inline void ClientLogFatal(spdlog::format_string_t<T...> fmt, T &&...args) {
-    engine3d::EngineLogger::GetClientLogger()->critical(fmt, std::forward<T>(args)...);
+inline void ConsoleLogFatal(spdlog::format_string_t<T...> fmt, T&&... args){
+    engine3d::ConsoleEngineLogger::GetLoggerInstance()->critical(fmt, std::forward<T>(args)...);
 }

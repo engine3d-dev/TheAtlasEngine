@@ -9,10 +9,10 @@ namespace engine3d{
     void Pipeline::InitializePipeline(API api){
         g_CurrentAPI = api;
 
-        if(g_CurrentAPI == API::OPENGL) CoreLogInfo("OpenGL API Enabled");
-        else if(g_CurrentAPI == API::VULKAN) CoreLogInfo("Vulkan API Enabled");
-        else if(g_CurrentAPI == API::DIRECTX11) CoreLogInfo("DirectX11 API Enabled");
-        else if(g_CurrentAPI == API::DIRECT12) CoreLogInfo("DirectX12 API Enabled");
+        if(g_CurrentAPI == API::OPENGL) ConsoleLogInfo("OpenGL API Enabled");
+        else if(g_CurrentAPI == API::VULKAN) ConsoleLogInfo("Vulkan API Enabled");
+        else if(g_CurrentAPI == API::DIRECTX11) ConsoleLogInfo("DirectX11 API Enabled");
+        else if(g_CurrentAPI == API::DIRECT12) ConsoleLogInfo("DirectX12 API Enabled");
         else CoreLogTrace("Unsupported API was set in Pipline::InitializePipeline(...)");
 
         //! @note TODO --- Move this OpenGL-code from pipeline

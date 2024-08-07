@@ -48,8 +48,9 @@ set(
     ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/VulkanSwapchain.h
     ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/VulkanCommandBuffer.h
     ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/VulkanCommandBuffer.h
-    # ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/VulkanSurface.h
-    # ../${ENGINE_INCLUDE_NAME}/Core/internal/platforms/Win32Application.h
+    ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/VulkanRenderPass.h
+    ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/Shaders/VulkanShaderModule.h
+    ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/Shaders/VulkanShaderCompiler.h
 )
 
 set(
@@ -96,8 +97,9 @@ set(
     ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/VulkanSwapchain.cpp
     ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/VulkanCommandBuffer.cpp
     ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/VulkanCommandQueue.cpp
-    # ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/VulkanSurface.cpp
-
+    ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/VulkanRenderPass.cpp
+    ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/Shaders/VulkanShaderModule.cpp
+    ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/Shaders/VulkanShaderCompiler.cpp
 )
 
 add_library(${PROJECT_NAME} ${all_headers} ${all_src})

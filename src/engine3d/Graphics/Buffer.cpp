@@ -10,14 +10,14 @@ namespace engine3d{
     Ref<VertexBuffer> VertexBuffer::Create(const void* data, size_t size){
         switch (Pipeline::CurrentAPI()){
         case API::OPENGL: return CreateRef<OpenGLVertexBuffer>(data, size);
-        case API::VULKAN: CoreLogError("Vulkan not implemented Shader"); break;
-        case API::DIRECTX11: CoreLogError("DirectX12 not implemented Shader"); break;
-        case API::DIRECT12: CoreLogError("DirectX12 not implemented Shader"); break;
+        case API::VULKAN: ConsoleLogError("Vulkan not implemented Shader"); break;
+        case API::DIRECTX11: ConsoleLogError("DirectX12 not implemented Shader"); break;
+        case API::DIRECT12: ConsoleLogError("DirectX12 not implemented Shader"); break;
         default:
             break;
         }
 
-        CoreLogWarn("API unsupported!");
+        ConsoleLogWarn("API unsupported!");
         assert(false);
         return nullptr;
     }
@@ -25,14 +25,14 @@ namespace engine3d{
     Ref<VertexBuffer> VertexBuffer::Create(size_t size){
         switch (Pipeline::CurrentAPI()){
         case API::OPENGL: return CreateRef<OpenGLVertexBuffer>(size);
-        case API::VULKAN: CoreLogError("Vulkan not implemented Shader"); break;
-        case API::DIRECTX11: CoreLogError("DirectX12 not implemented Shader"); break;
-        case API::DIRECT12: CoreLogError("DirectX12 not implemented Shader"); break;
+        case API::VULKAN: ConsoleLogError("Vulkan not implemented Shader"); break;
+        case API::DIRECTX11: ConsoleLogError("DirectX12 not implemented Shader"); break;
+        case API::DIRECT12: ConsoleLogError("DirectX12 not implemented Shader"); break;
         default:
             break;
         }
 
-        CoreLogWarn("API unsupported!");
+        ConsoleLogWarn("API unsupported!");
         assert(false);
         return nullptr;
     }
@@ -59,9 +59,9 @@ namespace engine3d{
     Ref<IndexBuffer> IndexBuffer::Create(const void* indices, size_t size){
         switch (Pipeline::CurrentAPI()){
         case API::OPENGL: return CreateRef<OpenGLIndexBuffer>(indices, size);
-        case API::VULKAN: CoreLogError("Vulkan not implemented Shader"); break;
-        case API::DIRECTX11: CoreLogError("DirectX12 not implemented Shader"); break;
-        case API::DIRECT12: CoreLogError("DirectX12 not implemented Shader"); break;
+        case API::VULKAN: ConsoleLogError("Vulkan not implemented Shader"); break;
+        case API::DIRECTX11: ConsoleLogError("DirectX12 not implemented Shader"); break;
+        case API::DIRECT12: ConsoleLogError("DirectX12 not implemented Shader"); break;
         default:
             break;
         }

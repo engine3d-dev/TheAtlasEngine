@@ -3,6 +3,7 @@
 #include <vulkan/vulkan.h>
 #include <string>
 #include <vulkan/vulkan_core.h>
+#include <vector>
 
 /**
  * @file helper_functions.h
@@ -12,6 +13,10 @@ namespace engine3d{
     void CenterCurrentWindow();
 
     namespace vk{
+        //! @note We go through our selected surface formats
+        //! @note Checking for both the srgb formats and srgb non linear color space.
+        //! @note If these aren't found in our selected surface formats and colorspaces then we use the default in our surface formats.
+        VkSurfaceFormatKHR SelectSurfaceFormatAndColorspace(const std::vector<VkSurfaceFormatKHR>& surfaceFormats);
         std::string VkResultToString(VkResult res);
         std::string GetDebugSeverity(VkDebugUtilsMessageSeverityFlagBitsEXT Severity);
         

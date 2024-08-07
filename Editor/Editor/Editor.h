@@ -1,4 +1,7 @@
 #pragma once
+#include "engine3d/Core/backend/Vulkan/Shaders/VulkanShaderCompiler.h"
+#include "engine3d/Core/backend/Vulkan/Shaders/VulkanShaderModule.h"
+#include "engine3d/Core/backend/Vulkan/VulkanRenderPass.h"
 #include <engine3d/Core/EngineLogger.h>
 #include <engine3d/Core/BaseApplication.h>
 #include <engine3d/Core/backend/Vulkan/Vulkan.h>
@@ -31,5 +34,9 @@ namespace engine3d{
         vk::VulkanSwapchain m_Swapchain;
         vk::VulkanCommandBuffer m_CmdBuffer;
         vk::VulkanCommandQueue m_CmdQueue;
+        vk::VulkanRenderPass m_RenderPass;
+        vk::VulkanShaderModule m_TriangleShaderVertModule;
+        vk::VulkanShaderModule m_TriangleShaderFragModule;
+        vk::VulkanShaderCompiler m_ShaderPipeline;
     };
 };

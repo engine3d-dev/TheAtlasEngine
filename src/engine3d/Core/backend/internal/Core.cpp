@@ -5,5 +5,5 @@
  * @note Initiating Engine3D Core modules
 */
 void Engine3DInitializeCore(){
-    engine3d::EngineLogger::Initialize();
+    engine3d::ConsoleEngineLogger::InitializeConsoleLogger("engine3d");
 }

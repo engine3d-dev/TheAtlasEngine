@@ -6,22 +6,22 @@ namespace engine3d{
     EngineLayer::EngineLayer() : Layer("EngineLayer") {}
 
     void EngineLayer::BeginPlay(){
-        CoreLogInfo("EngineLayer::BeginPlay function called in class {}", Layer::GetLayerString());
+        ConsoleLogInfo("EngineLayer::BeginPlay function called in class {}", Layer::GetLayerString());
     }
 
     void EngineLayer::EndPlay(){
-        // CoreLogInfo("EngineLayer::EndPlay function called");
+        // ConsoleLogInfo("EngineLayer::EndPlay function called");
     }
 
     void EngineLayer::UpdateFrame(float ts){
-        // CoreLogInfo("EngineLayer::UpdateFrame(float) function called");
+        // ConsoleLogInfo("EngineLayer::UpdateFrame(float) function called");
         if(InputPoll::IsKeyPressed(ENGINE_KEY_ESCAPE)){
             exit(0);
         }
     }
 
     void EngineLayer::UpdateEvent(Event& event){
-        // CoreLogInfo("EngineLayer::UpdateEvent(Event&) function called");
+        // ConsoleLogInfo("EngineLayer::UpdateEvent(Event&) function called");
     }
 
     void EngineLayer::UpdateUI(){}

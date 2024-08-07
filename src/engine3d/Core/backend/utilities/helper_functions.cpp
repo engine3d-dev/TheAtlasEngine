@@ -3,6 +3,7 @@
 #include <Core/EngineLogger.h>
 
 namespace engine3d{
+
     //! @param currentWindowCtx
     //! @note Our current window context for passing in our window.
     //! @param isWindowOpen
@@ -25,6 +26,20 @@ namespace engine3d{
     }
 
     namespace vk{
+        //! @note We go through our selected surface formats
+        //! @note Checking for both the srgb formats and srgb non linear color space.
+        //! @note If these aren't found in our selected surface formats and colorspaces then we use the default in our surface formats.
+        VkSurfaceFormatKHR SelectSurfaceFormatAndColorspace(const std::vector<VkSurfaceFormatKHR>& surfaceFormats){
+            for(int i = 0; i < surfaceFormats.size(); i++){
+                if((surfaceFormats[i].format == VK_FORMAT_B8G8R8A8_SRGB) and (surfaceFormats[i].colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)){
+                    return surfaceFormats[i];
+                }
+            }
+
+            return surfaceFormats[0];
+        }
+
+        //! @note TODO -- Probably do a specialized template for this so we dont need to make a function call, instead when we receive VkResult type we print the corresponding std::string.
         std::string VkResultToString(VkResult res){
             switch (res){
                 case VkResult::VK_SUCCESS: return "VkResult::VK_SUCCESS";
@@ -97,7 +112,7 @@ namespace engine3d{
             case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT: return "Warning";
             case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT: return "Error";
             default:
-                CoreLogError("Invalid severity Code");
+                ConsoleLogError("Invalid severity Code");
                 return "";
             }
         }
@@ -109,7 +124,7 @@ namespace engine3d{
             case VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT: return "Performance";
             case VK_DEBUG_UTILS_MESSAGE_TYPE_DEVICE_ADDRESS_BINDING_BIT_EXT: return "Device address binding";
             default:
-                CoreLogError("Invalid type code!");
+                ConsoleLogError("Invalid type code!");
                 return "";
             }
         }

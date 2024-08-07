@@ -5,21 +5,6 @@
 
 struct GLFWwindow;
 namespace engine3d{
-    //! @note Properties for our current window application.
-    struct WindowApplicationProperties{
-        uint32_t width, height;
-        std::string title;
-    };
-    
-    //! @note TODO -- Would be better to rename VulkanProperties to VulkanContext
-    //! @note Since this is really what it is doing
-    struct VulkanProperties{
-        VkSurfaceKHR surface = VK_NULL_HANDLE;
-        VkInstance instance = VK_NULL_HANDLE;
-        VkDebugUtilsMessengerEXT debugMessenger = VK_NULL_HANDLE;
-        WindowApplicationProperties windowProperties;
-        GLFWwindow* glfwWindowInstance;
-    };
 
     namespace vk{
         /**
@@ -33,13 +18,18 @@ namespace engine3d{
             void InitializePipeline();
             void CleanupPipeline();
             static GLFWwindow* GetCurrentWindow();
-            static VkInstance GetVkInstance();
-            static VkSurfaceKHR GetVkSurface();
-            static VulkanProperties& GetVulkanProperties();
+            static VkInstance& GetVkInstance();
+            static VkSurfaceKHR& GetVkSurface();
+            static std::string& GetApplicationTitle();
+            static uint32_t GetWidth();
+            static uint32_t GetHeight();
+
 
         private:
             //! @note Debug callback requires validatoin layers and debug utils to be enabled in extensions as it is not part of the vulkan core.
             void CreateDebugMessenger();
+
+            //! @note TODO -- Probably want to abstract this and deal with window surfaces using Vulkan and the targeted platforms-specific windowing system
             void CreateSurface();
 
         };

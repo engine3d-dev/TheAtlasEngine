@@ -6,12 +6,12 @@ namespace engine3d{
     Ref<Shader> Shader::Create(const std::filesystem::path& vertex, const std::filesystem::path& fragment){
         switch(Pipeline::CurrentAPI()){
             case API::OPENGL: return CreateRef<OpenGLShader>(vertex, fragment);
-            case API::VULKAN: CoreLogError("Vulkan not implemented Shader"); break;
-            case API::DIRECTX11: CoreLogError("DirectX12 not implemented Shader"); break;
-            case API::DIRECT12: CoreLogError("DirectX12 not implemented Shader"); break;
+            case API::VULKAN: ConsoleLogError("Vulkan not implemented Shader"); break;
+            case API::DIRECTX11: ConsoleLogError("DirectX12 not implemented Shader"); break;
+            case API::DIRECT12: ConsoleLogError("DirectX12 not implemented Shader"); break;
         }
 
-        CoreLogError("API that was set is unsupported");
+        ConsoleLogError("API that was set is unsupported");
         assert(false);
         return nullptr;
     }
@@ -19,12 +19,12 @@ namespace engine3d{
     Ref<Shader> Shader::Create(const std::filesystem::path& singleShaderSource){
         switch(Pipeline::CurrentAPI()){
             case API::OPENGL: return CreateRef<OpenGLShader>(singleShaderSource);
-            case API::VULKAN: CoreLogError("Vulkan not implemented Shader"); break;
-            case API::DIRECTX11: CoreLogError("DirectX12 not implemented Shader"); break;
-            case API::DIRECT12: CoreLogError("DirectX12 not implemented Shader"); break;
+            case API::VULKAN: ConsoleLogError("Vulkan not implemented Shader"); break;
+            case API::DIRECTX11: ConsoleLogError("DirectX12 not implemented Shader"); break;
+            case API::DIRECT12: ConsoleLogError("DirectX12 not implemented Shader"); break;
         }
 
-        CoreLogError("API that was set is unsupported");
+        ConsoleLogError("API that was set is unsupported");
         assert(false);
         return nullptr;
     }
@@ -85,7 +85,7 @@ namespace engine3d{
 
     void ShaderLibrary::Add(const std::string& name, const Ref<Shader>& shader){
         if(IsShaderExists(name)){
-            CoreLogWarn("Shader with name {} already exists", name);
+            ConsoleLogWarn("Shader with name {} already exists", name);
             return;
         }
         m_Shaders[name] = shader;
@@ -93,7 +93,7 @@ namespace engine3d{
 
     Ref<Shader> ShaderLibrary::Get(const std::string& name){
         if(!IsShaderExists(name)){
-            CoreLogWarn("Shader named {} does not exist. Cannot be extracted by ShaderLibrary::Get", name);
+            ConsoleLogWarn("Shader named {} does not exist. Cannot be extracted by ShaderLibrary::Get", name);
             assert(false);
         }
 

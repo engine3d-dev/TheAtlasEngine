@@ -34,12 +34,12 @@ namespace engine3d{
 
             void RecordCommandBuffers();
 
-            VkCommandBuffer operator[](uint32_t idx);
+            VkCommandBuffer& operator[](uint32_t idx);
 
         private:
             uint32_t m_ImagesCount = 0; // number of images
             std::vector<VkCommandBuffer> m_CommandBuffers;
             VkCommandPool m_CommandPool;
         };
-    }; 
+    };
 };

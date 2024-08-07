@@ -2,18 +2,22 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 namespace engine3d{
-    std::shared_ptr<spdlog::logger> EngineLogger::coreLogger;
-    std::shared_ptr<spdlog::logger> EngineLogger::clientLogger;
 
-    void EngineLogger::Initialize(){
-        spdlog::set_pattern( "%^[%T] %n: %v%$");
-        // coreLogger = std::make_shared<spdlog::logger>("GameEngine");
-        coreLogger = spdlog::stdout_color_mt("Engine3D");
-        coreLogger->set_level(spdlog::level::trace);
+    //! @note Console logger
+    Ref<spdlog::logger> ConsoleEngineLogger::m_ConsoleLogger;
 
-        // clientLogger = std::make_shared<spdlog::logger>("APP");
-        clientLogger = spdlog::stdout_color_mt("Application");
-        clientLogger->set_level(spdlog::level::trace);
+    void ConsoleEngineLogger::InitializeConsoleLogger(const std::string name, const std::string& pattern){
+        spdlog::set_pattern(pattern);
+        m_ConsoleLogger = spdlog::stdout_color_mt(name);
+        m_ConsoleLogger->set_level(spdlog::level::trace);
     }
 
+    Ref<spdlog::logger> ConsoleEngineLogger::GetLoggerInstance(){
+        if(m_ConsoleLogger == nullptr){
+            spdlog::log(spdlog::level::critical, "ConsoleEngineLogger was initialized! (Should not hit this statement at all)\n");
+            std::terminate();
+        }
+        
+        return m_ConsoleLogger;
+    }
 };

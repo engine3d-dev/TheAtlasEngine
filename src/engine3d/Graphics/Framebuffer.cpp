@@ -10,7 +10,7 @@ namespace engine3d{
         default: break;
         }
 
-        CoreLogError("In Framebuffer::Create() Pipeline::CurrentAPI() was enabled to an unsupported API!");
+        ConsoleLogError("In Framebuffer::Create() Pipeline::CurrentAPI() was enabled to an unsupported API!");
         assert(false);
         return nullptr;
     }

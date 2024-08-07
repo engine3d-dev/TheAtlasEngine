@@ -98,6 +98,5 @@ namespace engine3d{
             static VulkanPhysicalDevice GetPhysicalDevice();
             static VulkanLogicalDevice GetLogicalDevice();
         };
-        // class VulkanDevice{};
     };
 };
