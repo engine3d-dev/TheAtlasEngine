@@ -34,5 +34,9 @@ namespace engine3d{
 
         std::string VkMemoryPropertyFlagToString(const VkMemoryPropertyFlags& flags);
 
+        void Begin(VkCommandBuffer commandBuffer, VkCommandBufferUsageFlags usageFlags);
+
+        void End(VkCommandBuffer buffer);
+
     }; // end of vulkan namespace
 };

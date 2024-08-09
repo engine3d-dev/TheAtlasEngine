@@ -23,7 +23,7 @@ namespace engine3d{
             ~VulkanSwapchain();
 
             //! @note Initiating our vulkan swapchain.
-            void InitializeSwaphchain();
+            static void InitializeSwaphchain();
 
             //! @note Getting our image/image view from our swapchain
             static uint32_t GetImagesSize();

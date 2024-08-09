@@ -1,7 +1,7 @@
 #include "Editor.h"
 #include "EngineLayer.h"
 #include "UILayer.h"
-#include "engine3d/Core/backend/Vulkan/VulkanCommandBuffer.h"
+#include "engine3d/Core/Renderer/Renderer.h"
 #include <engine3d/Core/Timestep.h>
 #include <GLFW/glfw3.h>
 
@@ -23,28 +23,33 @@ namespace engine3d{
         m_Layers[0]->OnAttach();
         m_Layers[1] = new UILayer();
         m_Layers[1]->OnAttach();
-
         
-        m_Pipeline.InitializePipeline();
-        m_VulkDevice.InitializeDevice();
-        m_Swapchain.InitializeSwaphchain();
-        m_CmdBuffer = vk::VulkanCommandBuffer(vk::VulkanSwapchain::GetImagesSize());
-        m_CmdBuffer.RecordCommandBuffers();
+        Renderer::Initialize();
+
+        //! @note Setting our color to being light blue 
+        Renderer::SetBackgroundColor({0.0f, 0.5f, 0.5f, 0.f});
+        // Renderer::SetBackgroundColor({1.0f, 0.0f, 0.0f, 1.0f});
+
+        // m_CmdBuffer = vk::VulkanCommandBuffer(vk::VulkanSwapchain::GetImagesSize());
+        // m_CmdBuffer.RecordCommandBuffers();
 
         //! @param index, zero - indicates getting first data in queue at index 0 (zero)
-        m_CmdQueue = vk::VulkanCommandQueue(0);
-        m_RenderPass.InitializeRenderPass();
-        m_RenderPass.InitializeFramebuffers();
-        m_TriangleShaderVertModule = vk::VulkanShaderModule("Resources/shaders/TriangleShader/triangle.vert.spirv");
-        m_TriangleShaderFragModule = vk::VulkanShaderModule("Resources/shaders/TriangleShader/triangle.frag.spirv");
+        //! @note TODO -- for cmd buffers/queues, shader modules, and render passes. Figuring out what parameters are important that users should specify when creating this instance
+        //! @note This is because as it stands the API requires for instancing the object before initializing it, but should just utilize the constructor to cleanup the API for initiating our object's lifetimes.
+        // m_CmdQueue = vk::VulkanCommandQueue(0);
+        // m_RenderPass.InitializeRenderPass();
+        // m_RenderPass.InitializeFramebuffers();
+        // m_TriangleShaderVertModule = vk::VulkanShaderModule("Resources/shaders/TriangleShader/triangle.vert.spirv");
+        // m_TriangleShaderFragModule = vk::VulkanShaderModule("Resources/shaders/TriangleShader/triangle.frag.spirv");
+        // engine3d::UILayer::InitializeUI(m_CmdQueue.GetVkQueueInstance());
 
         // m_ShaderPipeline = vk::VulkanShaderCompiler(m_TriangleShaderVertModule.GetVkShaderModuleInstance(), m_TriangleShaderFragModule.GetVkShaderModuleInstance(), m_RenderPass.GetRenderPassInstnace());
 
     }
 
     void EditorApplication::ShutdownEditor(){
-        m_Pipeline.CleanupPipeline();
-        m_VulkDevice.CleanupDevice();
+        // m_Pipeline.CleanupPipeline();
+        // m_VulkDevice.CleanupDevice();
     }
 
     void EditorApplication::RunEditor(){
@@ -58,12 +63,13 @@ namespace engine3d{
             }
 
             // Clearing screen
-            uint32_t idx = m_CmdQueue.AcquireNextImage();
-            m_CmdQueue.WaitIdleFence();
-            m_CmdQueue.SubmitAsync(m_CmdBuffer[idx]);
-            // m_CmdQueue.WaitIdle();
-            m_CmdQueue.WaitIdleFence();
-            m_CmdQueue.Presentation(idx);
+            // uint32_t idx = m_CmdQueue.AcquireNextImage();
+            // m_CmdQueue.WaitIdleFence();
+            // m_CmdQueue.SubmitAsync(m_CmdBuffer[idx]);
+            // // m_CmdQueue.WaitIdle();
+            // m_CmdQueue.WaitIdleFence();
+            // m_CmdQueue.Presentation(idx);
+            Renderer::FlushScene();
 
             // m_RenderPass.BeginPass(idx, m_CmdBuffer[idx], VK_SUBPASS_CONTENTS_INLINE, m_ShaderPipeline.GetShaderPipeline());
             // vkCmdBindPipeline(m_CmdBuffer[idx], VK_PIPELINE_BIND_POINT_GRAPHICS, m_ShaderPipeline.GetShaderPipeline());

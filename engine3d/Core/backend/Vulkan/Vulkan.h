@@ -15,7 +15,7 @@ namespace engine3d{
         */
         class VulkanPipeline{
         public:
-            void InitializePipeline();
+            static void InitializePipeline();
             void CleanupPipeline();
             static GLFWwindow* GetCurrentWindow();
             static VkInstance& GetVkInstance();
@@ -23,15 +23,6 @@ namespace engine3d{
             static std::string& GetApplicationTitle();
             static uint32_t GetWidth();
             static uint32_t GetHeight();
-
-
-        private:
-            //! @note Debug callback requires validatoin layers and debug utils to be enabled in extensions as it is not part of the vulkan core.
-            void CreateDebugMessenger();
-
-            //! @note TODO -- Probably want to abstract this and deal with window surfaces using Vulkan and the targeted platforms-specific windowing system
-            void CreateSurface();
-
         };
     };
 };

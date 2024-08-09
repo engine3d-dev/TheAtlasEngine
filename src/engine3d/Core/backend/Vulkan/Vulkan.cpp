@@ -53,6 +53,18 @@ namespace engine3d::vk{
         uint32_t width, height;
         std::string title;
     };
+
+    //! @note Initializing debug messenger
+    void make_debug_messenger(){
+        VkDebugUtilsMessengerCreateInfoEXT debugMsgCreateInfo = {
+            .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
+            .pNext = nullptr,
+            .messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
+            .messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
+            .pfnUserCallback = &DebugCallback,
+            .pUserData = nullptr
+        };
+    }
     
     //! @note TODO -- Would be better to rename VulkanProperties to VulkanContext
     //! @note Since this is really what it is doing
@@ -129,8 +141,25 @@ namespace engine3d::vk{
             assert(false);
         }
 
-        CreateDebugMessenger();
-        CreateSurface();
+        // make_debug_messenger();
+        //! @note Debug callback requires validatoin layers and debug utils to be enabled in extensions as it is not part of the vulkan core.
+        VkDebugUtilsMessengerCreateInfoEXT debugMsgCreateInfo = {
+            .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
+            .pNext = nullptr,
+            .messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
+            .messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
+            .pfnUserCallback = &DebugCallback,
+            .pUserData = nullptr
+        };
+
+        //! @note Creating our surface
+        //! @note TODO -- Probably want to abstract this and deal with window surfaces using Vulkan and the targeted platforms-specific windowing system
+        VkResult surface_res = glfwCreateWindowSurface(g_properties.instance, g_properties.glfwWindowInstance, nullptr, &g_properties.surface);
+
+        if(surface_res != VK_SUCCESS){
+            ConsoleLogError("glfwCreateWindowSurface errored message is ===>\t\t{}", VkResultToString(surface_res));
+        }
+        // CreateSurface();
     }
 
     void VulkanPipeline::CleanupPipeline(){
@@ -150,21 +179,6 @@ namespace engine3d::vk{
         }
 
         vkDestroyInstance(g_properties.instance, nullptr);
-    }
-    
-    void VulkanPipeline::CreateDebugMessenger(){
-        VkDebugUtilsMessengerCreateInfoEXT debugMsgCreateInfo = {
-            .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
-            .pNext = nullptr,
-            .messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
-            .messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
-            .pfnUserCallback = &DebugCallback,
-            .pUserData = nullptr
-        };
-    }
-
-    void VulkanPipeline::CreateSurface(){
-        if(glfwCreateWindowSurface(g_properties.instance, g_properties.glfwWindowInstance, nullptr, &g_properties.surface) != VK_SUCCESS){}
     }
 
     // VulkanProperties& VulkanPipeline::GetVulkanProperties(){ return g_properties; }

@@ -57,6 +57,9 @@ namespace engine3d{
             // VkPhysicalDevice Selected();
             PhysicalDeviceAttribute SelectedDevice();
         private:
+            //! @note TODO -- probably have this be a std::map<T, T> or something
+            //! @note This way we can have a faster search for the best physical device to use and quicker search time.
+            //! @note Rather then iterating until we find that specific physical device
             std::vector<PhysicalDeviceAttribute> m_PhysicalDevices;
             int m_DeviceIdx = 0; // index to selected device
         };
@@ -84,11 +87,12 @@ namespace engine3d{
         /**
          * @name VulkanDevice
          * @note Represent our abstraction layers for physical and logical devices that are dealt within Vulkan
+         * @note VulkanDevice is exposed to the developer and will be frequently used when working on the vulkan abstraction
         */
         class VulkanDevice{
         public:
             //! @note Initiating our devices through Vulkan that are available
-            void InitializeDevice();
+            static void InitializeDevice();
 
             //! @note Cleaning up making sure things get deallocated cleanly (if there are any)
             void CleanupDevice();

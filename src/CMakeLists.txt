@@ -51,6 +51,8 @@ set(
     ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/VulkanRenderPass.h
     ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/Shaders/VulkanShaderModule.h
     ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/Shaders/VulkanShaderCompiler.h
+
+    ../${ENGINE_INCLUDE_NAME}/Core/Renderer/Renderer.h
 )
 
 set(
@@ -100,6 +102,8 @@ set(
     ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/VulkanRenderPass.cpp
     ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/Shaders/VulkanShaderModule.cpp
     ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/Shaders/VulkanShaderCompiler.cpp
+    ${ENGINE_INCLUDE_NAME}/Core/Renderer/Renderer.cpp
+
 )
 
 add_library(${PROJECT_NAME} ${all_headers} ${all_src})

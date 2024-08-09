@@ -32,9 +32,12 @@ namespace engine3d{
             void Begin(VkCommandBuffer commandBuffer, VkCommandBufferUsageFlags usageFlags);
             void End(VkCommandBuffer buffer);
 
+            void RecordClearBackgroundColor(float r, float g, float b, float a = 1.0f);
             void RecordCommandBuffers();
 
             VkCommandBuffer& operator[](uint32_t idx);
+
+            uint32_t GetCmdBufferSize();
 
         private:
             uint32_t m_ImagesCount = 0; // number of images

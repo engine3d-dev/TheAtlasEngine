@@ -71,7 +71,7 @@ namespace engine3d::vk{
         m_PresentCompleteSemaphore = make_semaphore(VulkanDevice::GetVkLogicalDeviceInstance());
 
         m_RenderCompleteFence = make_fence(VulkanDevice::GetVkLogicalDeviceInstance());
-        m_PresentCompleteFence = make_fence(VulkanDevice::GetVkLogicalDeviceInstance());
+        // m_PresentCompleteFence = make_fence(VulkanDevice::GetVkLogicalDeviceInstance());
     }
 
     //! @note This function returns the index of our image. Getting our next image.
@@ -84,6 +84,10 @@ namespace engine3d::vk{
         }
 
         return imageIdx;
+    }
+
+    VkQueue& VulkanCommandQueue::GetVkQueueInstance(){
+        return m_CmdQueue;
     }
 
     // void VulkanCommandQueue::ResetCommandBufferToEnqueue(){
@@ -163,11 +167,13 @@ namespace engine3d::vk{
 
     void VulkanCommandQueue::WaitIdleFence(){
         // vkResetCommandBuffer
-        vkWaitForFences(VulkanDevice::GetVkLogicalDeviceInstance(), 1, &m_RenderCompleteFence, true, 1000000000);
+
+        //! @note Since we applied the VkFence when we submit our command buffers. We need to specify when to wait until that command buffer has been rendered completely
+        vkWaitForFences(VulkanDevice::GetVkLogicalDeviceInstance(), 1, &m_RenderCompleteFence, true, 1000000);
         vkResetFences(VulkanDevice::GetVkLogicalDeviceInstance(), 1, &m_RenderCompleteFence);
 
-        vkWaitForFences(VulkanDevice::GetVkLogicalDeviceInstance(), 1, &m_PresentCompleteFence, true, 1000000000);
-        vkResetFences(VulkanDevice::GetVkLogicalDeviceInstance(), 1, &m_PresentCompleteFence);
+        // vkWaitForFences(VulkanDevice::GetVkLogicalDeviceInstance(), 1, &m_PresentCompleteFence, true, 1000000);
+        // vkResetFences(VulkanDevice::GetVkLogicalDeviceInstance(), 1, &m_PresentCompleteFence);
 
 
     }

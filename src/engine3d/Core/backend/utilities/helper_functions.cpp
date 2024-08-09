@@ -503,5 +503,26 @@ namespace engine3d{
             }
             return "VkMemoryPropertyFlagToString Undefined String Returned!";
         }
+
+        void Begin(VkCommandBuffer commandBuffer, VkCommandBufferUsageFlags usageFlags){
+            VkCommandBufferBeginInfo beginInfo{
+                .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+                .pNext = nullptr,
+                .flags = usageFlags,
+                .pInheritanceInfo = nullptr
+            };
+
+            VkResult res = vkBeginCommandBuffer(commandBuffer, &beginInfo);
+            if(res != VK_SUCCESS){
+                ConsoleLogError("vkBeginCommandBuffer error message is ==> {}", VkResultToString(res));
+            }
+        }
+
+        void End(VkCommandBuffer buffer){
+            VkResult res = vkEndCommandBuffer(buffer);
+            if(res != VK_SUCCESS){
+                ConsoleLogError("vkEndCommandBuffer errored message is {}", VkResultToString(res));
+            }
+        }
     }; // end of vk namespace
 };

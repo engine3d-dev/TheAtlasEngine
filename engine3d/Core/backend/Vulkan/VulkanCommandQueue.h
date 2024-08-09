@@ -19,6 +19,8 @@ namespace engine3d{
             uint32_t AcquireNextImage();
 
             void ResetCommandBufferToEnqueue();
+
+            VkQueue& GetVkQueueInstance();
             
             /**
              * @note Difference between SubmitAsync and SubmitSync

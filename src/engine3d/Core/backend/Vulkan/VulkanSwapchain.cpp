@@ -7,7 +7,7 @@
 #include <vulkan/vulkan_core.h>
 
 namespace engine3d::vk{
-    VkSwapchainKHR g_Swapchain;
+    static VkSwapchainKHR g_Swapchain;
     static std::vector<VkImage> g_Images; // images stored in this swapchain that can be used during presentation mode
     static std::vector<VkImageView> g_ImageViews; // In vulkan we cant access directly to images, instead we need to create image views to access our images in our swapchain. Gives access to subset of our images
 
@@ -119,7 +119,7 @@ namespace engine3d::vk{
         VkResult res = vkCreateSwapchainKHR(VulkanDevice::GetVkLogicalDeviceInstance(), &swapchainCreateInfo, nullptr, &g_Swapchain);
 
         if(res != VK_SUCCESS){
-            ConsoleLogError("vkCreateSwapchainKHR error, was unsuccessful!");
+            ConsoleLogError("vkCreateSwapchainKHR error, was unsuccessful! Error message is\t\t{}", VkResultToString(res));
         }
         // else{
         //     ConsoleLogInfo("vkCreateSwapchainKHR was created successful!");
@@ -129,7 +129,7 @@ namespace engine3d::vk{
         res = vkGetSwapchainImagesKHR(VulkanDevice::GetVkLogicalDeviceInstance(), g_Swapchain, &swapchainImagesCount, nullptr);
 
         if(res != VK_SUCCESS){
-            ConsoleLogError("vkGetSwapchainImagesKHR Error (1)");
+            ConsoleLogError("vkGetSwapchainImagesKHR Error (1) with errored message\t\t{}", VkResultToString(res));
         }
         // else{
         //     ConsoleLogInfo("Swapchain\t\tNumber of Images {}", swapchainImagesCount);
@@ -142,7 +142,7 @@ namespace engine3d::vk{
         res = vkGetSwapchainImagesKHR(VulkanDevice::GetVkLogicalDeviceInstance(), g_Swapchain, &swapchainImagesCount, g_Images.data());
 
         if(res != VK_SUCCESS){
-            ConsoleLogError("vkGetSwapchainImagesKHR Error (2)");
+            ConsoleLogError("vkGetSwapchainImagesKHR Error (2) with errored message\t\t{}", VkResultToString(res));
         }
 
         int layerCount = 1;

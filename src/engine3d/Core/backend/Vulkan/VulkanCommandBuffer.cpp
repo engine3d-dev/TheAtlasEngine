@@ -68,6 +68,73 @@ namespace engine3d::vk{
         }
     }
 
+    void VulkanCommandBuffer::RecordClearBackgroundColor(float r, float g, float b, float a){
+        VkClearColorValue clearColorValue = { r, g, b, a};
+
+        VkImageSubresourceRange imgRange = {
+            .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+            .baseMipLevel = 0,
+            .levelCount = 1,
+            .baseArrayLayer = 0,
+            .layerCount = 1
+        };
+
+        uint32_t presentQueueFamily = VulkanDevice::GetLogicalDevice().QueueFamily();
+        
+        //! @note Command buffers for our images
+        for(int i = 0; i < m_CommandBuffers.size(); i++){
+            VkImageMemoryBarrier presentationToClearBarrier = {};
+			presentationToClearBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+			presentationToClearBarrier.srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+			presentationToClearBarrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+			presentationToClearBarrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+			presentationToClearBarrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+			presentationToClearBarrier.srcQueueFamilyIndex = presentQueueFamily;
+			presentationToClearBarrier.dstQueueFamilyIndex = presentQueueFamily;
+			presentationToClearBarrier.image = VulkanSwapchain::GetImage(i);
+			presentationToClearBarrier.subresourceRange = imgRange;
+
+			// Change layout of image to be optimal for presenting
+			VkImageMemoryBarrier clearToPresentBarrer = {};
+			clearToPresentBarrer.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+			clearToPresentBarrer.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+			clearToPresentBarrer.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+			clearToPresentBarrer.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+			clearToPresentBarrer.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+			clearToPresentBarrer.srcQueueFamilyIndex = presentQueueFamily;
+			clearToPresentBarrer.dstQueueFamilyIndex = presentQueueFamily;
+			clearToPresentBarrer.image = VulkanSwapchain::GetImage(i);
+			clearToPresentBarrer.subresourceRange = imgRange;
+
+            Begin(m_CommandBuffers[i], VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
+
+            vkCmdPipelineBarrier(m_CommandBuffers[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 
+            0, // dependency flags
+            0, nullptr, // memory barriers
+            0, nullptr, // buffer memory barriers 
+            1, &presentationToClearBarrier);
+
+            vkCmdClearColorImage(m_CommandBuffers[i], VulkanSwapchain::GetImage(i), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &clearColorValue, 1, &imgRange);
+            vkCmdPipelineBarrier(m_CommandBuffers[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, 0, 0, nullptr, 0, nullptr, 1, &clearToPresentBarrer);
+
+            End(m_CommandBuffers[i]);
+        }
+
+        //! @param TODO -- Should fix the way we handle command buffers... am not liking this API!
+        //! @note Used for recording the clear instructions before submission.
+        // for(uint32_t i = 0; i < m_CommandBuffers.size(); i++){
+        //     //! @param VK_IMAGE_LAYOUT_GENERAL layouts specify the pixels packed together inside actual memory of the image.
+        //     //! @note Use of different layouts are for performance, whereas your GPU may perform better utilizing different layouts at diff stages of pipeline.
+        //     //! @param VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT is used to make the state of this recorded buffer as a simultaneously use bit
+        //     Begin(m_CommandBuffers[i], VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
+
+        //     vkCmdClearColorImage(m_CommandBuffers[i], VulkanSwapchain::GetImage(i), VK_IMAGE_LAYOUT_GENERAL, &clearColorValue, 1, &imgRange);
+        //     End(m_CommandBuffers[i]);
+        // }
+
+        ConsoleLogInfo("VulkanCommandBuffer::Record() called!");
+    }
+
     void VulkanCommandBuffer::RecordCommandBuffers(){
         //! @note Actual color that represents what our window will be cleared to.
         VkClearColorValue clearColorValue = { 0.0f, 0.5f, 0.5f, 0.f };
@@ -165,5 +232,9 @@ namespace engine3d::vk{
 
     VkCommandBuffer& VulkanCommandBuffer::operator[](uint32_t idx){
         return m_CommandBuffers[idx];
+    }
+
+    uint32_t VulkanCommandBuffer::GetCmdBufferSize(){
+        return m_CommandBuffers.size();
     }
 };
