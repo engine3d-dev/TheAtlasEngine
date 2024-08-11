@@ -32,6 +32,11 @@ namespace engine3d{
         public:
             VulkanRenderPass() = default;
             VulkanRenderPass(const std::string& debugName);
+
+            /**
+             * @note TODO --- should have Begin() and End() functions be outside of these class instances
+             * @note Since some of the concepts within Vulkan requires there to be vkCmdBegin* and vkCmdEnd*, I'm thinking 
+             */
             void Begin(VkCommandBuffer buffer, VkSubpassContents contents);
             void End(VkCommandBuffer buffer);
 
@@ -40,23 +45,8 @@ namespace engine3d{
             VkRenderPassBeginInfo& GetBeginInfo();
 
             VkFramebuffer& GetFramebuffer(uint32_t idx);
-            // void InitializeRenderPass();
 
-            // void InitializeRenderPass2();
-
-            // //! @note Renderpass are needed first before getting framebuffers working
-            // void InitializeFramebuffers();
-
-            // VkRenderPass GetRenderPassInstnace();
-
-            // void BeginPass(uint32_t swapchainIdx, VkCommandBuffer command, VkSubpassContents flags, VkPipeline pipeline);
-            // void EndPass(VkCommandBuffer command);
-
-            // void BeginPass();
-            // void EndPass();
-
-            // void Begin(VkCommandBuffer buffer);
-            // void End(VkCommandBuffer buffer);
+            VkRenderPass& GetVkRenderPass();
 
         private:
             std::vector<VkFramebuffer> m_Framebuffers;

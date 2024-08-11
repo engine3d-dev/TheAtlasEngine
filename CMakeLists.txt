@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.25)
 project(engine3d C CXX)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "") # works (in creating the compile_commands.json file)
@@ -13,6 +13,19 @@ find_package(fmt REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(yaml-cpp REQUIRED)
 find_package(box2d REQUIRED)
+# add_subdirectory(engine3d/Core/backend/third_party/JoltPhysics)
+
+include(FetchContent)
+
+# Include Jolt (3D Physics framework)
+FetchContent_Declare(
+    JoltPhysics
+    GIT_REPOSITORY "https://github.com/engine3d-dev/JoltPhysics"
+    SOURCE_SUBDIR "build"
+)
+
+FetchContent_MakeAvailable(JoltPhysics)
+# find_package(shaderc REQUIRED)
 # find_package(joltphysics REQUIRED)
 # For some reason draco is having some errors with ftell in one of it's files
 # Draco is a dependency for using assimp
@@ -69,6 +82,9 @@ if(MSVC)
     target_compile_options(${PROJECT_NAME} PUBLIC "/Z1" "/NOD")
 endif(MSVC)
 
+
+target_include_directories(${PROJECT_NAME} PUBLIC ${JoltPhysics_SOURCE_DIR}/..)
+
 target_link_libraries(
     ${PROJECT_NAME}
     PUBLIC
@@ -81,7 +97,7 @@ target_link_libraries(
     spdlog::spdlog
     yaml-cpp::yaml-cpp
     box2d::box2d
-    # joltphysics::joltphysics
+    Jolt
 )
 
 install(TARGETS ${PROJECT_NAME})

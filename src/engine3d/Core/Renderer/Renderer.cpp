@@ -6,9 +6,11 @@
 #include <Core/backend/Vulkan/VulkanSwapchain.h>
 #include <Core/backend/Vulkan/VulkanRenderPass.h>
 #include <Core/backend/Vulkan/Shaders/VulkanShaderModule.h>
-#include <Core/backend/Vulkan/Shaders/VulkanShaderCompiler.h>
+#include <Core/backend/Vulkan/Shaders/VulkanShaderPipelineBuilder.h>
 #include <Core/Renderer/Renderer.h>
 #include <Core/backend/utilities/helper_functions.h>
+#include <Jolt/Jolt.h>
+#include <vulkan/vulkan_core.h>
 
 namespace engine3d{
     struct RendererProperties{
@@ -17,7 +19,7 @@ namespace engine3d{
         vk::VulkanRenderPass m_RenderPass;
         vk::VulkanShaderModule m_TriangleShaderVertModule;
         vk::VulkanShaderModule m_TriangleShaderFragModule;
-        vk::VulkanShaderCompiler m_ShaderPipeline;
+        vk::VulkanShaderPipelineBuilder m_ShaderPipeline;
         VkClearColorValue color; // rgba color
         VkClearValue clearValue;
     };
@@ -43,6 +45,8 @@ namespace engine3d{
         // g_properties.m_RenderPass.InitializeFramebuffers();
         g_properties.m_TriangleShaderVertModule = vk::VulkanShaderModule("Resources/shaders/TriangleShader/triangle.vert.spirv");
         g_properties.m_TriangleShaderFragModule = vk::VulkanShaderModule("Resources/shaders/TriangleShader/triangle.frag.spirv");
+
+        g_properties.m_ShaderPipeline = vk::VulkanShaderPipelineBuilder(g_properties.m_TriangleShaderVertModule.GetVkShaderModuleInstance(), g_properties.m_TriangleShaderFragModule.GetVkShaderModuleInstance(), g_properties.m_RenderPass.GetVkRenderPass());
     }
 
     void Renderer::SetBackgroundColor(const std::array<float, 4>& rgba){
@@ -66,6 +70,7 @@ namespace engine3d{
         
         //! @note Command buffers for our images
         for(int i = 0; i < g_properties.m_CommandBuffer.GetCmdBufferSize(); i++){
+            auto& cmdBuffer = g_properties.m_CommandBuffer[i];
             // VkImageMemoryBarrier presentationToClearBarrier = {};
 			// presentationToClearBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
 			// presentationToClearBarrier.srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
@@ -89,26 +94,28 @@ namespace engine3d{
 			// clearToPresentBarrer.image = vk::VulkanSwapchain::GetImage(i);
 			// clearToPresentBarrer.subresourceRange = imgRange;
 
-            vk::Begin(g_properties.m_CommandBuffer[i], VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
-
             g_properties.m_RenderPass.GetBeginInfo().framebuffer = g_properties.m_RenderPass.GetFramebuffer(i);
+
+            vk::Begin(cmdBuffer, VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
             // g_properties.m_RenderPass.SetCurrentFramebuffer(i);
             // g_properties.m_RenderPass
-            vkCmdBeginRenderPass(g_properties.m_CommandBuffer[i], &g_properties.m_RenderPass.GetBeginInfo(), VK_SUBPASS_CONTENTS_INLINE);
-            // g_properties.m_RenderPass.Begin(g_properties.m_CommandBuffer[i], VK_SUBPASS_CONTENTS_INLINE);
+            vkCmdBeginRenderPass(cmdBuffer, &g_properties.m_RenderPass.GetBeginInfo(), VK_SUBPASS_CONTENTS_INLINE);
+            // g_properties.m_RenderPass.Begin(cmdBuffer, VK_SUBPASS_CONTENTS_INLINE);
 
-            // vkCmdPipelineBarrier(g_properties.m_CommandBuffer[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 
+            // vkCmdPipelineBarrier(cmdBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 
             // 0, // dependency flags
             // 0, nullptr, // memory barriers
             // 0, nullptr, // buffer memory barriers 
             // 1, &presentationToClearBarrier);
 
-            // vkCmdClearColorImage(g_properties.m_CommandBuffer[i], vk::VulkanSwapchain::GetImage(i), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &g_properties.clearValue.color, 1, &imgRange);
-            // vkCmdPipelineBarrier(g_properties.m_CommandBuffer[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, 0, 0, nullptr, 0, nullptr, 1, &clearToPresentBarrer);
+            // vkCmdClearColorImage(cmdBuffer, vk::VulkanSwapchain::GetImage(i), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &g_properties.clearValue.color, 1, &imgRange);
+            // vkCmdPipelineBarrier(cmdBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, 0, 0, nullptr, 0, nullptr, 1, &clearToPresentBarrer);
+            vkCmdBindPipeline(cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, g_properties.m_ShaderPipeline.GetVkPipeline());
+            vkCmdDraw(cmdBuffer, 3, 1, 0, 0);
 
-            // g_properties.m_RenderPass.End(g_properties.m_CommandBuffer[i]);
-            vkCmdEndRenderPass(g_properties.m_CommandBuffer[i]);
-            vk::End(g_properties.m_CommandBuffer[i]);
+            // g_properties.m_RenderPass.End(cmdBuffer);
+            vkCmdEndRenderPass(cmdBuffer);
+            vk::End(cmdBuffer);
         }
     }
 

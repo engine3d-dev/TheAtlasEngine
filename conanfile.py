@@ -34,6 +34,9 @@ class engine3dRecipe(ConanFile):
 
         # Vulkan-related headers and includes packages
         self.requires("vulkan-headers/1.3.268.0", transitive_headers=True)
+        # self.requires("shaderc/2023.6")
+        # self.requires("joltphysics/3.0.1")
+        # self.requires("physx/4.1.2")
         # self.requires("directx-headers/1.610.2", transitive_headers=True)
         # self.requires("assimp/5.4.1")
         # self.requires("joltphysics/3.0.1", transitive_headers=True)

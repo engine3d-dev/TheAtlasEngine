@@ -9,17 +9,6 @@
 namespace engine3d::vk{
 
     VulkanShaderModule::VulkanShaderModule(const std::string& filepath){
-        // if(!Load(filepath)){
-        //     ConsoleLogError("Could not load shader file {}", filepath);
-        //     // return;
-        // }
-
-        // std::vector<uint32_t> buffer = Load(filepath);
-
-        // if(buffer.empty()){
-        //     ConsoleLogError("m_Buffer.empty() was actually indicating that the buffers empty!");
-        //     return;
-        // }
         std::ifstream ins(filepath, std::ios::ate | std::ios::binary);
 
         if(!ins.is_open()){
@@ -60,7 +49,7 @@ namespace engine3d::vk{
             ConsoleLogError("vkCreateShaderModule errored with message\t\t{}", VkResultToString(res));
         }
 
-        ConsoleLogInfo("VulkanShaderModule created!");
+        ConsoleLogInfo("VulkanShaderModule Loaded!");
     }
 
     VkShaderModule& VulkanShaderModule::GetVkShaderModuleInstance() { return m_ShaderModule; }

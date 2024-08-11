@@ -7,6 +7,8 @@ find_package(engine3d CONFIG REQUIRED)
 
 add_executable(example src/Application.cpp)
 
+target_include_directories(${PROJECT_NAME} PUBLIC ../)
+
 # file(COPY Resources DESTINATION ${CMAKE_BINARY_DIR})
 # file(COPY Resources DESTINATION build PATTERN build EXCLUDE)
 

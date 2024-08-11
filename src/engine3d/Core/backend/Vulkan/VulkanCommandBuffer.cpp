@@ -36,9 +36,11 @@ namespace engine3d::vk{
             .level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
             .commandBufferCount = (uint32_t)m_CommandBuffers.size()
         };
-
-        if(vkAllocateCommandBuffers(VulkanDevice::GetVkLogicalDeviceInstance(), &commandBufAllocInfo, m_CommandBuffers.data()) != VK_SUCCESS){
+        
+        VkResult allocateResult = vkAllocateCommandBuffers(VulkanDevice::GetVkLogicalDeviceInstance(), &commandBufAllocInfo, m_CommandBuffers.data());
+        if(res != VK_SUCCESS){
             ConsoleLogError("vkAllocateCommandBuffers error because was unsuccessful in VulkanCommandBuffer.cpp: VulkanCommandBuffer::VulkanCommandBuffer()!");
+            ConsoleLogError("Errored message is\t\t{}", VkResultToString(allocateResult));
         }
 
         ConsoleLogInfo("VulkanCmdBuffer initiated!");

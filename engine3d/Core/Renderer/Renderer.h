@@ -33,6 +33,6 @@ namespace engine3d{
 
         static VkClearValue* GetClearColor();
 
-
+    private:
     };
 };

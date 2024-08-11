@@ -50,7 +50,7 @@ set(
     ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/VulkanCommandBuffer.h
     ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/VulkanRenderPass.h
     ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/Shaders/VulkanShaderModule.h
-    ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/Shaders/VulkanShaderCompiler.h
+    ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/Shaders/VulkanShaderPipelineBuilder.h
 
     ../${ENGINE_INCLUDE_NAME}/Core/Renderer/Renderer.h
 )
@@ -101,7 +101,7 @@ set(
     ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/VulkanCommandQueue.cpp
     ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/VulkanRenderPass.cpp
     ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/Shaders/VulkanShaderModule.cpp
-    ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/Shaders/VulkanShaderCompiler.cpp
+    ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/Shaders/VulkanShaderPipelineBuilder.cpp
     ${ENGINE_INCLUDE_NAME}/Core/Renderer/Renderer.cpp
 
 )

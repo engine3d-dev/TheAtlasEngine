@@ -148,6 +148,8 @@ namespace engine3d::vk{
         return m_Framebuffers[idx];
     }
 
+    VkRenderPass& VulkanRenderPass::GetVkRenderPass(){ return m_RenderPass; }
+
 
 
 
