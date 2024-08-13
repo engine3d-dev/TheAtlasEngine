@@ -1,5 +1,5 @@
 # engine3d
-Multipurpose engine for developing games, animations, simulations. In it's early stages of development, currently.
+Open-source game engine to be used for developing games and working on cool projects.
 
 ## Prerequisites
 To learn more about how to install the prerequisites before building engine3d go to the website `getting started` tab
