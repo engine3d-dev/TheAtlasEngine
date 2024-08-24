@@ -141,21 +141,6 @@ namespace engine3d::vk{
         g_Descriptors.renderPassBeginInfo.framebuffer = m_Framebuffers[idx];
     }
 
-    VkRenderPassBeginInfo& VulkanRenderPass::GetBeginInfo(){ return g_Descriptors.renderPassBeginInfo; }
-
-
-    VkFramebuffer& VulkanRenderPass::GetFramebuffer(uint32_t idx){
-        return m_Framebuffers[idx];
-    }
-
     VkRenderPass& VulkanRenderPass::GetVkRenderPass(){ return m_RenderPass; }
 
-
-
-
-
-
-
-
-    // VkRenderPass VulkanRenderPass::GetRenderPassInstnace(){ return m_RenderPass; }
 };

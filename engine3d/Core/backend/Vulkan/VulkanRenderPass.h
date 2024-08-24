@@ -42,10 +42,6 @@ namespace engine3d{
 
             void SetCurrentFramebuffer(uint32_t idx);
 
-            VkRenderPassBeginInfo& GetBeginInfo();
-
-            VkFramebuffer& GetFramebuffer(uint32_t idx);
-
             VkRenderPass& GetVkRenderPass();
 
         private:

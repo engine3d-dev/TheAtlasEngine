@@ -20,7 +20,7 @@ namespace engine3d::vk{
         VkCommandPoolCreateInfo commandPoolCreateInfo = {
             .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
             .pNext = nullptr,
-            .flags = 0,
+            .flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT, // this flag indicates to expect this individual command buffer made from this pool
             .queueFamilyIndex = VulkanDevice::GetLogicalDevice().QueueFamily(),
         };
 

@@ -19,12 +19,12 @@ class engine3dRecipe(ConanFile):
     default_options = {"shared": False, "fPIC": True}
 
     # Sources are located in the same place as this recipe, copy them to the recipe
-    exports_sources = "CMakeLists.txt", "src/CMakeLists.txt", "Editor/CMakeLists.txt", "src/*", "engine3d/*", "Editor/*"
+    exports_sources = "CMakeLists.txt", "src/CMakeLists.txt", "Editor/CMakeLists.txt", "src/*", "engine3d/*", "Editor/*", "Testbed/*"
 
     def requirements(self):
+        self.requires("make/4.4.1")
         self.tool_requires("cmake/3.27.1")
         self.requires("glfw/3.4", transitive_headers=True)
-        # self.requires("glad/0.1.36", transitive_headers=True)
         self.requires("fmt/10.2.1", transitive_headers=True)
         self.requires("spdlog/1.14.1", transitive_headers=True)
         self.requires("glm/1.0.1", transitive_headers=True)
@@ -56,10 +56,13 @@ class engine3dRecipe(ConanFile):
     def generate(self):
         deps = CMakeDeps(self)
         deps.generate()
-        tc = CMakeToolchain(self)
+        # If you use "MinGW Makefiles" on windows, by default looks for mingw32-make.exe instead.
+        # Needed to find make.exe installed by choco
+        tc = CMakeToolchain(self, generator="Unix Makefiles")
         tc.generate()
 
     def build(self):
+        # cmake = CMake(self, generator="Unix Makefiles")
         cmake = CMake(self)
         # cmake.verbose = True
         cmake.configure()
