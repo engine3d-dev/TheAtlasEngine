@@ -1,3 +1,4 @@
+#include "Core/ApplicationInstance.h"
 #include <Core/backend/Vulkan/Vulkan.h>
 #include <Core/EngineLogger.h>
 #include <Core/backend/utilities/helper_functions.h>
@@ -95,7 +96,8 @@ namespace engine3d::vk{
 
         g_properties.windowProperties.width = 800;
         g_properties.windowProperties.height = 600;
-        g_properties.windowProperties.title = "Engine3D";
+        // g_properties.windowProperties.title = "Engine3D";
+        g_properties.windowProperties.title = ApplicationInstance::CurrentApplicationName();
 
         // GLFWvidmode* mode = (GLFWvidmode *)glfwGetVideoMode(glfwGetPrimaryMonitor());
 

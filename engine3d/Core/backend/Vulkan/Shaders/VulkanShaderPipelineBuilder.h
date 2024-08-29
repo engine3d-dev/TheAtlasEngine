@@ -2,13 +2,18 @@
 #include <vector>
 #include <vulkan/vulkan.h>
 #include <vulkan/vulkan_core.h>
+// #include <Core/backend/Vulkan/Shaders/VulkanShaderModule.h>
+#include <Core/backend/Vulkan/Shaders/VulkanShaderModule.h>
+#include <Core/backend/Vulkan/VulkanRenderPass.h>
 
 namespace engine3d{
     namespace vk{
         class VulkanShaderPipelineBuilder{
+            // class VulkanShaderModule;
         public:
             VulkanShaderPipelineBuilder() = default;
             VulkanShaderPipelineBuilder(VkShaderModule vertShaderModule, VkShaderModule fragShaderModule, VkRenderPass& pass);
+            VulkanShaderPipelineBuilder(VulkanShaderModule& vertShader, VulkanShaderModule& fragShader, VulkanRenderPass& pass);
 
             VkPipeline& GetVkPipeline();
 

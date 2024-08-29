@@ -1,5 +1,5 @@
 #pragma once
-#include <engine3d/Core/internal/Core.h>
+#include <Core/internal/Core.h>
 #include <engine3d/Scene/Camera.h>
 
 namespace engine3d{

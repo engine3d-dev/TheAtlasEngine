@@ -23,7 +23,7 @@
 
 #pragma once
 // #include "imgui.h"      // IMGUI_IMPL_API
-#include <engine3d/Core/backend/third_party/imgui/imgui.h>
+#include <Core/backend/third_party/imgui/imgui.h>
 #ifndef IMGUI_DISABLE
 
 IMGUI_IMPL_API bool     ImGui_ImplOpenGL2_Init();

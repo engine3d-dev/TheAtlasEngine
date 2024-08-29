@@ -1,10 +1,10 @@
 #pragma once
-// #include <engine3d/Core/internal/Core.h>
+// #include <Core/internal/Core.h>
 // #include <Core/Core.h>
 // #include <engine3d/Event/KeyCodes.h>
 // #include <Core/Application.h>
-#include <engine3d/Core/Event/KeyCodes.h>
-#include <engine3d/Core/Event/MouseCodes.h>
+#include <Core/Event/KeyCodes.h>
+#include <Core/Event/MouseCodes.h>
 #include <glm/glm.hpp>
 
 namespace engine3d{

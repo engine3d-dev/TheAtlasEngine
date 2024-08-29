@@ -1,5 +1,5 @@
-#include <engine3d/Core/internal/Core.h>
-#include <engine3d/Core/Layer.h>
+#include <Core/internal/Core.h>
+#include <Core/Layer.h>
 
 
 namespace engine3d{

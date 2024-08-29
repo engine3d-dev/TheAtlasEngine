@@ -44,6 +44,8 @@ namespace engine3d{
 
             VkRenderPass& GetVkRenderPass();
 
+            VkRenderPassBeginInfo& GetVkRenderpassBeginInfo();
+
         private:
             std::vector<VkFramebuffer> m_Framebuffers;
             VkRenderPass m_RenderPass;

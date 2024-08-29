@@ -13,6 +13,7 @@ namespace engine3d::vk{
         VkRenderPassBeginInfo renderPassBeginInfo;
         VkAttachmentDescription attachmentDescription;
         VkAttachmentReference color_attachment_ref;
+
     };
 
     static VulkanRenderPassDescriptors g_Descriptors;
@@ -97,30 +98,6 @@ namespace engine3d::vk{
         };
 
         ConsoleLogInfo("VulkanRenderPass Initiated!");
-        ConsoleLogInfo("VulkanRendererPass Debug Name === {}", debugName);
-
-        //! @note Initializing framebuffers
-        m_Framebuffers.resize(VulkanSwapchain::GetImagesSize());
-
-        for(uint32_t i = 0; i < VulkanSwapchain::GetImagesSize(); i++){
-            VkFramebufferCreateInfo fbCreateInfo = {
-                .sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
-                .renderPass = m_RenderPass,
-                .attachmentCount = 1,
-                .pAttachments = &VulkanSwapchain::GetImageView(i),
-                .width = VulkanPipeline::GetWidth(),
-                .height = VulkanPipeline::GetHeight(),
-                .layers = 1
-            };
-
-            VkResult fbRes = vkCreateFramebuffer(VulkanDevice::GetVkLogicalDeviceInstance(), &fbCreateInfo, nullptr, &m_Framebuffers[i]);
-
-            if(fbRes != VK_SUCCESS){
-                ConsoleLogError("Framebuffer at index ({}) errored out! Error message is\t\t{}", i, VkResultToString(fbRes));
-            }
-        }
-
-        ConsoleLogInfo("Framebuffers also created after render pass!");
     }
 
     void VulkanRenderPass::Begin(VkCommandBuffer buffer, VkSubpassContents contents){
@@ -142,5 +119,7 @@ namespace engine3d::vk{
     }
 
     VkRenderPass& VulkanRenderPass::GetVkRenderPass(){ return m_RenderPass; }
+
+    VkRenderPassBeginInfo& VulkanRenderPass::GetVkRenderpassBeginInfo(){ return g_Descriptors.renderPassBeginInfo; }
 
 };

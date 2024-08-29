@@ -1,6 +1,6 @@
 #pragma once
 #include <memory>
-#include <engine3d/Core/Core.h>
+#include <Core/Core.h>
 #include <fmt/os.h>
 #include <fmt/ostream.h>
 #include <spdlog/spdlog.h>

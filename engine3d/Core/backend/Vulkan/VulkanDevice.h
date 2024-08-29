@@ -78,7 +78,9 @@ namespace engine3d{
             VkDevice LogicalDeviceInstance();
 
             //! @note Value that stores index to the queue family
-            uint32_t& QueueFamily();
+            uint32_t& QueueFamilyVkCount();
+            VkQueue& QueueGraphicsFamily();
+            VkQueue& QueueComputeFamily();
         private:
             uint32_t m_queueFamily;
             VkDevice m_Device;

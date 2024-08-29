@@ -14,6 +14,8 @@
 namespace engine3d::vk{
     static VulkanPhysicalDevice g_PhysicalDevice;
     static VulkanLogicalDevice g_LogicalDevice;
+    static VkQueue g_GraphicsQueue;
+    static VkQueue g_ComputeQueue;
 
     /**
      * @note The process that i learned when trying to check if physical devices are available is first check based on the size count of the devices.
@@ -269,6 +271,8 @@ namespace engine3d::vk{
             ConsoleLogError("vkCreateDevice Error in VulkanDevice::InitializeDevice()!");
         }
     #endif
+        vkGetDeviceQueue(VulkanDevice::GetVkLogicalDeviceInstance(), VulkanDevice::GetLogicalDevice().QueueFamilyVkCount(), 0, &g_GraphicsQueue);
+        // vkGetDeviceQueue(VulkanDevice::GetVkLogicalDeviceInstance(), VulkanDevice::GetLogicalDevice().QueueFamilyVkCount(), 0, &g_ComputeQueue);
     }
 
     void VulkanLogicalDevice::CleanupLogicalDevice(){
@@ -276,7 +280,11 @@ namespace engine3d::vk{
 
     VkDevice VulkanLogicalDevice::LogicalDeviceInstance(){ return m_Device; }
 
-    uint32_t& VulkanLogicalDevice::QueueFamily(){ return m_queueFamily; }
+    uint32_t& VulkanLogicalDevice::QueueFamilyVkCount(){ return m_queueFamily; }
+
+    VkQueue& VulkanLogicalDevice::QueueGraphicsFamily(){ return g_GraphicsQueue; }
+
+    VkQueue& VulkanLogicalDevice::QueueComputeFamily(){ return g_ComputeQueue; }
 
     void VulkanDevice::InitializeDevice(){
         g_LogicalDevice.InitializeLogicalDevice();

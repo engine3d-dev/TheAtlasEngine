@@ -1,5 +1,5 @@
 #pragma once
-#include <engine3d/Core/Core.h>
+#include <Core/Core.h>
 #include <string>
 #include <GLFW/glfw3.h>
 

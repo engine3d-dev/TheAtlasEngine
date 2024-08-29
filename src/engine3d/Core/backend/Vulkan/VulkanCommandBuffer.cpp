@@ -21,7 +21,7 @@ namespace engine3d::vk{
             .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
             .pNext = nullptr,
             .flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT, // this flag indicates to expect this individual command buffer made from this pool
-            .queueFamilyIndex = VulkanDevice::GetLogicalDevice().QueueFamily(),
+            .queueFamilyIndex = VulkanDevice::GetLogicalDevice().QueueFamilyVkCount(),
         };
 
         m_CommandBuffers.resize(m_ImagesCount);
@@ -81,7 +81,7 @@ namespace engine3d::vk{
             .layerCount = 1
         };
 
-        uint32_t presentQueueFamily = VulkanDevice::GetLogicalDevice().QueueFamily();
+        uint32_t presentQueueFamily = VulkanDevice::GetLogicalDevice().QueueFamilyVkCount();
         
         //! @note Command buffers for our images
         for(int i = 0; i < m_CommandBuffers.size(); i++){
@@ -149,7 +149,7 @@ namespace engine3d::vk{
             .layerCount = 1
         };
 
-        uint32_t presentQueueFamily = VulkanDevice::GetLogicalDevice().QueueFamily();
+        uint32_t presentQueueFamily = VulkanDevice::GetLogicalDevice().QueueFamilyVkCount();
         
         //! @note Command buffers for our images
         for(int i = 0; i < m_CommandBuffers.size(); i++){

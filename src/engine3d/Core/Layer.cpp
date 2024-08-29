@@ -19,9 +19,9 @@ namespace engine3d{
         UpdateFrame(ts);
     }
 
-    void Layer::OnEvent(Event& event){
-        UpdateEvent(event);
-    }
+    // void Layer::OnEvent(Event& event){
+    //     UpdateEvent(event);
+    // }
 
     void Layer::OnUIRender(){
         UpdateUI();

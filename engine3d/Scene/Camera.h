@@ -1,7 +1,7 @@
 #pragma once
-#include <engine3d/Core/internal/Core.h>
+#include <Core/internal/Core.h>
 #include <engine3d/Event/Event.h>
-#include <engine3d/Core/Timestep.h>
+#include <Core/Timestep.h>
 #include "glm/glm.hpp"
 
 namespace engine3d{

@@ -1,8 +1,8 @@
 #pragma once
-// #include <engine3d/Core/internal/Core.h>
-#include <engine3d/Core/Core.h>
-#include <engine3d/Core/Event/Event.h>
-#include <engine3d/Core/Event/KeyCodes.h>
+// #include <Core/internal/Core.h>
+#include <Core/Core.h>
+#include <Core/Event/Event.h>
+#include <Core/Event/KeyCodes.h>
 #include <sstream>
 
 namespace engine3d{

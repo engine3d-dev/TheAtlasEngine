@@ -11,7 +11,7 @@ namespace engine3d::vk{
             .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
             .pNext = nullptr,
             .flags = 0,
-            .queueFamilyIndex = VulkanDevice::GetLogicalDevice().QueueFamily()
+            .queueFamilyIndex = VulkanDevice::GetLogicalDevice().QueueFamilyVkCount()
         };
 
         VkResult res = vkCreateCommandPool(VulkanDevice::GetVkLogicalDeviceInstance(), &commandPoolInfo, nullptr, &g_CommandPool);

@@ -48,7 +48,7 @@ namespace engine3d::vk{
 
     VulkanCommandQueue::VulkanCommandQueue(uint32_t queueIdx){
         //! @note Fetching the queue's handler
-        vkGetDeviceQueue(VulkanDevice::GetVkLogicalDeviceInstance(), VulkanDevice::GetLogicalDevice().QueueFamily(), queueIdx, &m_CmdQueue);
+        vkGetDeviceQueue(VulkanDevice::GetVkLogicalDeviceInstance(), VulkanDevice::GetLogicalDevice().QueueFamilyVkCount(), queueIdx, &m_CmdQueue);
 
         //! @note Added fence information in replacement of vkWaitIdle
         VkFenceCreateInfo createInfo = {

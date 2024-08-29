@@ -18,7 +18,7 @@ namespace engine3d::vk{
 
         //! @note Spirv expects buffer to be uint32, make sure reserve an int vector big enough for entire file.
         size_t filesize = (size_t)ins.tellg();
-        std::vector<uint32_t> buffer(filesize / sizeof(uint32_t));
+        std::vector<char*> buffer(filesize / sizeof(uint32_t));
 
         // put file cursor at beginning
         ins.seekg(0);
@@ -39,7 +39,7 @@ namespace engine3d::vk{
             .pNext = nullptr,
             // codesize has to be in bytes, multiple ints by buffer by size of the ints to know its actual size
             .codeSize = buffer.size() * sizeof(uint32_t),
-            .pCode = buffer.data()
+            .pCode = (uint32_t*)buffer.data()
         };
         
         //! @note Then we actually create the shader module with VkShaderModule being our handler
@@ -47,33 +47,18 @@ namespace engine3d::vk{
 
         if(res != VK_SUCCESS){
             ConsoleLogError("vkCreateShaderModule errored with message\t\t{}", VkResultToString(res));
+            m_ShaderLoaded = false;
+        }
+        else{
+            m_ShaderLoaded = true;
         }
 
         ConsoleLogInfo("VulkanShaderModule Loaded!");
+
+        ConsoleLogInfo("ShaderModule Data{}", (char *)buffer.data());
     }
 
+    bool VulkanShaderModule::IsLoaded(){ return m_ShaderLoaded; }
+
     VkShaderModule& VulkanShaderModule::GetVkShaderModuleInstance() { return m_ShaderModule; }
-
-    // std::vector<uint32_t> VulkanShaderModule::Load(const std::string& filepath){
-    //     std::fstream ins(filepath.c_str(), std::ios::ate | std::ios::binary);
-
-    //     if(!ins){
-    //         return {};
-    //     }
-
-    //     //! @note Spirv expects buffer to be uint32, make sure reserve an int vector big enough for entire file.
-    //     size_t filesize = (size_t)ins.tellg();
-    //     std::vector<uint32_t> buffer(filesize / sizeof(uint32_t));
-
-    //     // put file cursor at beginning
-    //     ins.seekg(0);
-
-    //     // load entire file into buffer
-    //     ins.read((char*)buffer.data(), filesize);
-
-    //     ins.close();
-
-
-    //     return buffer;
-    // }
 };

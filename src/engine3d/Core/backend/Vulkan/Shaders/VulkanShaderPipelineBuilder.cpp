@@ -1,8 +1,10 @@
+#include <Core/backend/Vulkan/Shaders/VulkanShaderPipelineBuilder.h>
 #include "Core/EngineLogger.h"
 #include "Core/backend/Vulkan/Vulkan.h"
 #include "Core/backend/Vulkan/VulkanDevice.h"
 #include "Core/backend/utilities/helper_functions.h"
-#include <Core/backend/Vulkan/Shaders/VulkanShaderPipelineBuilder.h>
+#include <Core/backend/Vulkan/Shaders/VulkanShaderModule.h>
+
 #include <vulkan/vulkan_core.h>
 
 namespace engine3d::vk{
@@ -211,6 +213,46 @@ namespace engine3d::vk{
         m_Pipeline = make_pipeline(VulkanDevice::GetVkLogicalDeviceInstance(), pass);
         m_VertShaderModule = vertShaderModule;
         m_FragShaderModule = fragShaderModule;
+
+        ConsoleLogInfo("VulkanShaderPipelineBuilder finished loading shader pipeline!");
+        // static shaderc::Compiler compiler;
+    }
+
+    VulkanShaderPipelineBuilder::VulkanShaderPipelineBuilder(VulkanShaderModule& vertShader, VulkanShaderModule& fragShader, VulkanRenderPass& pass){
+        m_ShaderStages.push_back(pipeline_shader_stage_create_info(VK_SHADER_STAGE_VERTEX_BIT, vertShader.GetVkShaderModuleInstance()));
+        m_ShaderStages.push_back(pipeline_shader_stage_create_info(VK_SHADER_STAGE_FRAGMENT_BIT, fragShader.GetVkShaderModuleInstance()));
+
+        m_VertexInputInfo = vertex_input_state_create_info();
+        m_InputAssembly = input_assembly_create_info(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
+
+        // m_Viewport.x = 0.0f;
+        // m_Viewport.y = 0.0f;
+        // m_Viewport.width = VulkanPipeline::GetWidth()
+        // m_Viewport.height = 0.0f;
+        m_Viewport = {
+            .x = 0.0f, .y = 0.0f,
+            .width = (float)VulkanPipeline::GetWidth(),
+            .height = (float)VulkanPipeline::GetHeight(),
+            .minDepth = 0.0f,
+            .maxDepth = 1.0f
+        };
+
+        m_Scissor = {
+            .offset = {0, 0},
+            .extent = {VulkanPipeline::GetWidth(), VulkanPipeline::GetHeight()}
+        };
+
+        m_Rasterizer = rasterization_state_create_info(VK_POLYGON_MODE_FILL);
+
+        m_Multisampling = multisampling_state_create_info();
+
+        m_ColorBlendAttachment = color_blend_attachment_state();
+
+        m_PipelineLayout = make_pipeline_layout(VulkanDevice::GetVkLogicalDeviceInstance());
+
+        m_Pipeline = make_pipeline(VulkanDevice::GetVkLogicalDeviceInstance(), pass.GetVkRenderPass());
+        m_VertShaderModule = vertShader.GetVkShaderModuleInstance();
+        m_FragShaderModule = fragShader.GetVkShaderModuleInstance();
 
         ConsoleLogInfo("VulkanShaderPipelineBuilder finished loading shader pipeline!");
     }

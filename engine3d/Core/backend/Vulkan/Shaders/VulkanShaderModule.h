@@ -16,7 +16,10 @@ namespace engine3d{
             VulkanShaderModule() = default;
             VulkanShaderModule(const std::string& filepath);
             VkShaderModule& GetVkShaderModuleInstance();
+
+            bool IsLoaded();
         private:
+            bool m_ShaderLoaded;
             VkShaderModule m_ShaderModule;
         };
     };
