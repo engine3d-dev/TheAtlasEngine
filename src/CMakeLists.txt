@@ -29,14 +29,14 @@ set(
     ../${ENGINE_INCLUDE_NAME}/Core/Window.h
 
     # backend/Vulkan Sources
-    ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/Vulkan.h
-    ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/VulkanDevice.h
-    ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/VulkanSwapchain.h
-    ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/VulkanCommandBuffer.h
-    ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/VulkanCommandBuffer.h
-    ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/VulkanRenderPass.h
-    ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/Shaders/VulkanShaderModule.h
-    ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/Shaders/VulkanShaderPipelineBuilder.h
+    ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan-Experiemental/Vulkan.h
+    ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan-Experiemental/VulkanDevice.h
+    ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan-Experiemental/VulkanSwapchain.h
+    ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan-Experiemental/VulkanCommandBuffer.h
+    ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan-Experiemental/VulkanCommandBuffer.h
+    ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan-Experiemental/VulkanRenderPass.h
+    # ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/Shaders/VulkanShaderModule.h
+    # ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/Shaders/VulkanShaderPipelineBuilder.h
 
     ../${ENGINE_INCLUDE_NAME}/Core/Renderer/Renderer.h
     ../${ENGINE_INCLUDE_NAME}/Core/Engine/Engine3D.h
@@ -73,14 +73,14 @@ set(
     ${ENGINE_INCLUDE_NAME}/Core/backend/utilities/helper_functions.cpp
 
     # backend/Vulkan Sources
-    ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/Vulkan.cpp
-    ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/VulkanDevice.cpp
-    ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/VulkanSwapchain.cpp
-    ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/VulkanCommandBuffer.cpp
-    ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/VulkanCommandQueue.cpp
-    ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/VulkanRenderPass.cpp
-    ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/Shaders/VulkanShaderModule.cpp
-    ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/Shaders/VulkanShaderPipelineBuilder.cpp
+    ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan-Experiemental/Vulkan.cpp
+    ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan-Experiemental/VulkanDevice.cpp
+    ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan-Experiemental/VulkanSwapchain.cpp
+    ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan-Experiemental/VulkanCommandBuffer.cpp
+    ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan-Experiemental/VulkanCommandQueue.cpp
+    ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan-Experiemental/VulkanRenderPass.cpp
+    # ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/Shaders/VulkanShaderModule.cpp
+    # ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan/Shaders/VulkanShaderPipelineBuilder.cpp
     ${ENGINE_INCLUDE_NAME}/Core/Renderer/Renderer.cpp
 
 

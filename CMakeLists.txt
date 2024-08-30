@@ -3,6 +3,16 @@ project(engine3d C CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 
+# Enabling fsanitize=address on all platforms
+
+# if(WIN32)
+#     set(CMAKE_CXX_FLAGS "-static /fsanitize=address")
+# else()
+#     set(CMAKE_CXX_FLAGS "-fsanitize=address")
+# endif()
+
+# 4 is 4, ten is ten, 14 is 14, 40 is 40
+
 # Setting the makefile location in chocolatey
 # set(CMAKE_MAKE_PROGRAM  "${env:ChocolateyInstall}")
 # set(CMAKE_GENERATOR "Unix Makefiles")
@@ -16,25 +26,26 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "") # works (in creating the
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(Vulkan REQUIRED)
-find_package(VulkanHeaders REQUIRED)
 find_package(glm REQUIRED)
 find_package(fmt REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(yaml-cpp REQUIRED)
-find_package(box2d REQUIRED)
+# find_package(box2d REQUIRED)
+find_package(imguidocking REQUIRED)
+find_package(joltphysics REQUIRED)
+# find_package(shaderc REQUIRED)
 # find_package(SPIRV-Tools REQUIRED)
-# add_subdirectory(engine3d/Core/backend/third_party/JoltPhysics)
 
-include(FetchContent)
+# include(FetchContent)
 
 # Include Jolt (3D Physics framework)
-FetchContent_Declare(
-    JoltPhysics
-    GIT_REPOSITORY "https://github.com/engine3d-dev/JoltPhysics"
-    SOURCE_SUBDIR "build"
-)
+# FetchContent_Declare(
+#     JoltPhysics
+#     GIT_REPOSITORY "https://github.com/engine3d-dev/JoltPhysics"
+#     SOURCE_SUBDIR "build"
+# )
 
-FetchContent_MakeAvailable(JoltPhysics)
+# FetchContent_MakeAvailable(JoltPhysics)
 
 # find_package(shaderc REQUIRED)
 # find_package(joltphysics REQUIRED)
@@ -44,8 +55,8 @@ FetchContent_MakeAvailable(JoltPhysics)
 # find_package(shaderc REQUIRED)
 
 add_subdirectory(src)
-add_subdirectory(Editor)
-add_subdirectory(Testbed)
+# add_subdirectory(Editor)
+# add_subdirectory(Testbed)
 
 # This will run the build doing -j which is building at full capacity.
 # TODO - Should probably have this be disabled by default and have this be a flag set through conan.
@@ -90,26 +101,31 @@ add_custom_command(
 # Usage - used to suppress that lld-link error and use the defaulted linked .library
 if(MSVC)
     target_compile_options(${PROJECT_NAME} PUBLIC "/Z1" "/NOD")
+# else()
+#     target_compile_options(${PROJECT_NAME} PUBLIC "-fsanitize=address")
 endif(MSVC)
 
 # target_include_directory is setting some private settings for differentiating what internal includes are privates and what should be includes should be exposed to the application-dev
 target_include_directories(${PROJECT_NAME} PRIVATE engine3d/ engine3d/Core)
-message("PROJECT SOURCE DIR ====>>> ${CMAKE_SOURCE_DIR}")
+# message("PROJECT SOURCE DIR ====>>> ${CMAKE_SOURCE_DIR}")
 target_include_directories(${PROJECT_NAME} PUBLIC ${JoltPhysics_SOURCE_DIR} ${GLM_INCLUDE_DIR} ./engine3d)
 
 target_link_libraries(
     ${PROJECT_NAME}
-    PUBLIC
+    PRIVATE
     glfw
     ${OPENGL_LIBRARIES}
     Vulkan::Vulkan
-    vulkan-headers::vulkan-headers
+    # vulkan-headers::vulkan-headers
     glm::glm
     fmt::fmt
     spdlog::spdlog
     yaml-cpp::yaml-cpp
-    box2d::box2d
-    Jolt
+    # box2d::box2d
+    # Jolt
+    imguidocking::imguidocking
+    Jolt::Jolt
+    # shaderc::shaderc
 )
 
 install(TARGETS ${PROJECT_NAME})
