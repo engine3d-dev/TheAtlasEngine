@@ -10,6 +10,8 @@ class engine3dTestConan(ConanFile):
     generators = "CMakeDeps", "CMakeToolchain"
 
     def requirements(self):
+        # self.requires("engine3d/1.0")
+        self.requires("imguidocking/1.0")
         self.requires(self.tested_reference_str)
 
     def build(self):
@@ -21,10 +23,7 @@ class engine3dTestConan(ConanFile):
         cmake_layout(self)
 
     # This is to run the example code
-    # Disabling it
-    # def test(self):
     def test(self):
-        pass
-    #     if can_run(self):
-    #         cmd = os.path.join(self.cpp.build.bindir, "example")
-    #         self.run(cmd, env="conanrun")
+        if can_run(self):
+            cmd = os.path.join(self.cpp.build.bindir, "example")
+            self.run(cmd, env="conanrun")
