@@ -8,11 +8,8 @@
 namespace engine3d{
 
     EditorApplication::EditorApplication(const std::string& p_DebugName) : ApplicationInstance(p_DebugName) {
-        /* Renderer::Initialize(); */
-        /* Renderer::SetBackgroundColor({0.0f, 0.5f, 0.5f, 0.f}); */
+        Renderer::Initialize();
         Renderer::SetBackgroundColor({1.0f, 0.0f, 0.0f, 0.0f});
-
-        ConsoleLogInfo("Initializing Current Application Name === {}!!!", ApplicationInstance::CurrentApplicationName());
     }
 
     EditorApplication::~EditorApplication() {}

@@ -13,7 +13,6 @@ class Editor(ConanFile):
     exports_sources = "CMakeLists.txt", "Editor/*"
 
     def requirements(self):
-        # self.requires("getopt-for-visual-studio/20200201")
         self.requires("imguidocking/1.0")
         self.requires("engine3d/1.0")
 
@@ -29,22 +28,4 @@ class Editor(ConanFile):
         cmake.build()
     
     def layout(self):
-        cmake_layout(self)
-    
-    # def package(self):
-    #     copy(self, "LICENSE", src=self.source_folder, dst=os.path.join(self.package_folder, "licenses"))
-    #     copy(self, pattern="*.h", src=os.path.join(self.source_folder, "./Editor/"), dst=os.path.join(self.package_folder, "Editor"))
-    #     copy(self, pattern="*.cpp", src=os.path.join(self.source_folder, "./Editor/"), dst=os.path.join(self.package_folder, "Editor"))
-    #     copy(self, pattern="*.a", src=self.build_folder, dst=os.path.join(self.package_folder, "lib"), keep_path=False)
-    #     copy(self, pattern="*.so", src=self.build_folder, dst=os.path.join(self.package_folder, "lib"), keep_path=False)
-    #     copy(self, pattern="*.lib", src=self.build_folder, dst=os.path.join(self.package_folder, "lib"), keep_path=False)
-    #     copy(self, pattern="*.dll", src=self.build_folder, dst=os.path.join(self.package_folder, "bin"), keep_path=False)
-    #     copy(self, pattern="*.dylib", src=self.build_folder, dst=os.path.join(self.package_folder, "lib"), keep_path=False)
-    #     cmake = CMake(self)
-    #     cmake.install()
-    
-    # def package_info(self):
-    #     self.cpp_info.set_property("cmake_target_name", "engine3d::engine3d")
-    #     self.cpp_info.libs = ["engine3d"]
-    #     self.cpp_info.includedirs = ['./', './engine3d']  # Ordered list of include paths
-    
+        cmake_layout(self)    

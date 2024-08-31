@@ -29,6 +29,7 @@ set(
     ../${ENGINE_INCLUDE_NAME}/Core/Window.h
 
     # backend/Vulkan Sources
+    ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan-Experiemental/helper-functions.h
     ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan-Experiemental/Vulkan.h
     ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan-Experiemental/VulkanDevice.h
     ../${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan-Experiemental/VulkanSwapchain.h
@@ -73,6 +74,7 @@ set(
     ${ENGINE_INCLUDE_NAME}/Core/backend/utilities/helper_functions.cpp
 
     # backend/Vulkan Sources
+    ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan-Experiemental/helper-functions.cpp
     ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan-Experiemental/Vulkan.cpp
     ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan-Experiemental/VulkanDevice.cpp
     ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan-Experiemental/VulkanSwapchain.cpp

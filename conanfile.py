@@ -32,7 +32,7 @@ class engine3dRecipe(ConanFile):
         self.requires("spdlog/1.14.1", transitive_headers=True)
         self.requires("glm/1.0.1", transitive_headers=True)
         self.requires("yaml-cpp/0.8.0", transitive_headers=True)
-        self.requires("box2d/1.0")
+        self.requires("box2d/2.4.2")
         self.requires("opengl/system", transitive_headers=True)
         
         # engine3d-dev customized conan packages for these dependencies
@@ -41,10 +41,7 @@ class engine3dRecipe(ConanFile):
 
         # self.requires("shaderc/2023.6")
         # self.requires("physx/4.1.2")
-        # self.requires("directx-headers/1.610.2", transitive_headers=True)
         # self.requires("assimp/5.4.1")
-        # self.requires("joltphysics/3.0.1", transitive_headers=True)
-        # self.requires("joltphysics/3.0.1", transitive_headers=True)
 
     def config_options(self):
         if self.settings.os == "Windows":

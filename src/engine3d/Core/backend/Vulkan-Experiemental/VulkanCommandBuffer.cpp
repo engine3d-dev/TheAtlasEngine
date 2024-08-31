@@ -12,11 +12,11 @@ namespace engine3d::vk{
      * @note TODO -- command pools should be in a different implementation task as later on we may be dealing with mutliple command buffers
      * @note Where we may want to record these commands, reset them, or even allocate them in parallel
     */
-    VulkanCommandBuffer::VulkanCommandBuffer(uint32_t imageSizeCount) {
+    VulkanCommandBuffer::VulkanCommandBuffer(uint32_t commandBufferSizeCount) {
         //! @note Initializing Command Buffer Pool
         //! @note TODO --- Having this be a separate implementation since we will be dealing with multiple command buffers in the future.
         //! @note For now we will have command pool in here.
-        m_ImagesCount = imageSizeCount;
+        // m_ImagesCount = imageSizeCount;
         VkCommandPoolCreateInfo commandPoolCreateInfo = {
             .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
             .pNext = nullptr,
@@ -24,7 +24,7 @@ namespace engine3d::vk{
             .queueFamilyIndex = VulkanDevice::GetLogicalDevice().QueueFamily(),
         };
 
-        m_CommandBuffers.resize(m_ImagesCount);
+        m_CommandBuffers.resize(commandBufferSizeCount);
 
         VkResult res = vkCreateCommandPool(VulkanDevice::GetVkLogicalDeviceInstance(), &commandPoolCreateInfo, nullptr, &m_CommandPool);
 
@@ -49,194 +49,82 @@ namespace engine3d::vk{
     VulkanCommandBuffer::~VulkanCommandBuffer(){
     }
 
-    void VulkanCommandBuffer::Begin(VkCommandBuffer commandBuffer, VkCommandBufferUsageFlags usageFlags){
-        VkCommandBufferBeginInfo beginInfo{
-            .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-            .pNext = nullptr,
-            .flags = usageFlags,
-            .pInheritanceInfo = nullptr
-        };
 
-        VkResult res = vkBeginCommandBuffer(commandBuffer, &beginInfo);
-        if(res != VK_SUCCESS){
-            ConsoleLogError("vkBeginCommandBuffer error message is ==> {}", VkResultToString(res));
-        }
-    }
+    /**
+        vk::record(commandBuffer, flags, [](){
+              // do stuff...
+        });
 
-    void VulkanCommandBuffer::End(VkCommandBuffer buffer){
-        VkResult res = vkEndCommandBuffer(buffer);
-        if(res != VK_SUCCESS){
-            ConsoleLogError("vkEndCommandBuffer errored message is {}", VkResultToString(res));
-        }
-    }
 
-    void VulkanCommandBuffer::RecordClearBackgroundColor(float r, float g, float b, float a){
-        VkClearColorValue clearColorValue = { r, g, b, a};
-
-        VkImageSubresourceRange imgRange = {
-            .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-            .baseMipLevel = 0,
-            .levelCount = 1,
-            .baseArrayLayer = 0,
-            .layerCount = 1
-        };
-
-        uint32_t presentQueueFamily = VulkanDevice::GetLogicalDevice().QueueFamily();
-        
-        //! @note Command buffers for our images
-        // for(int i = 0; i < m_CommandBuffers.size(); i++){
-        //     VkImageMemoryBarrier presentationToClearBarrier = {};
-		// 	presentationToClearBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-		// 	presentationToClearBarrier.srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
-		// 	presentationToClearBarrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-		// 	presentationToClearBarrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		// 	presentationToClearBarrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-		// 	presentationToClearBarrier.srcQueueFamilyIndex = presentQueueFamily;
-		// 	presentationToClearBarrier.dstQueueFamilyIndex = presentQueueFamily;
-		// 	presentationToClearBarrier.image = VulkanSwapchain::GetImage(i);
-		// 	presentationToClearBarrier.subresourceRange = imgRange;
-
-		// 	// Change layout of image to be optimal for presenting
-		// 	VkImageMemoryBarrier clearToPresentBarrer = {};
-		// 	clearToPresentBarrer.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-		// 	clearToPresentBarrer.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-		// 	clearToPresentBarrer.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
-		// 	clearToPresentBarrer.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-		// 	clearToPresentBarrer.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-		// 	clearToPresentBarrer.srcQueueFamilyIndex = presentQueueFamily;
-		// 	clearToPresentBarrer.dstQueueFamilyIndex = presentQueueFamily;
-		// 	clearToPresentBarrer.image = VulkanSwapchain::GetImage(i);
-		// 	clearToPresentBarrer.subresourceRange = imgRange;
-
-        //     Begin(m_CommandBuffers[i], VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
-
-        //     vkCmdPipelineBarrier(m_CommandBuffers[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 
-        //     0, // dependency flags
-        //     0, nullptr, // memory barriers
-        //     0, nullptr, // buffer memory barriers 
-        //     1, &presentationToClearBarrier);
-
-        //     vkCmdClearColorImage(m_CommandBuffers[i], VulkanSwapchain::GetImage(i), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &clearColorValue, 1, &imgRange);
-        //     vkCmdPipelineBarrier(m_CommandBuffers[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, 0, 0, nullptr, 0, nullptr, 1, &clearToPresentBarrer);
-
-        //     End(m_CommandBuffers[i]);
-        // }
-
-        //! @param TODO -- Should fix the way we handle command buffers... am not liking this API!
-        //! @note Used for recording the clear instructions before submission.
-        for(uint32_t i = 0; i < m_CommandBuffers.size(); i++){
-            //! @param VK_IMAGE_LAYOUT_GENERAL layouts specify the pixels packed together inside actual memory of the image.
-            //! @note Use of different layouts are for performance, whereas your GPU may perform better utilizing different layouts at diff stages of pipeline.
-            //! @param VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT is used to make the state of this recorded buffer as a simultaneously use bit
-            Begin(m_CommandBuffers[i], VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
-
-            vkCmdClearColorImage(m_CommandBuffers[i], VulkanSwapchain::GetImage(i), VK_IMAGE_LAYOUT_GENERAL, &clearColorValue, 1, &imgRange);
-            End(m_CommandBuffers[i]);
+        static void record(VulkanCommandBuffer, flags, UCommand cmd){
+            commandBuffer.begin(flags);
+            cmd();
+            commandBuffer.end();
         }
 
-        ConsoleLogInfo("VulkanCommandBuffer::Record() called!");
-    }
+        @note Option #1 -- If there are multiple command buffers this is what it would look like:
 
-    void VulkanCommandBuffer::RecordCommandBuffers(){
-        //! @note Actual color that represents what our window will be cleared to.
-        VkClearColorValue clearColorValue = { 0.0f, 0.5f, 0.5f, 0.f };
-
-        VkImageSubresourceRange imgRange = {
-            .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-            .baseMipLevel = 0,
-            .levelCount = 1,
-            .baseArrayLayer = 0,
-            .layerCount = 1
-        };
-
-        uint32_t presentQueueFamily = VulkanDevice::GetLogicalDevice().QueueFamily();
-        
-        //! @note Command buffers for our images
         for(int i = 0; i < m_CommandBuffers.size(); i++){
-            //! @note Why does this not work when we specify VK_QUEUE_FAMILY_IGNORED!
-            // VkImageMemoryBarrier presentationToClearBarrier = {
-            //     .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
-            //     .pNext = nullptr,
-            //     .srcAccessMask = VK_ACCESS_MEMORY_READ_BIT,
-            //     .dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT,
-            //     .oldLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-            //     .newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-            //     .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-            //     .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-            //     .image = VulkanSwapchain::GetImage(i),
-            //     .subresourceRange = imgRange
-            // };
+            vk::record(m_CommandBuffers[i], flags, [](){
 
-            // //! @note Change layout of image to be optimal WHEN presenting
-            // VkImageMemoryBarrier clearToPresentBarrer = {
-            //     .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
-            //     .pNext = nullptr,
-            //     .srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT,
-            //     .dstAccessMask = VK_ACCESS_MEMORY_READ_BIT,
-            //     .newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-            //     .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-            //     .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-            //     .image = VulkanSwapchain::GetImage(i),
-            //     .subresourceRange = imgRange
-            // };
-
-            VkImageMemoryBarrier presentationToClearBarrier = {};
-			presentationToClearBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-			presentationToClearBarrier.srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
-			presentationToClearBarrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-			presentationToClearBarrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-			presentationToClearBarrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-			presentationToClearBarrier.srcQueueFamilyIndex = presentQueueFamily;
-			presentationToClearBarrier.dstQueueFamilyIndex = presentQueueFamily;
-			presentationToClearBarrier.image = VulkanSwapchain::GetImage(i);
-			presentationToClearBarrier.subresourceRange = imgRange;
-
-			// Change layout of image to be optimal for presenting
-			VkImageMemoryBarrier clearToPresentBarrer = {};
-			clearToPresentBarrer.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-			clearToPresentBarrer.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-			clearToPresentBarrer.dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
-			clearToPresentBarrer.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-			clearToPresentBarrer.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-			clearToPresentBarrer.srcQueueFamilyIndex = presentQueueFamily;
-			clearToPresentBarrer.dstQueueFamilyIndex = presentQueueFamily;
-			clearToPresentBarrer.image = VulkanSwapchain::GetImage(i);
-			clearToPresentBarrer.subresourceRange = imgRange;
-
-            Begin(m_CommandBuffers[i], VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
-
-            vkCmdPipelineBarrier(m_CommandBuffers[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 
-            0, // dependency flags
-            0, nullptr, // memory barriers
-            0, nullptr, // buffer memory barriers 
-            1, &presentationToClearBarrier);
-
-            vkCmdClearColorImage(m_CommandBuffers[i], VulkanSwapchain::GetImage(i), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, &clearColorValue, 1, &imgRange);
-            vkCmdPipelineBarrier(m_CommandBuffers[i], VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, 0, 0, nullptr, 0, nullptr, 1, &clearToPresentBarrer);
-
-            End(m_CommandBuffers[i]);
+            });
         }
 
-        //! @param TODO -- Should fix the way we handle command buffers... am not liking this API!
-        //! @note Used for recording the clear instructions before submission.
-        // for(uint32_t i = 0; i < m_CommandBuffers.size(); i++){
-        //     //! @param VK_IMAGE_LAYOUT_GENERAL layouts specify the pixels packed together inside actual memory of the image.
-        //     //! @note Use of different layouts are for performance, whereas your GPU may perform better utilizing different layouts at diff stages of pipeline.
-        //     //! @param VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT is used to make the state of this recorded buffer as a simultaneously use bit
-        //     Begin(m_CommandBuffers[i], VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
+        @note Option #2
+        @note Esentially this will record commands to this buffer - that also depends how many command buffers is stored here.
+        vk::record(m_CommandBuffers, flags, [](){});
 
-        //     vkCmdClearColorImage(m_CommandBuffers[i], VulkanSwapchain::GetImage(i), VK_IMAGE_LAYOUT_GENERAL, &clearColorValue, 1, &imgRange);
-        //     End(m_CommandBuffers[i]);
-        // }
+        @note Backend would look
+        void record(m_CommandBuffers, flags, UCommand command){
+            for(int i = 0; i < size; i++){
+                auto& currCmdBuffer = m_CommandBuffers[i];
+                currCmdBuffer.begin(flags);
+                command();
+                currCmdBuffer.end();
+            }
+        }
 
-        ConsoleLogInfo("VkCommandBuffer Recorded!");
-    }
+    */
 
-    VkCommandBuffer& VulkanCommandBuffer::operator[](uint32_t idx){
+    VkCommandBuffer& VulkanCommandBuffer::GetActiveBuffer(uint32_t idx) {
         return m_CommandBuffers[idx];
     }
 
-    uint32_t VulkanCommandBuffer::GetCmdBufferSize(){
+    uint32_t VulkanCommandBuffer::Size() const{
         return m_CommandBuffers.size();
     }
+
+
+
+
+
+
+
+    // void VulkanCommandBuffer::RecordClearBackgroundColor(float r, float g, float b, float a){
+    //     VkClearColorValue clearColorValue = { r, g, b, a};
+
+    //     VkImageSubresourceRange imgRange = {
+    //         .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+    //         .baseMipLevel = 0,
+    //         .levelCount = 1,
+    //         .baseArrayLayer = 0,
+    //         .layerCount = 1
+    //     };
+
+    //     uint32_t presentQueueFamily = VulkanDevice::GetLogicalDevice().QueueFamily();
+
+    //     //! @param TODO -- Should fix the way we handle command buffers... am not liking this API!
+    //     //! @note Used for recording the clear instructions before submission.
+    //     for(uint32_t i = 0; i < m_CommandBuffers.size(); i++){
+    //         //! @param VK_IMAGE_LAYOUT_GENERAL layouts specify the pixels packed together inside actual memory of the image.
+    //         //! @note Use of different layouts are for performance, whereas your GPU may perform better utilizing different layouts at diff stages of pipeline.
+    //         //! @param VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT is used to make the state of this recorded buffer as a simultaneously use bit
+    //         // Begin(m_CommandBuffers[i], VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
+
+    //         vkCmdClearColorImage(m_CommandBuffers[i], VulkanSwapchain::GetImage(i), VK_IMAGE_LAYOUT_GENERAL, &clearColorValue, 1, &imgRange);
+    //         End(m_CommandBuffers[i]);
+    //     }
+
+    //     ConsoleLogInfo("VulkanCommandBuffer::Record() called!");
+    // }
 };
