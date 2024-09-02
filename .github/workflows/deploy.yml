@@ -10,8 +10,6 @@ jobs:
     with:
       compiler: gcc
       version: ${{ github.ref_name }}
-      arch: x86_64
-      compiler_version: 12.3
       compiler_package: ""
       os: Linux
     secrets: inherit
