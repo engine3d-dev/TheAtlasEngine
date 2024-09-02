@@ -9,5 +9,6 @@ jobs:
     uses: engine3d-dev/ci/.github/workflows/deploy.yml@main
     with:
       version: ${{ github.ref_name }}
+      arch: x86_64
       os: Linux
     secrets: inherit
