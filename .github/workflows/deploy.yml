@@ -9,7 +9,6 @@ jobs:
   engine3d:
     uses: engine3d-dev/ci/.github/workflows/deploy.yml@2.x.y
     with:
-      compiler: gcc
       version: ${{ github.ref_name }}
       arch: x86_64
       compiler_version: 12.3
