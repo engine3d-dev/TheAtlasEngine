@@ -22,13 +22,17 @@ namespace engine3d{
         class VulkanCommandBuffer{
         public:
             VulkanCommandBuffer() = default;
+<<<<<<< HEAD
             /**
              * @param count is the size of command buffers this current command buffer structure contains.
             */
+=======
+>>>>>>> fa59aaf07c9cbf80f5d25918c4d43b3cca25238f
             VulkanCommandBuffer(uint32_t count);
             ~VulkanCommandBuffer();
 
             /**
+<<<<<<< HEAD
              * @param begin indicates when the command buffer should start recording commands
              * @param end tells the command buffer where to stop recording commands.
             */
@@ -42,6 +46,23 @@ namespace engine3d{
             uint32_t Size() const;
 
         private:
+=======
+             * @param CommandBuffer is the buffer that we take as the handle
+             * @param VkCommandUsageFlags represents the flags tell how the command buffers will be used through submission
+            */
+            void Begin(VkCommandBuffer commandBuffer, VkCommandBufferUsageFlags usageFlags);
+            void End(VkCommandBuffer buffer);
+
+            void RecordClearBackgroundColor(float r, float g, float b, float a = 1.0f);
+            void RecordCommandBuffers();
+
+            VkCommandBuffer& operator[](uint32_t idx);
+
+            uint32_t GetCmdBufferSize();
+
+        private:
+            uint32_t m_ImagesCount = 0; // number of images
+>>>>>>> fa59aaf07c9cbf80f5d25918c4d43b3cca25238f
             std::vector<VkCommandBuffer> m_CommandBuffers;
             VkCommandPool m_CommandPool;
         };

@@ -74,7 +74,10 @@ set(
     ${ENGINE_INCLUDE_NAME}/Core/backend/utilities/helper_functions.cpp
 
     # backend/Vulkan Sources
+<<<<<<< HEAD
     ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan-Experiemental/helper-functions.cpp
+=======
+>>>>>>> fa59aaf07c9cbf80f5d25918c4d43b3cca25238f
     ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan-Experiemental/Vulkan.cpp
     ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan-Experiemental/VulkanDevice.cpp
     ${ENGINE_INCLUDE_NAME}/Core/backend/Vulkan-Experiemental/VulkanSwapchain.cpp

@@ -47,3 +47,51 @@ namespace engine3d{
     private:
     };
 };
+
+/**
+ * 
+ * 
+ * 
+ * 
+ * 
+
+!@note Changing command buffers API
+
+
+//! @note This is equivalent to doing:
+vk::Begin(m_CommandBuffer);
+// Do the actual task below here
+vk::End(m_CommandBuffer);
+
+//! @note Preferred API. Since recording tasks into command buffer may vary.
+//! @note Option #1
+m_ClearColorCommandBuffer.Record([](){
+    VkImageSubresourceRange imageRange = {
+        .aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT,
+        .baseMipLevel = 0,
+        .levelCount = 1,
+        .baseArrayLayer = 0,
+        .layerCount = 1
+    };
+
+    uint32_t presentQueueFamily = vk::VulkanDevice::GetLogicalDevice().QueueFamily();
+    
+    vkCmdClearColorImage(g_ClearColorCommandBuffer, vk::VulkanSwapchain::GetImage(0), VK_IMAGE_LAYOUT_GENERAL, &clearColorValue.color, 1, &imageRange);
+});
+
+//! @note Option #2
+
+vk::Record(m_CommandBuffer, [](){
+    VkImageSubresourceRange imageRange = {
+        .aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT,
+        .baseMipLevel = 0,
+        .levelCount = 1,
+        .baseArrayLayer = 0,
+        .layerCount = 1
+    };
+
+    uint32_t presentQueueFamily = vk::VulkanDevice::GetLogicalDevice().QueueFamily();
+    
+    vkCmdClearColorImage(g_ClearColorCommandBuffer, vk::VulkanSwapchain::GetImage(0), VK_IMAGE_LAYOUT_GENERAL, &clearColorValue.color, 1, &imageRange);
+});
+*/
