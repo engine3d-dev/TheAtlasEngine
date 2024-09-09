@@ -1,0 +1,9 @@
+[submodule "engine3d/Core/backend/third_party/JolyPhysics"]
+	path = engine3d/Core/backend/third_party/JolyPhysics
+	url = https://github.com/engine3d-dev/JoltPhysics
+[submodule "engine3d/Core/backend/third_party/imgui"]
+	path = engine3d/Core/backend/third_party/imgui
+	url = https://github.com/SpinnerX/imgui
+[submodule "engine3d/Core/backend/third_party/ImGuizmo"]
+	path = engine3d/Core/backend/third_party/ImGuizmo
+	url = https://github.com/SpinnerX/ImGuizmo

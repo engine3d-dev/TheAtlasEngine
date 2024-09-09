@@ -25,22 +25,23 @@ class engine3dRecipe(ConanFile):
         self.requires("make/4.4.1")
         self.tool_requires("cmake/3.27.1")
         self.requires("glfw/3.4", transitive_headers=True)
+
+        # These end in 1.0 because they are engine3d-customized conan packages
+        # Slighly modified of the conan packages and it's CMake generators to using "Unix Makefiles" 
         self.requires("fmt/10.2.1", transitive_headers=True)
         self.requires("spdlog/1.14.1", transitive_headers=True)
         self.requires("glm/1.0.1", transitive_headers=True)
         self.requires("yaml-cpp/0.8.0", transitive_headers=True)
-        self.requires("box2d/2.4.1", transitive_headers=True)
+        self.requires("box2d/2.4.2")
         self.requires("opengl/system", transitive_headers=True)
+        
+        # engine3d-dev customized conan packages for these dependencies
+        # self.requires("imguidocking/1.0")
+        # self.requires("joltphysics/1.0")
 
-        # Vulkan-related headers and includes packages
-        self.requires("vulkan-headers/1.3.268.0", transitive_headers=True)
         # self.requires("shaderc/2023.6")
-        # self.requires("joltphysics/3.0.1")
         # self.requires("physx/4.1.2")
-        # self.requires("directx-headers/1.610.2", transitive_headers=True)
         # self.requires("assimp/5.4.1")
-        # self.requires("joltphysics/3.0.1", transitive_headers=True)
-        # self.requires("joltphysics/3.0.1", transitive_headers=True)
 
     def config_options(self):
         if self.settings.os == "Windows":
@@ -62,9 +63,8 @@ class engine3dRecipe(ConanFile):
         tc.generate()
 
     def build(self):
-        # cmake = CMake(self, generator="Unix Makefiles")
         cmake = CMake(self)
-        # cmake.verbose = True
+        cmake.verbose = True
         cmake.configure()
         cmake.build()
 
