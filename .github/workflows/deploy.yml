@@ -11,6 +11,5 @@ jobs:
     with:
       version: ${{ github.ref_name }}
       arch: x86_64
-      compiler_version: 12.3
       os: Linux
     secrets: inherit
