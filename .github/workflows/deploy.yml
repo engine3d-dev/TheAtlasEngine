@@ -12,5 +12,4 @@ jobs:
       # version: ${{ github.ref_name }}
       arch: x86_64
       os: Linux
-      version: "1.0"
     secrets: inherit
