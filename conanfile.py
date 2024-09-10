@@ -36,12 +36,21 @@ class engine3dRecipe(ConanFile):
         self.requires("opengl/system", transitive_headers=True)
         
         # engine3d-dev customized conan packages for these dependencies
-        # self.requires("imguidocking/1.0")
-        # self.requires("joltphysics/1.0")
+        self.requires("imguidocking/1.0")
+        self.requires("joltphysics/1.0")
 
         # self.requires("shaderc/2023.6")
         # self.requires("physx/4.1.2")
         # self.requires("assimp/5.4.1")
+    
+    def system_requirements(self):
+        # depending on the platform or the tools.system.package_manager:tool configuration
+        # only one of these will be executed
+        Apt(self).install(["libgl-dev"])
+        Yum(self).install(["libglvnd-devel"])
+        PacMan(self).install(["libglvnd"])
+        Zypper(self).install(["Mesa-libGL-devel"])
+
 
     def config_options(self):
         if self.settings.os == "Windows":
