@@ -47,7 +47,7 @@ class engine3dRecipe(ConanFile):
     def system_requirements(self):
         # depending on the platform or the tools.system.package_manager:tool configuration
         # only one of these will be executed
-        Apt(self).install(["libgl-dev"])
+        Apt(self).install(["libgl-dev", "clang"])
         Yum(self).install(["libglvnd-devel"])
         PacMan(self).install(["libglvnd"])
         Zypper(self).install(["Mesa-libGL-devel"])
