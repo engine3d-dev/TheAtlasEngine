@@ -8,6 +8,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "") # works (in creating the
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(Vulkan REQUIRED)
+find_package(VulkanHeaders REQUIRED)
 find_package(glm REQUIRED)
 find_package(fmt REQUIRED)
 find_package(spdlog REQUIRED)
@@ -62,10 +63,6 @@ endif(MSVC)
 
 # target_include_directory is setting some private settings for differentiating what internal includes are privates and what should be includes should be exposed to the application-dev
 target_include_directories(${PROJECT_NAME} PRIVATE engine3d/ engine3d/Core)
-<<<<<<< HEAD
-=======
-# message("PROJECT SOURCE DIR ====>>> ${CMAKE_SOURCE_DIR}")
->>>>>>> fa59aaf07c9cbf80f5d25918c4d43b3cca25238f
 target_include_directories(${PROJECT_NAME} PUBLIC ${JoltPhysics_SOURCE_DIR} ${GLM_INCLUDE_DIR} ./engine3d)
 
 target_link_libraries(
@@ -74,25 +71,14 @@ target_link_libraries(
     glfw
     ${OPENGL_LIBRARIES}
     Vulkan::Vulkan
-<<<<<<< HEAD
-=======
-    # vulkan-headers::vulkan-headers
->>>>>>> fa59aaf07c9cbf80f5d25918c4d43b3cca25238f
+    vulkan-headers::vulkan-headers
     glm::glm
     fmt::fmt
     spdlog::spdlog
     yaml-cpp::yaml-cpp
-<<<<<<< HEAD
     imguidocking::imguidocking
     box2d::box2d
     Jolt::Jolt
-=======
-    # box2d::box2d
-    # Jolt
-    imguidocking::imguidocking
-    Jolt::Jolt
-    # shaderc::shaderc
->>>>>>> fa59aaf07c9cbf80f5d25918c4d43b3cca25238f
 )
 
 install(TARGETS ${PROJECT_NAME})
