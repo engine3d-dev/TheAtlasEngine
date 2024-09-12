@@ -7,8 +7,15 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "") # works (in creating the
 
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
+if(WIN32)
 find_package(Vulkan REQUIRED)
 find_package(VulkanHeaders REQUIRED)
+endif(WIN32)
+
+if(LINUX)
+find_package(VulkanLoader REQUIRED)
+endif(LINUX)
+
 find_package(glm REQUIRED)
 find_package(fmt REQUIRED)
 find_package(spdlog REQUIRED)
@@ -65,6 +72,7 @@ endif(MSVC)
 target_include_directories(${PROJECT_NAME} PRIVATE engine3d/ engine3d/Core)
 target_include_directories(${PROJECT_NAME} PUBLIC ${JoltPhysics_SOURCE_DIR} ${GLM_INCLUDE_DIR} ./engine3d)
 
+if(WIN32)
 target_link_libraries(
     ${PROJECT_NAME}
     PRIVATE
@@ -80,5 +88,24 @@ target_link_libraries(
     box2d::box2d
     Jolt::Jolt
 )
+endif(WIN32)
+
+if(LINUX)
+target_link_libraries(
+    ${PROJECT_NAME}
+    PRIVATE
+    glfw
+    ${OPENGL_LIBRARIES}
+    Vulkan::Loader
+    glm::glm
+    fmt::fmt
+    spdlog::spdlog
+    yaml-cpp::yaml-cpp
+    imguidocking::imguidocking
+    box2d::box2d
+    Jolt::Jolt
+)
+endif(LINUX)
+
 
 install(TARGETS ${PROJECT_NAME})
