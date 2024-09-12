@@ -1,5 +1,5 @@
 #pragma once
-#include <Core/Core.h>
+#include <Core/core.h>
 #include <Core/Event/Event.h>
 #include <sstream>
 

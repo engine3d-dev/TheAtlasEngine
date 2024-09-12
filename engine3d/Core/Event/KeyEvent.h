@@ -1,6 +1,6 @@
 #pragma once
 // #include <Core/internal/Core.h>
-#include <Core/Core.h>
+#include <Core/core.h>
 #include <Core/Event/Event.h>
 #include <Core/Event/KeyCodes.h>
 #include <sstream>
