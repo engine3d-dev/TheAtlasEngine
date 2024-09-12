@@ -42,7 +42,7 @@ class engine3dRecipe(ConanFile):
             self.requires("vulkan-headers/1.3.290.0")
         if self.settings.os == "Linux":
             self.requires("vulkan-loader/1.3.290.0")
-            
+        print(f"OS = {self.settings.os}")            
         self.requires("imguidocking/1.0")
         self.requires("joltphysics/1.0")
         # self.requires("assimp/5.4.1")
@@ -50,7 +50,7 @@ class engine3dRecipe(ConanFile):
     def system_requirements(self):
         # depending on the platform or the tools.system.package_manager:tool configuration
         # only one of these will be executed
-        Apt(self).install(["libgl-dev", "clang"])
+        Apt(self).install(["libgl-dev"])
         Yum(self).install(["libglvnd-devel"])
         PacMan(self).install(["libglvnd"])
         Zypper(self).install(["Mesa-libGL-devel"])
@@ -75,6 +75,10 @@ class engine3dRecipe(ConanFile):
         tc.generate()
 
     def build(self):
+        # you can again check or process additional logic before build
+        if not self.conf.get("tools.system.package_manager:mode"):
+            self.conf.define("tools.system.package_manager:mode", "install")
+        
         cmake = CMake(self)
         cmake.verbose = True
         cmake.configure()
