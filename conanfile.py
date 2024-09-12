@@ -47,13 +47,13 @@ class engine3dRecipe(ConanFile):
         self.requires("joltphysics/1.0")
         # self.requires("assimp/5.4.1")
     
-    def system_requirements(self):
+    # def system_requirements(self):
         # depending on the platform or the tools.system.package_manager:tool configuration
         # only one of these will be executed
-        Apt(self).install(["libgl-dev"])
-        Yum(self).install(["libglvnd-devel"])
-        PacMan(self).install(["libglvnd"])
-        Zypper(self).install(["Mesa-libGL-devel"])
+        # Apt(self).install(["libgl-dev"])
+        # Yum(self).install(["libglvnd-devel"])
+        # PacMan(self).install(["libglvnd"])
+        # Zypper(self).install(["Mesa-libGL-devel"])
 
     def config_options(self):
         if self.settings.os == "Windows":
