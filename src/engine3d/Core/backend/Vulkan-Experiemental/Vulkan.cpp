@@ -3,7 +3,7 @@
 #include <Core/backend/utilities/helper_functions.h>
 #include <vulkan/vulkan_core.h>
 
-#if __WIN32
+#if _WIN32
 #define VK_USE_PLATFORM_WIN32_KHR
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>

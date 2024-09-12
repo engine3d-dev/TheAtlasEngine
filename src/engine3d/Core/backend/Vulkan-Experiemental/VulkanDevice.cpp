@@ -3,6 +3,7 @@
 #include <Core/backend/Vulkan-Experiemental/Vulkan.h>
 #include <Core/backend/utilities/helper_functions.h>
 
+#if _WIN32
 #define VK_USE_PLATFORM_WIN32_KHR
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -10,7 +11,10 @@
 #include <GLFW/glfw3native.h>
 #include <vulkan/vulkan_win32.h>
 #include <vulkan/vulkan_core.h>
-
+#else
+#include <GLFW/glfw3.h>
+#include <vulkan/vulkan.h>
+#endif
 namespace engine3d::vk{
     static VulkanPhysicalDevice g_PhysicalDevice;
     static VulkanLogicalDevice g_LogicalDevice;
