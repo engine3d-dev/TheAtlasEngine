@@ -3,58 +3,32 @@ project(engine3d C CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 
-# Setting the makefile location in chocolatey
-# set(CMAKE_MAKE_PROGRAM  "${env:ChocolateyInstall}")
-# set(CMAKE_GENERATOR "Unix Makefiles")
-# message("generator is set to ${CMAKE_GENERATOR}/make.exe")
-# set(CMAKE_MAKE_PROGRAM $ENV{ChocolateyInstall}/make.exe)
-# message("Testing message from engine3d/CMakeLists.txt!!!")
-# message("Choco make directory ===============>>> ${CMAKE_MAKE_PROGRAM}")
-
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "") # works (in creating the compile_commands.json file)
 
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
+if(WIN32)
 find_package(Vulkan REQUIRED)
 find_package(VulkanHeaders REQUIRED)
+endif(WIN32)
+
+if(LINUX)
+find_package(VulkanLoader REQUIRED)
+endif(LINUX)
+
 find_package(glm REQUIRED)
 find_package(fmt REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(yaml-cpp REQUIRED)
+find_package(imguidocking REQUIRED)
 find_package(box2d REQUIRED)
-# find_package(SPIRV-Tools REQUIRED)
-# add_subdirectory(engine3d/Core/backend/third_party/JoltPhysics)
-
-include(FetchContent)
-
-# Include Jolt (3D Physics framework)
-FetchContent_Declare(
-    JoltPhysics
-    GIT_REPOSITORY "https://github.com/engine3d-dev/JoltPhysics"
-    SOURCE_SUBDIR "build"
-)
-
-FetchContent_MakeAvailable(JoltPhysics)
-
-# find_package(shaderc REQUIRED)
-# find_package(joltphysics REQUIRED)
-# For some reason draco is having some errors with ftell in one of it's files
-# Draco is a dependency for using assimp
+find_package(joltphysics REQUIRED)
 # find_package(assimp REQUIRED)
-# find_package(shaderc REQUIRED)
 
 add_subdirectory(src)
-add_subdirectory(Editor)
-add_subdirectory(Testbed)
+# add_subdirectory(Editor)
 
-# This will run the build doing -j which is building at full capacity.
-# TODO - Should probably have this be disabled by default and have this be a flag set through conan.
-# add_custom_target(my_parallel_build
-#                       COMMAND ${CMAKE_COMMAND} --build -j
-#                       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-#                       COMMENT "My parallel build with 5 cores")
-
-# Copy to source directory
+# Copy to compile_commands.json for .clangd
 add_custom_target(
     copy-compile-commands ALL
     DEPENDS
@@ -90,16 +64,18 @@ add_custom_command(
 # Usage - used to suppress that lld-link error and use the defaulted linked .library
 if(MSVC)
     target_compile_options(${PROJECT_NAME} PUBLIC "/Z1" "/NOD")
+# else()
+#     target_compile_options(${PROJECT_NAME} PUBLIC "-fsanitize=address")
 endif(MSVC)
 
 # target_include_directory is setting some private settings for differentiating what internal includes are privates and what should be includes should be exposed to the application-dev
 target_include_directories(${PROJECT_NAME} PRIVATE engine3d/ engine3d/Core)
-message("PROJECT SOURCE DIR ====>>> ${CMAKE_SOURCE_DIR}")
 target_include_directories(${PROJECT_NAME} PUBLIC ${JoltPhysics_SOURCE_DIR} ${GLM_INCLUDE_DIR} ./engine3d)
 
+if(WIN32)
 target_link_libraries(
     ${PROJECT_NAME}
-    PUBLIC
+    PRIVATE
     glfw
     ${OPENGL_LIBRARIES}
     Vulkan::Vulkan
@@ -108,8 +84,28 @@ target_link_libraries(
     fmt::fmt
     spdlog::spdlog
     yaml-cpp::yaml-cpp
+    imguidocking::imguidocking
     box2d::box2d
-    Jolt
+    Jolt::Jolt
 )
+endif(WIN32)
+
+if(LINUX)
+target_link_libraries(
+    ${PROJECT_NAME}
+    PRIVATE
+    glfw
+    ${OPENGL_LIBRARIES}
+    Vulkan::Loader
+    glm::glm
+    fmt::fmt
+    spdlog::spdlog
+    yaml-cpp::yaml-cpp
+    imguidocking::imguidocking
+    box2d::box2d
+    Jolt::Jolt
+)
+endif(LINUX)
+
 
 install(TARGETS ${PROJECT_NAME})

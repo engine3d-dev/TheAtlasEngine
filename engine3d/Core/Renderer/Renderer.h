@@ -1,6 +1,5 @@
 #pragma once
-#include <Core/backend/Vulkan/Shaders/VulkanShaderPipelineBuilder.h>
-#include <Core/backend/Vulkan/VulkanCommandBuffer.h>
+
 #include <array>
 #include <vulkan/vulkan.h>
 
@@ -20,13 +19,6 @@ namespace engine3d{
     
         //! @note This will be how our renderer get's initialized
         static void Initialize();
-
-        //! @note TODO -- Move this into swapchain.
-        //! @note We have the final pass within swapchain.
-        static VkRenderPass& GetCurrentRenderPass();
-
-        static void RenderTriangle(const vk::VulkanCommandBuffer &cmdBuffer, engine3d::vk::VulkanShaderPipelineBuilder &shaderPipeline);
-
         //! @note Per indices will represent our rgba values
         /**
          * @param 0 =   r
@@ -35,52 +27,71 @@ namespace engine3d{
          * @param 3 =   a
         */
         static void SetBackgroundColor(const std::array<float, 4>& rgba);
-        /**
-         * @name Submit
-         * @note Submits our tasks that are defined as callback function object
-         * @note This way we can have them be stored in a storage buffer.
-         * @note Storage buffer will handle how each tasks may operate.
-         * @note How this function operates?
-         * @note When you submit a function you do any vulkan-related logic then that function object gets rendered in the precedence order that the time each tasks been submitted.
-         * @note Which also vary at when each tasks get submitted
-         * @note The table to think about this is the following : Submit(=>[task(), task(), task(), imguiTask(), ....] -> swapchain -> presentation
-         * @note TODO -- Some kind of storage API to help with managing all of our tasks as part of our submission flow.
-         * @note Since submitting work can vary on flags and various other factors this submission allows for flexibility in types of commands to submit and how these commands are prepared.
-         * @note frames in flight - means to ensure syncrhonization between host and device (CPU and GPU)
-         * 
-        
-        Example - If this was to happen in UICore or UI-related abstraction around imgui.
-
-        // This is a quick API flow example of what the behavior would be utilizing the Renderer::Submit call
-        // Allowing to submit per-task based commands per submission.
-        // Allowing to have a generic API for submitting different tasks to render passes before sending them to the swapchain.
-
-        // Just adding this to be clear where this code may reside at.
-        // In reality the instead of creating a pointer to our current instance, we might directly modify to using the "this" keyword
-        UICore* core = this;
-        Renderer::Submit([core](){
-            VulkanCommandBuffer buffer = VulkanCommandBuffer::Create(...);
-            VulkanRenderPass renderPass = VulkanRenderPass(1, buffer.data());
-
-            vk::BeginRenderPass(renderPass, renderPass.BeginInfo(), flags);
-            vk::Begin(buffer, flags);
-            vk::End(buffer);
-            vk::EndRenderPass(renderPass);
-        });
-
-        */
-        template<typename Command>
-        static void Submit(const Command&& function){
-        }
 
         //! @note Will want a function to flush our scene when giving the renderer all of our context
-        //! @note For now this flush function is how we flush our current primitives to get them presented onto the screen.
-        //! @note TODO -- Move the logic that acquires next image into the vulkan abstraction
         static void FlushScene();
 
         static VkClearValue* GetClearColor();
 
-        // std::unique_ptr<Renderer> m_Test;
+        template<typename UTask>
+        static void Submit(const UTask&& task){
+        }
+
+        //! @note This is what will be used to submit our color when refreshing frames.
+        // static void RenderClearColor();
+        //! @note Testing rendering basic clear frames
+        static void RenderBasicClearColor();
+
+        static void Presentation();
+
     private:
     };
 };
+
+/**
+ * 
+ * 
+ * 
+ * 
+ * 
+
+!@note Changing command buffers API
+
+
+//! @note This is equivalent to doing:
+vk::Begin(m_CommandBuffer);
+// Do the actual task below here
+vk::End(m_CommandBuffer);
+
+//! @note Preferred API. Since recording tasks into command buffer may vary.
+//! @note Option #1
+m_ClearColorCommandBuffer.Record([](){
+    VkImageSubresourceRange imageRange = {
+        .aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT,
+        .baseMipLevel = 0,
+        .levelCount = 1,
+        .baseArrayLayer = 0,
+        .layerCount = 1
+    };
+
+    uint32_t presentQueueFamily = vk::VulkanDevice::GetLogicalDevice().QueueFamily();
+    
+    vkCmdClearColorImage(g_ClearColorCommandBuffer, vk::VulkanSwapchain::GetImage(0), VK_IMAGE_LAYOUT_GENERAL, &clearColorValue.color, 1, &imageRange);
+});
+
+//! @note Option #2
+
+vk::Record(m_CommandBuffer, [](){
+    VkImageSubresourceRange imageRange = {
+        .aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT,
+        .baseMipLevel = 0,
+        .levelCount = 1,
+        .baseArrayLayer = 0,
+        .layerCount = 1
+    };
+
+    uint32_t presentQueueFamily = vk::VulkanDevice::GetLogicalDevice().QueueFamily();
+    
+    vkCmdClearColorImage(g_ClearColorCommandBuffer, vk::VulkanSwapchain::GetImage(0), VK_IMAGE_LAYOUT_GENERAL, &clearColorValue.color, 1, &imageRange);
+});
+*/
