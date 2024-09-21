@@ -1,6 +1,6 @@
 #pragma once
 // #include <Core/internal/Core.h>
-// #include <Core/core.h>
+// #include <Core/Core.h>
 // #include <engine3d/Event/KeyCodes.h>
 // #include <Core/Application.h>
 #include <Core/Event/KeyCodes.h>
