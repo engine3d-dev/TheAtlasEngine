@@ -20,9 +20,9 @@ find_package(glm REQUIRED)
 find_package(fmt REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(yaml-cpp REQUIRED)
-find_package(imguidocking REQUIRED)
+# find_package(imguidocking REQUIRED)
 find_package(box2d REQUIRED)
-find_package(joltphysics REQUIRED)
+# find_package(joltphysics REQUIRED)
 # find_package(assimp REQUIRED)
 
 add_subdirectory(src)
@@ -84,9 +84,9 @@ target_link_libraries(
     fmt::fmt
     spdlog::spdlog
     yaml-cpp::yaml-cpp
-    imguidocking::imguidocking
+    # imguidocking::imguidocking
     box2d::box2d
-    Jolt::Jolt
+    # Jolt::Jolt
 )
 endif(WIN32)
 
@@ -101,7 +101,7 @@ target_link_libraries(
     fmt::fmt
     spdlog::spdlog
     yaml-cpp::yaml-cpp
-    imguidocking::imguidocking
+    # imguidocking::imguidocking
     box2d::box2d
     Jolt::Jolt
 )

@@ -43,8 +43,8 @@ class engine3dRecipe(ConanFile):
         if self.settings.os == "Linux":
             self.requires("vulkan-loader/1.3.290.0")
         print(f"OS = {self.settings.os}")            
-        self.requires("imguidocking/1.0")
-        self.requires("joltphysics/1.0")
+        # self.requires("imguidocking/1.0")
+        # self.requires("joltphysics/1.0")
         # self.requires("assimp/5.4.1")
     
     # def system_requirements(self):
