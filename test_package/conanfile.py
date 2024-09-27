@@ -12,7 +12,6 @@ class engine3dTestConan(ConanFile):
     def requirements(self):
         # self.requires("engine3d/1.0")
         self.requires("vulkan-headers/1.3.290.0")
-        self.requires("imguidocking/1.0")
         self.requires(self.tested_reference_str)
 
     def build(self):
