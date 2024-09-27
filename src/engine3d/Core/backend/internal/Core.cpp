@@ -12,6 +12,7 @@ namespace engine3d{
         //! @note Initializes core vulkan API
         vk::VulkanPipeline::InitializePipeline(); // initializes our vulakn API
         vk::VulkanDevice::InitializeDevice(); // initializes our physical/logical devices
+        vk::VulkanSwapchain::InitializeSwaphchain();
         // UICore::InitializeImgui();
     }
 };
