@@ -8,13 +8,13 @@
 #include <Core/backend/utilities/helper_functions.h>
 
 #include <vulkan/vulkan_core.h>
-#include <imgui/backends/imgui_impl_glfw.h>
-#include <imgui/backends/imgui_impl_vulkan.h>
+// #include <imgui/backends/imgui_impl_glfw.h>
+// #include <imgui/backends/imgui_impl_vulkan.h>
 
 namespace engine3d{
     static bool g_IsUICoreEnabled = false;
-    static ImGui_ImplVulkanH_Window g_MainWindowData;
-    ImGui_ImplVulkanH_Window* wd = &g_MainWindowData;
+    // static ImGui_ImplVulkanH_Window g_MainWindowData;
+    // ImGui_ImplVulkanH_Window* wd = &g_MainWindowData;
 
     // static ImGui_ImplVulkanH_Window* wd = &g_MainWindowData;
     static VkDescriptorPool g_DescriptorPool = VK_NULL_HANDLE;

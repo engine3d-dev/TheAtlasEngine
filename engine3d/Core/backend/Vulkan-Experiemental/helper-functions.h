@@ -24,11 +24,11 @@ namespace engine3d::vk{
     * @param UCommand will enable users to define what specifications of our commands we want to record.
     */
     template<typename UCommand>
-    void record(VulkanCommandBuffer& commandBuffer, VkCommandBufferUsageFlags flags, const UCommand& p_CommandToCollect){
+    void record(VulkanCommandBuffer& commandBuffer, const UCommand& p_CommandToCollect){
         for(uint32_t currCmdBufferIdx = 0; currCmdBufferIdx < commandBuffer.Size(); currCmdBufferIdx++){
             auto& buffer =  commandBuffer.GetActiveBuffer(currCmdBufferIdx);
 
-            begin(buffer, flags);
+            begin(buffer, commandBuffer.GetUsageFlags());
             p_CommandToCollect(buffer, currCmdBufferIdx);
             end(buffer);
         }

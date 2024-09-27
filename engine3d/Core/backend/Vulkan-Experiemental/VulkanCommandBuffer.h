@@ -1,39 +1,32 @@
 #pragma once
 #include <vulkan/vulkan.h>
 #include <vector>
+#include <vulkan/vulkan_core.h>
 
 namespace engine3d{
     namespace vk{
         /**
-         * @name Vulkan Command Buffer
-         * @note Abstraction of our command buffer in Vulkan
-         * @note Typically there are a few stages to the command buffer lifecylcle.
-         * @param States Allocate (Initial) => Begin (Recording) => End (Execute) => Complete (Submission)
-         * @note While chechking during recording if command buffer's invalid then it'll reset back to it's initial state.
-         * @note If invalid just before submission then it would complete with a one-time submit(pending) then go through an invalid state before resetting to its initial state.
+         * @param count is the size of command buffers this current command buffer structure contains.
          * 
-         * @param MemoryFragmentation
-         * @note Since Vulkan allows for multiple command buffers where users can reset its initial state, be aware to onto cause memory fragmentation.
-         * @note For memory fragmentation, Vulkan allows for the notion of VkCommandPool (Command Buffer Pools)
-         * @note To think about this is an optimized memory allocator to reduce memory fragmentations tailored for these specific jobs.
-         * @note Addition to VkCommandPool must externally and explicitly be synchronized if you want to allocate, record, or reset commands.
-         * @note Better approach to this is to allocate a pool for each thread to allow safely recording different command buffers in different threads in parallel. (Which OpenGL does not allow you do to do)
+         * @param p_CmdFlags used for specifying usage behavior for the current command buffer.
+         * 
+         * @param VkCommandBufferUsageFlags
+         * 
+         * @param VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT specifies each recording of cmd buffer will only be submitted once & buffer will reset/record again between each submission
+         * 
+         * @param VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT specifies a secondary command buffer is considered to be entirely inside a render pass.
+         * If this is the primary command buffer, then this bit will be ignored.
+         * 
+         * @param VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT Specifies command buffer can be resubmitted to any queue of the same queue fam while in pending state and recording into multiple primary command buffers.
         */
         class VulkanCommandBuffer{
         public:
             VulkanCommandBuffer() = default;
-            /**
-             * @param count is the size of command buffers this current command buffer structure contains.
-            */
-            VulkanCommandBuffer(uint32_t count);
+            
+            VulkanCommandBuffer(VkCommandBufferUsageFlags p_CmdFlags, uint32_t count);
             ~VulkanCommandBuffer();
 
-            /**
-             * @param begin indicates when the command buffer should start recording commands
-             * @param end tells the command buffer where to stop recording commands.
-            */
-            void begin(VkCommandBufferUsageFlags flags);
-            void end();
+            VkCommandBufferUsageFlags& GetUsageFlags();
 
             /** @note Returning our currently active command buffer **/
             VkCommandBuffer& GetActiveBuffer(uint32_t idx);

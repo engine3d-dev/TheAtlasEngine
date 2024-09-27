@@ -31,7 +31,7 @@ namespace engine3d{
         class VulkanRenderPass{
         public:
             VulkanRenderPass() = default;
-            VulkanRenderPass(const std::string& debugName);
+            VulkanRenderPass(const std::string& debugName, const std::vector<VkAttachmentDescription>& p_Attachments = {});
 
             /**
              * @note TODO --- should have Begin() and End() functions be outside of these class instances
@@ -49,6 +49,7 @@ namespace engine3d{
             VkRenderPass& GetVkRenderPass();
 
         private:
+            std::vector<VkAttachmentDescription> m_AttachmentDescriptions;
             std::vector<VkFramebuffer> m_Framebuffers;
             VkRenderPass m_RenderPass;
 
