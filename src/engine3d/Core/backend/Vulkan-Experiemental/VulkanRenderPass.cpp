@@ -17,7 +17,7 @@ namespace engine3d::vk{
 
     static VulkanRenderPassDescriptors g_Descriptors;
 
-    VulkanRenderPass::VulkanRenderPass(const std::string& debugName){
+    VulkanRenderPass::VulkanRenderPass(const std::string& debugName, const std::vector<VkAttachmentDescription>& p_Attachments) : m_AttachmentDescriptions(p_Attachments) {
 
         g_Descriptors.attachmentDescription = {
             .flags = 0,
