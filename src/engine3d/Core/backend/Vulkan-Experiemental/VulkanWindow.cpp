@@ -15,7 +15,7 @@ namespace engine3d::vk{
         g_WindowProperties.height = p_Height;
 
         //! @note initializes our swapchain and our VkImage/VkImageView's
-        vk::VulkanSwapchain::InitializeSwaphchain();
+        // vk::VulkanSwapchain::InitializeSwaphchain();
     }
 
     std::string VulkanWindow::GetTitle() const { return g_WindowProperties.title; }
