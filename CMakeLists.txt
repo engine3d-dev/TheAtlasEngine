@@ -16,6 +16,11 @@ if(LINUX)
 find_package(VulkanLoader REQUIRED)
 endif(LINUX)
 
+if(APPLE)
+find_package(Vulkan REQUIRED)
+# find_package(VulkanHeaders REQUIRED)
+endif(APPLE)
+
 find_package(glm REQUIRED)
 find_package(fmt REQUIRED)
 find_package(spdlog REQUIRED)
@@ -107,5 +112,21 @@ target_link_libraries(
 )
 endif(LINUX)
 
+if(APPLE)
+target_link_libraries(
+    ${PROJECT_NAME}
+    PRIVATE
+    glfw
+    ${OPENGL_LIBRARIES}
+    Vulkan::Vulkan
+    # vulkan-headers::vulkan-headers
+    glm::glm
+    fmt::fmt
+    spdlog::spdlog
+    yaml-cpp::yaml-cpp
+    # imguidocking::imguidocking
+    box2d::box2d
+)
+endif(APPLE)
 
 install(TARGETS ${PROJECT_NAME})

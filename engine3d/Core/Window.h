@@ -16,6 +16,10 @@ namespace engine3d{
          * @param IWidnowSpecified is what the user defines as their window.
          * @note TODO --- Probably would have this be in helper_functions.h as this is an exposed to the API that uses may used to get the right API.
         */
+
+        VkSurfaceKHR& GetVkSurface();
+        GLFWwindow* GetNativeWindow();
+
         template<typename UWindowSpecified, typename IWindowSpecified>
         static UWindowSpecified* As(IWindowSpecified){
             return static_cast<UWindowSpecified *>(GetCurrentWindowAPI());
