@@ -14,7 +14,8 @@ namespace engine3d{
 
     Ref<spdlog::logger> ConsoleEngineLogger::GetLoggerInstance(){
         if(m_ConsoleLogger == nullptr){
-            spdlog::log(spdlog::level::critical, "ConsoleEngineLogger was initialized! (Should not hit this statement at all)\n");
+            spdlog::log(spdlog::level::critical, "ConsoleEngineLogger WAS NOT initialized! (Should not hit this statement at all)\n");
+            spdlog::log(spdlog::level::critical, "Founded at {0} and on line {1}", __FILE__, __LINE__);
             std::terminate();
         }
         

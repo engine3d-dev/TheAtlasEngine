@@ -25,8 +25,8 @@ find_package(box2d REQUIRED)
 # find_package(joltphysics REQUIRED)
 # find_package(assimp REQUIRED)
 
+add_subdirectory(Editor)
 add_subdirectory(src)
-# add_subdirectory(Editor)
 
 # Copy to compile_commands.json for .clangd
 add_custom_target(

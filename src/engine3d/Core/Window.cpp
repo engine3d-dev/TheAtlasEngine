@@ -1,40 +1,57 @@
 // #include <Core/Window.h>
-#include <Core/Window.h>
+#include <internal/VulkanCpp/VulkanWindow.h>
+#include "ApplicationInstance.h"
 #include <Core/EngineLogger.h>
+#include <stdexcept>
 #include <string>
 
 namespace engine3d{
-    static WindowProperties g_Properties;
+    // Window* Window::Create(uint32_t p_Width, uint32_t p_Height, const std::string& p_Title){
 
-    Window::Window(uint32_t p_Width, uint32_t p_Height, const std::string& p_Title){
-        if(!glfwInit()){
-            ConsoleLogError("GLFWInit() called had failed!");
-            return;
+    // }
+    
+    static Window* g_WindowAPI = nullptr;
+
+    Window* Window::Create(uint32_t p_Width, uint32_t p_Height, const std::string &p_Title){
+        switch (ApplicationInstance::CurrentAPI()){
+        case API::VULKAN:
+            return new vk::VulkanWindow(p_Width, p_Height, p_Title);
+        default:
+            throw std::runtime_error("API was unspecified!");
         }
-
-        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-        g_Properties = {.title = p_Title, .width = p_Width, .height = p_Height};
-
-        m_WindowInstance = glfwCreateWindow((int)p_Width, (int)p_Height, p_Title.c_str(),nullptr, nullptr);
-
-        if(!m_WindowInstance){
-            ConsoleLogError("m_WindowInstance could not work because it is nullptr!");
-            return;
-        }
+        return nullptr;
     }
 
-    void* Window::GetCurrentWindowAPI(){ return m_WindowInstance; }
-
-    bool Window::IsWindowShutdown() const{
-        return glfwWindowShouldClose(m_WindowInstance);
+    bool Window::IsActive() const{
+        return CurrentWindowActive();
     }
 
-    WindowProperties Window::GetProperties(){
-        return g_Properties;
+    VkSurfaceKHR& Window::GetVkSurface(){
+        return VkSurface();
     }
 
-    void Window::OnUpdateDisplay(){
-        glfwPollEvents();
+    GLFWwindow* Window::GetNativeWindow(){
+        return NativeWindow();
+    }
+
+    uint32_t Window::GetWidth() const{
+        return Width();
+    }
+
+    uint32_t Window::GetHeight() const{
+        return Height();
+    }
+
+    std::string Window::GetTitle() const{
+        return Title();
+    }
+
+
+    void Window::OnUpdatePerTick(){
+        UpdatePerTick();
+    }
+
+    void Window::UpdateFrames(){
+        Presentation();
     }
 };

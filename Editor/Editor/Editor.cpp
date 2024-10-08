@@ -1,15 +1,13 @@
 #include "Editor.h"
-#include <engine3d/Core/Event/InputPoll.h>
+// #include <engine3d/Core/Event/InputPoll.h>
 #include "engine3d/Core/EngineLogger.h"
-#include "engine3d/Core/Renderer/Renderer.h"
+// #include "engine3d/Core/Renderer/Renderer.h"
 #include <engine3d/Core/Timestep.h>
-#include <imgui/imgui.h>
-
 namespace engine3d{
 
     EditorApplication::EditorApplication(const std::string& p_DebugName) : ApplicationInstance(p_DebugName) {
-        Renderer::Initialize();
-        Renderer::SetBackgroundColor({1.0f, 0.0f, 0.0f, 0.0f});
+        // Renderer::Initialize();
+        // Renderer::SetBackgroundColor({1.0f, 0.0f, 0.0f, 0.0f});
     }
 
     EditorApplication::~EditorApplication() {}
@@ -25,7 +23,7 @@ namespace engine3d{
         //! @note TODO --  Flush should only happens when our scene is given everything that lives within this scene (ref to lifetimes)
         /* Renderer::FlushScene(); */
 		
-		Renderer::Presentation();
+		// Renderer::Presentation();
         // ImGui::Begin("Hello, world!"); // Create a window called "Hello, world!" and append into it.
         // ImGui::End();
     }
