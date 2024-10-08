@@ -1,4 +1,6 @@
+#include "EngineLogger.h"
 #include <Core/internal/VulkanCpp/Vulkan.h>
+#include <cstdio>
 #include <vulkan/vulkan_core.h>
 #include <vector>
 #include <stdexcept>
@@ -38,9 +40,11 @@ namespace engine3d::vk{
         // "VK_LAYER_KHRONOS_shader_object",
     };
 
-    VkInstance g_Instance;
+    static VkInstance g_Instance;
 
     void Vulkan::InitializeVulkanCore(){
+        /* std::print("Initialization at {}",__FUNCTION__); */
+        printf("Initialization at InitializeVulkanCore()!!!!\n");
         //! @note to initialize vulkan we need to first specify our application properties.
         //! @note Initialize vulkan's instance information for instantiation.
         VkApplicationInfo appInfo = {
@@ -62,9 +66,16 @@ namespace engine3d::vk{
             .ppEnabledExtensionNames = extensions.data()
         };
 
+#if defined(__APPLE__)
+    createInfo.flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
+#endif
+
         VkResult res = vkCreateInstance(&createInfo, nullptr, &g_Instance);
         if(res != VK_SUCCESS){
-            throw std::runtime_error("vkCreateInstance errored message ===> ");
+            /* ConsoleLogError("vkCreateInstance errored message ===> {}", res); */
+            printf("%i\n", res);
+            printf("%s\n", res);
+            throw std::runtime_error("vkCreateInstance errored message ===> {}");
         }
 
         if(g_Instance == VK_NULL_HANDLE){
