@@ -1,6 +1,7 @@
 #include "EngineLogger.h"
 #include <Core/internal/VulkanCpp/Vulkan.h>
 #include <cstdio>
+
 #include <vulkan/vulkan_core.h>
 #include <vector>
 #include <stdexcept>
@@ -43,8 +44,6 @@ namespace engine3d::vk{
     static VkInstance g_Instance;
 
     void Vulkan::InitializeVulkanCore(){
-        /* std::print("Initialization at {}",__FUNCTION__); */
-        printf("Initialization at InitializeVulkanCore()!!!!\n");
         //! @note to initialize vulkan we need to first specify our application properties.
         //! @note Initialize vulkan's instance information for instantiation.
         VkApplicationInfo appInfo = {
@@ -72,10 +71,7 @@ namespace engine3d::vk{
 
         VkResult res = vkCreateInstance(&createInfo, nullptr, &g_Instance);
         if(res != VK_SUCCESS){
-            /* ConsoleLogError("vkCreateInstance errored message ===> {}", res); */
-            printf("%i\n", res);
-            printf("%s\n", res);
-            throw std::runtime_error("vkCreateInstance errored message ===> {}");
+            throw std::runtime_error("vkCreateInstance errored message ===> ");
         }
 
         if(g_Instance == VK_NULL_HANDLE){
@@ -94,4 +90,5 @@ namespace engine3d::vk{
         }
         return g_Instance;
     }
+
 };
