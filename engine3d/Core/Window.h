@@ -1,18 +1,14 @@
 #pragma once
 #include <Core/Core.h>
 #include <string>
-#include <GLFW/glfw3.h>
+#include <vulkan/vulkan_core.h>
 
+class GLFWwindow;
 namespace engine3d{
-    struct WindowProperties{
-        std::string title="Default";
-        uint32_t width=0, height=0;
-    };
-
     class Window{
     public:
-        Window(uint32_t p_Width, uint32_t p_Height, const std::string& p_Title);
-        // GLFWwindow* NativeWindow();
+        // Window(uint32_t p_Width, uint32_t p_Height, const std::string& p_Title);
+        static Window* Create(uint32_t p_Width=900, uint32_t p_Height=600, const std::string& p_Title="Engine3D");
 
         /**
          * @name As(typename input);
@@ -21,24 +17,38 @@ namespace engine3d{
          * @note TODO --- Probably would have this be in helper_functions.h as this is an exposed to the API that uses may used to get the right API.
         */
         template<typename UWindowSpecified, typename IWindowSpecified>
-        UWindowSpecified* As(IWindowSpecified){
+        static UWindowSpecified* As(IWindowSpecified){
             return static_cast<UWindowSpecified *>(GetCurrentWindowAPI());
         }
 
-        bool IsWindowShutdown() const;
+        bool IsActive() const;
 
-        //! @note Used for updating/presenting our images to the display per frame basis.
-        void OnUpdateDisplay();
+        VkSurfaceKHR& GetVkSurface();
+        GLFWwindow* GetNativeWindow();
 
-        static WindowProperties GetProperties();
+        uint32_t GetWidth() const;
+        uint32_t GetHeight() const;
+        std::string GetTitle() const;
+
+        void OnUpdatePerTick();
+
+        void UpdateFrames();
 
     protected:
-        virtual void UpdateFrame() = 0;
+        virtual uint32_t Width() const = 0;
+        virtual uint32_t Height() const = 0;
+        virtual std::string Title() const = 0;
+        
+        virtual bool CurrentWindowActive() const = 0;
+        
+        virtual VkSurfaceKHR& VkSurface() = 0;
 
-    private:
         //! @note Returns our current set native window API.
-        virtual void* GetCurrentWindowAPI();
-    public:
-        GLFWwindow* m_WindowInstance;
+        virtual GLFWwindow* NativeWindow() = 0;
+
+        //! @note Update surface rendering every frame.
+        virtual void UpdatePerTick() = 0;
+
+        virtual void Presentation() = 0;
     };
 };

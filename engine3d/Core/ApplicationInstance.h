@@ -1,5 +1,8 @@
 #pragma once
 #include <string>
+#include <Core/Core.h>
+#include "internal/API.h"
+#include <Core/Window.h>
 
 namespace engine3d{
     /**
@@ -8,20 +11,33 @@ namespace engine3d{
      * @note An application would be the engine3d editor, and games (devs build) are consider separate applications from the engine3d toolkit.
      * @note Defining each of our applications instance.
     */
+    // class Window;
     class ApplicationInstance{
     public:
         ApplicationInstance(const std::string&);
-        void StartApplicationRunMainloop();
+        void ExecuteApplicationMainloop();
 
         //! @note Setting our application name.
         static std::string& CurrentApplicationName();
 
         static float CurrentFrameTime();
+
+        static ApplicationInstance& Super();
+
+        static void SetCurrentAPI(API p_CurrentApi);
+
+        static Window& GetWindow();
+
+        static API CurrentAPI();
     private:
         //! @note 
         void UpdateCurrentApplicationInstance();
     private:
         virtual void UpdateThisApplicationInstance() = 0;
+
+    private:
+        Window* m_Window;
+        static ApplicationInstance* g_ThisInstance;
     };
 
     ApplicationInstance* InitializeApplication();
