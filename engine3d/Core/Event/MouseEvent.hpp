@@ -4,6 +4,10 @@
 #include <sstream>
 
 namespace engine3d{
+    /**
+     * @name MouseEvent.hpp
+     * @note defines our mouse movement and being to control when this specific event occurs
+     */
     class ENGINE_API MouseMovedEvent : public Event{
     public:
         MouseMovedEvent(float x, float y) : mouseX(x), mouseY(y) {};

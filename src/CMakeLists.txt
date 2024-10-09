@@ -1,4 +1,5 @@
 set(ENGINE_INCLUDE_NAME ../engine3d)
+set(ENGINE_INTERNAL_INCLUDE ${ENGINE_INCLUDE_NAME}/Core/internal)
 set(ENGINE_SRC_DIR engine3d)
 set(VULKAN_INCLUDE_DIR ${ENGINE_INCLUDE_NAME}/Core/internal/VulkanCpp)
 set(VULKAN_SRC_DIR ${ENGINE_SRC_DIR}/Core/internal/VulkanCpp)
@@ -10,6 +11,15 @@ set(
 
     ${ENGINE_INCLUDE_NAME}/Core/EngineLogger.hpp
     ${ENGINE_INCLUDE_NAME}/Core/Window.hpp
+
+    # Event system includes
+    ${ENGINE_INCLUDE_NAME}/Core/Event/KeyCodes.hpp
+    ${ENGINE_INCLUDE_NAME}/Core/Event/MouseCodes.hpp
+    ${ENGINE_INCLUDE_NAME}/Core/Event/Event.hpp
+    ${ENGINE_INCLUDE_NAME}/Core/Event/InputPoll.hpp
+    ${ENGINE_INCLUDE_NAME}/Core/Event/KeyEvent.hpp
+    ${ENGINE_INCLUDE_NAME}/Core/Event/MouseEvent.hpp
+
 
     ${VULKAN_INCLUDE_DIR}/Vulkan.hpp
     ${VULKAN_INCLUDE_DIR}/VulkanWindow.hpp
@@ -32,6 +42,8 @@ set(
 
     ${ENGINE_SRC_DIR}/Core/Window.cpp
     ${ENGINE_SRC_DIR}/Core/EngineLogger.cpp
+
+    ${ENGINE_SRC_DIR}/Core/Event/InputPoll.cpp
 
     ${VULKAN_SRC_DIR}/Vulkan.cpp
     ${VULKAN_SRC_DIR}/VulkanWindow.cpp

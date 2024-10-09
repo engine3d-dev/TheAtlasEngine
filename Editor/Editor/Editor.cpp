@@ -1,4 +1,6 @@
 #include "Editor.hpp"
+#include "Core/Event/InputPoll.hpp"
+#include "Core/Event/KeyCodes.hpp"
 #include <engine3d/Core/EngineLogger.hpp>
 #include <engine3d/Core/Timestep.hpp>
 namespace engine3d{
