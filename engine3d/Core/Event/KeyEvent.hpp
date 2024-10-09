@@ -6,6 +6,10 @@
 
 namespace engine3d{
     
+    /**
+     * @name KeyEvent.hpp
+     * @note Defines different key events and how different keycodes define the action corresponding to those keys
+     */
     class ENGINE_API KeyEvent : public Event{
     public:
 

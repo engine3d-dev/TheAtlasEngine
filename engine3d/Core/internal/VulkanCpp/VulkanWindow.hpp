@@ -24,8 +24,6 @@ namespace engine3d{
             GLFWwindow* NativeWindow() override;
 
             //! @note Update surface rendering every frame.
-            void UpdatePerTick() override;
-
             void Presentation() override;
 
         private:
