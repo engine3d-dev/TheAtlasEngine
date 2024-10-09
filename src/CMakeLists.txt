@@ -6,17 +6,17 @@ set(VULKAN_SRC_DIR ${ENGINE_SRC_DIR}/Core/internal/VulkanCpp)
 set(
     all_headers
 
-    ${ENGINE_INCLUDE_NAME}/Core/ApplicationInstance.h
+    ${ENGINE_INCLUDE_NAME}/Core/ApplicationInstance.hpp
 
-    ${ENGINE_INCLUDE_NAME}/Core/EngineLogger.h
-    ${ENGINE_INCLUDE_NAME}/Core/Window.h
+    ${ENGINE_INCLUDE_NAME}/Core/EngineLogger.hpp
+    ${ENGINE_INCLUDE_NAME}/Core/Window.hpp
 
-    ${VULKAN_INCLUDE_DIR}/Vulkan.h
-    ${VULKAN_INCLUDE_DIR}/VulkanWindow.h
-    ${VULKAN_INCLUDE_DIR}/VulkanDevice.h
-    ${VULKAN_INCLUDE_DIR}/VulkanPhysicalDevice.h
-    ${VULKAN_INCLUDE_DIR}/VulkanLogicalDevice.h
-    ${VULKAN_INCLUDE_DIR}/VulkanSwapchain.h
+    ${VULKAN_INCLUDE_DIR}/Vulkan.hpp
+    ${VULKAN_INCLUDE_DIR}/VulkanWindow.hpp
+    ${VULKAN_INCLUDE_DIR}/VulkanDevice.hpp
+    ${VULKAN_INCLUDE_DIR}/VulkanPhysicalDevice.hpp
+    ${VULKAN_INCLUDE_DIR}/VulkanLogicalDevice.hpp
+    ${VULKAN_INCLUDE_DIR}/VulkanSwapchain.hpp
 
     # Renderer Includes
     ${ENGINE_INCLUDE_NAME}/Core/Renderer/Renderer.hpp

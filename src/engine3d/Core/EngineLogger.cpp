@@ -1,4 +1,4 @@
-#include <Core/EngineLogger.h>
+#include <Core/EngineLogger.hpp>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 namespace engine3d{

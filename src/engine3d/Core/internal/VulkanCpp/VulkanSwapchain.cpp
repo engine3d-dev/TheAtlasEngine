@@ -1,8 +1,8 @@
-#include "EngineLogger.h"
+#include "EngineLogger.hpp"
 #include "Renderer/Renderer.hpp"
-#include "internal/VulkanCpp/Vulkan.h"
-#include "internal/VulkanCpp/VulkanDevice.h"
-#include <Core/internal/VulkanCpp/VulkanSwapchain.h>
+#include "internal/VulkanCpp/Vulkan.hpp"
+#include "internal/VulkanCpp/VulkanDevice.hpp"
+#include <Core/internal/VulkanCpp/VulkanSwapchain.hpp>
 
 #include <stdexcept>
 
@@ -22,6 +22,7 @@
 #include <vulkan/vulkan.h>
 #endif
 
+#include <stdio.h>
 
 static PFN_vkGetPhysicalDeviceSurfaceSupportKHR fpGetPhysicalDeviceSurfaceSupportKHR;
 static PFN_vkGetPhysicalDeviceSurfaceCapabilitiesKHR fpGetPhysicalDeviceSurfaceCapabilitiesKHR;
@@ -29,13 +30,21 @@ static PFN_vkGetPhysicalDeviceSurfaceCapabilitiesKHR fpGetPhysicalDeviceSurfaceC
 
 namespace engine3d::vk{
     VulkanSwapchain::VulkanSwapchain(GLFWwindow* p_WindowHandler, bool p_VSync){
+        ConsoleLogInfo("Initializing VulkanSwapchain!!!!");
         m_VSync = p_VSync;
 
         glfwCreateWindowSurface(Vulkan::GetVkInstance(), p_WindowHandler, nullptr, &m_Surface);
 
-        auto physical_device = VulkanDevice::GetPhysicalDevice().GetVkPhysicalDevice();
+        auto& physical_device = VulkanDevice::GetPhysicalDevice().GetVkPhysicalDevice();
+        if(physical_device == VK_NULL_HANDLE){
+            /* printf("physical_device === nullptr~\n"); */
+            ConsoleLogWarn("physical_device === VK_NULL_HANDLE\n");
+        }
+
         uint32_t queue_count = 0;
-        // vkGetPhysicalDeviceQueueFamilyProperties(physical_device, &queue_count, nullptr);
+        vkGetPhysicalDeviceQueueFamilyProperties(physical_device, &queue_count, nullptr);
+        /* printf("queue_count = %i\n", queue_count); */
+
         // assert(queue_count >= 1);
         // if(queue_count >= 1){
         //     ConsoleLogWarn("Queue Count >= 1");

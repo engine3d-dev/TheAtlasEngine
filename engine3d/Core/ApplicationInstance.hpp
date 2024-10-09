@@ -1,8 +1,8 @@
 #pragma once
 #include <string>
-#include <Core/Core.h>
-#include "internal/API.h"
-#include <Core/Window.h>
+#include <Core/Core.hpp>
+#include "internal/API.hpp"
+#include <Core/Window.hpp>
 
 namespace engine3d{
     /**

@@ -1,7 +1,7 @@
-// #include <Core/Window.h>
-#include <internal/VulkanCpp/VulkanWindow.h>
-#include "ApplicationInstance.h"
-#include <Core/EngineLogger.h>
+// #include <Core/Window.hpp>
+#include <internal/VulkanCpp/VulkanWindow.hpp>
+#include "ApplicationInstance.hpp"
+#include <Core/EngineLogger.hpp>
 #include <stdexcept>
 #include <string>
 

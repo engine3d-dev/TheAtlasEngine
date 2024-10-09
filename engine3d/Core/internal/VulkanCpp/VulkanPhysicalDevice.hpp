@@ -6,6 +6,12 @@
 
 namespace engine3d{
     namespace vk{
+        /*
+         * @name VulkanPhysicalDevice
+         * @note Abstracted physical device layer for validating compatbility with our current platform's GPU.
+         * @note In other words represent actual physical GPU that is available on our current machine.
+         * @note Allows with workloads from vulkan logical devices and exposing to various queue families the GPU supports.
+        */
         class VulkanPhysicalDevice{
             struct QueueFamilyIndices{
                 int Graphics = -1;
@@ -16,15 +22,27 @@ namespace engine3d{
             VulkanPhysicalDevice();
 
             VkPhysicalDevice& GetVkPhysicalDevice();
-            VkFormat GetDepthFormat();
 
+            /*
+             * @name GetDepthFormat()
+             * @note Returns the depth format we need for image depth usage.
+             * @note By returning the depth format we also describe how our memory is laid out.
+            */
+            VkFormat GetDepthFormat();
+            
+            //! @note Returns boolean if we pass a valid extension name.
             bool IsExtensionSupported(const std::string& ext_name);
         private:
+            //! @note Returns the queue family indices to which queue family indices are supported and valid.
             VulkanPhysicalDevice::QueueFamilyIndices GetQueueFamilyIndices(int flag);
-
+            
+            //! @note Used for validating if depth format is available or valid on our current machine.
             VkFormat SearchAvailableDepthFormat();
-
+            
+            //! @note print debugging information of our physical device properties.
             void print_physical_device_property(VkPhysicalDeviceProperties properties);
+
+            //! @note Fetching our devices that are compatible to use.
             std::vector<VkPhysicalDevice> get_available_devices();
 
 

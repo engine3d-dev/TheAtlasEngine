@@ -1,10 +1,16 @@
 #pragma once
-#include <internal/VulkanCpp/VulkanPhysicalDevice.h>
+#include <internal/VulkanCpp/VulkanPhysicalDevice.hpp>
 #include <vulkan/vulkan.h>
 #include <vulkan/vulkan_core.h>
 
 namespace engine3d{
     namespace vk{
+        /*
+         * @name VulkanLogicalDevice
+         * @note Represent our vulkan interface to the physical device.
+         * @note Using this logical device allows for multiple application accessing the physical devices on our machine.
+         * @note Utilizing our selected physical device (VulkanPhysicalDevice), using this logical device to specify features/extensions with our selected physical device.
+        */
         class VulkanLogicalDevice{
         public:
             VulkanLogicalDevice() {}

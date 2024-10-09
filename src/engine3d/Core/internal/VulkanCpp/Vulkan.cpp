@@ -1,13 +1,14 @@
-#include "EngineLogger.h"
-#include <Core/internal/VulkanCpp/Vulkan.h>
+#include "EngineLogger.hpp"
+#include <Core/internal/VulkanCpp/Vulkan.hpp>
 #include <cstdio>
 
 #include <vulkan/vulkan_core.h>
 #include <vector>
 #include <stdexcept>
-#include <Core/internal/VulkanCpp/VulkanDevice.h>
+#include <Core/internal/VulkanCpp/VulkanDevice.hpp>
 
 namespace engine3d::vk{
+    //! @note These are different extensions we need to check are available as required for the vulkan API.
 #if defined(_WIN32)
     static std::vector<const char *> extensions = {
         VK_KHR_SURFACE_EXTENSION_NAME,
@@ -35,10 +36,10 @@ namespace engine3d::vk{
 
     static std::vector<const char*> validationLayers = {
         "VK_LAYER_KHRONOS_validation",
-        // "VK_LAYER_LUNARG_api_dump",
-        // "VK_LAYER_KHRONOS_profiles",
-        // "VK_LAYER_KHRONOS_synchronization2",
-        // "VK_LAYER_KHRONOS_shader_object",
+        /* "VK_LAYER_LUNARG_api_dump", */
+        /* "VK_LAYER_KHRONOS_profiles", */
+        /* "VK_LAYER_KHRONOS_synchronization2", */
+        /* "VK_LAYER_KHRONOS_shader_object", */
     };
 
     static VkInstance g_Instance;
@@ -66,6 +67,7 @@ namespace engine3d::vk{
         };
 
 #if defined(__APPLE__)
+    //! @note enabling this flags allow vulkan non-conformant vulkan implementation to be built on top of another non-vulkan graphics API sucha as Metal, DX12, and etc.
     createInfo.flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
 #endif
 
@@ -75,7 +77,7 @@ namespace engine3d::vk{
         }
 
         if(g_Instance == VK_NULL_HANDLE){
-            printf("Vulkan VkInstance::g_Instance === nullptr\n");
+            throw std::runtime_error("Vulkan VkInstance::g_Instance === nullptr");
         }
 
         //! @note Setting the debug callback
@@ -85,9 +87,6 @@ namespace engine3d::vk{
     }
 
     VkInstance& Vulkan::GetVkInstance(){
-        if(g_Instance == VK_NULL_HANDLE){
-            printf("Vulkan VkInstance::g_Instance (from GetVkInstance)=== nullptr\n");
-        }
         return g_Instance;
     }
 
