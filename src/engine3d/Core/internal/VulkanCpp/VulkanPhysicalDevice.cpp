@@ -1,5 +1,6 @@
-#include <internal/VulkanCpp/VulkanPhysicalDevice.h>
-#include <internal/VulkanCpp/Vulkan.h>
+#include "EngineLogger.hpp"
+#include <internal/VulkanCpp/VulkanPhysicalDevice.hpp>
+#include <internal/VulkanCpp/Vulkan.hpp>
 #include <vector>
 #include <sstream>
 
@@ -19,20 +20,15 @@
 namespace engine3d::vk{
 
     VulkanPhysicalDevice::VulkanPhysicalDevice(){
-        // printf("==================================================\n");
-        // printf("==================================================\n");
-        // printf("==================================================\n");
-        // printf("VULKAN PHYSICAL DEVICE CONSTRUCTED\n");
-        // printf("At before get_available_devices()\n");
-
-        // printf("After before get_available_devices()\n");
-        // ConsoleLogError("VULKAN PHYSICAL DEVICE CONSTRUCTED!\n");
         auto& instance = Vulkan::GetVkInstance();
         std::vector<VkPhysicalDevice> devices = get_available_devices();
         
         // printf("available devices size() = %zu\n", devices.size());
         uint32_t gpu_count = devices.size();
-
+        
+        //! @note Validating our physical device is a discrete GPU.
+        //! @note Using our discrete GPU that has been found on our machine.
+        //! @note vkGetPhysicalDeviceProperties is how we get information about our physical device.
         for(VkPhysicalDevice device : devices){
             vkGetPhysicalDeviceProperties(device, &m_PhysicalDeviceProperties);
 
@@ -47,18 +43,21 @@ namespace engine3d::vk{
         }
 
         m_PhysicalDeviceHandler = m_SelectedPhysicalDevice;
-
+        
         vkGetPhysicalDeviceFeatures(m_PhysicalDeviceHandler, &m_PhysicalDeviceFeatures);
         vkGetPhysicalDeviceMemoryProperties(m_PhysicalDeviceHandler, &m_PhysicalMemoryProperties);
-
+        
+        //! @note This is how we know what queue families are available to us by checking through our physical devices.
         uint32_t queue_family_count = 0;
         vkGetPhysicalDeviceQueueFamilyProperties(m_PhysicalDeviceHandler, &queue_family_count, nullptr);
+        /* printf("queue_family_count === %i\n", queue_family_count); */
         // assert(queue_family_count > 0);
         if(queue_family_count <= 0) throw std::runtime_error("queue_family_count === 0");
 
         m_QueueFamilyProperties.resize(queue_family_count);
         vkGetPhysicalDeviceQueueFamilyProperties(m_PhysicalDeviceHandler, &queue_family_count, m_QueueFamilyProperties.data()); // reads in the queue family properties from our physical devices
-
+        
+        //! @note Validating our extensions and getting the extensinos that we support.
         uint32_t extension_count = 0;
         vkEnumerateDeviceExtensionProperties(m_PhysicalDeviceHandler, nullptr, &extension_count, nullptr); // just used to read how many extensions are available.
 
@@ -87,6 +86,7 @@ namespace engine3d::vk{
         m_QueueIndices = GetQueueFamilyIndices(requested_queue_t);
 
         // VK_QUEUE_GRAPHICS_BIT
+        //! @note Checking queue family for graphics operations. ( Such as vkCmdDraw*(...) )
         if(requested_queue_t & VK_QUEUE_GRAPHICS_BIT){
             VkDeviceQueueCreateInfo createInfo{
                 .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
@@ -98,6 +98,7 @@ namespace engine3d::vk{
         }
 
         // VK_QUEUE_COMPUTE_BIT
+        //! @note Specifies queues in this queue family support compute operations.
         if(requested_queue_t & VK_QUEUE_COMPUTE_BIT){
             if (m_QueueIndices.Compute != m_QueueIndices.Graphics){
 				// If compute family index differs, we need an additional queue create info for the compute queue
@@ -110,7 +111,9 @@ namespace engine3d::vk{
 				m_DeviceQueueCreateInfos.push_back(createInfo);
 			}
         }
-
+        
+        // VK_QUEUE_TRANSFER_BIT
+        //! @note specifies queues in this family only has support for transfer operations.
         if(requested_queue_t & VK_QUEUE_TRANSFER_BIT){
             if((m_QueueIndices.Transfer != m_QueueIndices.Graphics) && (m_QueueIndices.Transfer != m_QueueIndices.Compute)){
 				// If compute family index differs, we need an additional queue create info for the compute queue
@@ -208,7 +211,7 @@ namespace engine3d::vk{
     bool VulkanPhysicalDevice::IsExtensionSupported(const std::string& ext_name){
         return m_SupportedExtensions.find(ext_name) != m_SupportedExtensions.end();
     }
-
+    
     std::vector<VkPhysicalDevice> VulkanPhysicalDevice::get_available_devices(){
         uint32_t gpu_devices_count = 0;
         printf("Before enumerating physical devices\n");

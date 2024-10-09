@@ -1,6 +1,5 @@
 #pragma once
-#include "Window.h"
-#include "internal/VulkanCpp/VulkanSwapchain.h"
+#include "Window.hpp"
 #include <string>
 #include <cstdint>
 #include <vulkan/vulkan_core.h>
@@ -32,7 +31,6 @@ namespace engine3d{
         private:
             GLFWwindow* m_Window;
             VkSurfaceKHR m_Surface;
-            VulkanSwapchain* m_CurrentWindowSwapchain;
             bool m_IsCurrentWindowActive = false;
             uint32_t m_Width, m_Height;
             std::string m_Title;

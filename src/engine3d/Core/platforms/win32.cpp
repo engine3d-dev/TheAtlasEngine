@@ -1,8 +1,8 @@
-#include "Core/EngineLogger.h"
-#include <internal/VulkanCpp/Vulkan.h>
-#include <internal/VulkanCpp/VulkanDevice.h>
+#include <Core/EngineLogger.hpp>
+#include <internal/VulkanCpp/Vulkan.hpp>
+#include <internal/VulkanCpp/VulkanDevice.hpp>
 
-#include <Core/ApplicationInstance.h>
+#include <Core/ApplicationInstance.hpp>
 
 extern engine3d::ApplicationInstance* engine3d::InitializeApplication();
 

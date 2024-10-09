@@ -1,8 +1,8 @@
-// #include <Core/internal/FrameTimer.h>
-#include <Core/ApplicationInstance.h>
-#include <Core/Timestep.h>
-// #include <Core/Renderer/Renderer.h>
-#include <Core/EngineLogger.h>
+// #include <Core/internal/FrameTimer.hpp>
+#include <Core/ApplicationInstance.hpp>
+#include <Core/Timestep.hpp>
+// #include <Core/Renderer/Renderer.hpp>
+#include <Core/EngineLogger.hpp>
 
 namespace engine3d{
     static float m_LastFrameTime = 0.0f;
@@ -14,7 +14,7 @@ namespace engine3d{
         g_ThisInstance = this;
         g_DebugName = p_DebugName;
         SetCurrentAPI(VULKAN);
-        m_Window = Window::Create();
+        m_Window = Window::Create(900, 600, p_DebugName);
     }
 
     void ApplicationInstance::ExecuteApplicationMainloop(){

@@ -18,7 +18,6 @@ endif(LINUX)
 
 if(APPLE)
 find_package(Vulkan REQUIRED)
-# find_package(VulkanHeaders REQUIRED)
 endif(APPLE)
 
 find_package(glm REQUIRED)

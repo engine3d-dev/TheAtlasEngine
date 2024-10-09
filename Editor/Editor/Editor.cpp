@@ -1,8 +1,6 @@
-#include "Editor.h"
-// #include <engine3d/Core/Event/InputPoll.h>
-#include "engine3d/Core/EngineLogger.h"
-// #include "engine3d/Core/Renderer/Renderer.h"
-#include <engine3d/Core/Timestep.h>
+#include "Editor.hpp"
+#include <engine3d/Core/EngineLogger.hpp>
+#include <engine3d/Core/Timestep.hpp>
 namespace engine3d{
 
     EditorApplication::EditorApplication(const std::string& p_DebugName) : ApplicationInstance(p_DebugName) {

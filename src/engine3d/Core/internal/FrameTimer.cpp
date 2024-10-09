@@ -1,4 +1,4 @@
-#include <Core/internal/FrameTimer.h>
+#include <Core/internal/FrameTimer.hpp>
 #include <GLFW/glfw3.h>
 
 namespace engine3d{

@@ -1,6 +1,6 @@
-#include "internal/VulkanCpp/VulkanDevice.h"
-#include <Core/internal/VulkanCpp/VulkanWindow.h>
-#include <Core/internal/VulkanCpp/Vulkan.h>
+#include <internal/VulkanCpp/VulkanDevice.hpp>
+#include <Core/internal/VulkanCpp/VulkanWindow.hpp>
+#include <Core/internal/VulkanCpp/Vulkan.hpp>
 #include <stdexcept>
 #include <vulkan/vulkan_core.h>
 
@@ -36,8 +36,6 @@ namespace engine3d::vk{
         if(res != VK_SUCCESS){
             throw std::runtime_error("glfwCreateWindowSurface() failed error number: =====> " + std::to_string(res));
         }
-
-        m_CurrentWindowSwapchain = new VulkanSwapchain(m_Window, false);
         m_IsCurrentWindowActive = true;
     }
 

@@ -3,7 +3,7 @@ project(Editor CXX)
 
 set(
     all_src
-    Editor/Editor.h
+    Editor/Editor.hpp
     Editor/Editor.cpp
 )
 

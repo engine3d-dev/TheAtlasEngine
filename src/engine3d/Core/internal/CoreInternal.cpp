@@ -1,5 +1,5 @@
-#include <internal/VulkanCpp/Vulkan.h>
-#include <Core/EngineLogger.h>
+#include <internal/VulkanCpp/Vulkan.hpp>
+#include <Core/EngineLogger.hpp>
 
 namespace engine3d{
     //! @note TODO -- Move this somewhere within the vulkan directory
