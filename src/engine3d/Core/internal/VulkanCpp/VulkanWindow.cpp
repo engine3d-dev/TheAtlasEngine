@@ -39,10 +39,6 @@ namespace engine3d::vk{
         m_IsCurrentWindowActive = true;
     }
 
-    void VulkanWindow::UpdatePerTick(){
-        glfwPollEvents();
-    }
-
     void VulkanWindow::Presentation(){
         // m_CurrentWindowSwapchain->Presentation();
     }

@@ -47,11 +47,7 @@ namespace engine3d{
     }
 
 
-    void Window::OnUpdatePerTick(){
-        UpdatePerTick();
-    }
-
-    void Window::UpdateFrames(){
+    void Window::OnUpdateAllFrames(){
         Presentation();
     }
 };

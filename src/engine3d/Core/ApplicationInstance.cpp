@@ -1,4 +1,5 @@
 // #include <Core/internal/FrameTimer.hpp>
+#include "Event/InputPoll.hpp"
 #include <Core/ApplicationInstance.hpp>
 #include <Core/Timestep.hpp>
 // #include <Core/Renderer/Renderer.hpp>
@@ -24,7 +25,11 @@ namespace engine3d{
             // FrameTimer::UpdateFrameTimer(); // give us the frames in flight.
 
             // Renderer::Presentation();
-            m_Window->OnUpdatePerTick();
+
+            UpdateCurrentApplicationInstance();
+            m_Window->OnUpdateAllFrames();
+
+            InputPoll::UpdateEvents();
         }
         
         //! @note Cleaning up imgui
