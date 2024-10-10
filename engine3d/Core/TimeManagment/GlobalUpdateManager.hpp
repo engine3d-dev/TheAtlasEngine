@@ -9,6 +9,7 @@ namespace engine3d
     * @note Used to keep track of updates and frame data.
     * @note Handles the other updateManagers.
     */
+
     class GlobalUpdateManager
     {
         private:
@@ -23,16 +24,20 @@ namespace engine3d
             bool editorRunning;
 
         public:
-
-            /// <remarks>
-            /// Do we want to make this just a getter? Or is this good syntax?
-            /// </remarks>
-
+            // May change to inline
             static const float& globalDeltaTime;
 
-            void setupConfig();
+
+            ///<remark>
+            /// Do we make this a singleton and make this private?
+            /// <\remark>
+            GlobalUpdateManager();
 
             // Manages the sync of each updateManager if required
             void globalOnTickUpdate();
+
+            // Maintains a const fps if possible
+            void waitForNextFrame();
+
     };
 };
