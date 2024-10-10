@@ -23,13 +23,6 @@ namespace engine3d
             */ 
             ParallelFrameUpdateManager* frameUpdateManager;
             SyncUpdateManager* syncUpdateManger;
-            /// <summary>
-            /// Adding the two bools may allow us to seperate the game
-            /// from the editor. Allowing us to stop one without stopping both.
-            /// We still need to think about how reverting back will work.
-            /// </summary>
-            bool isRunning;
-            bool editorRunning;
 
         public:
 

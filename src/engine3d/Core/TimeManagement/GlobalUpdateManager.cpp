@@ -7,10 +7,17 @@ namespace engine3d
         frameUpdateManager = new ParallelFrameUpdateManager();
     }
 
+    void GlobalUpdateManager::globalOnTickUpdate()
+    {
+        const static float& globalDeltaTime = GlobalDeltaTime;
+
+        
+
+    }
 
      GlobalUpdateManager::~GlobalUpdateManager()
      {
-        
+        delete syncUpdateManger;
+        delete frameUpdateManager;
      }
-    void globalOnTickUpdate();
 }
