@@ -3,6 +3,7 @@
 #include <print>
 #include "UpdateManagers/ParallelFrameUpdateManager.hpp"
 #include "UpdateManagers/SyncUpdateManager.hpp"
+#include <print>
 
 namespace engine3d
 {

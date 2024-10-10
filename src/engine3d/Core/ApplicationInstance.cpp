@@ -16,11 +16,11 @@ namespace engine3d{
         g_DebugName = p_DebugName;
         SetCurrentAPI(VULKAN);
         m_Window = Window::Create(900, 600, p_DebugName);
+        
     }
 
     void ApplicationInstance::ExecuteApplicationMainloop(){
         ConsoleLogInfo("EditorApplication::RunApplicationMainloop called!");
-
         while(m_Window->IsActive()){
             // FrameTimer::UpdateFrameTimer(); // give us the frames in flight.
 

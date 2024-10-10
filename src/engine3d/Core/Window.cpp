@@ -1,6 +1,7 @@
 // #include <Core/Window.hpp>
 #include <internal/VulkanCpp/VulkanWindow.hpp>
 #include "ApplicationInstance.hpp"
+#include "TimeManagement/GlobalUpdateManager.hpp"
 #include <Core/EngineLogger.hpp>
 #include <stdexcept>
 #include <string>
