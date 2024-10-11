@@ -1,10 +1,10 @@
 #pragma once
-#include <Window.hpp>
+// #include <Window.hpp>
+#include <chrono>
 #include <print>
 #include "UpdateManagers/ParallelFrameUpdateManager.hpp"
 #include "UpdateManagers/SyncUpdateManager.hpp"
-#include <print>
-
+#include <Core/TimeManagement/Timer.hpp>
 namespace engine3d
 {
     /**
@@ -16,7 +16,11 @@ namespace engine3d
     class GlobalUpdateManager
     {
         private:
-            float GlobalDeltaTime;
+            //!  @note represents the deltaTime for all applications
+            float m_GlobalDeltaTime;
+            std::chrono::time_point<std::chrono::high_resolution_clock> m_UpdateTime;
+            Timer* m_GlobalTimer;
+            int counter;
 
             /*
             * NEEDS FIX: Should not create raw pointers in constructors
@@ -26,6 +30,7 @@ namespace engine3d
             SyncUpdateManager* syncUpdateManger;
 
         public:
+            static GlobalUpdateManager* m_Instance;
 
             /*
             * NEEDS FIX: Change to a more secure way to always have one

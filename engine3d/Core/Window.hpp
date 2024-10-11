@@ -1,4 +1,5 @@
 #pragma once
+#include <Core/TimeManagement/GlobalUpdateManager.hpp>
 #include <Core/Core.hpp>
 #include <string>
 #include <vulkan/vulkan_core.h>
@@ -34,7 +35,7 @@ namespace engine3d{
         uint32_t GetHeight() const;
         std::string GetTitle() const;
 
-        void OnUpdateAllFrames();
+        void OnUpdateAllFrames(GlobalUpdateManager* g_UpdateManager);
 
     protected:
         //! @note These are all implementation details not exposed to the public API's
