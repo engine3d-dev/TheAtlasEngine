@@ -1,10 +1,6 @@
 #pragma once
 // #include <Window.hpp>
-#include <chrono>
-#include <print>
-#include "UpdateManagers/ParallelFrameUpdateManager.hpp"
-#include "UpdateManagers/SyncUpdateManager.hpp"
-#include <Core/TimeManagement/Timer.hpp>
+#include <Core/TimeManagement/UpdateManagers/SyncUpdateManager.hpp>
 namespace engine3d
 {
     /**
@@ -20,14 +16,21 @@ namespace engine3d
             float m_GlobalDeltaTime;
             std::chrono::time_point<std::chrono::high_resolution_clock> m_UpdateTime;
             Timer* m_GlobalTimer;
+            Timer* m_FPSMaintain;
+
+            //! @note for testing purposes can delete later!
+            SyncUpdateManager* t_syncUpdate;
+
+            float m_MaxFPS;
             int counter;
+            
 
             /*
             * NEEDS FIX: Should not create raw pointers in constructors
             * and deleting them in destructor. Unsafe!
             */ 
-            ParallelFrameUpdateManager* frameUpdateManager;
-            SyncUpdateManager* syncUpdateManger;
+ 
+            InputPoll* m_keyEvent;
 
         public:
             static GlobalUpdateManager* m_Instance;
@@ -41,6 +44,8 @@ namespace engine3d
 
             // Manages the sync of each updateManager if required
             void globalOnTickUpdate();
+
+            void OnSetUp();
 
             // Maintains a const fps if possible
             void waitForNextFrame();
