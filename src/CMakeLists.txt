@@ -19,6 +19,10 @@ set(
     ${ENGINE_INCLUDE_NAME}/Core/TimeManagement/UpdateManagers/SyncUpdateManager.hpp
     ${ENGINE_INCLUDE_NAME}/Core/TimeManagement/UpdateManagers/ParallelFrameUpdateManager.hpp
 
+    # Application Manager
+    ${ENGINE_INCLUDE_NAME}/Core/ApplicationManager/Scene.hpp
+    ${ENGINE_INCLUDE_NAME}/Core/ApplicationManager/ThreadPool.hpp
+
     # Event system includes
     ${ENGINE_INCLUDE_NAME}/Core/Event/KeyCodes.hpp
     ${ENGINE_INCLUDE_NAME}/Core/Event/MouseCodes.hpp
@@ -55,6 +59,9 @@ set(
     ${ENGINE_SRC_DIR}/Core/TimeManagement/Timer.cpp
     ${ENGINE_SRC_DIR}/Core/TimeManagement/UpdateManagers/SyncUpdateManager.cpp
     ${ENGINE_SRC_DIR}/Core/TimeManagement/UpdateManagers/ParallelFrameUpdateManager.cpp
+
+    ${ENGINE_SRC_DIR}/Core/ApplicationManager/Scene.cpp
+    ${ENGINE_SRC_DIR}/Core/ApplicationManager/ThreadPool.cpp
 
     ${ENGINE_SRC_DIR}/Core/Event/InputPoll.cpp
 
