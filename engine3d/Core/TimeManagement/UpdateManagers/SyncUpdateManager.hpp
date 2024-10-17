@@ -1,4 +1,5 @@
 #pragma once
+#include "TimeManagement/UpdateParent/SyncUpdate.hpp"
 #include <Core/Event/InputPoll.hpp>
 #include <chrono>
 #include <Core/TimeManagement/Timer.hpp>
@@ -11,7 +12,7 @@ namespace engine3d
             ~SyncUpdateManager();
 
             //Called by threadManager
-            void runUpdate(float deltaTime);
+            void runUpdate(float deltaTime, SyncUpdate* start, SyncUpdate* end);
         protected:
             // Called EveryFrame
             virtual void onTickUpdate(float deltaTime) {};
@@ -38,5 +39,7 @@ namespace engine3d
             //! @note inaccuate fps because it relies on window to call.
             //! @note Jframe may solve issue but yet to be tested.
             int m_localFPS;
+
+            float test;
     };
 };

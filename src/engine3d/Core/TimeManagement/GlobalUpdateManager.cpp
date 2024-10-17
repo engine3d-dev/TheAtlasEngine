@@ -1,4 +1,4 @@
-#include "TimeManagement/UpdateManagers/SyncUpdateManager.hpp"
+#include <Core/TimeManagement/UpdateManagers/SyncUpdateManager.hpp>
 #include <Core/Event/InputPoll.hpp>
 #include <Core/TimeManagement/GlobalUpdateManager.hpp>
 #include <chrono>
@@ -27,8 +27,9 @@ namespace engine3d
         m_MaxFPS = 80;
         counter = 0;
 
+        n=0;
+
         m_keyEvent = new InputPoll();
-        t_syncUpdate = new SyncUpdateManager();
 
         ConsoleLogInfo("F1 to see Global time and F2 to see Local time!\n");
         
@@ -37,7 +38,6 @@ namespace engine3d
     void GlobalUpdateManager::globalOnTickUpdate()
     {
         m_FPSMaintain->reset();
-        t_syncUpdate->runUpdate(m_GlobalDeltaTime);
 
         if(m_GlobalTimer->elapsedSec() >= 1)
         {
@@ -53,6 +53,14 @@ namespace engine3d
         {
             counter++;
         }
+        
+        //! @note for showcase purposes
+        // for(int i = 0; i < 1400; i++)
+        // {
+        //     for(int j = 0; j < 10000; j++){
+        //         n++;
+        //     }
+        // }
 
         m_GlobalDeltaTime = duration_cast<microseconds>(
                 m_GlobalTimer->getCurrentTime() - m_UpdateTime).count();
@@ -77,8 +85,6 @@ namespace engine3d
         delete m_GlobalTimer;
         delete m_FPSMaintain;
         delete m_keyEvent;
-
-        delete t_syncUpdate;
      }
 
      //paraOnFrameManager
