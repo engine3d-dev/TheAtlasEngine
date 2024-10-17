@@ -1,8 +1,7 @@
-#include <thread>
-#include <Scene.hpp>
+#include <Core/ApplicationManager/Scene.hpp>
 
 class SendThread
 {
-public:
-    void ThreadSender(SceneThreadReceiver &receiver, int taskID);
+    public:
+        void ThreadSender(SceneThreadReceiver &receiver, int taskID);
 };

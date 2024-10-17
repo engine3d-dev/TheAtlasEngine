@@ -19,19 +19,27 @@ namespace engine3d
         m_localFPS = 0;
         srand(std::time(NULL));
         m_randomFrame = (rand() % m_maxVariance) + m_minFrames;
+
+        test = 0;
     }
 
-    void SyncUpdateManager::runUpdate(float deltaTime)
+    //! @note this does not work per object this might need to change a little.
+    //! Possible pass gameObjects with the virtual functions.
+    //! Possibly seperate active scripts to non active ones in scenes.
+    void SyncUpdateManager::runUpdate(float deltaTime, SyncUpdate* start, SyncUpdate* end)
     {
-        onTickUpdate(deltaTime);
-
+        //! @note unsafe!!!!
+        for(auto it1 = start; it1 != end; it1++)
+        {
+            it1->runTickUpdate(deltaTime);
+        }
         /** 
         * @note Render is not quite placed in the right position here
         * @param randomFrame Used both to determine update and
         * used to allow render to optimise gpu sending if needed
         *
         * @note I used random in this case becuase it is hard for a
-        * human to catch wether then render is correct or not.
+        * human to catch wether the render is correct or not.
         * Benchmark later.
         */
         render(m_localDeltaTime, m_randomFrame);
@@ -44,11 +52,18 @@ namespace engine3d
             lateUpdate(m_localDeltaTime);
 
             m_localDeltaTime = duration_cast<std::chrono::microseconds>
-                (m_LocalTimer->getCurrentTime() 
-                    - m_localUpdateTime).count();
+                (m_LocalTimer->getCurrentTime() - m_localUpdateTime).count();
 
             m_localUpdateTime = m_LocalTimer->getCurrentTime();
             m_localFPS++;
+
+            //! @note for showcase purposes
+            // for(int i = 0; i < 1350; i++)
+            // {
+            //     for(int j = 0; j < 10000; j++){
+            //         test++;
+            //     }
+            // }
         }
         else 
         {

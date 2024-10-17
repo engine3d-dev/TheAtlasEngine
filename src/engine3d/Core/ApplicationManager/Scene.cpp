@@ -1,5 +1,4 @@
-#include <Scene.hpp>
-#include <iostream>
+#include <Core/ApplicationManager/Scene.hpp>
 
 void SceneThreadReceiver::HandleTask(int taskID)
 {

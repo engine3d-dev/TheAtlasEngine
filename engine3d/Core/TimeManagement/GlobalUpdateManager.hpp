@@ -18,9 +18,6 @@ namespace engine3d
             Timer* m_GlobalTimer;
             Timer* m_FPSMaintain;
 
-            //! @note for testing purposes can delete later!
-            SyncUpdateManager* t_syncUpdate;
-
             float m_MaxFPS;
             int counter;
             
