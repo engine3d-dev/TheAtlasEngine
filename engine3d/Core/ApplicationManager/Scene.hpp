@@ -1,7 +1,4 @@
-#include <iostream>
-
-class SceneThreadReceiver
-{
+class SceneThread {
 public:
-    void HandleTask(int taskID);
+  void HandleTask();
 };

@@ -1,8 +1,5 @@
-#include <thread>
-#include <Scene.hpp>
-
-class SendThread
-{
+class ThreadMngr {
 public:
-    void ThreadSender(SceneThreadReceiver &receiver, int taskID);
+  void ThreadHandler();
+  void OnRun(float deltaTime);
 };
