@@ -19,7 +19,7 @@ namespace engine3d
             Timer* m_FPSMaintain;
 
             float m_MaxFPS;
-            int counter;
+            int m_FPSCounter;
             
 
             /*
@@ -27,7 +27,7 @@ namespace engine3d
             * and deleting them in destructor. Unsafe!
             */ 
  
-            InputPoll* m_keyEvent;
+            InputPoll* m_KeyEvent;
 
         public:
             static GlobalUpdateManager* m_Instance;

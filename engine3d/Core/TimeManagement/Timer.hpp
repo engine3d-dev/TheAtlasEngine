@@ -1,4 +1,4 @@
-
+#pragma once
 #include <chrono>
 namespace engine3d{
     class Timer{
@@ -6,16 +6,16 @@ namespace engine3d{
         public:
         Timer();
 
-        void reset();
+        void Reset();
 
-        float elapsed();
+        float Elapsed();
 
-        float elapsedSec();
+        float ElapsedSec();
 
-        std::chrono::time_point<std::chrono::high_resolution_clock> getCurrentTime();
+        std::chrono::time_point<std::chrono::high_resolution_clock> GetCurrentTime();
 
         private:
-            std::chrono::time_point<std::chrono::high_resolution_clock> m_stopWatch;
+            std::chrono::time_point<std::chrono::high_resolution_clock> m_StopWatch;
 
     };
 };

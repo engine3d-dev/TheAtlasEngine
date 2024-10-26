@@ -7,28 +7,28 @@ namespace engine3d
 
     Timer::Timer()
     {
-        reset();
+        Reset();
     }
 
     // set a start time
-    void Timer::reset()
+    void Timer::Reset()
     {
-        m_stopWatch = high_resolution_clock::now();
+        m_StopWatch = high_resolution_clock::now();
     }
 
     // Get current Time
-    time_point<high_resolution_clock> Timer::getCurrentTime()
+    time_point<high_resolution_clock> Timer::GetCurrentTime()
     {
         return high_resolution_clock::now();
     }
 
-    float Timer::elapsed()
+    float Timer::Elapsed()
     {
-        return duration_cast<microseconds>(getCurrentTime()-m_stopWatch).count();
+        return duration_cast<microseconds>(GetCurrentTime()-m_StopWatch).count();
     }
 
-    float Timer::elapsedSec()
+    float Timer::ElapsedSec()
     {
-        return elapsed()/1000000;
+        return Elapsed()/1000000;
     }
 }

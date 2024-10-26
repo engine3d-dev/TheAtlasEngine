@@ -8,31 +8,26 @@ namespace engine3d
 {
     SyncUpdateManager::SyncUpdateManager()
     {
+
         m_LocalTimer = new Timer();
-        m_keyEvent = new InputPoll();
-        m_localUpdateTime = m_LocalTimer->getCurrentTime();
+        m_KeyEvent = new InputPoll();
+        m_LocalUpdateTime = m_LocalTimer->GetCurrentTime();
 
-        m_localDeltaTime = 0.0;
-        m_maxVariance = 2;
-        m_minFrames = 0;
-        m_localUpdateCounter = 0;
-        m_localFPS = 0;
+        m_LocalDeltaTime = 0.0;
+        m_MaxVariance = 2;
+        m_MinFrames = 0;
+        m_LocalUpdateCounter = 0;
+        m_LocalFPS = 0;
         srand(std::time(NULL));
-        m_randomFrame = (rand() % m_maxVariance) + m_minFrames;
-
-        test = 0;
+        m_RandomFrame = (rand() % m_MaxVariance) + m_MinFrames;
     }
 
     //! @note this does not work per object this might need to change a little.
-    //! Possible pass gameObjects with the virtual functions.
+    //! Possibly pass gameObjects with the virtual functions.
     //! Possibly seperate active scripts to non active ones in scenes.
-    void SyncUpdateManager::runUpdate(float deltaTime, SyncUpdate* start, SyncUpdate* end)
+    void SyncUpdateManager::RunUpdate(float deltaTime)
     {
         //! @note unsafe!!!!
-        for(auto it1 = start; it1 != end; it1++)
-        {
-            it1->runTickUpdate(deltaTime);
-        }
         /** 
         * @note Render is not quite placed in the right position here
         * @param randomFrame Used both to determine update and
@@ -42,52 +37,67 @@ namespace engine3d
         * human to catch wether the render is correct or not.
         * Benchmark later.
         */
-        render(m_localDeltaTime, m_randomFrame);
-        if(m_randomFrame <= m_localUpdateCounter)
+        if(m_RandomFrame <= m_LocalUpdateCounter)
         {
-            m_randomFrame = (rand() % m_maxVariance) + m_minFrames;
-            m_localUpdateCounter = 0;
+            m_RandomFrame = (rand() % m_MaxVariance) + m_MinFrames;
+            m_LocalUpdateCounter = 0;
 
-            update(m_localDeltaTime);
-            lateUpdate(m_localDeltaTime);
+            OnUpdate(m_LocalDeltaTime);
+            OnLateUpdate(m_LocalDeltaTime);
 
-            m_localDeltaTime = duration_cast<std::chrono::microseconds>
-                (m_LocalTimer->getCurrentTime() - m_localUpdateTime).count();
+            m_LocalDeltaTime = duration_cast<std::chrono::microseconds>
+                (m_LocalTimer->GetCurrentTime() - m_LocalUpdateTime).count();
 
-            m_localUpdateTime = m_LocalTimer->getCurrentTime();
-            m_localFPS++;
-
-            //! @note for showcase purposes
-            // for(int i = 0; i < 1350; i++)
-            // {
-            //     for(int j = 0; j < 10000; j++){
-            //         test++;
-            //     }
-            // }
+            m_LocalUpdateTime = m_LocalTimer->GetCurrentTime();
+            m_LocalFPS++;
         }
         else 
         {
-            m_localUpdateCounter++;
+            m_LocalUpdateCounter++;
         }
 
-        if(m_LocalTimer->elapsedSec() >= 1.0)
+        if(m_LocalTimer->ElapsedSec() >= 1.0)
         {
-            m_LocalTimer->reset();
+            m_LocalTimer->Reset();
 
             //! @note Key event added to allow switch between global and local.
-            if(m_keyEvent->IsKeyPressed(KeyCode::F2))
+            if(m_KeyEvent->IsKeyPressed(KeyCode::F2))
             {
                 ConsoleLogInfo("Local FPS: {0}, Local Delta Time: {1}",
-                    m_localFPS, m_localDeltaTime);
+                    m_LocalFPS, m_LocalDeltaTime);
             }
-            m_localFPS = 0;
+            m_LocalFPS = 0;
         }
         
+    }
+
+    void OnTickUpdate()
+    {
+        for(auto& l_Subscriber : m_SyncOnTickUpdateSubscribers)
+        {
+            l_Subscriber();
+        }
+    }
+
+    void OnUpdate()
+    {
+        for(auto& l_Subscriber : m_SyncUpdateSubscribers)
+        {
+            l_Subscriber();
+        }
+    }
+
+    void OnLateUpdate()
+    {
+        for(auto& l_Subscriber : m_SyncLateUpdateSubscribers)
+        {
+            l_Subscriber();
+        }
     }
 
     SyncUpdateManager::~SyncUpdateManager()
     {
         delete m_LocalTimer;
-        delete m_keyEvent;
+        delete m_KeyEvent;
     }
 }

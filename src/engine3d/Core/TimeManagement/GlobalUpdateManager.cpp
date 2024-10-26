@@ -23,13 +23,13 @@ namespace engine3d
         m_FPSMaintain = new Timer();
 
         m_GlobalDeltaTime = 0.0;
-        m_UpdateTime = m_GlobalTimer->getCurrentTime();
+        m_UpdateTime = m_GlobalTimer->GetCurrentTime();
         m_MaxFPS = 80;
-        counter = 0;
+        m_FPSCounter = 0;
 
         n=0;
 
-        m_keyEvent = new InputPoll();
+        m_KeyEvent = new InputPoll();
 
         ConsoleLogInfo("F1 to see Global time and F2 to see Local time!\n");
         
@@ -37,21 +37,21 @@ namespace engine3d
 
     void GlobalUpdateManager::globalOnTickUpdate()
     {
-        m_FPSMaintain->reset();
+        m_FPSMaintain->Reset();
 
-        if(m_GlobalTimer->elapsedSec() >= 1)
+        if(m_GlobalTimer->ElapsedSec() >= 1)
         {
-            if(m_keyEvent->IsKeyPressed(KeyCode::F1))
+            if(m_KeyEvent->IsKeyPressed(KeyCode::F1))
             {
                 ConsoleLogInfo("FPS: {1} Delta Time: {0}",
-                    m_GlobalDeltaTime, counter);
+                    m_GlobalDeltaTime, m_FPSCounter);
             }
-            m_GlobalTimer->reset();
-            counter = 0;
+            m_GlobalTimer->Reset();
+            m_FPSCounter = 0;
         }
         else 
         {
-            counter++;
+            m_FPSCounter++;
         }
         
         //! @note for showcase purposes
@@ -63,9 +63,9 @@ namespace engine3d
         // }
 
         m_GlobalDeltaTime = duration_cast<microseconds>(
-                m_GlobalTimer->getCurrentTime() - m_UpdateTime).count();
+                m_GlobalTimer->GetCurrentTime() - m_UpdateTime).count();
 
-        m_UpdateTime = m_GlobalTimer->getCurrentTime();
+        m_UpdateTime = m_GlobalTimer->GetCurrentTime();
 
         waitForNextFrame();
     }
@@ -73,7 +73,7 @@ namespace engine3d
     void GlobalUpdateManager::waitForNextFrame()
     {
 
-        while(m_FPSMaintain->elapsedSec() < 1.0/m_MaxFPS)
+        while(m_FPSMaintain->ElapsedSec() < 1.0/m_MaxFPS)
         {
             continue;
         }
@@ -84,7 +84,7 @@ namespace engine3d
      {
         delete m_GlobalTimer;
         delete m_FPSMaintain;
-        delete m_keyEvent;
+        delete m_KeyEvent;
      }
 
      //paraOnFrameManager
