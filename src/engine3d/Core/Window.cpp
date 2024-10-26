@@ -1,6 +1,7 @@
 // #include <Core/Window.hpp>
 #include <internal/VulkanCpp/VulkanWindow.hpp>
 #include "ApplicationInstance.hpp"
+#include "TimeManagement/GlobalUpdateManager.hpp"
 #include <Core/EngineLogger.hpp>
 #include <stdexcept>
 #include <string>
@@ -47,7 +48,8 @@ namespace engine3d{
     }
 
 
-    void Window::OnUpdateAllFrames(){
+    void Window::OnUpdateAllFrames(GlobalUpdateManager* p_UpdateManager){
+        p_UpdateManager->globalOnTickUpdate();
         Presentation();
     }
 };

@@ -26,6 +26,8 @@ namespace engine3d{
 
         static void SetCurrentAPI(API p_CurrentApi);
 
+        static void callApplicationUpdate();
+
         static Window& GetWindow();
 
         static API CurrentAPI();
