@@ -61,7 +61,7 @@ namespace engine3d
             m_LocalTimer->Reset();
 
             //! @note Key event added to allow switch between global and local.
-            if(m_KeyEvent->IsKeyPressed(KeyCode::F2))
+            if(m_KeyEvent->IsKeyPressed(KeyCode::W))
             {
                 ConsoleLogInfo("Local FPS: {0}, Local Delta Time: {1}",
                     m_LocalFPS, m_LocalDeltaTime);
@@ -71,27 +71,27 @@ namespace engine3d
         
     }
 
-    void OnTickUpdate()
+    void SyncUpdateManager::OnPhysicsUpdate(float p_DeltaTime)
     {
         for(auto& l_Subscriber : m_SyncOnTickUpdateSubscribers)
         {
-            l_Subscriber();
+            l_Subscriber(p_DeltaTime);
         }
     }
 
-    void OnUpdate()
+    void SyncUpdateManager::OnUpdate(float p_DeltaTime)
     {
         for(auto& l_Subscriber : m_SyncUpdateSubscribers)
         {
-            l_Subscriber();
+            l_Subscriber(p_DeltaTime);
         }
     }
 
-    void OnLateUpdate()
+    void SyncUpdateManager::OnLateUpdate(float p_DeltaTime)
     {
         for(auto& l_Subscriber : m_SyncLateUpdateSubscribers)
         {
-            l_Subscriber();
+            l_Subscriber(p_DeltaTime);
         }
     }
 

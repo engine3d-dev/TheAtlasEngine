@@ -40,12 +40,12 @@ namespace engine3d
             ~GlobalUpdateManager();
 
             // Manages the sync of each updateManager if required
-            void globalOnTickUpdate();
+            void GlobalOnTickUpdate();
 
             void OnSetUp();
 
             // Maintains a const fps if possible
-            void waitForNextFrame();
+            void WaitForNextFrame();
 
     };
 };
