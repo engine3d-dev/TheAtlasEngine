@@ -7,27 +7,22 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "") # works (in creating the
 
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
-if(WIN32)
+
 find_package(Vulkan REQUIRED)
 find_package(VulkanHeaders REQUIRED)
-endif(WIN32)
 
 if(LINUX)
 find_package(VulkanLoader REQUIRED)
 endif(LINUX)
 
-if(APPLE)
-find_package(Vulkan REQUIRED)
-endif(APPLE)
-
 find_package(glm REQUIRED)
 find_package(fmt REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(yaml-cpp REQUIRED)
-# find_package(imguidocking REQUIRED)
+find_package(imguidocking REQUIRED)
 find_package(box2d REQUIRED)
-# find_package(joltphysics REQUIRED)
-# find_package(assimp REQUIRED)
+find_package(joltphysics REQUIRED)
+find_package(EnTT REQUIRED)
 
 add_subdirectory(Editor)
 add_subdirectory(src)
@@ -68,8 +63,6 @@ add_custom_command(
 # Usage - used to suppress that lld-link error and use the defaulted linked .library
 if(MSVC)
     target_compile_options(${PROJECT_NAME} PUBLIC "/Z1" "/NOD")
-# else()
-#     target_compile_options(${PROJECT_NAME} PUBLIC "-fsanitize=address")
 endif(MSVC)
 
 # target_include_directory is setting some private settings for differentiating what internal includes are privates and what should be includes should be exposed to the application-dev
@@ -88,9 +81,10 @@ target_link_libraries(
     fmt::fmt
     spdlog::spdlog
     yaml-cpp::yaml-cpp
-    # imguidocking::imguidocking
+    imguidocking::imguidocking
     box2d::box2d
-    # Jolt::Jolt
+    Jolt::Jolt
+    EnTT::EnTT
 )
 endif(WIN32)
 
@@ -105,9 +99,10 @@ target_link_libraries(
     fmt::fmt
     spdlog::spdlog
     yaml-cpp::yaml-cpp
-    # imguidocking::imguidocking
+    imguidocking::imguidocking
     box2d::box2d
     Jolt::Jolt
+    EnTT::EnTT
 )
 endif(LINUX)
 
@@ -118,13 +113,14 @@ target_link_libraries(
     glfw
     ${OPENGL_LIBRARIES}
     Vulkan::Vulkan
-    # vulkan-headers::vulkan-headers
+    vulkan-headers::vulkan-headers
     glm::glm
     fmt::fmt
     spdlog::spdlog
     yaml-cpp::yaml-cpp
-    # imguidocking::imguidocking
+    imguidocking::imguidocking
     box2d::box2d
+    EnTT::EnTT
 )
 endif(APPLE)
 
