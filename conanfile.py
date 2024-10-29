@@ -26,6 +26,8 @@ class engine3dRecipe(ConanFile):
         self.requires("make/4.4.1")
         self.tool_requires("cmake/3.27.1")
         self.requires("glfw/3.4", transitive_headers=True)
+        self.requires("opengl/system", transitive_headers=True)
+
 
         # These end in 1.0 because they are engine3d-customized conan packages
         # Slighly modified of the conan packages and it's CMake generators to using "Unix Makefiles" 
@@ -34,19 +36,18 @@ class engine3dRecipe(ConanFile):
         self.requires("glm/1.0.1", transitive_headers=True)
         self.requires("yaml-cpp/0.8.0", transitive_headers=True)
         self.requires("box2d/2.4.2")
-        self.requires("opengl/system", transitive_headers=True)
-        
-        # engine3d-dev customized conan packages for these dependencies
+        self.requires("imguidocking/1.0")
+        self.requires("entt/3.13.2")
 
-        if self.settings.os == "Windows":
-            self.requires("vulkan-headers/1.3.290.0")
+
+        self.requires("joltphysics/1.0")
+        
+        self.requires("vulkan-headers/1.3.290.0")
         if self.settings.os == "Linux":
             self.requires("vulkan-loader/1.3.290.0")
         print(f"OS = {self.settings.os}")            
-        # self.requires("imguidocking/1.0")
-        # self.requires("joltphysics/1.0")
-        # self.requires("assimp/5.4.1")
-    
+
+    # Still unsure if I want to use this --- linux specific conan thing.    
     # def system_requirements(self):
         # depending on the platform or the tools.system.package_manager:tool configuration
         # only one of these will be executed
