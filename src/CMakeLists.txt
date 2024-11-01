@@ -80,6 +80,8 @@ set(
     ${VULKAN_SRC_DIR}/VulkanLogicalDevice.cpp
     ${VULKAN_SRC_DIR}/VulkanSwapchain.cpp
 
+    ${ENGINE_SRC_DIR}/Core/SceneManagment/SceneObjects/SceneObject.cpp
+
     ${ENGINE_SRC_DIR}/Core/Renderer/Renderer.cpp
 )
 

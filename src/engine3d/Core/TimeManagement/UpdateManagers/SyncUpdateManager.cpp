@@ -37,6 +37,7 @@ namespace engine3d
         * human to catch wether the render is correct or not.
         * Benchmark later.
         */
+        OnPhysicsUpdate(deltaTime);
         if(m_RandomFrame <= m_LocalUpdateCounter)
         {
             m_RandomFrame = (rand() % m_MaxVariance) + m_MinFrames;
@@ -61,7 +62,7 @@ namespace engine3d
             m_LocalTimer->Reset();
 
             //! @note Key event added to allow switch between global and local.
-            if(m_KeyEvent->IsKeyPressed(KeyCode::W))
+            if(m_KeyEvent->IsKeyPressed(KeyCode::F2))
             {
                 ConsoleLogInfo("Local FPS: {0}, Local Delta Time: {1}",
                     m_LocalFPS, m_LocalDeltaTime);

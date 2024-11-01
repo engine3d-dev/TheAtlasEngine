@@ -1,7 +1,9 @@
 #include <Core/SceneManagment/Components/GameComponent.hpp>
 
-GameComponent::GameComponent()
+namespace Engine3D
 {
-    // For later 
-}
-
+    void GameComponent::SetSceneObjectRef(SceneObject& p_Object)
+    {
+        m_GameObjectRef = &p_Object;
+    }
+};

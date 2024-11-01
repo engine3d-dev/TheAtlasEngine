@@ -1,3 +1,6 @@
 #include <Core/SceneManagment/SceneObjects/SceneObject.hpp>
 
-// nothing for now!
+namespace Engine3D
+{
+	SceneObject::SceneObject(entt::entity handle, Scene* scene) : SceneObjectHandler(handle), m_ParentScene(scene) {}
+};

@@ -49,7 +49,7 @@ namespace engine3d{
 
 
     void Window::OnUpdateAllFrames(GlobalUpdateManager* p_UpdateManager){
-        p_UpdateManager->globalOnTickUpdate();
+        p_UpdateManager->GlobalOnTickUpdate();
         Presentation();
     }
 };
