@@ -1,17 +1,17 @@
+#include "ApplicationInstance.hpp"
 #include <Core/TimeManagement/UpdateManagers/SyncUpdateManager.hpp>
 #include <Core/Event/InputPoll.hpp>
 #include <Core/TimeManagement/GlobalUpdateManager.hpp>
 #include <chrono>
 #include <print>
 #include <Core/EngineLogger.hpp>
+#include <GLFW/glfw3.h>
 
 using namespace std::chrono;
 
 using highResClock = high_resolution_clock;
 namespace engine3d
 {
-    float n = 0;
-    static float g_globalDeltaTime = 0;
     GlobalUpdateManager::GlobalUpdateManager()
     {
         OnSetUp();
@@ -27,15 +27,14 @@ namespace engine3d
         m_MaxFPS = 80;
         m_FPSCounter = 0;
 
-        n=0;
-
         m_KeyEvent = new InputPoll();
 
+        //! @note syncupdatemanager will not work until the thread manager works.
         ConsoleLogInfo("F1 to see Global time and F2 to see Local time!\n");
         
     }
 
-    void GlobalUpdateManager::globalOnTickUpdate()
+    void GlobalUpdateManager::GlobalOnTickUpdate()
     {
         m_FPSMaintain->Reset();
 
@@ -46,31 +45,29 @@ namespace engine3d
                 ConsoleLogInfo("FPS: {1} Delta Time: {0}",
                     m_GlobalDeltaTime, m_FPSCounter);
             }
-            m_GlobalTimer->Reset();
+                        m_GlobalTimer->Reset();
             m_FPSCounter = 0;
         }
         else 
         {
             m_FPSCounter++;
         }
-        
-        //! @note for showcase purposes
-        // for(int i = 0; i < 1400; i++)
-        // {
-        //     for(int j = 0; j < 10000; j++){
-        //         n++;
-        //     }
-        // }
+
+        if(m_KeyEvent->IsKeyPressed(KeyCode::F12))
+        {
+            glfwDestroyWindow(ApplicationInstance::GetWindow().GetNativeWindow()); 
+        }
+
 
         m_GlobalDeltaTime = duration_cast<microseconds>(
                 m_GlobalTimer->GetCurrentTime() - m_UpdateTime).count();
 
         m_UpdateTime = m_GlobalTimer->GetCurrentTime();
 
-        waitForNextFrame();
+        WaitForNextFrame();
     }
 
-    void GlobalUpdateManager::waitForNextFrame()
+    void GlobalUpdateManager::WaitForNextFrame()
     {
 
         while(m_FPSMaintain->ElapsedSec() < 1.0/m_MaxFPS)
@@ -79,15 +76,10 @@ namespace engine3d
         }
     }
 
-
      GlobalUpdateManager::~GlobalUpdateManager()
      {
         delete m_GlobalTimer;
         delete m_FPSMaintain;
         delete m_KeyEvent;
      }
-
-     //paraOnFrameManager
-     //paraOnFrameUpdate
-     //paraOnCallUpdate
 }

@@ -1,4 +1,5 @@
 set(ENGINE_INCLUDE_NAME ../engine3d)
+set(INCLUDE_TESTAPP ../TestApp)
 set(ENGINE_INTERNAL_INCLUDE ${ENGINE_INCLUDE_NAME}/Core/internal)
 set(ENGINE_SRC_DIR engine3d)
 set(VULKAN_INCLUDE_DIR ${ENGINE_INCLUDE_NAME}/Core/internal/VulkanCpp)
@@ -39,8 +40,15 @@ set(
     ${VULKAN_INCLUDE_DIR}/VulkanLogicalDevice.hpp
     ${VULKAN_INCLUDE_DIR}/VulkanSwapchain.hpp
 
+    # Scene Managment Includes
+    ${ENGINE_INCLUDE_NAME}/Core/SceneManagment/Components/GameComponent.hpp
+    ${ENGINE_INCLUDE_NAME}/Core/SceneManagment/SceneObjects/SceneObject.hpp
+
     # Renderer Includes
     ${ENGINE_INCLUDE_NAME}/Core/Renderer/Renderer.hpp
+
+    # Test Application Includes
+
 )
 
 set(
@@ -71,6 +79,8 @@ set(
     ${VULKAN_SRC_DIR}/VulkanPhysicalDevice.cpp
     ${VULKAN_SRC_DIR}/VulkanLogicalDevice.cpp
     ${VULKAN_SRC_DIR}/VulkanSwapchain.cpp
+
+    ${ENGINE_SRC_DIR}/Core/SceneManagment/SceneObjects/SceneObject.cpp
 
     ${ENGINE_SRC_DIR}/Core/Renderer/Renderer.cpp
 )

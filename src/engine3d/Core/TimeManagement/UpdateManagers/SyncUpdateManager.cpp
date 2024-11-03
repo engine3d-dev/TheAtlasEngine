@@ -37,6 +37,7 @@ namespace engine3d
         * human to catch wether the render is correct or not.
         * Benchmark later.
         */
+        OnPhysicsUpdate(deltaTime);
         if(m_RandomFrame <= m_LocalUpdateCounter)
         {
             m_RandomFrame = (rand() % m_MaxVariance) + m_MinFrames;
@@ -71,27 +72,27 @@ namespace engine3d
         
     }
 
-    void OnTickUpdate()
+    void SyncUpdateManager::OnPhysicsUpdate(float p_DeltaTime)
     {
         for(auto& l_Subscriber : m_SyncOnTickUpdateSubscribers)
         {
-            l_Subscriber();
+            l_Subscriber(p_DeltaTime);
         }
     }
 
-    void OnUpdate()
+    void SyncUpdateManager::OnUpdate(float p_DeltaTime)
     {
         for(auto& l_Subscriber : m_SyncUpdateSubscribers)
         {
-            l_Subscriber();
+            l_Subscriber(p_DeltaTime);
         }
     }
 
-    void OnLateUpdate()
+    void SyncUpdateManager::OnLateUpdate(float p_DeltaTime)
     {
         for(auto& l_Subscriber : m_SyncLateUpdateSubscribers)
         {
-            l_Subscriber();
+            l_Subscriber(p_DeltaTime);
         }
     }
 

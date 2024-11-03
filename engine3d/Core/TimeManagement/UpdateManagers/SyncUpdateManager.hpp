@@ -6,9 +6,9 @@
 namespace engine3d
 {
 
-    static std::vector<std::function<void()>> m_SyncLateUpdateSubscribers;
-    static std::vector<std::function<void()>> m_SyncUpdateSubscribers;
-    static std::vector<std::function<void()>> m_SyncOnTickUpdateSubscribers;
+    static std::vector<std::function<void(float)>> m_SyncLateUpdateSubscribers;
+    static std::vector<std::function<void(float)>> m_SyncUpdateSubscribers;
+    static std::vector<std::function<void(float)>> m_SyncOnTickUpdateSubscribers;
     class SyncUpdateManager
     {
         private:
@@ -31,11 +31,11 @@ namespace engine3d
             int m_LocalFPS;
 
             // Called EveryFrame
-            void OnPhysicsUpdate(float deltaTime) {};
+            void OnPhysicsUpdate(float p_DeltaTime);
 
             // Varied by random frames
-            void OnUpdate(float deltaTime) {};
-            void OnLateUpdate(float deltaTime) {};
+            void OnUpdate(float p_DeltaTime);
+            void OnLateUpdate(float p_DeltaTime);
 
             //! @note update specialization
             template<typename, typename = std::void_t<>>
@@ -43,7 +43,7 @@ namespace engine3d
 
             template<typename UCompClass>
             struct m_HasUpdate<UCompClass, std::void_t<decltype(
-                declval<UCompClass>().Update())>> : std::true_type {};
+                declval<UCompClass>().Update(0.0f))>> : std::true_type {};
 
             //! @note lateUpdate specialization
             template<typename, typename = std::void_t<>>
@@ -51,15 +51,15 @@ namespace engine3d
 
             template<typename UCompClass>
             struct m_HasLateUpdate<UCompClass, std::void_t<decltype(
-                declval<UCompClass>().LateUpdate())>> : std::true_type {};
+                declval<UCompClass>().FrameUpdate(0.0f))>> : std::true_type {};
 
             //! @note onTickUpdate specialization
             template<typename, typename = std::void_t<>>
-            struct m_HasOnTickUpdate : std::false_type{};
+            struct m_HasPhysicsUpdate : std::false_type{};
 
             template<typename UCompClass>
-            struct m_HasOnTickUpdate<UCompClass, std::void_t<decltype(
-                declval<UCompClass>().OnTickUpdate())>> : std::true_type {};
+            struct m_HasPhysicsUpdate<UCompClass, std::void_t<decltype(
+                declval<UCompClass>().PhysicsUpdate(0.0f))>> : std::true_type {};
 
         public:
             ~SyncUpdateManager();
@@ -93,7 +93,7 @@ namespace engine3d
                         return;
                     }
                 }
-                if constexpr (m_HasOnTickUpdate<UComponent>::value)
+                if constexpr (m_HasPhysicsUpdate<UComponent>::value)
                 {
                     if(&UComponent::OnTickUpdate == p_Update)
                     {
