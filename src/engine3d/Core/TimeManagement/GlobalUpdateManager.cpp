@@ -1,9 +1,11 @@
+#include "ApplicationInstance.hpp"
 #include <Core/TimeManagement/UpdateManagers/SyncUpdateManager.hpp>
 #include <Core/Event/InputPoll.hpp>
 #include <Core/TimeManagement/GlobalUpdateManager.hpp>
 #include <chrono>
 #include <print>
 #include <Core/EngineLogger.hpp>
+#include <GLFW/glfw3.h>
 
 using namespace std::chrono;
 
@@ -43,13 +45,19 @@ namespace engine3d
                 ConsoleLogInfo("FPS: {1} Delta Time: {0}",
                     m_GlobalDeltaTime, m_FPSCounter);
             }
-            m_GlobalTimer->Reset();
+                        m_GlobalTimer->Reset();
             m_FPSCounter = 0;
         }
         else 
         {
             m_FPSCounter++;
         }
+
+        if(m_KeyEvent->IsKeyPressed(KeyCode::F12))
+        {
+            glfwDestroyWindow(ApplicationInstance::GetWindow().GetNativeWindow()); 
+        }
+
 
         m_GlobalDeltaTime = duration_cast<microseconds>(
                 m_GlobalTimer->GetCurrentTime() - m_UpdateTime).count();
