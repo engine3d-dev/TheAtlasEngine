@@ -1,8 +1,8 @@
 #include <Core/SceneManagment/Components/GameComponent.hpp>
 
-namespace Engine3D
+namespace engine3d
 {
-    void GameComponent::SetSceneObjectRef(SceneObject& p_Object)
+    void GameComponent::SetSceneObjectRef(SceneObject &p_Object)
     {
         m_GameObjectRef = &p_Object;
     }

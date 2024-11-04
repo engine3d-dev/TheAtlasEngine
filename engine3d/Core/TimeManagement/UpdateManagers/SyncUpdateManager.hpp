@@ -3,26 +3,20 @@
 #include <Core/Event/InputPoll.hpp>
 #include <functional>
 #include <chrono>
+#include <stdexcept>
 namespace engine3d
 {
 
-    static std::vector<std::function<void(float)>> m_SyncLateUpdateSubscribers;
-    static std::vector<std::function<void(float)>> m_SyncUpdateSubscribers;
-    static std::vector<std::function<void(float)>> m_SyncOnTickUpdateSubscribers;
     class SyncUpdateManager
     {
         private:
-            SyncUpdateManager();
             std::chrono::time_point<std::chrono::high_resolution_clock> m_LocalUpdateTime;
             
             int m_MaxVariance;
             int m_MinFrames;
 
-            static SyncUpdateManager* m_Manager;
-
             Timer* m_LocalTimer;
             InputPoll* m_KeyEvent;
-            float m_LocalDeltaTime;
             int m_LocalUpdateCounter;
             int m_RandomFrame;
 
@@ -31,11 +25,11 @@ namespace engine3d
             int m_LocalFPS;
 
             // Called EveryFrame
-            void OnPhysicsUpdate(float p_DeltaTime);
+            void OnPhysicsUpdate();
 
             // Varied by random frames
-            void OnUpdate(float p_DeltaTime);
-            void OnLateUpdate(float p_DeltaTime);
+            void OnUpdate();
+            void OnLateUpdate();
 
             //! @note update specialization
             template<typename, typename = std::void_t<>>
@@ -43,7 +37,7 @@ namespace engine3d
 
             template<typename UCompClass>
             struct m_HasUpdate<UCompClass, std::void_t<decltype(
-                declval<UCompClass>().Update(0.0f))>> : std::true_type {};
+                std::declval<UCompClass>().Update())>> : std::true_type {};
 
             //! @note lateUpdate specialization
             template<typename, typename = std::void_t<>>
@@ -51,7 +45,7 @@ namespace engine3d
 
             template<typename UCompClass>
             struct m_HasLateUpdate<UCompClass, std::void_t<decltype(
-                declval<UCompClass>().FrameUpdate(0.0f))>> : std::true_type {};
+                std::declval<UCompClass>().LateUpdate())>> : std::true_type {};
 
             //! @note onTickUpdate specialization
             template<typename, typename = std::void_t<>>
@@ -59,18 +53,24 @@ namespace engine3d
 
             template<typename UCompClass>
             struct m_HasPhysicsUpdate<UCompClass, std::void_t<decltype(
-                declval<UCompClass>().PhysicsUpdate(0.0f))>> : std::true_type {};
+                std::declval<UCompClass>().PhysicsUpdate())>> : std::true_type {};
 
         public:
-            ~SyncUpdateManager();
+            std::vector<std::function<void()>> m_SyncLateUpdateSubscribers;
+            std::vector<std::function<void()>> m_SyncUpdateSubscribers;
+            std::vector<std::function<void()>> m_SyncOnTickUpdateSubscribers;
 
+            SyncUpdateManager();
+            ~SyncUpdateManager();
+            float m_SyncLocalDeltaTime;
             //Called by threadManager
             void RunUpdate(float deltaTime);
 
             //Component Subscription
             template<typename UComponent, typename UFunction>
-            static void Subscribe(UComponent* p_Instance, const UFunction&& p_Update)
+            void Subscribe(UComponent* p_Instance, const UFunction&& p_Update)
             {
+
                 if constexpr (m_HasUpdate<UComponent>::value)
                 {
                     if(&UComponent::Update == p_Update)
@@ -95,7 +95,7 @@ namespace engine3d
                 }
                 if constexpr (m_HasPhysicsUpdate<UComponent>::value)
                 {
-                    if(&UComponent::OnTickUpdate == p_Update)
+                    if(&UComponent::PhysicsUpdate == p_Update)
                     {
                         m_SyncOnTickUpdateSubscribers.push_back([p_Instance, p_Update]() 
                         {
@@ -104,15 +104,12 @@ namespace engine3d
                         return;
                     }
                 }
-                throw runtime_error("Faulty subscribed function!\n \tUse update, lateUpdate, onTickUpdate!");
-            }
-          
-            static SyncUpdateManager& getInstance()
-            {
-              static SyncUpdateManager instance;
-              return instance;
+                throw std::runtime_error
+                    ("Faulty subscribed function!\n \tUse update, lateUpdate, onTickUpdate!");
             }
 
+            static SyncUpdateManager* g_GetSyncUpdateManager() {return g_SyncManager;}
+            static SyncUpdateManager* g_SyncManager;
             SyncUpdateManager(const SyncUpdateManager&) = delete;
             SyncUpdateManager& operator=(const SyncUpdateManager&) = delete;
     };

@@ -3,7 +3,7 @@
 #include <xhash>
 #include <Core/Core.hpp>
 
-namespace Engine3D{
+namespace engine3d{
     /**
      * @name UUID
      * @note Traditionally a 128-bit value, as it is normally defined
@@ -27,8 +27,8 @@ namespace Engine3D{
 
 namespace std{
     template<>
-    struct hash<Engine3D::UUID>{
-        std::size_t operator()(const Engine3D::UUID& uuid) const {
+    struct hash<engine3d::UUID>{
+        std::size_t operator()(const engine3d::UUID& uuid) const {
             return hash<uint64_t>()((uint64_t)uuid);
         }
     };

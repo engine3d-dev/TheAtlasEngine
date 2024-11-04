@@ -43,11 +43,13 @@ set(
     # Scene Managment Includes
     ${ENGINE_INCLUDE_NAME}/Core/SceneManagment/Components/GameComponent.hpp
     ${ENGINE_INCLUDE_NAME}/Core/SceneManagment/SceneObjects/SceneObject.hpp
+    ${ENGINE_INCLUDE_NAME}/Core/ApplicationManager/GameObjManager/UUID.hpp
 
     # Renderer Includes
     ${ENGINE_INCLUDE_NAME}/Core/Renderer/Renderer.hpp
 
     # Test Application Includes
+    ${INCLUDE_TESTAPP}/SceneTest/Scenes/Assets/Components/testComp.hpp
 
 )
 
@@ -81,8 +83,12 @@ set(
     ${VULKAN_SRC_DIR}/VulkanSwapchain.cpp
 
     ${ENGINE_SRC_DIR}/Core/SceneManagment/SceneObjects/SceneObject.cpp
+    ${ENGINE_SRC_DIR}/Core/SceneManagment/Components/GameComponent.cpp
+    ${ENGINE_SRC_DIR}/Core/ApplicationManager/GameObjManager/UUID.cpp
 
     ${ENGINE_SRC_DIR}/Core/Renderer/Renderer.cpp
+
+    ${INCLUDE_TESTAPP}/SceneTest/src/Scenes/Assets/Components/testComp.cpp
 )
 
 add_library(${PROJECT_NAME} ${all_headers} ${all_src})

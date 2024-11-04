@@ -1,15 +1,15 @@
 #pragma once
 
-#include <Core/SceneManagment/SceneObjects/SceneObject.hpp>
+#include <Core\SceneManagment\SceneObjects\SceneObject.hpp>
 #include <cstdint>
 
-namespace Engine3D 
+namespace engine3d 
 {
   class GameComponent
   {
     public:
-      GameComponent();
-      ~GameComponent();
+      GameComponent() = default;
+      ~GameComponent() = default;
 
       void SetSceneObjectRef(SceneObject &p_Object);
       void SetComponentID(uint64_t p_CompID);

@@ -1,4 +1,6 @@
 
+#include "ApplicationManager/Scene.hpp"
+#include "SceneManagment/SceneObjects/SceneObject.hpp"
 #include <Core/ApplicationManager/ThreadPool.hpp>
 #include <Core/TimeManagement/UpdateManagers/SyncUpdateManager.hpp>
 #include <mutex>
@@ -14,8 +16,16 @@ namespace engine3d
 {
   ThreadMngr::ThreadMngr()
   {
-     syncManager = &SyncUpdateManager::getInstance();
-     syncUpdateThread = std::jthread(&ThreadMngr::UpdateSyncFunction, this); 
+    m_SyncManager = new SyncUpdateManager();
+    m_SyncManager->g_SyncManager = m_SyncManager;
+    t_NewScene = new Scene();
+    t_NewObject = new SceneObject(t_NewScene);
+    t_NewObject->SceneObject::AddComponent<testComp>();
+    m_ThreadStop = false;
+    syncUpdateThread = std::jthread(&ThreadMngr::UpdateSyncFunction, this);
+
+    if(syncUpdateThread.joinable())
+      printf("Thread manager Running!\n");
   }
   void ThreadMngr::ThreadHandler() 
   {
@@ -34,15 +44,24 @@ namespace engine3d
     while(!m_ThreadStop)
     {
       std::unique_lock<std::mutex> lock(syncLock);
-
       frameKey.wait(lock, [] {return ready;});
+      if(m_ThreadStop)
+      {
+        printf("Cleaning Thread!\n");
+        break;
+      }
       ready = false;
-      syncManager->RunUpdate(m_DeltaTime);
+      m_SyncManager->RunUpdate(m_DeltaTime);
     }
   }
 
   ThreadMngr::~ThreadMngr()
   {
-    syncUpdateThread.join();
+    delete t_NewObject;
+    delete t_NewScene;
+    delete m_SyncManager;
+    m_ThreadStop = true;
+    ready = true;
+    frameKey.notify_all();
   }
 };
