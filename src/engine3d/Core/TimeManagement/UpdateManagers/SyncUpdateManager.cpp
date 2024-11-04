@@ -6,6 +6,7 @@
 
 namespace engine3d
 {
+    SyncUpdateManager* SyncUpdateManager::g_SyncManager = nullptr;
     SyncUpdateManager::SyncUpdateManager()
     {
 
@@ -13,7 +14,7 @@ namespace engine3d
         m_KeyEvent = new InputPoll();
         m_LocalUpdateTime = m_LocalTimer->GetCurrentTime();
 
-        m_LocalDeltaTime = 0.0;
+        m_SyncLocalDeltaTime = 0.0;
         m_MaxVariance = 2;
         m_MinFrames = 0;
         m_LocalUpdateCounter = 0;
@@ -37,16 +38,16 @@ namespace engine3d
         * human to catch wether the render is correct or not.
         * Benchmark later.
         */
-        OnPhysicsUpdate(deltaTime);
+        OnPhysicsUpdate();
         if(m_RandomFrame <= m_LocalUpdateCounter)
         {
             m_RandomFrame = (rand() % m_MaxVariance) + m_MinFrames;
             m_LocalUpdateCounter = 0;
 
-            OnUpdate(m_LocalDeltaTime);
-            OnLateUpdate(m_LocalDeltaTime);
+            OnUpdate();
+            OnLateUpdate();
 
-            m_LocalDeltaTime = duration_cast<std::chrono::microseconds>
+            m_SyncLocalDeltaTime = duration_cast<std::chrono::microseconds>
                 (m_LocalTimer->GetCurrentTime() - m_LocalUpdateTime).count();
 
             m_LocalUpdateTime = m_LocalTimer->GetCurrentTime();
@@ -65,34 +66,34 @@ namespace engine3d
             if(m_KeyEvent->IsKeyPressed(KeyCode::F2))
             {
                 ConsoleLogInfo("Local FPS: {0}, Local Delta Time: {1}",
-                    m_LocalFPS, m_LocalDeltaTime);
+                    m_LocalFPS, m_SyncLocalDeltaTime);
             }
             m_LocalFPS = 0;
         }
         
     }
 
-    void SyncUpdateManager::OnPhysicsUpdate(float p_DeltaTime)
+    void SyncUpdateManager::OnPhysicsUpdate()
     {
         for(auto& l_Subscriber : m_SyncOnTickUpdateSubscribers)
         {
-            l_Subscriber(p_DeltaTime);
+            l_Subscriber();
         }
     }
 
-    void SyncUpdateManager::OnUpdate(float p_DeltaTime)
+    void SyncUpdateManager::OnUpdate()
     {
         for(auto& l_Subscriber : m_SyncUpdateSubscribers)
         {
-            l_Subscriber(p_DeltaTime);
+            l_Subscriber();
         }
     }
 
-    void SyncUpdateManager::OnLateUpdate(float p_DeltaTime)
+    void SyncUpdateManager::OnLateUpdate()
     {
         for(auto& l_Subscriber : m_SyncLateUpdateSubscribers)
         {
-            l_Subscriber(p_DeltaTime);
+            l_Subscriber();
         }
     }
 

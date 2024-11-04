@@ -1,7 +1,7 @@
 #include <Core/ApplicationManager/GameObjManager/UUID.hpp>
 #include <random>
 
-namespace Engine3D
+namespace engine3d
 {
     static std::random_device randomDevice;
     static std::mt19937_64 engine(randomDevice());
