@@ -1,4 +1,5 @@
 #include "ApplicationInstance.hpp"
+#include "ApplicationManager/ThreadPool.hpp"
 #include <Core/TimeManagement/UpdateManagers/SyncUpdateManager.hpp>
 #include <Core/Event/InputPoll.hpp>
 #include <Core/TimeManagement/GlobalUpdateManager.hpp>
@@ -21,6 +22,7 @@ namespace engine3d
     {
         m_GlobalTimer = new Timer();
         m_FPSMaintain = new Timer();
+        m_threadManager = new ThreadMngr();
 
         m_GlobalDeltaTime = 0.0;
         m_UpdateTime = m_GlobalTimer->GetCurrentTime();
@@ -58,11 +60,12 @@ namespace engine3d
             glfwDestroyWindow(ApplicationInstance::GetWindow().GetNativeWindow()); 
         }
 
-
         m_GlobalDeltaTime = duration_cast<microseconds>(
                 m_GlobalTimer->GetCurrentTime() - m_UpdateTime).count();
 
         m_UpdateTime = m_GlobalTimer->GetCurrentTime();
+
+        m_threadManager->OnRun(m_GlobalDeltaTime);
 
         WaitForNextFrame();
     }
@@ -81,5 +84,6 @@ namespace engine3d
         delete m_GlobalTimer;
         delete m_FPSMaintain;
         delete m_KeyEvent;
+        delete m_threadManager;
      }
 }

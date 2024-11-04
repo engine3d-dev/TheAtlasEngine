@@ -1,13 +1,48 @@
 
 #include <Core/ApplicationManager/ThreadPool.hpp>
+#include <Core/TimeManagement/UpdateManagers/SyncUpdateManager.hpp>
+#include <mutex>
+#include <thread>
+#include <condition_variable>
 
-void ThreadMngr::ThreadHandler() {
-  // this is supposed to serve Scene class a thread
-}
+//Testing variables
+std::mutex syncLock;
+std::condition_variable frameKey;
+bool ready = false;
 
-void ThreadMngr::OnRun(float deltaTime) {
-  // go into scene & grab the array of sync update
-  // create the worker thread & send that thread sceneMngr
-  // create the end pointers for the array & call
-  // SyncUpdateManager::runUpdate(float deltaTime);
-}
+namespace engine3d
+{
+  ThreadMngr::ThreadMngr()
+  {
+     syncManager = &SyncUpdateManager::getInstance();
+     syncUpdateThread = std::jthread(&ThreadMngr::UpdateSyncFunction, this); 
+  }
+  void ThreadMngr::ThreadHandler() 
+  {
+    // this is supposed to serve Scene class a thread
+  }
+
+  void ThreadMngr::OnRun(float p_DeltaTime) 
+  {
+    m_DeltaTime = p_DeltaTime;
+    ready = true;
+    frameKey.notify_one();
+  }
+
+  void ThreadMngr::UpdateSyncFunction()
+  {
+    while(!m_ThreadStop)
+    {
+      std::unique_lock<std::mutex> lock(syncLock);
+
+      frameKey.wait(lock, [] {return ready;});
+      ready = false;
+      syncManager->RunUpdate(m_DeltaTime);
+    }
+  }
+
+  ThreadMngr::~ThreadMngr()
+  {
+    syncUpdateThread.join();
+  }
+};

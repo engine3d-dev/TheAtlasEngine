@@ -1,5 +1,6 @@
 #pragma once
 // #include <Window.hpp>
+#include <Core/ApplicationManager/ThreadPool.hpp>
 #include <Core/TimeManagement/UpdateManagers/SyncUpdateManager.hpp>
 namespace engine3d
 {
@@ -46,6 +47,8 @@ namespace engine3d
 
             // Maintains a const fps if possible
             void WaitForNextFrame();
+
+            ThreadMngr * m_threadManager = NULL;
 
     };
 };
