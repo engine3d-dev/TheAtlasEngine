@@ -106,5 +106,14 @@ namespace engine3d
                 }
                 throw runtime_error("Faulty subscribed function!\n \tUse update, lateUpdate, onTickUpdate!");
             }
+          
+            static SyncUpdateManager& getInstance()
+            {
+              static SyncUpdateManager instance;
+              return instance;
+            }
+
+            SyncUpdateManager(const SyncUpdateManager&) = delete;
+            SyncUpdateManager& operator=(const SyncUpdateManager&) = delete;
     };
 };

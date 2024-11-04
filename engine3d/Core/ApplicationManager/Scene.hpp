@@ -1,4 +1,4 @@
-
+#pragma once
 #include <entt/entt.hpp>
 class Scene {
   public:
