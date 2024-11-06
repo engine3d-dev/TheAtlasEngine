@@ -108,8 +108,11 @@ namespace engine3d
                     ("Faulty subscribed function!\n \tUse update, lateUpdate, onTickUpdate!");
             }
 
-            static SyncUpdateManager* g_GetSyncUpdateManager() {return g_SyncManager;}
-            static SyncUpdateManager* g_SyncManager;
+            static SyncUpdateManager* GetInstance() 
+            {
+                static SyncUpdateManager instance;
+                return &instance;
+            }
             SyncUpdateManager(const SyncUpdateManager&) = delete;
             SyncUpdateManager& operator=(const SyncUpdateManager&) = delete;
     };

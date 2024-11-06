@@ -25,6 +25,7 @@ find_package(joltphysics REQUIRED)
 find_package(EnTT REQUIRED)
 
 add_subdirectory(Editor)
+add_subdirectory(TestApp)
 add_subdirectory(src)
 
 # Copy to compile_commands.json for .clangd

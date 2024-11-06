@@ -1,5 +1,5 @@
 set(ENGINE_INCLUDE_NAME ../engine3d)
-set(INCLUDE_TESTAPP ../TestApp)
+# set(INCLUDE_TESTAPP ../TestApp)
 set(ENGINE_INTERNAL_INCLUDE ${ENGINE_INCLUDE_NAME}/Core/internal)
 set(ENGINE_SRC_DIR engine3d)
 set(VULKAN_INCLUDE_DIR ${ENGINE_INCLUDE_NAME}/Core/internal/VulkanCpp)
@@ -22,7 +22,7 @@ set(
 
     # Application Manager
     ${ENGINE_INCLUDE_NAME}/Core/ApplicationManager/Scene.hpp
-    ${ENGINE_INCLUDE_NAME}/Core/ApplicationManager/ThreadPool.hpp
+    ${ENGINE_INCLUDE_NAME}/Core/ApplicationManager/ThreadMngr.hpp
 
     # Event system includes
     ${ENGINE_INCLUDE_NAME}/Core/Event/KeyCodes.hpp
@@ -49,7 +49,7 @@ set(
     ${ENGINE_INCLUDE_NAME}/Core/Renderer/Renderer.hpp
 
     # Test Application Includes
-    ${INCLUDE_TESTAPP}/SceneTest/Scenes/Assets/Components/testComp.hpp
+    # ${INCLUDE_TESTAPP}/SceneTest/Scenes/Assets/Components/testComp.hpp
 
 )
 
@@ -71,7 +71,7 @@ set(
     ${ENGINE_SRC_DIR}/Core/TimeManagement/UpdateManagers/ParallelFrameUpdateManager.cpp
 
     ${ENGINE_SRC_DIR}/Core/ApplicationManager/Scene.cpp
-    ${ENGINE_SRC_DIR}/Core/ApplicationManager/ThreadPool.cpp
+    ${ENGINE_SRC_DIR}/Core/ApplicationManager/ThreadMngr.cpp
 
     ${ENGINE_SRC_DIR}/Core/Event/InputPoll.cpp
 
@@ -88,7 +88,7 @@ set(
 
     ${ENGINE_SRC_DIR}/Core/Renderer/Renderer.cpp
 
-    ${INCLUDE_TESTAPP}/SceneTest/src/Scenes/Assets/Components/testComp.cpp
+    # ${INCLUDE_TESTAPP}/SceneTest/src/Scenes/Assets/Components/testComp.cpp
 )
 
 add_library(${PROJECT_NAME} ${all_headers} ${all_src})

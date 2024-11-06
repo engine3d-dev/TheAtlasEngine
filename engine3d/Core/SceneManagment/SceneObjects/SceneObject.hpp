@@ -20,6 +20,7 @@ namespace engine3d
 
       template <typename T, typename... Args> void AddComponent(Args &&...args) 
       {
+        printf("Working0\n");
         //! @note when adding component
         T &component = m_ParentScene->m_SceneRegistry.emplace<T>(
             SceneObjectHandler, std::forward<Args>(args)...);

@@ -1,5 +1,4 @@
 #include "ApplicationInstance.hpp"
-#include "ApplicationManager/ThreadPool.hpp"
 #include <Core/TimeManagement/UpdateManagers/SyncUpdateManager.hpp>
 #include <Core/Event/InputPoll.hpp>
 #include <Core/TimeManagement/GlobalUpdateManager.hpp>
