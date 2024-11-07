@@ -8,15 +8,22 @@ project(TestApp CXX)
 add_executable(${PROJECT_NAME}
     Application.cpp 
 
-    #To many components
+    #To Test
     SceneTest/Scenes/Assets/Components/testComp.hpp 
     SceneTest/src/Scenes/Assets/Components/testComp.cpp
+
+    #Transform
     SceneTest/Scenes/Assets/Components/Transform.hpp
     SceneTest/src/Scenes/Assets/Components/Transform.cpp
+
+    #Physics
+    SceneTest/Scenes/Assets/Components/PhysicsObject.hpp
+    SceneTest/src/Scenes/Assets/Components/PhysicsObject.cpp
 
     #Scenes
     SceneTest/Scenes/Assets/SceneInstances/ShowCaseSceneInstance.hpp
     SceneTest/src/Scenes/Assets/SceneInstances/ShowCaseSceneInstance.cpp
+
     
     )
 
@@ -28,6 +35,7 @@ find_package(spdlog REQUIRED)
 find_package(glm REQUIRED)
 find_package(yaml-cpp REQUIRED)
 find_package(Vulkan REQUIRED)
+find_package(joltphysics REQUIRED)
 
 target_link_libraries(
     ${PROJECT_NAME}
@@ -36,7 +44,7 @@ target_link_libraries(
     glm::glm
     yaml-cpp::yaml-cpp
     Vulkan::Vulkan
+    Jolt::Jolt
     # imguidocking::imguidocking
-    # engine3d::engine3d
     engine3d
 )

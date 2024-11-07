@@ -48,8 +48,11 @@ set(
     # Renderer Includes
     ${ENGINE_INCLUDE_NAME}/Core/Renderer/Renderer.hpp
 
-    # Test Application Includes
-    # ${INCLUDE_TESTAPP}/SceneTest/Scenes/Assets/Components/testComp.hpp
+    # Math Includes
+    ${ENGINE_INCLUDE_NAME}/Math/Interpolation.hpp
+
+    # Physics Includes
+    ${ENGINE_INCLUDE_NAME}/Physics/JoltHandler.hpp
 
 )
 
@@ -88,7 +91,9 @@ set(
 
     ${ENGINE_SRC_DIR}/Core/Renderer/Renderer.cpp
 
-    # ${INCLUDE_TESTAPP}/SceneTest/src/Scenes/Assets/Components/testComp.cpp
+    ${ENGINE_SRC_DIR}/Math/Interpolation.cpp
+
+    ${ENGINE_SRC_DIR}/Physics/JoltHandler.cpp
 )
 
 add_library(${PROJECT_NAME} ${all_headers} ${all_src})
