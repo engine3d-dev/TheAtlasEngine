@@ -6,9 +6,9 @@
 ShowCaseSceneInstance::ShowCaseSceneInstance()
 {
     m_Scene = new engine3d::Scene();
-    m_SceneObjects.push_back(new engine3d::SceneObject(m_Scene));
     printf("getting here\n");
-    m_SceneObjects[0]->AddComponent<testComp>();
+    CreateObjects();
+
 }
 
 ShowCaseSceneInstance::~ShowCaseSceneInstance()
@@ -18,4 +18,13 @@ ShowCaseSceneInstance::~ShowCaseSceneInstance()
     {
         delete obj;
     }
+}
+
+void ShowCaseSceneInstance::CreateObjects()
+{
+    m_SceneObjects.push_back(new engine3d::SceneObject(m_Scene));
+    m_SceneObjects[0]->AddComponent<testComp>();
+    m_SceneObjects[0]->name = "Ball";
+
+    
 }

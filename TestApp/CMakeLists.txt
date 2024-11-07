@@ -7,10 +7,17 @@ project(TestApp CXX)
 # find_package(engine3d CONFIG REQUIRED)
 add_executable(${PROJECT_NAME}
     Application.cpp 
+
+    #To many components
     SceneTest/Scenes/Assets/Components/testComp.hpp 
     SceneTest/src/Scenes/Assets/Components/testComp.cpp
+    SceneTest/Scenes/Assets/Components/Transform.hpp
+    SceneTest/src/Scenes/Assets/Components/Transform.cpp
+
+    #Scenes
     SceneTest/Scenes/Assets/SceneInstances/ShowCaseSceneInstance.hpp
     SceneTest/src/Scenes/Assets/SceneInstances/ShowCaseSceneInstance.cpp
+    
     )
 
 target_include_directories(${PROJECT_NAME} PUBLIC SceneTest)

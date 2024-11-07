@@ -7,6 +7,7 @@
  * */
 #include <Core/ApplicationManager/GameObjManager/UUID.hpp>
 #include <Core/ApplicationManager/Scene.hpp>
+#include <string>
 
 namespace engine3d
 {
@@ -17,17 +18,15 @@ namespace engine3d
       SceneObject(entt::entity handle, Scene *scene);
       SceneObject(const SceneObject &) = default;
       SceneObject(Scene* scene);
+      std::string name;
 
       template <typename T, typename... Args> void AddComponent(Args &&...args) 
       {
-        printf("Working0\n");
         //! @note when adding component
         T &component = m_ParentScene->m_SceneRegistry.emplace<T>(
             SceneObjectHandler, std::forward<Args>(args)...);
-        printf("Working1\n");
         // Adding refrence to component
         component.SetSceneObjectRef(*(this));
-        printf("Working2\n");
         //! @note Call to component to do specific action when integrating with
         //! gameObject
         component.OnIntegrate();
