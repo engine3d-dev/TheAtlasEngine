@@ -6,7 +6,6 @@
 
 namespace engine3d
 {
-    SyncUpdateManager* SyncUpdateManager::g_SyncManager = nullptr;
     SyncUpdateManager::SyncUpdateManager()
     {
 

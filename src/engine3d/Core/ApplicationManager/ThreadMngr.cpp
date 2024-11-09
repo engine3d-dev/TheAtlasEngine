@@ -1,7 +1,7 @@
 
 #include "ApplicationManager/Scene.hpp"
 #include "SceneManagment/SceneObjects/SceneObject.hpp"
-#include <Core/ApplicationManager/ThreadPool.hpp>
+#include <Core/ApplicationManager/ThreadMngr.hpp>
 #include <Core/TimeManagement/UpdateManagers/SyncUpdateManager.hpp>
 #include <mutex>
 #include <thread>
@@ -16,11 +16,11 @@ namespace engine3d
 {
   ThreadMngr::ThreadMngr()
   {
-    m_SyncManager = new SyncUpdateManager();
-    m_SyncManager->g_SyncManager = m_SyncManager;
+    m_SyncManager = SyncUpdateManager::GetInstance();
     t_NewScene = new Scene();
+    //! @note NOTE TO MENTION TO AARON: new SceneObject(this);
     t_NewObject = new SceneObject(t_NewScene);
-    t_NewObject->SceneObject::AddComponent<testComp>();
+    // t_NewObject->SceneObject::AddComponent<testComp>();
     m_ThreadStop = false;
     syncUpdateThread = std::jthread(&ThreadMngr::UpdateSyncFunction, this);
 
@@ -55,11 +55,15 @@ namespace engine3d
     }
   }
 
+  SyncUpdateManager * ThreadMngr::getSyncManager()
+  {
+    return m_SyncManager;
+  }
+
   ThreadMngr::~ThreadMngr()
   {
     delete t_NewObject;
     delete t_NewScene;
-    delete m_SyncManager;
     m_ThreadStop = true;
     ready = true;
     frameKey.notify_all();

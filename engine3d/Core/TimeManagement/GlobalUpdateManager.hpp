@@ -1,6 +1,6 @@
 #pragma once
 // #include <Window.hpp>
-#include <Core/ApplicationManager/ThreadPool.hpp>
+#include <Core/ApplicationManager/ThreadMngr.hpp>
 #include <Core/TimeManagement/UpdateManagers/SyncUpdateManager.hpp>
 namespace engine3d
 {

@@ -2,7 +2,7 @@
 #include <Core/SceneManagment/SceneObjects/SceneObject.hpp>
 #include <Core/TimeManagement/UpdateManagers/SyncUpdateManager.hpp>
 #include <Core/ApplicationManager/Scene.hpp>
-#include <Core/../../TestApp/SceneTest/Scenes/Assets/Components/testComp.hpp>
+// #include <Core/../../TestApp/SceneTest/Scenes/Assets/Components/testComp.hpp>
 #include <thread>
 
 
@@ -15,6 +15,7 @@ namespace engine3d
       ~ ThreadMngr();
       void ThreadHandler();
       void OnRun(float p_DeltaTime);
+      SyncUpdateManager * getSyncManager();
       bool m_ThreadStop = false;
     private:
       std::jthread syncUpdateThread;

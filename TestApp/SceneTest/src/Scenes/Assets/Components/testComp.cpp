@@ -1,20 +1,22 @@
-#include "EngineLogger.hpp"
-#include "Event/InputPoll.hpp"
-#include "Event/KeyCodes.hpp"
-#include "TimeManagement/UpdateManagers/SyncUpdateManager.hpp"
-#include <Core/../../TestApp/SceneTest/Scenes/Assets/Components/testComp.hpp>
-namespace engine3d
-{
+// #include <engine3d/Core/EngineLogger.hpp>
+#include "Core/SceneManagment/SceneObjects/SceneObject.hpp"
+#include <engine3d/Core/EngineLogger.hpp>
+#include <engine3d/Core/Event/InputPoll.hpp>
+#include <engine3d/Core/Event/KeyCodes.hpp>
+#include <engine3d/Core/TimeManagement/UpdateManagers/SyncUpdateManager.hpp>
+#include <Scenes/Assets/Components/testComp.hpp>
+// #include "Scene"
+
+using namespace engine3d;
     void testComp::OnIntegrate()
-    {
-        SyncUpdateManager::g_SyncManager->Subscribe
+    {;
+        SyncUpdateManager::GetInstance()->Subscribe
             (this, &testComp::Update);
-        SyncUpdateManager::g_SyncManager->Subscribe
+        SyncUpdateManager::GetInstance()->Subscribe
             (this, &testComp::LateUpdate);
-        SyncUpdateManager::g_SyncManager->Subscribe
+        SyncUpdateManager::GetInstance()->Subscribe
             (this, &testComp::PhysicsUpdate);
-        
-        printf("Registered Object!");
+
     }
 
     void testComp::Update() 
@@ -30,4 +32,13 @@ namespace engine3d
             t_Secret = false;
         }
     }
-};
+
+    void testComp::LateUpdate()
+    {
+
+    }
+
+    void testComp::PhysicsUpdate()
+    {
+        
+    }
