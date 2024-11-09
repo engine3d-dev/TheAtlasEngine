@@ -1,8 +1,9 @@
-#include <Jolt/Jolt.h>
+
+#pragma once
 // This is a test version of this class as there is to much
-class PhysicsObject
+class PhysicsBody3D
 {
     //Jolt Physics Test
 
-    PhysicsObject();
+    PhysicsBody3D();
 };

@@ -1,5 +1,6 @@
 #include "Core/SceneManagment/Components/GameComponent.hpp"
 #include <glm/glm.hpp>
+#include <glm/fwd.hpp>
 #include <Core/SceneManagment/SceneObjects/SceneObject.hpp>
 class Transform : public engine3d::GameComponent
 {
@@ -15,5 +16,7 @@ class Transform : public engine3d::GameComponent
         glm::lowp_vec4 GetLPQuat();
         glm::lowp_vec3 GetLPAxisRot();
         glm::lowp_vec3 GetLPSclae();
+
+        void OnIntegrate();
 
 };

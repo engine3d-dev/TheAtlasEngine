@@ -53,6 +53,7 @@ set(
 
     # Physics Includes
     ${ENGINE_INCLUDE_NAME}/Physics/JoltHandler.hpp
+    ${ENGINE_INCLUDE_NAME}/Physics/BPLayerInterfaceHandler.hpp
 
 )
 
@@ -94,6 +95,7 @@ set(
     ${ENGINE_SRC_DIR}/Math/Interpolation.cpp
 
     ${ENGINE_SRC_DIR}/Physics/JoltHandler.cpp
+    ${ENGINE_SRC_DIR}/Physics/BPLayerInterfaceHandler.cpp
 )
 
 add_library(${PROJECT_NAME} ${all_headers} ${all_src})

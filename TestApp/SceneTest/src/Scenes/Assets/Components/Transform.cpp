@@ -1,5 +1,6 @@
 #include "Scenes/Assets/Components/Transform.hpp"
-#include <glm/fwd.hpp>
+
+void Transform::OnIntegrate(){}
 
 Transform::Transform () : 
     m_Position(0.0f),

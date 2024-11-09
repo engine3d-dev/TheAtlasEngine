@@ -17,8 +17,8 @@ add_executable(${PROJECT_NAME}
     SceneTest/src/Scenes/Assets/Components/Transform.cpp
 
     #Physics
-    SceneTest/Scenes/Assets/Components/PhysicsObject.hpp
-    SceneTest/src/Scenes/Assets/Components/PhysicsObject.cpp
+    SceneTest/Scenes/Assets/Components/PhysicsBody3D.hpp
+    SceneTest/src/Scenes/Assets/Components/PhysicsBody3D.cpp
 
     #Scenes
     SceneTest/Scenes/Assets/SceneInstances/ShowCaseSceneInstance.hpp

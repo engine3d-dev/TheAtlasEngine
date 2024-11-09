@@ -1,5 +1,4 @@
 // #include <Core/internal/FrameTimer.hpp>
-#include "Event/InputPoll.hpp"
 #include <Core/ApplicationInstance.hpp>
 #include <Core/Timestep.hpp>
 // #include <Core/Renderer/Renderer.hpp>

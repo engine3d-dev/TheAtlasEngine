@@ -25,8 +25,8 @@ namespace engine3d
 
         m_GlobalDeltaTime = 0.0;
         m_UpdateTime = m_GlobalTimer->GetCurrentTime();
-        m_MaxFPS = 80;
-        m_FPSCounter = 0;
+        m_MaxFPS = 90;
+        m_FPSCounter = 1;
 
         m_KeyEvent = new InputPoll();
 
@@ -47,7 +47,7 @@ namespace engine3d
                     m_GlobalDeltaTime, m_FPSCounter);
             }
                         m_GlobalTimer->Reset();
-            m_FPSCounter = 0;
+            m_FPSCounter = 1;
         }
         else 
         {

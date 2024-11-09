@@ -1,10 +1,11 @@
-#include <Jolt/Jolt.h>
-
-#include <Jolt/Core/Memory.h>
+#pragma once
 namespace engine3d
 {
     class JoltHandler
     {
-        JoltHandler();
+        public:
+            JoltHandler();
+            ~JoltHandler();
+
     };
 };
