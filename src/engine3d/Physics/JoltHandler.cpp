@@ -1,27 +1,17 @@
 #include <Physics/JoltHandler.hpp>
-#include <Physics/Interfaces/BPLayerInterfaceHandler.hpp>
-#include <Physics/Interfaces/ObjectVsBPLayerFilterInterface.hpp>
-#include <Physics/Interfaces/ObjectLayerPairFilterInterface.hpp>
-#include <Physics/Interaction/Engine3DActivationListener.hpp>
-#include <Physics/Interaction/Engine3DContactListener.hpp>
-//! @note All includes under here except JoltHandler
-#include <Jolt/Core/JobSystemThreadPool.h>
-#include <Jolt/Physics/PhysicsSettings.h>
-#include <Jolt/Physics/PhysicsSystem.h>
-#include <Jolt/Core/IssueReporting.h>
-#include <Jolt/Core/TempAllocator.h>
-#include <Jolt/RegisterTypes.h>
-#include <Jolt/Core/Factory.h>
-#include <Jolt/Core/Memory.h>
+// Other includes
 #include <cassert>
 #include <cstdarg>
 #include <cstdint>
 #include <print>
 #include <thread>
+//! @note All includes under here except JoltHandler
+
 
 
 namespace engine3d
 {
+
     static void TraceImpl(const char *inFMT, ...)
     {
         // Format the message
@@ -54,9 +44,6 @@ namespace engine3d
         //! @note we have to register to collision dispatch first
         JPH::RegisterTypes();
         std::print("Wokring3\n");
-        // Allocate data
-        JPH::TempAllocatorImpl temp_allocator(100 * 1024 * 1024);
-        std::print("Wokring3.5\n");
 
         // Example threadpool, branches will take care of this later.
         JPH::JobSystemThreadPool job_system(
@@ -76,15 +63,6 @@ namespace engine3d
         // Max number of touches per object
         const uint32_t cMaxContactConstraints = 16000;
 
-        // Substructs for seperating types of bodies interface
-        BPLayerInterfaceHandler broad_phase_layer_interface;
-
-        // Filter for body types filter using broadphase
-        ObjectVsBPLayerFilterInterface object_vs_broadphase_layer_filter;
-
-        // Filter for body types using Object Layers
-        ObjectLayerPairFilterInterface object_vs_object_layer_filter;
-
         std::print("Wokring4\n");
         // Actual physics system
         JPH::PhysicsSystem physics_system;
@@ -97,13 +75,13 @@ namespace engine3d
             object_vs_broadphase_layer_filter,
             object_vs_object_layer_filter);
 
-        // Setting Contact listener
-        Engine3DContactlistener contact_listener;
         physics_system.SetContactListener(&contact_listener);
 
-        // Setting Activation listener
-        Engine3DActivationListener body_activation_listener;
         physics_system.SetBodyActivationListener(&body_activation_listener);
+
+        BodyInterface &body_interface = physics_system.GetBodyInterface();
+
+        
     }
 
     JoltHandler::~JoltHandler()
