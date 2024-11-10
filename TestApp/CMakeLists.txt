@@ -30,12 +30,15 @@ add_executable(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME} PUBLIC SceneTest)
 target_include_directories(${PROJECT_NAME} PRIVATE ../)
 
+target_compile_definitions(${PROJECT_NAME} PRIVATE ${dev_definitions})
+
 find_package(fmt REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(glm REQUIRED)
 find_package(yaml-cpp REQUIRED)
 find_package(Vulkan REQUIRED)
 find_package(joltphysics REQUIRED)
+
 
 target_link_libraries(
     ${PROJECT_NAME}
