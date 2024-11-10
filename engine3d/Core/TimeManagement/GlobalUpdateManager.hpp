@@ -2,6 +2,7 @@
 // #include <Window.hpp>
 #include <Core/ApplicationManager/ThreadMngr.hpp>
 #include <Core/TimeManagement/UpdateManagers/SyncUpdateManager.hpp>
+#include <Physics/JoltHandler.hpp>
 namespace engine3d
 {
     /**
@@ -50,5 +51,6 @@ namespace engine3d
 
             ThreadMngr * m_threadManager = NULL;
 
+            JoltHandler m_PhysicsHandler;
     };
 };
