@@ -1,4 +1,5 @@
 #include "ApplicationInstance.hpp"
+#include "Physics/JoltHandler.hpp"
 #include <Core/TimeManagement/UpdateManagers/SyncUpdateManager.hpp>
 #include <Core/Event/InputPoll.hpp>
 #include <Core/TimeManagement/GlobalUpdateManager.hpp>
@@ -28,7 +29,7 @@ namespace engine3d
         m_MaxFPS = 90;
         m_FPSCounter = 1;
 
-
+        m_PhysicsHandler = new JoltHandler();
 
         m_KeyEvent = new InputPoll();
 

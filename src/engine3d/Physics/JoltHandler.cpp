@@ -38,6 +38,8 @@ namespace engine3d
         JPH::Factory::sInstance = new JPH::Factory();
         std::print("Wokring2.5\n");
 
+        TempAllocatorImpl physics_allocator(100 * 1024 * 1024);
+
         assert(JPH::Factory::sInstance != nullptr && "Factory instance must be initialized");
         // Set up all types and shapes
         //! @note If we want to create our own shapes

@@ -24,8 +24,6 @@ namespace engine3d
             JoltHandler();
             ~JoltHandler();
         private:
-            // Allocate data
-            JPH::TempAllocatorImpl physics_allocator = JPH::TempAllocatorImpl(100 * 1024 * 1024);
             // Substructs for seperating types of bodies interface
             BPLayerInterfaceHandler broad_phase_layer_interface;
 

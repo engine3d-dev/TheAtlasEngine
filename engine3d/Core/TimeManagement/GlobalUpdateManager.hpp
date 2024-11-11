@@ -51,6 +51,6 @@ namespace engine3d
 
             ThreadMngr * m_threadManager = NULL;
 
-            JoltHandler m_PhysicsHandler;
+            JoltHandler* m_PhysicsHandler;
     };
 };
