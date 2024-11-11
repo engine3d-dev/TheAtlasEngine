@@ -13,7 +13,7 @@ class Editor(ConanFile):
     exports_sources = "CMakeLists.txt", "Editor/*"
 
     def requirements(self):
-        self.requires("imguidocking/1.0")
+        #self.requires("imguidocking/1.0")
         self.requires("engine3d/1.0")
 
     def generate(self):

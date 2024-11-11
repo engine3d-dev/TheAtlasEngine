@@ -6,7 +6,7 @@ project(TestApp CXX)
 
 # find_package(engine3d CONFIG REQUIRED)
 add_executable(${PROJECT_NAME}
-    Application.cpp 
+    Application.cpp
 
     #To Test
     SceneTest/Scenes/Assets/Components/testComp.hpp 
@@ -38,6 +38,7 @@ find_package(glm REQUIRED)
 find_package(yaml-cpp REQUIRED)
 find_package(Vulkan REQUIRED)
 find_package(joltphysics REQUIRED)
+find_package(EnTT REQUIRED)
 
 
 target_link_libraries(
@@ -48,6 +49,7 @@ target_link_libraries(
     yaml-cpp::yaml-cpp
     Vulkan::Vulkan
     Jolt::Jolt
-    # imguidocking::imguidocking
+    EnTT::EnTT
+    imguidocking::imguidocking
     engine3d
 )

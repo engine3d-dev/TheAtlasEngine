@@ -25,7 +25,7 @@ find_package(joltphysics REQUIRED)
 find_package(EnTT REQUIRED)
 
 add_subdirectory(Editor)
-add_subdirectory(TestApp)
+#add_subdirectory(TestApp)
 add_subdirectory(src)
 
 # Copy to compile_commands.json for .clangd
@@ -68,8 +68,9 @@ endif(MSVC)
 
 
 # target_include_directory is setting some private settings for differentiating what internal includes are privates and what should be includes should be exposed to the application-dev
+target_include_directories(${PROJECT_NAME} PUBLIC ${JoltPhysics_SOURCE_DIR} ${EnTT_INCLUDE_DIR})
 target_include_directories(${PROJECT_NAME} PRIVATE engine3d/ engine3d/Core)
-target_include_directories(${PROJECT_NAME} PUBLIC ${JoltPhysics_SOURCE_DIR} ${GLM_INCLUDE_DIR} ${EnTT_INCLUDE_DIR} ./engine3d)
+target_include_directories(${PROJECT_NAME} PUBLIC ${GLM_INCLUDE_DIR} ./engine3d)
 
 
 #Set Compiler definitions

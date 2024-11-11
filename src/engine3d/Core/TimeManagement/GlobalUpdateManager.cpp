@@ -28,6 +28,8 @@ namespace engine3d
         m_MaxFPS = 90;
         m_FPSCounter = 1;
 
+
+
         m_KeyEvent = new InputPoll();
 
         //! @note syncupdatemanager will not work until the thread manager works.

@@ -11,7 +11,9 @@ find_package(spdlog REQUIRED)
 find_package(glm REQUIRED)
 find_package(yaml-cpp REQUIRED)
 find_package(Vulkan REQUIRED)
-# find_package(imguidocking REQUIRED)
+find_package(EnTT REQUIRED)
+find_package(joltphysics REQUIRED)
+find_package(imguidocking REQUIRED)
 # find_package(engine3d REQUIRED)
 
 add_executable(${PROJECT_NAME} ${all_src})
@@ -25,7 +27,9 @@ target_link_libraries(
     glm::glm
     yaml-cpp::yaml-cpp
     Vulkan::Vulkan
-    # imguidocking::imguidocking
+    EnTT::EnTT
+    Jolt::Jolt
+    imguidocking::imguidocking
     # engine3d::engine3d
     engine3d
 )

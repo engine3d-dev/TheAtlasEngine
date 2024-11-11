@@ -9,6 +9,6 @@ add_executable(example Application.hpp Application.cpp)
 target_link_libraries(${PROJECT_NAME}
     Vulkan::Vulkan
     # vulkan-headers::vulkan-headers
-    # imguidocking::imguidocking
+    imguidocking::imguidocking
     engine3d::engine3d
 )
