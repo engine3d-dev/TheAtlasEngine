@@ -1,5 +1,8 @@
 // #include <engine3d/Core/EngineLogger.hpp>
-#include "Core/SceneManagment/SceneObjects/SceneObject.hpp"
+#include "Core/SceneManagment/Components/GameComponent.hpp"
+#include "Physics/JoltHandler.hpp"
+#include "Scenes/Assets/Components/Physics/PhysicsBody3D.hpp"
+#include <Jolt/Physics/EActivation.h>
 #include <engine3d/Core/EngineLogger.hpp>
 #include <engine3d/Core/Event/InputPoll.hpp>
 #include <engine3d/Core/Event/KeyCodes.hpp>
@@ -17,19 +20,21 @@ using namespace engine3d;
         SyncUpdateManager::GetInstance()->Subscribe
             (this, &testComp::PhysicsUpdate);
 
+        // Need an activation and start funciton
+        m_rb = m_GameObjectRef->SceneGetComponent<PhysicsBody3D>().GetBody();
+
     }
 
     void testComp::Update() 
     {
-        if(InputPoll::IsKeyPressed(KeyCode::F5) && !t_Secret)
+        if(InputPoll::IsKeyPressed(KeyCode::F5))
         {
-            ConsoleLogInfo("Secret Key has been pressed!\n");
-            t_Secret = true;
-        }
-        else if(!InputPoll::IsKeyPressed(KeyCode::F5) && t_Secret)
-        {
-            ConsoleLogInfo("Secret Key has been released!\n");
-            t_Secret = false;
+            JoltHandler::GetInstance()->
+                getInterface()->AddForce(
+                    m_rb->m_BodyID,
+                    RVec3(0.0f,100000.0f,0.0f),
+                    EActivation::Activate
+                );
         }
     }
 

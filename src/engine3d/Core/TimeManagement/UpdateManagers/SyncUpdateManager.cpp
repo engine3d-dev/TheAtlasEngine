@@ -1,7 +1,9 @@
 #include "TimeManagement/UpdateManagers/SyncUpdateManager.hpp"
 #include "EngineLogger.hpp"
 #include "Event/KeyCodes.hpp"
+#include "Physics/JoltHandler.hpp"
 #include <GLFW/glfw3.h>
+#include <chrono>
 #include <time.h>
 
 namespace engine3d
@@ -26,7 +28,7 @@ namespace engine3d
     //! Possibly pass gameObjects with the virtual functions.
     //! Possibly seperate active scripts to non active ones in scenes.
     void SyncUpdateManager::RunUpdate(float deltaTime)
-    {
+    { 
         //! @note unsafe!!!!
         /** 
         * @note Render is not quite placed in the right position here
@@ -38,6 +40,15 @@ namespace engine3d
         * Benchmark later.
         */
         OnPhysicsUpdate();
+        const int collisionSteps = 1 + (60*(deltaTime));
+
+        JoltHandler* p_joltHandler = JoltHandler::GetInstance();
+        //Updating physics system based on jolt physics
+        p_joltHandler->physics_system.Update(
+            deltaTime, 
+            collisionSteps, 
+            p_joltHandler->physics_allocator, 
+            p_joltHandler->job_system);
         if(m_RandomFrame <= m_LocalUpdateCounter)
         {
             m_RandomFrame = (rand() % m_MaxVariance) + m_MinFrames;
@@ -48,6 +59,7 @@ namespace engine3d
 
             m_SyncLocalDeltaTime = duration_cast<std::chrono::microseconds>
                 (m_LocalTimer->GetCurrentTime() - m_LocalUpdateTime).count();
+            m_SyncLocalDeltaTime = m_SyncLocalDeltaTime/1000000;
 
             m_LocalUpdateTime = m_LocalTimer->GetCurrentTime();
             m_LocalFPS++;

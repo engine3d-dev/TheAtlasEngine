@@ -32,7 +32,11 @@ namespace engine3d
             InputPoll* m_KeyEvent;
 
         public:
-            static GlobalUpdateManager* m_Instance;
+            static GlobalUpdateManager* GetInstance() 
+            {
+                static GlobalUpdateManager instance;
+                return &instance;
+            }
 
             /*
             * NEEDS FIX: Change to a more secure way to always have one
@@ -51,6 +55,7 @@ namespace engine3d
 
             ThreadMngr * m_threadManager = NULL;
 
-            JoltHandler* m_PhysicsHandler;
+            GlobalUpdateManager(const GlobalUpdateManager&) = delete;
+            GlobalUpdateManager& operator=(const GlobalUpdateManager&) = delete;
     };
 };

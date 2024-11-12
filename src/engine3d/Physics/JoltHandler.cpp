@@ -1,5 +1,16 @@
+
 #include <Physics/JoltHandler.hpp>
 // Other includes
+
+#include <Jolt/Physics/Body/BodyCreationSettings.h>
+#include <Jolt/Physics/Collision/Shape/SphereShape.h>
+#include <Jolt/Physics/Collision/Shape/BoxShape.h>
+#include <Jolt/Physics/Collision/Shape/Shape.h>
+#include <Jolt/Physics/EActivation.h>
+#include <Jolt/Physics/Body/Body.h>
+#include <Jolt/Physics/Body/Body.h>
+#include <Jolt/Math/Quat.h>
+
 #include <cassert>
 #include <cstdarg>
 #include <cstdint>
@@ -8,6 +19,9 @@
 //! @note All includes under here except JoltHandler
 
 
+using namespace engine3d;
+using namespace JPH::literals;
+using namespace JPH;
 
 namespace engine3d
 {
@@ -38,8 +52,6 @@ namespace engine3d
         JPH::Factory::sInstance = new JPH::Factory();
         std::print("Wokring2.5\n");
 
-        TempAllocatorImpl physics_allocator(100 * 1024 * 1024);
-
         assert(JPH::Factory::sInstance != nullptr && "Factory instance must be initialized");
         // Set up all types and shapes
         //! @note If we want to create our own shapes
@@ -48,10 +60,13 @@ namespace engine3d
         std::print("Wokring3\n");
 
         // Example threadpool, branches will take care of this later.
-        JPH::JobSystemThreadPool job_system(
+        job_system = new JPH::JobSystemThreadPool(
             JPH::cMaxPhysicsJobs,
             JPH::cMaxPhysicsBarriers,
             std::thread::hardware_concurrency() - 1);
+
+        // Single malloc allocation
+        physics_allocator = new TempAllocatorImpl(100*1024*1024);
 
         // Max RB to exsist at once
         const uint32_t cMaxBodies = 60000;
@@ -67,7 +82,6 @@ namespace engine3d
 
         std::print("Wokring4\n");
         // Actual physics system
-        JPH::PhysicsSystem physics_system;
         physics_system.Init(
             cMaxBodies,
             cNumBodyMutexes,
@@ -81,15 +95,22 @@ namespace engine3d
 
         physics_system.SetBodyActivationListener(&body_activation_listener);
 
-        BodyInterface &body_interface = physics_system.GetBodyInterface();
+        body_interface = &(physics_system.GetBodyInterface());
 
-        
+        m_BoxShape = new BoxShape(Vec3(10.0f, 1.0f, 10.0f));
+        m_SphereShape = new SphereShape(1.0f);
+    }
+
+    BodyInterface* JoltHandler::getInterface()
+    {
+        return body_interface;
     }
 
     JoltHandler::~JoltHandler()
     {
         JPH::UnregisterTypes();
         std::print("Deleting Physics Factory...\n");
+        delete m_BoxShape;
         delete JPH::Factory::sInstance;
         JPH::Factory::sInstance = nullptr;
     }

@@ -7,6 +7,7 @@
  * */
 #include <Core/ApplicationManager/GameObjManager/UUID.hpp>
 #include <Core/ApplicationManager/Scene.hpp>
+#include <exception>
 #include <string>
 
 namespace engine3d
@@ -25,6 +26,7 @@ namespace engine3d
         //! @note when adding component
         T &component = m_ParentScene->m_SceneRegistry.emplace<T>(
             SceneObjectHandler, std::forward<Args>(args)...);
+
         // Adding refrence to component
         component.SetSceneObjectRef(*(this));
         //! @note Call to component to do specific action when integrating with
@@ -37,8 +39,7 @@ namespace engine3d
         // Checking if SceneObject contains this component.
         if (!this->HasComponent<T>())
         {
-          coreLogError("SceneObject does not have component!");
-          return NULL;
+          throw std::exception("Found no component! Cannot add!\n");
         }
 
         return m_ParentScene->m_SceneRegistry.get<T>(SceneObjectHandler);
@@ -54,9 +55,9 @@ namespace engine3d
       template <typename T> void RemoveComponent() 
       {
         if (!this->HasComponent<T>())
-          {
-            coreLogError("SceneObject does not have component!");
-          }
+        {
+          throw std::exception("Found no component! Cannot delete!\n");
+        }
         m_ParentScene->m_SceneRegistry.remove<T>(SceneObjectHandler);
       }
 

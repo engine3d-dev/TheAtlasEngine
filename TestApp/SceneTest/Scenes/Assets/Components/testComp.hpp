@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Scenes/Assets/Components/Physics/PhysicsBody3D.hpp"
 #include <Core/SceneManagment/Components/GameComponent.hpp>
 
     class testComp : public engine3d::GameComponent
@@ -11,4 +12,5 @@
             void PhysicsUpdate();
         private:
             bool t_Secret = false;
+            BodyContainer * m_rb;
     };

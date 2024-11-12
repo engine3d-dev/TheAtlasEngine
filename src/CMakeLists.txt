@@ -45,6 +45,9 @@ set(
     ${ENGINE_INCLUDE_NAME}/Core/SceneManagment/SceneObjects/SceneObject.hpp
     ${ENGINE_INCLUDE_NAME}/Core/ApplicationManager/GameObjManager/UUID.hpp
 
+    # Special Component Includes
+    ${ENGINE_INCLUDE_NAME}/Core/SceneManagment/Components/SPComps/Transform.hpp
+
     # Renderer Includes
     ${ENGINE_INCLUDE_NAME}/Core/Renderer/Renderer.hpp
 
@@ -92,6 +95,8 @@ set(
     ${ENGINE_SRC_DIR}/Core/SceneManagment/SceneObjects/SceneObject.cpp
     ${ENGINE_SRC_DIR}/Core/SceneManagment/Components/GameComponent.cpp
     ${ENGINE_SRC_DIR}/Core/ApplicationManager/GameObjManager/UUID.cpp
+
+    ${ENGINE_SRC_DIR}/Core/SceneManagment/Components/SPComps/Transform.cpp
 
     ${ENGINE_SRC_DIR}/Core/Renderer/Renderer.cpp
 

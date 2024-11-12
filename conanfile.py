@@ -36,7 +36,7 @@ class engine3dRecipe(ConanFile):
         self.requires("glm/1.0.1", transitive_headers=True)
         self.requires("yaml-cpp/0.8.0", transitive_headers=True)
         self.requires("box2d/2.4.2")
-        self.requires("imguidocking/1.0")
+        #self.requires("imguidocking/1.0")
         self.requires("entt/3.13.2")
 
 

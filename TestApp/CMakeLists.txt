@@ -12,13 +12,20 @@ add_executable(${PROJECT_NAME}
     SceneTest/Scenes/Assets/Components/testComp.hpp 
     SceneTest/src/Scenes/Assets/Components/testComp.cpp
 
-    #Transform
-    SceneTest/Scenes/Assets/Components/Transform.hpp
-    SceneTest/src/Scenes/Assets/Components/Transform.cpp
-
     #Physics
-    SceneTest/Scenes/Assets/Components/PhysicsBody3D.hpp
-    SceneTest/src/Scenes/Assets/Components/PhysicsBody3D.cpp
+    SceneTest/Scenes/Assets/Components/Physics/PhysicsBody3D.hpp
+    SceneTest/src/Scenes/Assets/Components/Physics/PhysicsBody3D.cpp
+
+    SceneTest/Scenes/Assets/Components/Bodies/BodyContainer.hpp
+    SceneTest/src/Scenes/Assets/Components/Bodies/BodyContainer.cpp
+
+
+    #Body Shapes
+    SceneTest/Scenes/Assets/Components/Bodies/Shapes/BoxShaper.hpp
+    SceneTest/src/Scenes/Assets/Components/Bodies/Shapes/BoxShaper.cpp
+
+    SceneTest/Scenes/Assets/Components/Bodies/Shapes/SphereShaper.hpp
+    SceneTest/src/Scenes/Assets/Components/Bodies/Shapes/SphereShaper.cpp
 
     #Scenes
     SceneTest/Scenes/Assets/SceneInstances/ShowCaseSceneInstance.hpp
@@ -50,6 +57,6 @@ target_link_libraries(
     Vulkan::Vulkan
     Jolt::Jolt
     EnTT::EnTT
-    imguidocking::imguidocking
+   # imguidocking::imguidocking
     engine3d
 )

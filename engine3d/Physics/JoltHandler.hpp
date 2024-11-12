@@ -1,5 +1,4 @@
 #pragma once
-
 // Engine3d includes
 #include <Physics/Interfaces/BPLayerInterfaceHandler.hpp>
 #include <Physics/Interfaces/ObjectVsBPLayerFilterInterface.hpp>
@@ -8,10 +7,16 @@
 #include <Physics/Interaction/Engine3DContactListener.hpp>
 
 // Jolt includes
+#include <Jolt/Physics/Collision/Shape/ConvexShape.h>
+#include <Jolt/Physics/Collision/Shape/SphereShape.h>
+#include <Jolt/Physics/Body/BodyCreationSettings.h>
+#include <Jolt/Physics/Collision/Shape/BoxShape.h>
+#include <Jolt/Physics/Body/BodyInterface.h>
 #include <Jolt/Core/JobSystemThreadPool.h>
 #include <Jolt/Physics/PhysicsSettings.h>
 #include <Jolt/Physics/PhysicsSystem.h>
 #include <Jolt/Core/IssueReporting.h>
+#include <Jolt/Core/TempAllocator.h>
 #include <Jolt/Core/TempAllocator.h>
 #include <Jolt/RegisterTypes.h>
 #include <Jolt/Core/Factory.h>
@@ -23,7 +28,24 @@ namespace engine3d
         public:
             JoltHandler();
             ~JoltHandler();
-        private:
+
+            static JoltHandler* GetInstance() 
+            {
+                static JoltHandler instance;
+                return &instance;
+            }
+
+            BodyInterface* getInterface();
+            JPH::BoxShape* m_BoxShape;
+            JPH::SphereShape* m_SphereShape;
+
+            // Actuall physics part
+            JPH::PhysicsSystem physics_system;
+
+            TempAllocatorImpl* physics_allocator;
+
+            JPH::JobSystemThreadPool* job_system;
+
             // Substructs for seperating types of bodies interface
             BPLayerInterfaceHandler broad_phase_layer_interface;
 
@@ -38,5 +60,8 @@ namespace engine3d
 
             // Setting Activation listener
             Engine3DActivationListener body_activation_listener;
+
+            // interface for the bodies
+            BodyInterface* body_interface;
     };
 };

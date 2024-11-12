@@ -14,7 +14,7 @@ namespace engine3d
       void SetSceneObjectRef(SceneObject &p_Object);
       void SetComponentID(uint64_t p_CompID);
 
-    private:
+    protected:
       SceneObject *m_GameObjectRef;
       uint64_t m_ComponentID;
   };

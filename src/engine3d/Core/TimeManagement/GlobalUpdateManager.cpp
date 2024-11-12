@@ -8,7 +8,12 @@
 #include <Core/EngineLogger.hpp>
 #include <GLFW/glfw3.h>
 
+using namespace JPH;
+using namespace JPH::literals;
+
 using namespace std::chrono;
+
+#define TOSECONDS  1000000
 
 using highResClock = high_resolution_clock;
 namespace engine3d
@@ -28,8 +33,6 @@ namespace engine3d
         m_UpdateTime = m_GlobalTimer->GetCurrentTime();
         m_MaxFPS = 90;
         m_FPSCounter = 1;
-
-        m_PhysicsHandler = new JoltHandler();
 
         m_KeyEvent = new InputPoll();
 
@@ -67,7 +70,7 @@ namespace engine3d
 
         m_UpdateTime = m_GlobalTimer->GetCurrentTime();
 
-        m_threadManager->OnRun(m_GlobalDeltaTime);
+        m_threadManager->OnRun(m_GlobalDeltaTime / TOSECONDS);
 
         WaitForNextFrame();
     }
