@@ -20,14 +20,18 @@ class engine3dRecipe(ConanFile):
     default_options = {"shared": False, "fPIC": True}
 
     # Sources are located in the same place as this recipe, copy them to the recipe
-    exports_sources = "CMakeLists.txt", "src/CMakeLists.txt", "Editor/CMakeLists.txt", "src/*", "engine3d/*", "Editor/*", "Testbed/*"
+    # exports_sources = "CMakeLists.txt", "src/CMakeLists.txt", "Editor/CMakeLists.txt", "src/*", "engine3d/*", "Editor/*", "Testbed/*"
+    exports_sources = "CMakeLists.txt", "src/CMakeLists.txt", "Editor/CMakeLists.txt", "src/*", "engine3d/*",
+
+    def build_requirements(self):
+        self.tool_requires("make/4.4.1")
+        self.tool_requires("cmake/3.27.1")
+        self.tool_requires("engine3d-cmake-utils/1.0")
 
     def requirements(self):
-        self.requires("make/4.4.1")
-        self.tool_requires("cmake/3.27.1")
         self.requires("glfw/3.4", transitive_headers=True)
         self.requires("opengl/system", transitive_headers=True)
-
+        self.requires("engine3d-cmake-utils/1.0")
 
         # These end in 1.0 because they are engine3d-customized conan packages
         # Slighly modified of the conan packages and it's CMake generators to using "Unix Makefiles" 
