@@ -4,9 +4,8 @@ set(ENGINE_SRC_DIR engine3d)
 set(VULKAN_INCLUDE_DIR ${ENGINE_INCLUDE_NAME}/Core/internal/VulkanCpp)
 set(VULKAN_SRC_DIR ${ENGINE_SRC_DIR}/Core/internal/VulkanCpp)
 
-set(
-    all_headers
-
+build_library(
+    SOURCES
     ${ENGINE_INCLUDE_NAME}/Core/ApplicationInstance.hpp
 
     ${ENGINE_INCLUDE_NAME}/Core/EngineLogger.hpp
@@ -30,10 +29,7 @@ set(
 
     # Renderer Includes
     ${ENGINE_INCLUDE_NAME}/Core/Renderer/Renderer.hpp
-)
 
-set(
-    all_src
     ${ENGINE_SRC_DIR}/Core/ApplicationInstance.cpp
 
 
@@ -54,5 +50,3 @@ set(
 
     ${ENGINE_SRC_DIR}/Core/Renderer/Renderer.cpp
 )
-
-add_library(${PROJECT_NAME} ${all_headers} ${all_src})
