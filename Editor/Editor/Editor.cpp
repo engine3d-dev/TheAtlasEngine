@@ -7,6 +7,7 @@
 #include <Core/EngineLogger.hpp>
 #include <Core/Timestep.hpp>
 #include <vulkan/vulkan_core.h>
+#include <Core/internal/Vulkan2Showcase/VulkanModel.hpp>
 
 namespace engine3d{
 
@@ -25,7 +26,7 @@ namespace engine3d{
         //     {{0.0f, .577f, 0.0f, 1.0f}, {0.5f, 1.0f}}
         // });
 
-        
+
         //! @note Basics of command buffers.
 
         //! @note First initializing pipeline layout create info
@@ -48,7 +49,7 @@ namespace engine3d{
         pipeline_config.PipelineRenderPass = ApplicationInstance::GetWindow().GetRenderpass();
         pipeline_config.PipelineLayout = m_PipelineLayout;
 
-        m_Shader = vk::VulkanShader("firstTriangle/simple_shader.vert.spv", "firstTriangle/simple_shader.frag.spv", pipeline_config);
+        m_Shader = vk::VulkanShader("simple_shader/simple_shader.vert.spv", "simple_shader/simple_shader.frag.spv", pipeline_config);
 
 
         //! @note Initializing Command buffers.
@@ -75,18 +76,33 @@ namespace engine3d{
         vk::vk_check(vkAllocateCommandBuffers(vk::VulkanContext::GetDriver(), &cmd_buffer_alloc_info, m_CommandBuffers.data()), "vkAllocateCommandBuffers", __FILE__, __LINE__, __FUNCTION__);
 
         ConsoleLogInfo("CommandBuffers Size === {}", m_CommandBuffers.size());
+
+
+        //! @note Loading triangle
+        std::vector<vk::VulkanModel::Vertex> triangle_vertices = {
+            {.Position={0.0f, -0.5f}, .Color = {1.0f, 0.0f, 0.0f}},
+            {.Position ={0.5f, 0.5f}, .Color = {0.0f, 1.0f, 0.0f}},
+            {.Position ={-0.5f, 0.5f}, .Color = {0.0f, 0.0f, 1.0f}}
+        };
+
+        vk::VulkanModel model = vk::VulkanModel(triangle_vertices, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+
+
+
+
+
+
+
+
         for(uint32_t i = 0; i < m_CommandBuffers.size(); i++){
-            // ConsoleLogWarn("Debug #1");
             VkCommandBufferBeginInfo cmd_buf_begin_info = {
                 .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO
             };
 
             // START OF COMMAND BUFFER RECORD
             vk::vk_check(vkBeginCommandBuffer(m_CommandBuffers[i], &cmd_buf_begin_info), "vkBeginCommandBuffer", __FILE__, __LINE__, __FUNCTION__);
-            ConsoleLogInfo("Inside Command Buffer Recording");
 
-        //     ConsoleLogWarn("Debug #1 (inside CmdBuf Record)");
-        //     // starting render pass
+            // starting render pass
             VkRenderPassBeginInfo rp_begin_info = {
                 .sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
                 .renderPass = ApplicationInstance::GetWindow().GetRenderpass(),
@@ -119,16 +135,19 @@ namespace engine3d{
             }
             vkCmdBeginRenderPass(m_CommandBuffers[i], &rp_begin_info, VK_SUBPASS_CONTENTS_INLINE);
 
+            //! @note We can probably add this into Shader::Bind()
+            //! @note Usage: m_Shader.Bind(m_CommandBuffers[i]);
             vkCmdBindPipeline(m_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_Shader.GetGraphicsPipeline());
-            vkCmdDraw(m_CommandBuffers[i], 3, 1, 0, 0);
+            // vkCmdDraw(m_CommandBuffers[i], 3, 1, 0, 0);
+            model.Bind(m_CommandBuffers[i]);
+            model.Draw(m_CommandBuffers[i]);
 
             vkCmdEndRenderPass(m_CommandBuffers[i]);
 
-        //     // END OF COMMAND BUFFER RECORDING
+            // END OF COMMAND BUFFER RECORDING
             vk::vk_check(vkEndCommandBuffer(m_CommandBuffers[i]), "vkEndCommandBuffer", __FILE__, __LINE__, __FUNCTION__);
             ConsoleLogInfo("Just after Command Buffer Recording");
         }
-
     }
 
     EditorApplication::~EditorApplication() {}
@@ -151,6 +170,8 @@ namespace engine3d{
         /*
         @note This is going to be what we will implement next in the Renderer.hpp/.cpp once we can render the triangle.
         @note The idea is in the application this the swapchain should not be called directly by the application developer.
+        @note Want to migrate to doing this so its easier for testability and submitting commands/drawcalls to vulkan's API.
+        @note Realistically we'll have VulkanRenderer that would be accepting these structures.
         Renderer::Submit([](){
             vkCmdBeginRenderPass(m_CommandBuffers[i], &rp_begin_info, VK_SUBPASS_CONTENTS_INLINE);
 

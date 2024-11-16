@@ -1,5 +1,4 @@
 #pragma once
-// #include <engine3d/Core/ApplicationInstance.hpp>
 #include <Core/ApplicationInstance.hpp>
 #include <Core/internal/Vulkan2Showcase/Shaders/VulkanShader.hpp>
 #include <vulkan/vulkan_core.h>

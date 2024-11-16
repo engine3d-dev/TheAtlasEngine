@@ -3,6 +3,7 @@
 #include <internal/Vulkan2Showcase/VulkanContext.hpp>
 #include <internal/Vulkan2Showcase/Shaders/VulkanShader.hpp>
 #include <internal/Vulkan2Showcase/Shaders/ShaderSpirvBins.hpp>
+#include <internal/Vulkan2Showcase/VulkanModel.hpp>
 
 #include <fstream>
 #include <vulkan/vulkan_core.h>
@@ -59,13 +60,16 @@ namespace engine3d::vk{
         shader_stages[0] = vert_shader_stage;
         shader_stages[1] = frag_shader_stage;
 
+        auto binding_description = VulkanModel::Vertex::GetVertexInputBindDescription();
+        auto attachment_description = VulkanModel::Vertex::GetVertexAttributeDescriptions();
+
         VkPipelineVertexInputStateCreateInfo vert_input_create_info = {
             .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
             .pNext = nullptr,
-            .vertexBindingDescriptionCount = 0,
-            .pVertexBindingDescriptions = nullptr,
-            .vertexAttributeDescriptionCount = 0,
-            .pVertexAttributeDescriptions = nullptr,
+            .vertexBindingDescriptionCount = static_cast<uint32_t>(binding_description.size()),
+            .pVertexBindingDescriptions = binding_description.data(),
+            .vertexAttributeDescriptionCount = static_cast<uint32_t>(attachment_description.size()),
+            .pVertexAttributeDescriptions = attachment_description.data(),
         };
 
         VkPipelineViewportStateCreateInfo PipelineViewportCreateInfo = {

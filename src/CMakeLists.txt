@@ -31,8 +31,9 @@ build_library(
     ${VULKAN_INCLUDE_DIR}/VulkanPhysicalDriver.hpp
     ${VULKAN_INCLUDE_DIR}/VulkanDriver.hpp
     ${VULKAN_INCLUDE_DIR}/VulkanSwapchain.hpp
+    ${VULKAN_INCLUDE_DIR}/VulkanModel.hpp
+
     ${VULKAN_SHADERS_INCLUDE_DIR}/VulkanShader.hpp
-    ${VULKAN_INCLUDE_DIR}/VulkanVertexBuffer.hpp
     # ${VULKAN_INCLUDE_DIR}/VulkanPhysicalDriver.hpp
     # ${VULKAN_INCLUDE_DIR}/VulkanDevice.hpp
     # ${VULKAN_INCLUDE_DIR}/VulkanPhysicalDevice.hpp
@@ -65,8 +66,7 @@ build_library(
     ${VULKAN_SRC_DIR}/VulkanSwapchain.cpp
 
     ${VULKAN_SHADERS_SRC_DIR}/VulkanShader.cpp
-
-    ${VULKAN_SRC_DIR}/VulkanVertexBuffer.cpp
+    ${VULKAN_SRC_DIR}/VulkanModel.cpp
     # ${VULKAN_SRC_DIR}/VulkanPhysicalDriver.cpp
     # ${VULKAN_SRC_DIR}/VulkanWindow.cpp
     # ${VULKAN_SRC_DIR}/VulkanDevice.cpp
