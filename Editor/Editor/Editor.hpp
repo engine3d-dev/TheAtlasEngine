@@ -1,6 +1,8 @@
 #pragma once
 // #include <engine3d/Core/ApplicationInstance.hpp>
-#include <engine3d/Core/ApplicationInstance.hpp>
+#include <Core/ApplicationInstance.hpp>
+#include <Core/internal/Vulkan2Showcase/Shaders/VulkanShader.hpp>
+#include <vulkan/vulkan_core.h>
 
 namespace engine3d{
 
@@ -20,5 +22,10 @@ namespace engine3d{
     private:
         //! @note Editor application, Engine, UI Layer.
         float m_LastFrameTime = 0.0f;
+        //! @note Essentially our VulkanShader is VkPipeline, ShaderModule all in one.
+        vk::VulkanShader m_Shader;
+        VkPipelineLayout m_PipelineLayout;
+        VkCommandPool m_CommandPool;
+        std::vector<VkCommandBuffer> m_CommandBuffers;
     };
 };

@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <Core/Core.hpp>
-#include "internal/API.hpp"
+#include <Core/API.hpp>
 #include <Core/Window.hpp>
 
 namespace engine3d{

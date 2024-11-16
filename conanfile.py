@@ -21,7 +21,7 @@ class engine3dRecipe(ConanFile):
 
     # Sources are located in the same place as this recipe, copy them to the recipe
     # exports_sources = "CMakeLists.txt", "src/CMakeLists.txt", "Editor/CMakeLists.txt", "src/*", "engine3d/*", "Editor/*", "Testbed/*"
-    exports_sources = "CMakeLists.txt", "src/CMakeLists.txt", "Editor/CMakeLists.txt", "src/*", "engine3d/*",
+    exports_sources = "CMakeLists.txt", "src/CMakeLists.txt", "Editor/CMakeLists.txt", "src/*", "engine3d/*", "Editor/*"
 
     def build_requirements(self):
         self.tool_requires("make/4.4.1")

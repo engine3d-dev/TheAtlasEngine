@@ -4,6 +4,7 @@
 #include <Core/Timestep.hpp>
 // #include <Core/Renderer/Renderer.hpp>
 #include <Core/EngineLogger.hpp>
+#include <entt/entt.hpp>
 
 namespace engine3d{
     static float m_LastFrameTime = 0.0f;
@@ -25,8 +26,12 @@ namespace engine3d{
             // FrameTimer::UpdateFrameTimer(); // give us the frames in flight.
 
             // Renderer::Presentation();
+            // m_Window->GetCurrentSwapchain()->BeginFrame();
+            // Renderer::BeginFrame();
 
+            // Renderer::SetBackgroundColor({1.0f, 0.0f, 0.0f, 0.0f});
             UpdateCurrentApplicationInstance();
+            // Renderer::EndFrame();
             m_Window->OnUpdateAllFrames();
 
             InputPoll::UpdateEvents();

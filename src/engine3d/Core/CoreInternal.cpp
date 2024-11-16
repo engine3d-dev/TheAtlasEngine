@@ -1,4 +1,3 @@
-#include <internal/VulkanCpp/Vulkan.hpp>
 #include <Core/EngineLogger.hpp>
 
 namespace engine3d{
@@ -6,7 +5,7 @@ namespace engine3d{
     //! @note Should only be used to initialize Vulkan's API and it's devices (physical and logical)
     void InitializeVulkanCore(){
         //! @note Initializes core vulkan API
-        vk::Vulkan::InitializeVulkanCore();
+        // vk::Vulkan::InitializeVulkanCore();
         // vk::VulkanSwapchain::InitializeSwaphchain();
         // UICore::InitializeImgui();
     }
@@ -19,5 +18,4 @@ namespace engine3d{
 void Engine3DInitializeCore(){
     printf("Engine3DInitializeCore() Called!\n");
     engine3d::ConsoleEngineLogger::InitializeConsoleLogger("engine3d");
-    engine3d::InitializeVulkanCore();
 }

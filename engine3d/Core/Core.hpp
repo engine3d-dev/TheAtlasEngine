@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 #include <cstdint>
 #include <memory>
 #include <type_traits>
@@ -24,6 +25,13 @@ namespace engine3d{
     template<typename... T>
     static void Render_Core_Assert(bool x, const T&&... args){
         assert(x);
+    }
+
+    constexpr void engine_assert(bool p_Exp, const std::string& p_DebugMsg){
+        if(!p_Exp){
+            printf("%s", p_DebugMsg.c_str());
+            assert(false);
+        }
     }
 
     template<typename, typename T>
