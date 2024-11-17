@@ -365,8 +365,88 @@ namespace engine3d::vk{
         ConsoleLogWarn("Vulkan2Showcase: Vulkan Swapchain Initialized Complete");
     }
 
-    //! @note Extracts the next image.
-    uint32_t VulkanSwapchain::AcquireNextImage(){
+    VkSwapchainKHR VulkanSwapchain::VkSwapchainHandler() {
+        return m_Swapchain;
+    }
+
+    VkFormat VulkanSwapchain::ReadSwapchainFormat(){
+        return m_SurfaceFormat.format;
+    }
+    
+    uint32_t VulkanSwapchain::ImagesSize() const {
+        return m_ImagesForSwapchain.size();
+    }
+    
+    VkFramebuffer VulkanSwapchain::ReadFramebuffer(uint32_t index) {
+        return m_FramebuffersForSwapchain[index];
+    }
+    
+    VkImageView VulkanSwapchain::ReadImageView(uint32_t index) {
+        return m_ImagesForSwapchain[index].ImageView;
+    }
+    
+    VkExtent2D VulkanSwapchain::ReadSwapchainExtent() {
+        return m_SwapchainExtent;
+    }
+
+    VkRenderPass VulkanSwapchain::ReadSwapchainRenderPass(){
+        return m_RenderpassForSwapchain;
+    }
+    
+    void VulkanSwapchain::SubmitAndWriteCommandBuffer(VkCommandBuffer* p_CommandBuffers) {
+        if(m_ImagesInFlight[m_CurrentImageIndex] != VK_NULL_HANDLE){
+            vkWaitForFences(m_Driver, 1, &m_ImagesInFlight[m_CurrentImageIndex], true, std::numeric_limits<uint64_t>::max());
+        }
+
+        m_ImagesInFlight[m_CurrentImageIndex] = m_InFlightFences[m_CurrentFrameIndex];
+
+        VkSubmitInfo submit_info = {
+            .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+            .pNext = nullptr,
+        };
+
+        VkSemaphore wait_semaphore[] = {m_SemaphoresForAvailableImages[m_CurrentFrameIndex]};
+
+        VkPipelineStageFlags wait_stages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+
+        submit_info.waitSemaphoreCount = 1;
+        submit_info.pWaitSemaphores = wait_semaphore;
+        submit_info.pWaitDstStageMask = wait_stages;
+
+        submit_info.commandBufferCount = 1;
+        submit_info.pCommandBuffers = p_CommandBuffers;
+
+        VkSemaphore signal_sems[] = { m_SemaphoresForRenderCompleted[m_CurrentFrameIndex]};
+
+        submit_info.signalSemaphoreCount = 1;
+        submit_info.pSignalSemaphores = signal_sems;
+
+        vkResetFences(m_Driver, 1, &m_InFlightFences[m_CurrentFrameIndex]);
+
+        vk_check(vkQueueSubmit(m_Driver.GetGraphicsQueue(), 1, &submit_info, m_InFlightFences[m_CurrentFrameIndex]), "vkQueueSubmit", __FILE__, __LINE__, __FUNCTION__);
+
+        //! @note Now we present our data to the display.
+        VkPresentInfoKHR present_info = {
+            .sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
+            .waitSemaphoreCount = 1,
+            .pWaitSemaphores = signal_sems,
+        };
+
+        VkSwapchainKHR swapchains_array[] = { m_Swapchain };
+        present_info.swapchainCount = 1;
+        present_info.pSwapchains = swapchains_array;
+
+        present_info.pImageIndices = &m_CurrentImageIndex;
+        if(m_PresentationQueue == VK_NULL_HANDLE){
+            ConsoleLogError("PresentationQueue is nullptr!!!");
+        }
+
+        vk_check(vkQueuePresentKHR(m_PresentationQueue, &present_info), "vkQueuePresentKHR", __FILE__, __LINE__, __FUNCTION__);
+
+        m_CurrentFrameIndex = (m_CurrentFrameIndex + 1) % VulkanSwapchain::MaxFramesInFlight;
+    }
+    
+    uint32_t VulkanSwapchain::ReadAcquiredNextFrame() {
         uint32_t image_index;
         vk_check(vkWaitForFences(m_Driver, 1, &m_InFlightFences[m_CurrentFrameIndex], true, std::numeric_limits<uint32_t>::max()), "vkWaitForFences", __FILE__, __LINE__, __FUNCTION__);
 
@@ -375,6 +455,33 @@ namespace engine3d::vk{
         return image_index;
     }
 
+    uint32_t VulkanSwapchain::CurrentFramePerTick() {
+        return m_CurrentFrameIndex;
+    }
+
+
+
+
+
+
+
+
+
+
+
+    //! @note Extracts the next image.
+    /*
+    uint32_t VulkanSwapchain::AcquireNextImage(){
+        uint32_t image_index;
+        vk_check(vkWaitForFences(m_Driver, 1, &m_InFlightFences[m_CurrentFrameIndex], true, std::numeric_limits<uint32_t>::max()), "vkWaitForFences", __FILE__, __LINE__, __FUNCTION__);
+
+        vk_check(vkAcquireNextImageKHR(m_Driver, m_Swapchain, std::numeric_limits<uint64_t>::max(), m_SemaphoresForAvailableImages[m_CurrentFrameIndex], VK_NULL_HANDLE, &image_index), "vkAcquireNextImageKHR", __FILE__, __LINE__, __FUNCTION__);
+        m_CurrentImageIndex = image_index;
+        return image_index;
+    }
+    */
+
+    /*
     void VulkanSwapchain::SubmitCommandBuffers(VkCommandBuffer* p_CommandBuffers){
         if(m_ImagesInFlight[m_CurrentImageIndex] != VK_NULL_HANDLE){
             vkWaitForFences(m_Driver, 1, &m_ImagesInFlight[m_CurrentImageIndex], true, std::numeric_limits<uint64_t>::max());
@@ -427,14 +534,10 @@ namespace engine3d::vk{
 
         m_CurrentFrameIndex = (m_CurrentFrameIndex + 1) % VulkanSwapchain::MaxFramesInFlight;
     }
+    */
 
-    void VulkanSwapchain::SubmitCommandBuffers(VkCommandBuffer* p_CommandBuffers, uint32_t& image_index){
-        // if(m_ImagesCurrentlyInFlight[image_index] != VK_NULL_HANDLE){
-        //     vkWaitForFences(m_Driver, 1, &m_ImagesCurrentlyInFlight[image_index], true, UINT16_MAX);
-        // }
 
-        // m_ImagesCurrentlyInFlight[image_index] = m_
-    }
+
 
 
     uint32_t VulkanSwapchain::SelectMemoryType(VkPhysicalDeviceMemoryProperties p_MemoryProperties, uint32_t p_TypeFilter, VkMemoryPropertyFlags property_flag){

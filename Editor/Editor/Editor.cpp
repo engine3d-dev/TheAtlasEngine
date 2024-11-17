@@ -11,7 +11,6 @@
 
 namespace engine3d{
 
-    // struct SimpleMeshPushConstant{
     struct SimplePushConstantData{
         glm::vec2 Offsets;
         alignas(16) glm::vec3 Color;
@@ -56,14 +55,14 @@ namespace engine3d{
         auto pipeline_config = vk::VulkanShader::shader_configuration(ApplicationInstance::GetWindow().GetWidth(), ApplicationInstance::GetWindow().GetHeight());
         //! @note We are setting our shader pipeline to utilize our current window's swapchain
         //! @note a TODO is to utilize different render passes utiization for shader pipelines, potentially.
-        pipeline_config.PipelineRenderPass = ApplicationInstance::GetWindow().GetRenderpass();
+        pipeline_config.PipelineRenderPass = ApplicationInstance::GetWindow().GetCurrentSwapchain()->GetRenderPass();
         pipeline_config.PipelineLayout = m_PipelineLayout;
 
         m_Shader = vk::VulkanShader("simple_shader/simple_shader.vert.spv", "simple_shader/simple_shader.frag.spv", pipeline_config);
 
 
         //! @note Initializing Command buffers.
-        m_CommandBuffers.resize(ApplicationInstance::GetWindow().GetSwapchainImagesSize());
+        m_CommandBuffers.resize(ApplicationInstance::GetWindow().GetCurrentSwapchain()->GetImagesSize());
 
         //! @note Creating our pools of command buffer structs
         VkCommandPoolCreateInfo pool_create_info = {
@@ -115,8 +114,8 @@ namespace engine3d{
             // starting render pass
             VkRenderPassBeginInfo rp_begin_info = {
                 .sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
-                .renderPass = ApplicationInstance::GetWindow().GetRenderpass(),
-                .framebuffer = ApplicationInstance::GetWindow().GetFramebufferAt(i), // Specifying which framebuffer to render pass to.
+                .renderPass = ApplicationInstance::GetWindow().GetCurrentSwapchain()->GetRenderPass(),
+                .framebuffer = ApplicationInstance::GetWindow().GetCurrentSwapchain()->GetFramebuffer(i), // Specifying which framebuffer to render pass to.
                 .renderArea = {
                     .offset = {0, 0},
                     .extent = {ApplicationInstance::GetWindow().GetWidth(), ApplicationInstance::GetWindow().GetHeight()}
@@ -130,14 +129,14 @@ namespace engine3d{
             rp_begin_info.clearValueCount = static_cast<uint32_t>(clearValues.size());
             rp_begin_info.pClearValues = clearValues.data();
 
-            if(ApplicationInstance::GetWindow().GetRenderpass() == VK_NULL_HANDLE){
+            if(ApplicationInstance::GetWindow().GetCurrentSwapchain()->GetRenderPass() == VK_NULL_HANDLE){
                 ConsoleLogInfo("Renderpass Read at index  i = {} is not valid", i);
             }
             else{
                 ConsoleLogInfo("Renderpass Read at index  i = {} is valid", i);
             }
 
-            if(ApplicationInstance::GetWindow().GetFramebufferAt(i) == VK_NULL_HANDLE){
+            if(ApplicationInstance::GetWindow().GetCurrentSwapchain()->GetFramebuffer(i) == VK_NULL_HANDLE){
                 ConsoleLogInfo("Framebuffer Read at index  i = {} is not valid", i);
             }
             else{
@@ -210,7 +209,7 @@ namespace engine3d{
             vk::vk_check(vkEndCommandBuffer(m_CommandBuffers[i]), "vkEndCommandBuffer", __FILE__, __LINE__, __FUNCTION__);
         });
         */
-        uint32_t image_index = ApplicationInstance::GetWindow().AcquireNextImage();
+        uint32_t image_index = ApplicationInstance::GetWindow().GetCurrentSwapchain()->AcquireNextImage();
 
         for(int j = 0; j < 4; j++){
                 SimplePushConstantData push{
@@ -228,7 +227,7 @@ namespace engine3d{
                 );
             }
 
-       ApplicationInstance::GetWindow().Submit(&m_CommandBuffers[image_index]);
+       ApplicationInstance::GetWindow().GetCurrentSwapchain()->SubmitCommandBuffer(&m_CommandBuffers[image_index]);
     }
 
     ApplicationInstance* InitializeApplication(){

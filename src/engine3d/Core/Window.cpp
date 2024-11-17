@@ -1,4 +1,3 @@
-// #include <Core/Window.hpp>
 #include <internal/Vulkan2Showcase/VulkanWindow.hpp>
 #include <Core/ApplicationInstance.hpp>
 #include <Core/EngineLogger.hpp>
@@ -7,9 +6,6 @@
 #include <vulkan/vulkan_core.h>
 
 namespace engine3d{
-    // Window* Window::Create(uint32_t p_Width, uint32_t p_Height, const std::string& p_Title){
-
-    // }
     
     static Window* g_WindowAPI = nullptr;
 
@@ -31,27 +27,11 @@ namespace engine3d{
         return VkSurface();
     }
 
-    VkRenderPass& Window::GetRenderpass(){
-        return VkRenderpass();
+    Ref<GraphicSwapchain> Window::GetCurrentSwapchain(){
+        return Swapchain();
     }
-
-    VkFramebuffer Window::GetFramebufferAt(uint32_t index){
-        return ReadFramebufferAt(index);
-    }
-
-    uint32_t Window::AcquireNextImage(){
-        return NextImagePerFrame();
-    }
-
-    void Window::Submit(VkCommandBuffer* p_CommandBuffer){
-        SubmitCommandBufferToSwapchain(p_CommandBuffer);
-    }
-
-    uint32_t Window::Tick(){
-        return PerFrameTick();
-    }
-
-    // Ref<Swapchain> Window::GetCurrentSwapchain(){
+    
+    // graphic_swapchain& Window::GetCurrentSwapchain(){
     //     return CurrentSwapchain();
     // }
 
@@ -70,18 +50,6 @@ namespace engine3d{
     std::string Window::GetTitle() const{
         return Title();
     }
-
-    VkSwapchainKHR Window::GetVkSwapchain(){
-        return VkSwapchain();
-    }
-
-    size_t Window::GetSwapchainImagesSize() const{
-        return SwapchainImagesSize();
-    }
-
-    // graphic_swapchain& Window::GetCurrentSwapchain(){
-    //     return CurrentSwapchain();
-    // }
 
 
     void Window::OnUpdateAllFrames(){

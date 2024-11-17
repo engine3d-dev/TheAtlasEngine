@@ -2,7 +2,8 @@
 #include <cstdint>
 #include <string>
 #include <Core/Window.hpp>
-#include <internal/Vulkan2Showcase/VulkanSwapchain.hpp>
+// #include <internal/Vulkan2Showcase/VulkanSwapchain.hpp>
+#include <Core/GraphicDrivers/GraphicSwapchain.hpp>
 #include <vulkan/vulkan_core.h>
 
 class GLFWwindow;
@@ -20,25 +21,11 @@ namespace engine3d::vk{
         
         VkSurfaceKHR& VkSurface() override;
 
-        VkSwapchainKHR VkSwapchain() override;
-        VkRenderPass& VkRenderpass() override;
-
-        VkFramebuffer ReadFramebufferAt(uint32_t index) override;
-
-        uint32_t NextImagePerFrame() override;
-
-        void SubmitCommandBufferToSwapchain(VkCommandBuffer* p_CommandBuffers) override;
-
-        void SubmitCommandBufferToSwapchain(VkCommandBuffer* p_CommandBuffers, uint32_t& image_index) override;
-        
-        uint32_t PerFrameTick() override;
-        //! @note Overrided functions
-        // VulkanSwapchain CurrentSwapchain() override;
+        Ref<GraphicSwapchain> Swapchain() override { return m_Swapchain; }
 
         //! @note Returns our current set native window API.
         GLFWwindow* NativeWindow() override;
 
-        uint32_t SwapchainImagesSize() const override { return m_Swapchain.GetImagesSize(); }
 
         //! @note Update surface rendering every frame.
         void Presentation() override;
@@ -50,7 +37,8 @@ namespace engine3d::vk{
 
         // VulkanPhysicalDriver m_PhysicalDriver;
         // VulkanDriver m_Driver;
-        VulkanSwapchain m_Swapchain;
+        // VulkanSwapchain m_Swapchain;
+        Ref<GraphicSwapchain> m_Swapchain;
         VkSurfaceKHR m_Surface;
     };
 };

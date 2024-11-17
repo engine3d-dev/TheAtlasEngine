@@ -22,7 +22,8 @@ namespace engine3d::vk{
         vk::VulkanContext::Initialize();
         vk_check(glfwCreateWindowSurface(vk::VulkanContext::GetVkInstance(),m_Window, nullptr, &m_Surface), "glfwCreateWindowSurface", __FILE__, __LINE__, __FUNCTION__);
         ConsoleLogWarn("glfwCreateWindowSurface Initialized!");
-        m_Swapchain = VulkanSwapchain(VulkanContext::GetPhysicalDriver(), VulkanContext::GetDriver(), m_Surface);
+        // m_Swapchain = VulkanSwapchain(VulkanContext::GetPhysicalDriver(), VulkanContext::GetDriver(), m_Surface);
+        m_Swapchain = GraphicSwapchain::InitializeSwapchain(m_Surface);
 
         ConsoleLogInfo("Vulkan2Showcase VulkanWindow Initialized Complete!!!");
     }
@@ -30,38 +31,6 @@ namespace engine3d::vk{
     bool VulkanWindow::CurrentWindowActive() const { return !glfwWindowShouldClose(m_Window); }
 
     VkSurfaceKHR& VulkanWindow::VkSurface(){ return m_Surface; }
-
-    VkRenderPass& VulkanWindow::VkRenderpass(){
-        return m_Swapchain.GetRenderpass();
-    }
-
-    VkFramebuffer VulkanWindow::ReadFramebufferAt(uint32_t index){
-        return m_Swapchain.GetFramebuffer(index);
-    }
-
-    uint32_t VulkanWindow::NextImagePerFrame(){
-        return m_Swapchain.AcquireNextImage();
-    }
-
-    VkSwapchainKHR VulkanWindow::VkSwapchain() {
-        return m_Swapchain.GetVkSwapchainHandler();
-    }
-
-    uint32_t VulkanWindow::PerFrameTick() {
-        return m_Swapchain.GetCurrentPerFrameTick();
-    }
-
-    void VulkanWindow::SubmitCommandBufferToSwapchain(VkCommandBuffer* p_CommandBuffers){
-        m_Swapchain.SubmitCommandBuffers(p_CommandBuffers);
-    }
-
-    void VulkanWindow::SubmitCommandBufferToSwapchain(VkCommandBuffer* p_CommandBuffers, uint32_t& image_index){
-        m_Swapchain.SubmitCommandBuffers(p_CommandBuffers, image_index);
-    }
-
-    // Ref<Swapchain> VulkanWindow::CurrentSwapchain() {
-        // return m_Swapchain;
-    // }
 
     GLFWwindow* VulkanWindow::NativeWindow(){ return m_Window; }
 

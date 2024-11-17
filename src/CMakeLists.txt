@@ -24,6 +24,8 @@ build_library(
     ${ENGINE_INCLUDE_NAME}/Core/Event/KeyEvent.hpp
     ${ENGINE_INCLUDE_NAME}/Core/Event/MouseEvent.hpp
 
+    ${ENGINE_INCLUDE_NAME}/Core/GraphicDrivers/GraphicSwapchain.hpp
+
     ${VULKAN_INCLUDE_DIR}/Vulkan.hpp
     ${VULKAN_INCLUDE_DIR}/helper_functions.hpp
     ${VULKAN_INCLUDE_DIR}/VulkanContext.hpp
@@ -55,6 +57,7 @@ build_library(
     ${ENGINE_SRC_DIR}/Core/Window.cpp
     # ${ENGINE_SRC_DIR}/Core/GraphicDrivers/Swapchain.cpp
     ${ENGINE_SRC_DIR}/Core/EngineLogger.cpp
+    ${ENGINE_SRC_DIR}/Core/GraphicDrivers/GraphicSwapchain.cpp
 
     ${ENGINE_SRC_DIR}/Core/Event/InputPoll.cpp
 
