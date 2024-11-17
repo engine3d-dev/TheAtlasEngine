@@ -11,9 +11,10 @@
 
 namespace engine3d{
 
-    struct Vertex {
-        glm::vec3 Position;
-        glm::vec3 Color;
+    // struct SimpleMeshPushConstant{
+    struct SimplePushConstantData{
+        glm::vec2 Offsets;
+        alignas(16) glm::vec3 Color;
     };
 
     EditorApplication::EditorApplication(const std::string& p_DebugName) : ApplicationInstance(p_DebugName) {
@@ -29,6 +30,13 @@ namespace engine3d{
 
         //! @note Basics of command buffers.
 
+        //! @note Initialize Push constant range
+        VkPushConstantRange push_const_range = {
+            .stageFlags =  VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+            .offset = 0,
+            .size = sizeof(SimplePushConstantData)
+        };
+
         //! @note First initializing pipeline layout create info
         VkPipelineLayoutCreateInfo pipeline_layout_create_info = {
             .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
@@ -36,8 +44,10 @@ namespace engine3d{
             .flags = 0,
             .setLayoutCount = 0,
             .pSetLayouts = nullptr,
-            .pushConstantRangeCount = 0,
-            .pPushConstantRanges = nullptr,
+            // .pushConstantRangeCount = 0,
+            // .pPushConstantRanges = nullptr,
+            .pushConstantRangeCount = 1,
+            .pPushConstantRanges = &push_const_range
         };
 
         vk::vk_check(vkCreatePipelineLayout(vk::VulkanContext::GetDriver(), &pipeline_layout_create_info, nullptr, &m_PipelineLayout), "vkCreatePipelineLayout", __FILE__, __LINE__, __FUNCTION__);
@@ -140,7 +150,24 @@ namespace engine3d{
             vkCmdBindPipeline(m_CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, m_Shader.GetGraphicsPipeline());
             // vkCmdDraw(m_CommandBuffers[i], 3, 1, 0, 0);
             model.Bind(m_CommandBuffers[i]);
-            model.Draw(m_CommandBuffers[i]);
+
+            for(int j = 0; j < 4; j++){
+                SimplePushConstantData push{
+                    .Offsets = {0.0f, -0.4f + j * 0.25f},
+                    .Color = {0.0f, 0.0f, 0.2f + 0.2f * j}
+                };
+
+                vkCmdPushConstants(
+                    m_CommandBuffers[i],
+                     m_PipelineLayout,
+                      VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+                       0,
+                        sizeof(SimplePushConstantData), 
+                        &push
+                );
+
+                model.Draw(m_CommandBuffers[i]);
+            }
 
             vkCmdEndRenderPass(m_CommandBuffers[i]);
 
@@ -184,6 +211,22 @@ namespace engine3d{
         });
         */
         uint32_t image_index = ApplicationInstance::GetWindow().AcquireNextImage();
+
+        for(int j = 0; j < 4; j++){
+                SimplePushConstantData push{
+                    .Offsets = {0.0f, -0.4f + j * 0.25f},
+                    .Color = {0.0f, 0.0f, 0.2f + 0.2f * j + 1}
+                };
+
+                vkCmdPushConstants(
+                    m_CommandBuffers[image_index],
+                     m_PipelineLayout,
+                      VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+                       0,
+                        sizeof(SimplePushConstantData), 
+                        &push
+                );
+            }
 
        ApplicationInstance::GetWindow().Submit(&m_CommandBuffers[image_index]);
     }

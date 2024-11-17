@@ -1,5 +1,4 @@
 #pragma once
-#include <vulkan/vulkan_core.h>
 #include <Core/internal/Vulkan2Showcase/VulkanPhysicalDriver.hpp>
 
 namespace engine3d::vk{
@@ -19,7 +18,6 @@ namespace engine3d::vk{
 
     private:
         VkDevice m_CurrentDriver;
-        // uint32_t m_Presentation
         VkQueue m_GraphicsQueue;
     };
 };

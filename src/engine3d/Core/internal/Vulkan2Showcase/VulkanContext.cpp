@@ -1,4 +1,5 @@
 #include <Core/EngineLogger.hpp>
+#include <Core/internal/Vulkan2Showcase/Vulkan.hpp>
 #include <internal/Vulkan2Showcase/VulkanContext.hpp>
 #include <internal/Vulkan2Showcase/helper_functions.hpp>
 

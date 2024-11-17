@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 #include <vulkan/vulkan_core.h>
-#include <Core/internal/Vulkan2Showcase/Vulkan.hpp>
 #include <Core/internal/Vulkan2Showcase/VulkanDriver.hpp>
 
 namespace engine3d::vk{
