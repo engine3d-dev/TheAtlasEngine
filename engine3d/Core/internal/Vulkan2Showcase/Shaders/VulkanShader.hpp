@@ -1,39 +1,28 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <Core/GraphicDrivers/Shader.hpp>
 #include <vulkan/vulkan_core.h>
-#include <array>
+// #include <internal/Vulkan2Showcase/Shaders/ShaderPipelineConfig.hpp>
 
 namespace engine3d::vk{
     /**
      * @name Vulkan Shader
      * @note Loads in the two shader modules (vertex and fragment shaders)
     */
-    class VulkanShader{
-        //! @note Used for specifying how the shader pipeline configuration may look like.
-        struct ShaderPipelineConfig{
-            VkViewport Viewport;
-            VkRect2D Scissor;
-            // VkPipelineViewportStateCreateInfo PipelineViewportCreateInfo;
-            VkPipelineInputAssemblyStateCreateInfo PipelineInputAsmInfo;
-            VkPipelineRasterizationStateCreateInfo PipelineRasterizationCreateInfo;
-            VkPipelineMultisampleStateCreateInfo PipelineMultisampleCreateInfo;
-            VkPipelineColorBlendAttachmentState PipelineColorBlendAttachments;
-            VkPipelineColorBlendStateCreateInfo PipelineColorBlendCreateInfo;
-            VkPipelineDepthStencilStateCreateInfo PipelineDepthStencilCreateInfo;
-            VkPipelineLayout PipelineLayout;
-            VkRenderPass PipelineRenderPass;
-            uint32_t SubpassCount;
-        };
+    class VulkanShader : public Shader{
     public:
         VulkanShader() = default;
         VulkanShader(const std::string& p_VertShader, const std::string& p_FragShader, const ShaderPipelineConfig& p_Config = {});
         ~VulkanShader(){}
 
-        static VulkanShader::ShaderPipelineConfig shader_configuration(uint32_t p_Width, uint32_t p_Height);
+        static ShaderPipelineConfig shader_configuration(uint32_t p_Width, uint32_t p_Height);
 
         VkPipeline GetGraphicsPipeline() { return m_GraphicsPipeline; }
 
+
+    private:
+        VkPipeline GraphicsPipeline() override { return m_GraphicsPipeline; }
     private:
 
         std::vector<char> read_file(const std::string& p_Filepath);

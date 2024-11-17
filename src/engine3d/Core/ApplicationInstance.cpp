@@ -23,6 +23,7 @@ namespace engine3d{
         ConsoleLogInfo("EditorApplication::RunApplicationMainloop called!");
 
         while(m_Window->IsActive()){
+            InputPoll::UpdateEvents();
             // FrameTimer::UpdateFrameTimer(); // give us the frames in flight.
 
             // Renderer::Presentation();
@@ -33,8 +34,6 @@ namespace engine3d{
             UpdateCurrentApplicationInstance();
             // Renderer::EndFrame();
             m_Window->OnUpdateAllFrames();
-
-            InputPoll::UpdateEvents();
         }
         
         //! @note Cleaning up imgui

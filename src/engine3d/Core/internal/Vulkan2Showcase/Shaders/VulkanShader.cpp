@@ -7,9 +7,10 @@
 
 #include <fstream>
 #include <vulkan/vulkan_core.h>
+#include <array>
 
 namespace engine3d::vk{
-    VulkanShader::VulkanShader(const std::string& p_VertShader, const std::string& p_FragShader, const VulkanShader::ShaderPipelineConfig& p_Config){
+    VulkanShader::VulkanShader(const std::string& p_VertShader, const std::string& p_FragShader, const ShaderPipelineConfig& p_Config){
         initialize_graphics_pipeline(p_VertShader, p_FragShader, p_Config);
     }
 
@@ -118,8 +119,8 @@ namespace engine3d::vk{
 
     }
 
-    VulkanShader::ShaderPipelineConfig VulkanShader::shader_configuration(uint32_t p_Width, uint32_t p_Height){
-        VulkanShader::ShaderPipelineConfig config{};
+    ShaderPipelineConfig VulkanShader::shader_configuration(uint32_t p_Width, uint32_t p_Height){
+        ShaderPipelineConfig config{};
 
         // VkPipelineInputAssemblyStateCreateInfo pipeline_input_asm_create_info = {
         config.PipelineInputAsmInfo = {
