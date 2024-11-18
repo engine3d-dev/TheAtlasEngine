@@ -1,21 +1,19 @@
-// #include <Core/Window.hpp>
-#include <internal/VulkanCpp/VulkanWindow.hpp>
-#include "ApplicationInstance.hpp"
+#include <internal/Vulkan2Showcase/VulkanWindow.hpp>
+#include <Core/ApplicationInstance.hpp>
 #include <Core/EngineLogger.hpp>
 #include <stdexcept>
 #include <string>
+#include <vulkan/vulkan_core.h>
+#include <Core/TimeManagement/GlobalUpdateManager.hpp>
 
 namespace engine3d{
-    // Window* Window::Create(uint32_t p_Width, uint32_t p_Height, const std::string& p_Title){
-
-    // }
     
     static Window* g_WindowAPI = nullptr;
 
     Window* Window::Create(uint32_t p_Width, uint32_t p_Height, const std::string &p_Title){
         switch (ApplicationInstance::CurrentAPI()){
         case API::VULKAN:
-            return new vk::VulkanWindow(p_Width, p_Height, p_Title);
+            return new vk::VulkanWindow(p_Title, p_Width, p_Height);
         default:
             throw std::runtime_error("API was unspecified!");
         }
@@ -28,6 +26,14 @@ namespace engine3d{
 
     VkSurfaceKHR& Window::GetVkSurface(){
         return VkSurface();
+    }
+
+    //! @note Eventually, I'll wanna change the Graphic
+    // graphic_swapchain& Window::GetCurrentSwapchain(){
+    //     return CurrentSwapchain();
+    // }
+    Ref<GraphicSwapchain> Window::GetCurrentSwapchain(){
+        return Swapchain();
     }
 
     GLFWwindow* Window::GetNativeWindow(){
@@ -46,8 +52,8 @@ namespace engine3d{
         return Title();
     }
 
-
     void Window::OnUpdateAllFrames(){
-        Presentation();
+
+        GlobalUpdateManager::GetInstance()->GlobalOnTickUpdate();
     }
 };

@@ -12,6 +12,9 @@ namespace engine3d{
      */
     class InputPoll{
     public:
+        InputPoll() = delete;
+        InputPoll(const InputPoll&) = delete;
+        void operator=(const InputPoll&) = delete;
 
         //! @note Key/Mouse event pressed!
         static bool IsKeyPressed(KeyCode keycode);

@@ -1,5 +1,5 @@
 #include <Core/ApplicationInstance.hpp>
-#include <Core/internal/VulkanCpp/Vulkan.hpp>
+#include <Core/internal/Vulkan2Showcase/Vulkan.hpp>
 #include <GLFW/glfw3.h>
 #include <Core/Event/InputPoll.hpp>
 
