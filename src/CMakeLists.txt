@@ -1,5 +1,5 @@
 set(ENGINE_INCLUDE_NAME ../engine3d)
-set(ENGINE_INTERNAL_INCLUDE ${ENGINE_INCLUDE_NAME}/Core/internal)
+# set(ENGINE_INTERNAL_INCLUDE ${ENGINE_INCLUDE_NAME}/Core/internal)
 set(ENGINE_SRC_DIR engine3d)
 set(VULKAN_INCLUDE_DIR ${ENGINE_INCLUDE_NAME}/Core/internal/Vulkan2Showcase)
 set(VULKAN_SRC_DIR ${ENGINE_SRC_DIR}/Core/internal/Vulkan2Showcase)
@@ -9,12 +9,20 @@ set(VULKAN_SHADERS_SRC_DIR ${VULKAN_SRC_DIR}/Shaders)
 
 build_library(
     SOURCES
-
     ${ENGINE_INCLUDE_NAME}/Core/ApplicationInstance.hpp
 
     ${ENGINE_INCLUDE_NAME}/Core/EngineLogger.hpp
     ${ENGINE_INCLUDE_NAME}/Core/Window.hpp
-    # ${ENGINE_INCLUDE_NAME}/Core/GraphicDrivers/Swapchain.hpp
+
+    # Update Management includes
+    ${ENGINE_INCLUDE_NAME}/Core/TimeManagement/GlobalUpdateManager.hpp
+    ${ENGINE_INCLUDE_NAME}/Core/TimeManagement/Timer.hpp
+    ${ENGINE_INCLUDE_NAME}/Core/TimeManagement/UpdateManagers/SyncUpdateManager.hpp
+    ${ENGINE_INCLUDE_NAME}/Core/TimeManagement/UpdateManagers/ParallelFrameUpdateManager.hpp
+
+    # Application Manager
+    ${ENGINE_INCLUDE_NAME}/Core/ApplicationManager/Scene.hpp
+    ${ENGINE_INCLUDE_NAME}/Core/ApplicationManager/ThreadMngr.hpp
 
     # Event system includes
     ${ENGINE_INCLUDE_NAME}/Core/Event/KeyCodes.hpp
@@ -41,17 +49,22 @@ build_library(
     ${VULKAN_INCLUDE_DIR}/VulkanModel.hpp
 
     ${VULKAN_SHADERS_INCLUDE_DIR}/VulkanShader.hpp
-    # ${VULKAN_INCLUDE_DIR}/VulkanPhysicalDriver.hpp
-    # ${VULKAN_INCLUDE_DIR}/VulkanDevice.hpp
-    # ${VULKAN_INCLUDE_DIR}/VulkanPhysicalDevice.hpp
-    # ${VULKAN_INCLUDE_DIR}/VulkanLogicalDevice.hpp
-    # ${VULKAN_INCLUDE_DIR}/VulkanAllocator.hpp
-    # ${VULKAN_INCLUDE_DIR}/VulkanSwapchain.hpp
-    # ${VULKAN_INCLUDE_DIR}/VulkanRenderer.hpp
-    # ${VULKAN_INCLUDE_DIR}/utilities.hpp
+
+    # Scene Managment Includes
+    ${ENGINE_INCLUDE_NAME}/Core/SceneManagment/Components/GameComponent.hpp
+    ${ENGINE_INCLUDE_NAME}/Core/SceneManagment/SceneObjects/SceneObject.hpp
+    ${ENGINE_INCLUDE_NAME}/Core/ApplicationManager/GameObjManager/UUID.hpp
+
+    # Special Component Includes
+    ${ENGINE_INCLUDE_NAME}/Core/SceneManagment/Components/SPComps/Transform.hpp
 
     # Renderer Includes
     ${ENGINE_INCLUDE_NAME}/Core/Renderer/Renderer.hpp
+
+
+    #############################
+    # Source .cpp files below
+    #############################
 
     ${ENGINE_SRC_DIR}/Core/ApplicationInstance.cpp
 
@@ -60,12 +73,17 @@ build_library(
     ${ENGINE_SRC_DIR}/Core/platforms/win32.cpp
 
     ${ENGINE_SRC_DIR}/Core/Window.cpp
-    # ${ENGINE_SRC_DIR}/Core/GraphicDrivers/Swapchain.cpp
     ${ENGINE_SRC_DIR}/Core/EngineLogger.cpp
 
+    ${ENGINE_SRC_DIR}/Core/TimeManagement/GlobalUpdateManager.cpp
+    ${ENGINE_SRC_DIR}/Core/TimeManagement/Timer.cpp
+    ${ENGINE_SRC_DIR}/Core/TimeManagement/UpdateManagers/SyncUpdateManager.cpp
+    ${ENGINE_SRC_DIR}/Core/TimeManagement/UpdateManagers/ParallelFrameUpdateManager.cpp
+
+    ${ENGINE_SRC_DIR}/Core/ApplicationManager/Scene.cpp
+    ${ENGINE_SRC_DIR}/Core/ApplicationManager/ThreadMngr.cpp
+
     ${ENGINE_SRC_DIR}/Core/Scene/SceneObject.cpp
-
-
 
     ${ENGINE_SRC_DIR}/Core/GraphicDrivers/GraphicSwapchain.cpp
     ${ENGINE_SRC_DIR}/Core/GraphicDrivers/Shader.cpp
@@ -81,15 +99,16 @@ build_library(
 
     ${VULKAN_SHADERS_SRC_DIR}/VulkanShader.cpp
     ${VULKAN_SRC_DIR}/VulkanModel.cpp
-    # ${VULKAN_SRC_DIR}/VulkanPhysicalDriver.cpp
-    # ${VULKAN_SRC_DIR}/VulkanWindow.cpp
-    # ${VULKAN_SRC_DIR}/VulkanDevice.cpp
-    # ${VULKAN_SRC_DIR}/VulkanPhysicalDevice.cpp
-    # ${VULKAN_SRC_DIR}/VulkanLogicalDevice.cpp
-    # ${VULKAN_SRC_DIR}/VulkanAllocator.cpp
-    # ${VULKAN_SRC_DIR}/VulkanSwapchain.cpp
-    # ${VULKAN_SRC_DIR}/VulkanRenderer.cpp
-    # ${VULKAN_SRC_DIR}/utilities.cpp
+
+    ${ENGINE_SRC_DIR}/Core/SceneManagment/SceneObjects/SceneObject.cpp
+    ${ENGINE_SRC_DIR}/Core/SceneManagment/Components/GameComponent.cpp
+    ${ENGINE_SRC_DIR}/Core/ApplicationManager/GameObjManager/UUID.cpp
+
+    ${ENGINE_SRC_DIR}/Core/SceneManagment/Components/SPComps/Transform.cpp
 
     ${ENGINE_SRC_DIR}/Core/Renderer/Renderer.cpp
+
+    ${ENGINE_SRC_DIR}/Math/Interpolation.cpp
+
+    ${ENGINE_SRC_DIR}/Physics/JoltHandler.cpp
 )

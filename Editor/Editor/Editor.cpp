@@ -1,4 +1,5 @@
 #include "Editor.hpp"
+#include "Core/TimeManagement/GlobalUpdateManager.hpp"
 // #include "internal/VulkanCpp/helper_functions.hpp"
 #include <Core/internal/Vulkan2Showcase/helper_functions.hpp>
 #include <Core/internal/Vulkan2Showcase/VulkanContext.hpp>
@@ -33,7 +34,6 @@ namespace engine3d{
         //     {{.5f, -.288f, 0.0f, 1.0f}, {1.0f, 0.0f}},
         //     {{0.0f, .577f, 0.0f, 1.0f}, {0.5f, 1.0f}}
         // });
-
 
         //! @note Basics of command buffers.
 
@@ -133,10 +133,13 @@ namespace engine3d{
             auto triangle = SceneObject::Create();
             triangle.SetModel(model);
             triangle.m_Transform2D.scale = glm::vec2(.5f) + i * 0.0025f;
-            triangle.m_Transform2D.rotation = glm::pi<float>() * .0025f;
+            triangle.m_Transform2D.rotation = glm::pi<float>() * .00002f;
             triangle.SetColor(colors[i % colors.size()]);
             m_GameObjects.push_back(triangle);
         }
+
+        GlobalUpdateManager::GetInstance()->SubscribeApplicationUpdate(this, &EditorApplication::OnApplicationUpdate);
+
     }
 
     EditorApplication::~EditorApplication() {}
@@ -194,7 +197,10 @@ namespace engine3d{
         int i = 0;
         for(auto& obj : m_GameObjects){
             i += 1;
-            obj.m_Transform2D.rotation = glm::mod<float>(obj.m_Transform2D.rotation + 0.0001f * i, 2.f * glm::pi<float>());
+            obj.m_Transform2D.rotation = glm::mod<float>(obj.m_Transform2D.rotation + 0.001f * i, 2.f * glm::pi<float>());
+            // obj.m_Transform2D.Translation.x = glm::mod<float>(obj.m_Transform2D.rotation + 0.00001f * i, 2.f * glm::pi<float>());
+            // obj.m_Transform2D.Translation.y = glm::mod<float>(obj.m_Transform2D.rotation + 0.00001f * i, 2.f * glm::pi<float>());
+
             // obj.SetRotation(glm::mod<float>(obj.m_Transform2D.rotation + 0.001f * i, 2.f * glm::pi<float>()));
         }
 
@@ -257,8 +263,8 @@ namespace engine3d{
         vk::vk_check(vkEndCommandBuffer(m_CommandBuffers[image_index]), "vkEndCommandBuffer", __FILE__, __LINE__, __FUNCTION__);
     }
 
-    void EditorApplication::UpdateThisApplicationInstance(){
-        
+    // void EditorApplication::UpdateThisApplicationInstance(){
+    void EditorApplication::OnApplicationUpdate(){
         //! @note Just testing to see if application still closes cleanly.
         // if(InputPoll::IsKeyPressed(ENGINE_KEY_ESCAPE)){
         //     exit(0);

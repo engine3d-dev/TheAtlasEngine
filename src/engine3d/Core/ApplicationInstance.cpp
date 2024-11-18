@@ -1,8 +1,7 @@
-// #include <Core/internal/FrameTimer.hpp>
-#include "Event/InputPoll.hpp"
+#include "TimeManagement/GlobalUpdateManager.hpp"
+#include <Core/Event/InputPoll.hpp>
 #include <Core/ApplicationInstance.hpp>
 #include <Core/Timestep.hpp>
-// #include <Core/Renderer/Renderer.hpp>
 #include <Core/EngineLogger.hpp>
 #include <entt/entt.hpp>
 
@@ -10,6 +9,7 @@ namespace engine3d{
     static float m_LastFrameTime = 0.0f;
     static std::string g_DebugName = "Engine3D";
     static API g_CurrentAPI = UNSPECIFIED;
+
     ApplicationInstance* ApplicationInstance::g_ThisInstance = nullptr;
 
     ApplicationInstance::ApplicationInstance(const std::string& p_DebugName){
@@ -31,8 +31,10 @@ namespace engine3d{
             // Renderer::BeginFrame();
 
             // Renderer::SetBackgroundColor({1.0f, 0.0f, 0.0f, 0.0f});
-            UpdateCurrentApplicationInstance();
+            // UpdateCurrentApplicationInstance();
+
             // Renderer::EndFrame();
+
             m_Window->OnUpdateAllFrames();
         }
         
@@ -42,9 +44,9 @@ namespace engine3d{
 
     ApplicationInstance& ApplicationInstance::Super(){ return *g_ThisInstance; }
 
-    void ApplicationInstance::UpdateCurrentApplicationInstance(){
-        UpdateThisApplicationInstance();
-    }
+    // void ApplicationInstance::UpdateCurrentApplicationInstance(){
+    //     UpdateThisApplicationInstance();
+    // }
 
     float ApplicationInstance::CurrentFrameTime(){
         return m_LastFrameTime;

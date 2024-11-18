@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <string>
 #include <vulkan/vulkan_core.h>
+#include <Core/TimeManagement/GlobalUpdateManager.hpp>
 
 namespace engine3d{
     
@@ -27,13 +28,13 @@ namespace engine3d{
         return VkSurface();
     }
 
-    Ref<GraphicSwapchain> Window::GetCurrentSwapchain(){
-        return Swapchain();
-    }
-    
+    //! @note Eventually, I'll wanna change the Graphic
     // graphic_swapchain& Window::GetCurrentSwapchain(){
     //     return CurrentSwapchain();
     // }
+    Ref<GraphicSwapchain> Window::GetCurrentSwapchain(){
+        return Swapchain();
+    }
 
     GLFWwindow* Window::GetNativeWindow(){
         return NativeWindow();
@@ -51,8 +52,8 @@ namespace engine3d{
         return Title();
     }
 
-
     void Window::OnUpdateAllFrames(){
-        Presentation();
+
+        GlobalUpdateManager::GetInstance()->GlobalOnTickUpdate();
     }
 };

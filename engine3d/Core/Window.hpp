@@ -17,7 +17,6 @@ namespace engine3d{
      * @param IsActive returns a boolean that is used for checking our window is active before use.
      * @param OnUpdateAllFrames is used for displaying in the last stages of the swapchain of images ready for to be on the actual screen.
     */
-    // class graphic_swapchain;
 
     class Window{
     public:
@@ -44,17 +43,12 @@ namespace engine3d{
         // Like this: graphic_swapchain& GetCurrentSwapchain();
         Ref<GraphicSwapchain> GetCurrentSwapchain();
         
-
         GLFWwindow* GetNativeWindow();
 
         uint32_t GetWidth() const;
         uint32_t GetHeight() const;
         std::string GetTitle() const;
         void OnUpdateAllFrames();
-
-        // void Submit(VkCommandBuffer* p_CommandBuffer);
-
-        // uint32_t Tick();
 
     protected:
         //! @note These are all implementation details not exposed to the public API's

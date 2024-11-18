@@ -13,11 +13,12 @@ namespace engine3d{
     public:
         EditorApplication(const std::string& debugName = "Engine3D Editor");
         virtual ~EditorApplication();
-    private:
+        
         //! @note TODO -- Probably have a cleanup handler for this
         //! @note Such as WorldCleanup() or some API to make sure we can cleanly deallocate and delete things...
         // void ShutdownEditor();
-        void UpdateThisApplicationInstance() override;
+        // void UpdateThisApplicationInstance() override;
+        void OnApplicationUpdate();
     
     private:
         //! @note Basically to differentiate draw calls with initialization tasks
