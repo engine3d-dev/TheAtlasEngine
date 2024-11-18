@@ -1,3 +1,4 @@
+#include "Renderer/Renderer.hpp"
 #include "TimeManagement/GlobalUpdateManager.hpp"
 #include <Core/Event/InputPoll.hpp>
 #include <Core/ApplicationInstance.hpp>
@@ -17,6 +18,8 @@ namespace engine3d{
         g_DebugName = p_DebugName;
         SetCurrentAPI(VULKAN);
         m_Window = Window::Create(900, 600, p_DebugName);
+
+        Renderer::Initialize("Engine3D Renderer");
     }
 
     void ApplicationInstance::ExecuteApplicationMainloop(){
@@ -34,8 +37,10 @@ namespace engine3d{
             // UpdateCurrentApplicationInstance();
 
             // Renderer::EndFrame();
-
+            // Renderer::BeginFrame();
+            Renderer::RecordCommandBuffers(Renderer::BeginFrame());
             m_Window->OnUpdateAllFrames();
+            Renderer::EndFrame();
         }
         
         //! @note Cleaning up imgui

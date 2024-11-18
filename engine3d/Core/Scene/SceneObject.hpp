@@ -26,6 +26,11 @@ namespace engine3d{
         }
     };
 
+    struct RigidBody2dComponent {
+        glm::vec2 velocity;
+        float mass{1.0f};
+    };
+
     //! @note Defines what our scene objects'll be.
     class SceneObject{
         using id_t = unsigned int;
@@ -55,6 +60,7 @@ namespace engine3d{
         Transform2DComponent& GetTransform() { return m_Transform2D; }
 
         Transform2DComponent m_Transform2D;
+        RigidBody2dComponent RigidBodyComponent;
 
     private:
         SceneObject(id_t p_Id);
