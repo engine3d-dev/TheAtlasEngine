@@ -61,11 +61,9 @@ build_library(
     # Renderer Includes
     ${ENGINE_INCLUDE_NAME}/Core/Renderer/Renderer.hpp
 
-
     #############################
     # Source .cpp files below
     #############################
-
     ${ENGINE_SRC_DIR}/Core/ApplicationInstance.cpp
 
 

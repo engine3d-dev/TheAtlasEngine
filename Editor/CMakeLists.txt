@@ -54,3 +54,4 @@ target_link_libraries(
     EnTT::EnTT
     engine3d
 )
+
