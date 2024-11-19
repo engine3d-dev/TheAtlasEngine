@@ -31,6 +31,7 @@ namespace engine3d{
     struct SimplePushConstantData{
         glm::mat2 Transform{1.f};
         glm::vec2 Offsets;
+        glm::vec2 iResolution;
         alignas(16) glm::vec3 Color;
     };
 
@@ -232,6 +233,7 @@ namespace engine3d{
                 .Transform = obj.GetTransform().mat2(),
                 // .Transform = glm::mod(obj.GetTransform().rotation * 0.1f, glm::two_pi<float>()),
                 .Offsets = obj.GetTransform().Translation,
+                .iResolution = {ApplicationInstance::GetWindow().GetWidth(), ApplicationInstance::GetWindow().GetHeight()},
                 .Color = obj.GetColor(),
             };
             vkCmdPushConstants(
