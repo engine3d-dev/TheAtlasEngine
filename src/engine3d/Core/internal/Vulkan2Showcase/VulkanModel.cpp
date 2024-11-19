@@ -90,7 +90,7 @@ namespace engine3d::vk{
         attribute_description[0] = {
             .location = 0, // // layout(location = 0)
             .binding = 0,
-            .format = VK_FORMAT_R32G32_SFLOAT,
+            .format = VK_FORMAT_R32G32B32_SFLOAT,
             // .offset = 0
             .offset = offsetof(Vertex, Position)
         };

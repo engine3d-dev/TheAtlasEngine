@@ -1,28 +1,40 @@
 #pragma once
 #include <Core/internal/Vulkan2Showcase/VulkanModel.hpp>
 #include <Core/Core.hpp>
+// #include <glm/ext/matrix_transform.hpp>
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace engine3d{
     //! @note Creating a transform component for our scene object
     struct Transform2DComponent{
-        glm::vec2 Translation{};
-        glm::vec2 scale = {1.f, 1.f};
-        float rotation;
+        glm::vec3 Translation{};
+        glm::vec3 scale = {1.f, 1.f, 1.f};
+        glm::vec3 rotation;
 
-        glm::mat2 mat2() {
-            const float s = glm::sin(rotation);
-            const float c = glm::cos(rotation);
-            glm::mat2 rotation_mat = {{c, s}, {-s, c}};
+        // glm::mat2 mat2() {
+        //     const float s = glm::sin(rotation);
+        //     const float c = glm::cos(rotation);
+        //     glm::mat2 rotation_mat = {{c, s}, {-s, c}};
 
-            glm::mat2 scale_mat{{scale.x, .0f}, {.0f, scale.y}};
-            // return glm::mat2{1.f};
-            // return scale_mat;
-            return rotation_mat * scale_mat;
+        //     glm::mat2 scale_mat{{scale.x, .0f}, {.0f, scale.y}};
+        //     // return glm::mat2{1.f};
+        //     // return scale_mat;
+        //     return rotation_mat * scale_mat;
+        // }
+
+        glm::mat4 mat4(){
+            auto transform = glm::translate(glm::mat4{1.f}, Translation);
+            transform = glm::rotate(transform, rotation.y, {0.f, 1.f, 0.f});
+            transform = glm::rotate(transform, rotation.x, {1.f, 0.f, 0.f});
+            transform = glm::rotate(transform, rotation.z, {0.f, 0.f, 1.f});
+
+            transform = glm::scale(transform, scale);
+            return transform;
         }
     };
 
@@ -43,7 +55,7 @@ namespace engine3d{
             m_Model = p_Model;
         }
 
-        void SetRotation(float& p_Rotation){
+        void SetRotation(glm::vec3& p_Rotation){
             m_Transform2D.rotation = p_Rotation;
         }
 

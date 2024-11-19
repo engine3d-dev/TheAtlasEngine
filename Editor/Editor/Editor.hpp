@@ -5,6 +5,8 @@
 #include <Core/TimeManagement/GlobalUpdateManager.hpp>
 
 namespace engine3d{
+    
+    /*
     class GravityPhysicsSystem{
     public:
         GravityPhysicsSystem() = default;
@@ -77,6 +79,7 @@ namespace engine3d{
             }
         }
     };
+    */
 
     //! @note Our actual editor application
     //! @note TODO -- Having a cenrtal application that will be used across both editor and the game(being developed)
@@ -99,8 +102,9 @@ namespace engine3d{
         std::vector<SceneObject> m_SceneGameObjects;
         std::vector<SceneObject> m_VectorFields;
 
-        GravityPhysicsSystem m_GravitySystem;
-        Vec2FieldSystem m_VectorFieldSystem;
+        // GravityPhysicsSystem m_GravitySystem;
+        // Vec2FieldSystem m_VectorFieldSystem;
+        Ref<vk::VulkanModel> m_CubeMesh;
 
 
 

@@ -29,8 +29,8 @@ namespace engine3d{
     // static std::vector<SceneObject> g_GameObjects;
 
     struct SimplePushConstantData{
-        glm::mat2 Transform{1.f};
-        glm::vec2 Offsets;
+        glm::mat4 Transform{1.f};
+        // glm::vec2 Offsets;
         glm::vec2 iResolution;
         alignas(16) glm::vec3 Color;
     };
@@ -109,26 +109,26 @@ namespace engine3d{
         //--------------------------------------------
         //! @note Loading Game Objectts Here
         //--------------------------------------------
-        std::vector<vk::VulkanModel::Vertex> triangle_vertices = {
-            {.Position={0.0f, -0.5f}, .Color = {1.0f, 0.0f, 0.0f}},
-            {.Position ={0.5f, 0.5f}, .Color = {0.0f, 1.0f, 0.0f}},
-            {.Position ={-0.5f, 0.5f}, .Color = {0.0f, 0.0f, 1.0f}}
-        };
-        // vk::VulkanModel model = vk::VulkanModel(triangle_vertices, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-        auto model = CreateRef<vk::VulkanModel>(triangle_vertices, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-        auto triangle = SceneObject::Create();
-        triangle.SetModel(model);
+        // std::vector<vk::VulkanModel::Vertex> triangle_vertices = {
+        //     {.Position={0.0f, -0.5f}, .Color = {1.0f, 0.0f, 0.0f}},
+        //     {.Position ={0.5f, 0.5f}, .Color = {0.0f, 1.0f, 0.0f}},
+        //     {.Position ={-0.5f, 0.5f}, .Color = {0.0f, 0.0f, 1.0f}}
+        // };
+        // // vk::VulkanModel model = vk::VulkanModel(triangle_vertices, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+        // auto model = CreateRef<vk::VulkanModel>(triangle_vertices, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+        // auto triangle = SceneObject::Create();
+        // triangle.SetModel(model);
 
-        //! @note Push Constants is pretty much how we can modify data without needing to record command buffers again.
+        // //! @note Push Constants is pretty much how we can modify data without needing to record command buffers again.
 
-        // g_GameObjects.push_back(std::move(triangle));
-        std::vector<glm::vec3> colors{
-            {1.f, .7f, .73f},
-            {1.f, .87f, .73f},
-            {1.f, 1.f, .73f},
-            {.73f, 1.f, .8f},
-            {.73, .88f, 1.f}  //
-        };
+        // // g_GameObjects.push_back(std::move(triangle));
+        // std::vector<glm::vec3> colors{
+        //     {1.f, .7f, .73f},
+        //     {1.f, .87f, .73f},
+        //     {1.f, 1.f, .73f},
+        //     {.73f, 1.f, .8f},
+        //     {.73, .88f, 1.f}  //
+        // };
 
         //! @note Loading 40 triangles.
         // for(int i = 0; i < 40; i++){
@@ -227,12 +227,10 @@ namespace engine3d{
 
         //! @note Only for testing purposes for mesh data.
         for(auto& obj : p_Objects){
-            // obj.m_Transform2D.rotation = glm::mod(obj.GetTransform().rotation + 0.001f, glm::two_pi<float>());
+            obj.m_Transform2D.rotation.y = glm::mod(obj.GetTransform().rotation.y + 0.001f, glm::two_pi<float>());
 
             SimplePushConstantData push = {
-                .Transform = obj.GetTransform().mat2(),
-                // .Transform = glm::mod(obj.GetTransform().rotation * 0.1f, glm::two_pi<float>()),
-                .Offsets = obj.GetTransform().Translation,
+                .Transform = obj.GetTransform().mat4(),
                 .iResolution = {ApplicationInstance::GetWindow().GetWidth(), ApplicationInstance::GetWindow().GetHeight()},
                 .Color = obj.GetColor(),
             };
