@@ -4,7 +4,7 @@
 #include "Scenes/Assets/Components/testComp.hpp"
 #include <Scenes/Assets/Components/Bodies/Shapes/BoxShaper.hpp>
 #include <Scenes/Assets/Components/Bodies/Shapes/SphereShaper.hpp>
-#include <TestApp/SceneTest/Scenes/Assets/SceneInstances/ShowCaseSceneInstance.hpp>
+#include <Scenes/Assets/SceneInstances/ShowCaseSceneInstance.hpp>
 
 ShowCaseSceneInstance::ShowCaseSceneInstance()
 {

@@ -1,6 +1,6 @@
 #include "Core/EngineLogger.hpp"
 #include <engine3d/Core/ApplicationInstance.hpp>
-#include "SceneTest/Scenes/Assets/SceneInstances/ShowCaseSceneInstance.hpp"
+#include "Scenes/Assets/SceneInstances/ShowCaseSceneInstance.hpp"
 #include <string>
 
 namespace engine3d{
