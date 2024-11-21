@@ -1,55 +1,14 @@
 #include "Editor.hpp"
-#include <Core/Core.hpp>
-#include "Core/Renderer/Renderer.hpp"
-#include "Core/Scene/SceneObject.hpp"
-// #include "internal/VulkanCpp/helper_functions.hpp"
-#include <Core/internal/Vulkan2Showcase/helper_functions.hpp>
-#include <Core/internal/Vulkan2Showcase/VulkanContext.hpp>
-#include <Core/Event/InputPoll.hpp>
-#include <Core/Event/KeyCodes.hpp>
-#include <Core/EngineLogger.hpp>
-#include <Core/Timestep.hpp>
-#include <glm/common.hpp>
-#include <glm/fwd.hpp>
-#include <glm/gtc/constants.hpp>
-#include <vulkan/vulkan_core.h>
+#include "EditorScene.hpp"
+#include <Core/internal/Vulkan2Showcase/VulkanModel.hpp>
+#include <Core/Scene/SceneTest.hpp>
+#include <Core/TimeManagement/GlobalUpdateManager.hpp>
+#include <Core/Renderer/Renderer.hpp>
 
 namespace engine3d{
-    /*
-    Ref<vk::VulkanModel> CreateSquareMesh(glm::vec2 offset) {
-        std::vector<vk::VulkanModel::Vertex> vertices = {
-            {{-0.5f, -0.5f}},
-            {{0.5f, 0.5f}},
-            {{-0.5f, 0.5f}},
-            {{-0.5f, -0.5f}},
-            {{0.5f, -0.5f}},
-            {{0.5f, 0.5f}},  //
-        };
-        for (auto& v : vertices) {
-            v.Position += offset;
-        }
-        return CreateRef<vk::VulkanModel>(vertices, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-    }
-    
-    Ref<vk::VulkanModel> CreateCircleMesh(unsigned int numSides) {
-        std::vector<vk::VulkanModel::Vertex> uniqueVertices{};
-        for (int i = 0; i < numSides; i++) {
-            float angle = i * glm::two_pi<float>() / numSides;
-            uniqueVertices.push_back({{glm::cos(angle), glm::sin(angle)}});
-        }
-        uniqueVertices.push_back({});  // adds center vertex at 0, 0
-        
-        std::vector<vk::VulkanModel::Vertex> vertices{};
-        for (int i = 0; i < numSides; i++) {
-            vertices.push_back(uniqueVertices[i]);
-            vertices.push_back(uniqueVertices[(i + 1) % numSides]);
-            vertices.push_back(uniqueVertices[numSides]);
-        }
-        return CreateRef<vk::VulkanModel>(vertices, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-    }
 
-    */
-
+     
+     /*
      Ref<vk::VulkanModel> CreateCubeMesh(glm::vec3 offset){
         std::vector<vk::VulkanModel::Vertex> vertices{
             // left face (white)
@@ -106,22 +65,23 @@ namespace engine3d{
         }
         return CreateRef<vk::VulkanModel>(vertices, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
     }
+    */
 
 
     EditorApplication::EditorApplication(const std::string& p_DebugName) : ApplicationInstance(p_DebugName) {
         GlobalUpdateManager::GetInstance()->SubscribeApplicationUpdate(this, &EditorApplication::OnApplicationUpdate);
-        m_CubeMesh = CreateCubeMesh({.0f, .0f, .0f});
+        // Ref<vk::VulkanModel> m_CubeMesh = CreateCubeMesh({.0f, .0f, .0f});
 
 
-        auto cube = SceneObject::Create();
-        cube.SetModel(m_CubeMesh);
-        cube.GetTransform().Translation = {.0f, .0f, .5f};
-        cube.GetTransform().scale = {.5f, .5f, .5f};
+        // auto cube = SceneObjectTutorial::Create();
+        // cube.SetModel(m_CubeMesh);
+        // cube.GetTransform().Translation = {.0f, .0f, .5f};
+        // cube.GetTransform().scale = {.5f, .5f, .5f};
 
-        m_SceneGameObjects.push_back(cube);
+        // m_SceneGameObjects.push_back(cube);
 
-        ConsoleLogError("m_SceneGameObjects.size() === {}", m_SceneGameObjects.size());
-        
+        // ConsoleLogError("m_SceneGameObjects.size() === {}", m_SceneGameObjects.size());
+        m_EditorScene = new EditorScene();
 
 
         // m_GravitySystem = GravityPhysicsSystem(0.81f);
@@ -176,7 +136,9 @@ namespace engine3d{
         //! @note Handle Events.
         // m_GravitySystem.update(m_SceneGameObjects, 5);
         // m_VectorFieldSystem.update(m_GravitySystem, m_SceneGameObjects, m_VectorFields);
-        Renderer::RecordGameObjects(m_SceneGameObjects);
+        auto& objects = m_EditorScene->GetSceneObjects();
+        Renderer::RecordSceneGameObjects(objects);
+        // Renderer::RecordGameObjects(m_SceneGameObjects);
         // Renderer::RecordGameObjects(m_VectorFields);
 
 

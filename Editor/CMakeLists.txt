@@ -11,5 +11,8 @@ build_demos(
     SOURCES
     Editor/Editor.hpp
     Editor/Editor.cpp
+
+    Editor/EditorScene.hpp
+    Editor/EditorScene.cpp
     LINK_LIBRARIES engine3d
 )

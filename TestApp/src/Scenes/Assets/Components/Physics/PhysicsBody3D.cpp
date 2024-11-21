@@ -30,7 +30,8 @@ void PhysicsBody3D::OnIntegrate()
 void PhysicsBody3D::Begin()
 {
         m_interface = engine3d::JoltHandler::GetInstance()->getInterface();
-        m_Transform = &m_GameObjectRef->SceneGetComponent<Transform>();
+        // m_Transform = &m_GameObjectRef->SceneGetComponent<Transform>();
+        // m_Transform = m_GameObjectRef
 }
 
 void PhysicsBody3D::Update()

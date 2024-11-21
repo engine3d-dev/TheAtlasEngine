@@ -219,7 +219,7 @@ namespace engine3d{
         */
     }
 
-    void Renderer::RecordGameObjects(std::vector<SceneObject>& p_Objects){
+    void Renderer::RecordGameObjects(std::vector<SceneObjectTutorial>& p_Objects){
         auto current_cmd_buffer = GetCurrentCommandBuffer();
         //! @note Essentially doing m_Pipeline->Bind(m_CommandBuffer[i])
         //! @note Starts when to start rendering!!
@@ -245,6 +245,36 @@ namespace engine3d{
 
             obj.GetModel()->Bind(current_cmd_buffer);
             obj.GetModel()->Draw(current_cmd_buffer);
+        }
+    }
+
+    void Renderer::RecordSceneGameObjects(std::vector<SceneObject*>& p_Objects){
+        auto current_cmd_buffer = GetCurrentCommandBuffer();
+        //! @note Essentially doing m_Pipeline->Bind(m_CommandBuffer[i])
+        //! @note Starts when to start rendering!!
+        vkCmdBindPipeline(current_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, g_Shader->GetGraphicsPipeline());
+
+        //! @note Only for testing purposes for mesh data.
+        for(auto& obj : p_Objects){
+            // obj.m_Transform2D.rotation.y = glm::mod(obj.GetTransform().rotation.y + 0.001f, glm::two_pi<float>());
+
+            SimplePushConstantData push = {
+                // .Transform = obj.GetTransform().mat4(),
+                .Transform = obj->toMat4(),
+                .iResolution = {ApplicationInstance::GetWindow().GetWidth(), ApplicationInstance::GetWindow().GetHeight()},
+                // .Color = obj.GetColor(),
+            };
+            vkCmdPushConstants(
+                current_cmd_buffer,
+                g_PipelineLayout,
+                VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+                0,
+                    sizeof(SimplePushConstantData), 
+                    &push
+            );
+
+            obj->GetModel()->Bind(current_cmd_buffer);
+            obj->GetModel()->Draw(current_cmd_buffer);
         }
     }
 

@@ -16,17 +16,6 @@ namespace engine3d{
         glm::vec3 scale = {1.f, 1.f, 1.f};
         glm::vec3 rotation;
 
-        // glm::mat2 mat2() {
-        //     const float s = glm::sin(rotation);
-        //     const float c = glm::cos(rotation);
-        //     glm::mat2 rotation_mat = {{c, s}, {-s, c}};
-
-        //     glm::mat2 scale_mat{{scale.x, .0f}, {.0f, scale.y}};
-        //     // return glm::mat2{1.f};
-        //     // return scale_mat;
-        //     return rotation_mat * scale_mat;
-        // }
-
         glm::mat4 mat4(){
             auto transform = glm::translate(glm::mat4{1.f}, Translation);
             transform = glm::rotate(transform, rotation.y, {0.f, 1.f, 0.f});
