@@ -89,6 +89,11 @@ namespace engine3d
                m_ParentScene == other.m_ParentScene;
       }
 
+      glm::vec3 GetRotation();
+      void SetRotation(const glm::vec3& p_Rotation);
+      
+      void SetPosition(const glm::vec3& p_Position);
+
       bool operator!=(const SceneObject &other) const { return !(*this == other); }
 
       UUID GetUUID() { return objectID; }

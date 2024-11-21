@@ -78,10 +78,6 @@ namespace engine3d{
         //! @note Setting our properties
         auto& transform = cube->SceneGetComponent<Transform>();
 
-        if(cube->HasComponent<Transform>()){
-            ConsoleLogInfo("Transform Component found!");
-        }
-
         transform.m_Position = {.0f, .0f, .5f};
         transform.m_Scale = {.5f, .5f, .5f};
         // cube->SetModel(cube_mesh);
