@@ -26,12 +26,11 @@ class engine3dRecipe(ConanFile):
     def build_requirements(self):
         self.tool_requires("make/4.4.1")
         self.tool_requires("cmake/3.27.1")
-        self.tool_requires("engine3d-cmake-utils/1.0")
+        self.tool_requires("engine3d-cmake-utils/2.0")
 
     def requirements(self):
         self.requires("glfw/3.4", transitive_headers=True)
         self.requires("opengl/system", transitive_headers=True)
-        self.requires("engine3d-cmake-utils/1.0")
 
         # These end in 1.0 because they are engine3d-customized conan packages
         # Slighly modified of the conan packages and it's CMake generators to using "Unix Makefiles" 
