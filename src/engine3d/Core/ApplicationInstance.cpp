@@ -1,5 +1,5 @@
 #include "Renderer/Renderer.hpp"
-#include "TimeManagement/GlobalUpdateManager.hpp"
+// #include "TimeManagement/GlobalUpdateManager.hpp"
 #include <Core/Event/InputPoll.hpp>
 #include <Core/ApplicationInstance.hpp>
 #include <Core/Timestep.hpp>
@@ -29,17 +29,7 @@ namespace engine3d{
             InputPoll::UpdateEvents();
             // FrameTimer::UpdateFrameTimer(); // give us the frames in flight.
 
-            // Renderer::Presentation();
-            // m_Window->GetCurrentSwapchain()->BeginFrame();
-            // Renderer::BeginFrame();
-
-            // Renderer::SetBackgroundColor({1.0f, 0.0f, 0.0f, 0.0f});
-            // UpdateCurrentApplicationInstance();
-
-            // Renderer::EndFrame();
-            // Renderer::BeginFrame();
             Renderer::BeginFrame();
-            // Renderer::RecordCommandBuffers(Renderer::BeginFrame());
             m_Window->OnUpdateAllFrames();
             Renderer::EndFrame();
         }

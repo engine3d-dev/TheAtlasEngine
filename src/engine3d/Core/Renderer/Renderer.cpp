@@ -18,6 +18,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 
+#include <Core/SceneManagment/Components/SPComps/EditorCamera.hpp>
+
 namespace engine3d{
     static std::vector<VkCommandBuffer> g_CommandBuffers;
     VkCommandPool g_CmdPool;
@@ -136,8 +138,27 @@ namespace engine3d{
 
         vkCmdBeginRenderPass(cmd_buffer, &rp_begin_info, VK_SUBPASS_CONTENTS_INLINE);
         g_IsFrameStarted = true;
-        // return cmd_buffer;
+        
+        VkViewport viewport = {
+            .x = 0.0f,
+            .y = 0.0f,
+            .width = static_cast<float>(ApplicationInstance::GetWindow().GetCurrentSwapchain()->GetSwapchainExtent().width),
+            .height = static_cast<float>(ApplicationInstance::GetWindow().GetCurrentSwapchain()->GetSwapchainExtent().height),
+            .maxDepth = 1.0f,
+        };
+
+        VkRect2D scissor = {
+            .offset = {0, 0},
+            .extent = ApplicationInstance::GetWindow().GetCurrentSwapchain()->GetSwapchainExtent()
+        };
+
+
+
         g_CommandBuffers[g_CurrentFrameIndex] = cmd_buffer;
+
+        vkCmdSetViewport(g_CommandBuffers[g_CurrentFrameIndex], 0, 1, &viewport);
+        vkCmdSetScissor(g_CommandBuffers[g_CurrentFrameIndex], 0, 1, &scissor);
+
     }
 
     void Renderer::RecordGameObjects(std::vector<SceneObjectTutorial>& p_Objects){
@@ -172,28 +193,32 @@ namespace engine3d{
 
     void Renderer::RecordSceneGameObjects(std::vector<SceneObject*>& p_Objects){
         auto current_cmd_buffer = GetCurrentCommandBuffer();
+
         //! @note Essentially doing m_Pipeline->Bind(m_CommandBuffer[i])
         //! @note Starts when to start rendering!!
         vkCmdBindPipeline(current_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, g_Shader->GetGraphicsPipeline());
         float delta_time = SyncUpdateManager::GetInstance()->m_SyncLocalDeltaTime;
         // ConsoleLogWarn("Delta Time = {:.7}", delta_time);
+        // auto projection_view = 
 
         //! @note Only for testing purposes for mesh data.
         for(auto& obj : p_Objects){
+            auto camera_component = obj->SceneGetComponent<EditorCamera>();
+            auto proj_view = camera_component.GetProjection() * camera_component.GetView();
+
             // obj.m_Transform2D.rotation.y = glm::mod(obj.GetTransform().rotation.y + 0.001f, glm::two_pi<float>());
             // float x = obj->GetRotation().x;
-            float y = glm::mod(obj->GetRotation().y + (0.1f * delta_time), glm::two_pi<float>());
-            float x = glm::mod(obj->GetRotation().x + (0.05f * delta_time), glm::two_pi<float>());
-            float z = obj->GetRotation().z;
+            // float y = glm::mod(obj->GetRotation().y + (0.1f * delta_time), glm::two_pi<float>());
+            // float x = glm::mod(obj->GetRotation().x + (0.05f * delta_time), glm::two_pi<float>());
+            // float z = obj->GetRotation().z;
 
-            glm::vec3 new_position = {x, y, z};
+            // glm::vec3 new_position = {x, y, z};
             // new_position = glm::normalize(new_position);
-            obj->SetRotation(new_position);
+            // obj->SetRotation(new_position);
 
             SimplePushConstantData push = {
-                // .Transform = obj.GetTransform().mat4(),
-                .Transform = obj->toMat4(),
-                .iResolution = {ApplicationInstance::GetWindow().GetWidth(), ApplicationInstance::GetWindow().GetHeight()},
+                .Transform = proj_view * obj->toMat4(),
+                // .iResolution = {ApplicationInstance::GetWindow().GetWidth(), ApplicationInstance::GetWindow().GetHeight()},
                 // .Color = obj.GetColor(),
             };
 

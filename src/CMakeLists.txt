@@ -57,6 +57,7 @@ add_library(
 
     # Special Component Includes
     ${ENGINE_INCLUDE_NAME}/Core/SceneManagment/Components/SPComps/Transform.hpp
+    ${ENGINE_INCLUDE_NAME}/Core/SceneManagment/Components/SPComps/EditorCamera.hpp
 
     # Renderer Includes
     ${ENGINE_INCLUDE_NAME}/Core/Renderer/Renderer.hpp
@@ -105,6 +106,7 @@ add_library(
     ${ENGINE_SRC_DIR}/Core/ApplicationManager/GameObjManager/UUID.cpp
 
     ${ENGINE_SRC_DIR}/Core/SceneManagment/Components/SPComps/Transform.cpp
+    ${ENGINE_SRC_DIR}/Core/SceneManagment/Components/SPComps/EditorCamera.cpp
 
     ${ENGINE_SRC_DIR}/Core/Renderer/Renderer.cpp
 

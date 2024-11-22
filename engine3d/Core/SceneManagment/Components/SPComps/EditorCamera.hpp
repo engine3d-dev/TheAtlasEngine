@@ -27,6 +27,27 @@ namespace engine3d{
         EditorCamera(const std::string& p_Tag);
 
         void SetInitialProperties(float p_Fov, float p_NearClip, float p_FarClip);
+
+        // ---------------------
+        //! @note From tutorial.
+        // ---------------------
+        void SetOrthoProjection(float left, float right, float top, float bottom, float near, float far);
+        void SetPerspectiveProjection(float fovy, float aspect, float near, float far);
+        
+        //! @note Used to get camera to view at a specific direction
+        void SetViewDirection(glm::vec3 Position, glm::vec3 Direction, glm::vec3 Up = glm::vec3(0.f, -1.f, 0.f));
+
+        //! @note Used to get the camera to view at a specific target.
+        void SetViewTarget(glm::vec3 Position, glm::vec3 Target, glm::vec3 Up = glm::vec3(0.f, -1.f, 0.f));
+
+        //! @note Euler angles to specify the rotation of transforms for orienting the camera.
+        void SetViewXYZ(glm::vec3 Position, glm::vec3 Rotation);
+        // ---------------------
+        //! @note From tutorial.
+        // ---------------------
+
+
+
         void OnUpdate();
         
         //! @note Eventually we will refer to OnIntegrate as OnCreate or  OnPlay or something.
