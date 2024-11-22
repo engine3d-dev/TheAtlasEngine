@@ -1,8 +1,8 @@
 #pragma once
-class CubeMesh
+#include <Scenes/Assets/Components/Graphics/Meshes/MeshContainer.hpp>
+class CubeMesh : public MeshContainer
 {
     public:
         CubeMesh();
-        void Draw();
 
 };

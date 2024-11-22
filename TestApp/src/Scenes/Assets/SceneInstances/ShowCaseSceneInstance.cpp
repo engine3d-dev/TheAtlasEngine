@@ -6,8 +6,8 @@
 #include <Scenes/Assets/Components/Bodies/Shapes/SphereShaper.hpp>
 #include <Scenes/Assets/SceneInstances/ShowCaseSceneInstance.hpp>
 #include <Scenes/Assets/Components/Graphics/Meshes/MeshContainer.hpp>
-#include <Scenes/Assets/Components/Graphics/Meshes/ChildrenMeshes/CubeMesh.cpp>
-#include <Scenes/Assets/Components/Graphics/Meshes/ChildrenMeshes/SphereMesh.cpp>
+#include <Scenes/Assets/Components/Graphics/Meshes/ChildrenMeshes/CubeMesh.hpp>
+#include <Scenes/Assets/Components/Graphics/Meshes/ChildrenMeshes/SphereMesh.hpp>
 
 ShowCaseSceneInstance::ShowCaseSceneInstance()
 {
@@ -24,8 +24,8 @@ void ShowCaseSceneInstance::CreateObjects()
     BodyContainer * l_Body = new BoxShaper();
     m_SceneObjects[0]->AddComponent<PhysicsBody3D>(l_Body);
 
-    MeshContainer * l_Mesh = new CubeMesh();
-    m_SceneObjects[0]->AddComponent<SpriteRender3D>(l_Mesh);
+    //MeshContainer * l_Mesh = new CubeMesh();
+    //m_SceneObjects[0]->AddComponent<SpriteRender3D>(l_Mesh);
     m_SceneObjects[0]->name = "Platform1";
 
     //Sphere

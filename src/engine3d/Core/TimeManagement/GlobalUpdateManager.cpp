@@ -4,6 +4,7 @@
 #include <Core/Event/InputPoll.hpp>
 #include <Core/TimeManagement/GlobalUpdateManager.hpp>
 #include <chrono>
+#include <numeric>
 #include <print>
 #include <Core/EngineLogger.hpp>
 #include <GLFW/glfw3.h>
@@ -33,7 +34,7 @@ namespace engine3d
 
         m_GlobalDeltaTime = 0.0;
         m_UpdateTime = m_GlobalTimer->GetCurrentTime();
-        m_MaxFPS = 90;
+        m_MaxFPS = 1000;//std::numeric_limits<uint32_t>::max();
         m_FPSCounter = 1;
 
         //! @note syncupdatemanager will not work until the thread manager works.

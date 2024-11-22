@@ -9,7 +9,7 @@ set(VULKAN_SHADERS_SRC_DIR ${VULKAN_SRC_DIR}/Shaders)
 
 build_library(
     SOURCES
-    ${ENGINE_INCLUDE_NAME}/Core/ApplicationInstance.hpp
+    ${ENGINE_SRC_DIR}/Core/ApplicationInstance.cpp
 
     ${ENGINE_INCLUDE_NAME}/Core/EngineLogger.hpp
     ${ENGINE_INCLUDE_NAME}/Core/Window.hpp
@@ -54,10 +54,6 @@ build_library(
     ${ENGINE_INCLUDE_NAME}/Core/SceneManagment/Components/GameComponent.hpp
     ${ENGINE_INCLUDE_NAME}/Core/SceneManagment/SceneObjects/SceneObject.hpp
     ${ENGINE_INCLUDE_NAME}/Core/ApplicationManager/GameObjManager/UUID.hpp
-
-    # ${ENGINE_INCLUDE_NAME}/src/Scenes/Assets/Components/Graphics/Meshes/ChildrenMeshes
-    # ${ENGINE_SRC_DIR}/src/Scenes/Assets/Components/Graphics/Meshes/ChildrenMeshes/SphereMesh.cpp
-    # ${ENGINE_INCLUDE_NAME}/src/Scenes/Assets/Components/Graphics/Meshes/ChildrenMeshes/CubeMesh.cpp
 
     # Special Component Includes
     ${ENGINE_INCLUDE_NAME}/Core/SceneManagment/Components/SPComps/Transform.hpp

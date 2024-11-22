@@ -2,6 +2,7 @@
 #include <internal/Vulkan2Showcase/helper_functions.hpp>
 #include <internal/Vulkan2Showcase/VulkanContext.hpp>
 #include <internal/Vulkan2Showcase/VulkanModel.hpp>
+#include <vector>
 #include <vulkan/vulkan_core.h>
 
 namespace engine3d::vk{
@@ -105,4 +106,31 @@ namespace engine3d::vk{
         return attribute_description;
     }
     
+    std::vector<VulkanModel::Vertex>* VulkanModel::CreateVertexVector
+        (std::vector<glm::vec3> p_Vertices, std::vector<glm::vec3> p_Colors)
+    {
+        std::vector<VulkanModel::Vertex>* temp = new std::vector<VulkanModel::Vertex>;
+        int i = 0;
+        for(auto verticies : p_Vertices)
+        {
+            //! if does not work vertex needs a constructor
+            temp[i].push_back(VulkanModel::Vertex(p_Vertices[i], p_Colors[i]));
+            i++;
+        }
+        return temp;
+    }
+
+    std::vector<VulkanModel::Vertex>* VulkanModel::CreateVertexVector
+        (std::vector<glm::vec3> p_Vertices)
+    {
+        std::vector<VulkanModel::Vertex>* temp = new std::vector<VulkanModel::Vertex>;
+        int i = 0;
+        for(auto verticies : p_Vertices)
+        {
+            //! if does not work vertex needs a constructor
+            temp[i].push_back(VulkanModel::Vertex(p_Vertices[i], {1.0f,1.0f,1.0f}));
+            i++;
+        }
+        return temp;
+    }
 };

@@ -1,5 +1,5 @@
 
-#include <Core/SceneManagment/Components/GameComponent.hpp>
+#include <engine3d/Core/SceneManagment/Components/GameComponent.hpp>
 #include <Scenes/Assets/Components/Physics/PhysicsBody3D.hpp>
 #include <Scenes/Assets/Components/Graphics/Meshes/MeshContainer.hpp>
 
@@ -16,7 +16,7 @@ class SpriteRender3D : public engine3d::GameComponent
           std::vector<glm::vec2> texCoords;
 
      private:
-          MeshContainer m_MeshContainer;
+          MeshContainer* m_MeshContainer;
           engine3d::Transform m_Transform;  
           glm::vec3* m_TransformPosition; 
 };

@@ -1,4 +1,5 @@
 #pragma once
+#include <glm/fwd.hpp>
 #include <vector>
 #include <vulkan/vulkan_core.h>
 
@@ -30,7 +31,9 @@ namespace engine3d::vk{
         void Bind(VkCommandBuffer p_Command);
         void Draw(VkCommandBuffer p_Command);
 
-
+        static std::vector<Vertex>* CreateVertexVector(std::vector<glm::vec3> p_Vertices, std::vector<glm::vec3> p_Colors);
+        static std::vector<Vertex>* CreateVertexVector(std::vector<glm::vec3> p_Vertices);
+        
     private:
         void initialize_vertex_buffers(const std::vector<Vertex>& p_Vertices);
 

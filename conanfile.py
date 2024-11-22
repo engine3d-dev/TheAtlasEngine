@@ -104,8 +104,3 @@ class engine3dRecipe(ConanFile):
         self.cpp_info.set_property("cmake_target_name", "engine3d::engine3d")
         self.cpp_info.libs = ["engine3d"]
         self.cpp_info.includedirs = ['./', './engine3d']  # Ordered list of include paths
-
-    
-
-    
-
