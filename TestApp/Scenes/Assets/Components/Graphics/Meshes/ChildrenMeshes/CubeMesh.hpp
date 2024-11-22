@@ -1,4 +1,8 @@
+#pragma once
 class CubeMesh
 {
-    //TODO: Implement later
+    public:
+        CubeMesh();
+        void Draw();
+
 };

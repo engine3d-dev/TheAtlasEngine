@@ -1,6 +1,5 @@
-#include "Core/EngineLogger.hpp"
+#include <Core/EngineLogger.hpp>
 #include <Scenes/Assets/Components/Graphics/Meshes/MeshContainer.hpp>
-#include <numbers>
 void MeshContainer::SphereBlueprint()
 {
     std::vector<glm::vec3>().swap(normals);
