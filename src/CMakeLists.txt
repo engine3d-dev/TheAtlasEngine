@@ -55,6 +55,10 @@ build_library(
     ${ENGINE_INCLUDE_NAME}/Core/SceneManagment/SceneObjects/SceneObject.hpp
     ${ENGINE_INCLUDE_NAME}/Core/ApplicationManager/GameObjManager/UUID.hpp
 
+    # ${ENGINE_INCLUDE_NAME}/src/Scenes/Assets/Components/Graphics/Meshes/ChildrenMeshes
+    # ${ENGINE_SRC_DIR}/src/Scenes/Assets/Components/Graphics/Meshes/ChildrenMeshes/SphereMesh.cpp
+    # ${ENGINE_INCLUDE_NAME}/src/Scenes/Assets/Components/Graphics/Meshes/ChildrenMeshes/CubeMesh.cpp
+
     # Special Component Includes
     ${ENGINE_INCLUDE_NAME}/Core/SceneManagment/Components/SPComps/Transform.hpp
 
