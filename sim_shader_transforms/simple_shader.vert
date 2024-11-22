@@ -20,8 +20,8 @@ void main(){
     // gl_Position = vec4(p * Position + push.offset, 0.0, 1.0);
     mat4 p = push.transform;
     p[0] /= (push.iResolution.x / push.iResolution.y);
-    p[1] /= (push.iResolution.x / push.iResolution.y);
-    p[2] /= (push.iResolution.x / push.iResolution.y);
+    // p[1] /= (push.iResolution.x / push.iResolution.y);
+    // p[2] /= (push.iResolution.x / push.iResolution.y);
     gl_Position = p * vec4(Position, 1.0);
     fragColor = Color;
 }

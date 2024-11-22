@@ -31,6 +31,10 @@ namespace engine3d {
         auto transform_component = SceneGetComponent<Transform>();
 
         auto transform = glm::translate(glm::mat4{1.f}, transform_component.m_Position);
+        transform[0][0] *= transform_component.m_Scale.x;
+        transform[1][1] *= transform_component.m_Scale.y;
+        transform[2][2] *= transform_component.m_Scale.z;
+
         transform = glm::rotate(transform, transform_component.m_AxisRotation.y, {0.f, 1.f, 0.f});
         transform = glm::rotate(transform, transform_component.m_AxisRotation.x, {1.f, 0.f, 0.f});
         transform = glm::rotate(transform, transform_component.m_AxisRotation.z, {0.f, 0.f, 1.f});

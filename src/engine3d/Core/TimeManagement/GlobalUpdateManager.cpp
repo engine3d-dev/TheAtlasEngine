@@ -33,6 +33,7 @@ namespace engine3d
 
         m_GlobalDeltaTime = 0.0;
         m_UpdateTime = m_GlobalTimer->GetCurrentTime();
+        // m_MaxFPS = 5000;
         m_MaxFPS = 500;
         m_FPSCounter = 1;
 

@@ -12,11 +12,11 @@ namespace engine3d{
     public:
         static void Initialize(const std::string& p_DebugName);
 
-        static VkCommandBuffer BeginFrame();
+        static void BeginFrame();
 
         //! @note Currently the record command buffers just does what "simple_render_system.hpp/.cpp" does already
         //! @note In the future I'll add API's for submitting draw calls.
-        static void RecordCommandBuffers(VkCommandBuffer p_CommandBuffer);
+        // static void RecordCommandBuffers(VkCommandBuffer p_CommandBuffer);
         static void RecordGameObjects(std::vector<SceneObjectTutorial>& p_Objects);
         static void RecordSceneGameObjects(std::vector<SceneObject*>& p_SceneObjects);
         static void EndFrame();

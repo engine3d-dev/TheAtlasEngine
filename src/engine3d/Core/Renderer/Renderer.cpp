@@ -1,12 +1,14 @@
 // #include "internal/VulkanCpp/Vulkan.hpp"
 #include "EngineLogger.hpp"
 #include "GraphicDrivers/Shader.hpp"
+#include "TimeManagement/UpdateManagers/SyncUpdateManager.hpp"
 #include "internal/Vulkan2Showcase/Shaders/VulkanShader.hpp"
 #include "internal/Vulkan2Showcase/VulkanContext.hpp"
 #include "internal/Vulkan2Showcase/VulkanModel.hpp"
 #include "internal/Vulkan2Showcase/helper_functions.hpp"
 #include <Core/ApplicationInstance.hpp>
 #include <Core/Renderer/Renderer.hpp>
+#include <glm/geometric.hpp>
 #include <vulkan/vulkan_core.h>
 #include <vector>
 
@@ -105,7 +107,7 @@ namespace engine3d{
         VkClearValue clearColorValue = {{p_Rgba[0], p_Rgba[1], p_Rgba[2], p_Rgba[3]}};
     }
 
-    VkCommandBuffer Renderer::BeginFrame(){
+    void Renderer::BeginFrame(){
         g_CurrentFrameIndex = ApplicationInstance::GetWindow().GetCurrentSwapchain()->AcquireNextImage();
         VkCommandBufferBeginInfo cmd_buffer_begin_info = {
             .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO
@@ -134,7 +136,8 @@ namespace engine3d{
 
         vkCmdBeginRenderPass(cmd_buffer, &rp_begin_info, VK_SUBPASS_CONTENTS_INLINE);
         g_IsFrameStarted = true;
-        return cmd_buffer;
+        // return cmd_buffer;
+        g_CommandBuffers[g_CurrentFrameIndex] = cmd_buffer;
     }
 
     void Renderer::RecordGameObjects(std::vector<SceneObjectTutorial>& p_Objects){
@@ -146,6 +149,7 @@ namespace engine3d{
         //! @note Only for testing purposes for mesh data.
         for(auto& obj : p_Objects){
             obj.m_Transform2D.rotation.y = glm::mod(obj.GetTransform().rotation.y + 0.001f, glm::two_pi<float>());
+            obj.m_Transform2D.rotation.x = glm::mod(obj.GetTransform().rotation.x + 0.001f, glm::two_pi<float>());
 
             SimplePushConstantData push = {
                 .Transform = obj.GetTransform().mat4(),
@@ -171,14 +175,20 @@ namespace engine3d{
         //! @note Essentially doing m_Pipeline->Bind(m_CommandBuffer[i])
         //! @note Starts when to start rendering!!
         vkCmdBindPipeline(current_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, g_Shader->GetGraphicsPipeline());
+        float delta_time = SyncUpdateManager::GetInstance()->m_SyncLocalDeltaTime;
+        // ConsoleLogWarn("Delta Time = {:.7}", delta_time);
 
         //! @note Only for testing purposes for mesh data.
         for(auto& obj : p_Objects){
             // obj.m_Transform2D.rotation.y = glm::mod(obj.GetTransform().rotation.y + 0.001f, glm::two_pi<float>());
-            float x = obj->GetRotation().x;
-            float y = glm::mod(obj->GetRotation().y + 0.001f, glm::two_pi<float>());
+            // float x = obj->GetRotation().x;
+            float y = glm::mod(obj->GetRotation().y + (0.1f * delta_time), glm::two_pi<float>());
+            float x = glm::mod(obj->GetRotation().x + (0.05f * delta_time), glm::two_pi<float>());
             float z = obj->GetRotation().z;
-            obj->SetRotation({x, y, z});
+
+            glm::vec3 new_position = {x, y, z};
+            // new_position = glm::normalize(new_position);
+            obj->SetRotation(new_position);
 
             SimplePushConstantData push = {
                 // .Transform = obj.GetTransform().mat4(),
@@ -186,6 +196,7 @@ namespace engine3d{
                 .iResolution = {ApplicationInstance::GetWindow().GetWidth(), ApplicationInstance::GetWindow().GetHeight()},
                 // .Color = obj.GetColor(),
             };
+
             vkCmdPushConstants(
                 current_cmd_buffer,
                 g_PipelineLayout,

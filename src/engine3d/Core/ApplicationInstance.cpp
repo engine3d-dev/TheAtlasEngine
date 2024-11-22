@@ -38,7 +38,8 @@ namespace engine3d{
 
             // Renderer::EndFrame();
             // Renderer::BeginFrame();
-            Renderer::RecordCommandBuffers(Renderer::BeginFrame());
+            Renderer::BeginFrame();
+            // Renderer::RecordCommandBuffers(Renderer::BeginFrame());
             m_Window->OnUpdateAllFrames();
             Renderer::EndFrame();
         }

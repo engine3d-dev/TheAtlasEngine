@@ -78,8 +78,10 @@ namespace engine3d{
         //! @note Setting our properties
         auto& transform = cube->SceneGetComponent<Transform>();
 
-        transform.m_Position = {.0f, .0f, .5f};
-        transform.m_Scale = {.5f, .5f, .5f};
+        // negative-float closer, positive-float z further
+        transform.m_Position = {.0f, .0f, .75f};
+        // transform.m_Scale = {.5f, .5f, 0.5};
+        transform.m_Scale = {.5f, .5f, 0.5};
         // cube->SetModel(cube_mesh);
         cube->SetModal(cube_mesh);
 
@@ -89,4 +91,10 @@ namespace engine3d{
 
     void EditorScene::OnCreate(){
     }
+
+    // void EditorScene::OnCameraUpdate(){
+    //     for(const auto& obj : m_SceneObjects){
+    //         obj->SceneGetComponent<EditorCamera>().OnUpdate();
+    //     }
+    // }
 };
