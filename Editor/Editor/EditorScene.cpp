@@ -4,6 +4,7 @@
 #include <Core/EngineLogger.hpp>
 #include <Core/SceneManagment/Components/SPComps/EditorCamera.hpp>
 #include <Core/TimeManagement/UpdateManagers/SyncUpdateManager.hpp>
+#include <Math/Interpolation.hpp>
 #include <Core/ApplicationInstance.hpp>
 #include <Core/Event/InputPoll.hpp>
 
@@ -73,50 +74,42 @@ namespace engine3d{
         auto cube_mesh = CreateCubeMesh({.0f, .0f, .0f});
 
         //! @note Make this scene object as part of our current scene.
-        // SceneObject* cube = new SceneObject(m_Scene);
-        SceneObject* cube = new SceneObject(m_Scene);
+
+        // -----------------------------
+        // Camera Scene Object Creation
+        // -----------------------------
         m_CameraObject = new SceneObject(m_Scene);
-
         m_CameraObject->AddComponent<EditorCamera>();
-
-        // auto cube = SceneObject::Create();
-        // cube.SetModel(m_CubeMesh);
-        // cube.GetTransform().Translation = {.0f, .0f, .5f};
-        // cube.GetTransform().scale = {.5f, .5f, .5f};
         auto& camera_transform = m_CameraObject->SceneGetComponent<Transform>();
         camera_transform.m_Position = {-1.f, -2.f, -20.f};
-
         auto camera = m_CameraObject->SceneGetComponent<EditorCamera>();
 
-        //! @note Setting our properties
-        auto& transform = cube->SceneGetComponent<Transform>();
+        // -----------------------------
+        // Cube 1 Scene object Creation
+        // -----------------------------
+        SceneObject* cube1 = new SceneObject(m_Scene);
+        auto& cube1_transform = cube1->SceneGetComponent<Transform>();
+        // auto aspect_ratio = ApplicationInstance::GetWindow().GetAspectRatio();
+        cube1_transform.m_Position = {.0f, .0f, 2.5};
+        cube1_transform.m_Scale = {.5f, .5f, 0.5};
+        cube1->SetModal(cube_mesh);
 
-        // cube->AddComponent<EditorCamera>();
+        // -----------------------------
+        // Cube 2 Scene object Creation
+        // -----------------------------
+        SceneObject* cube2 = new SceneObject(m_Scene);
+        auto& cube2_transform = cube2->SceneGetComponent<Transform>();
+        // auto aspect_ratio = ApplicationInstance::GetWindow().GetAspectRatio();
+        cube2_transform.m_Position = {5.f, .0f, -7.f};
+        cube2_transform.m_Scale = {.5f, .5f, 0.5};
+        cube2->SetModal(cube_mesh);
 
-        // auto& camera = cube->SceneGetComponent<EditorCamera>();
-        // camera.SetInitialProperties(30.0f, 0.1f, 1000.0f);
-        // camera.SetView(glm::vec3(0.f), glm::vec3(0.5f, 0.f, 1.f));
-        auto aspect_ratio = ApplicationInstance::GetWindow().GetAspectRatio();
-        // camera.SetOrthoProjection(-1, 1, -1, 1, -1, 1);
 
-        //! @note Shows the actual cube in center of screen that works
-        //! @note Because z = -20.f your gonna want to increase the near clip by 100.0f
-        // camera.SetViewTarget({-1.f, -2.f, -20.f}, {0.f, 0.f, 2.5f});
-        // camera.SetViewTarget(glm::vec3(-1.f, -2.f, -20.f), glm::vec3(0.f, 0.f, 2.5f));
 
-        // negative-float closer, positive-float z further
-        // transform.m_Position = {.0f, .0f, .75f};
-        // transform.m_Position = {.0f, .0f, 2.5f};
-        transform.m_Position = {.0f, .0f, 2.5};
-        // transform.m_Position.z = transform.m_Position.z - 2.5f;
-        // camera.SetViewXYZ(transform.m_Position, transform.m_AxisRotation);
-        // transform.m_Scale = {.5f, .5f, 0.5};
-        transform.m_Scale = {.5f, .5f, 0.5};
-        // cube->SetModel(cube_mesh);
-        cube->SetModal(cube_mesh);
 
         //! @note Then we add them to our vector.
-        m_SceneObjects.push_back(cube);
+        m_SceneObjects.push_back(cube1);
+        m_SceneObjects.push_back(cube2);
 
     }
 
@@ -141,6 +134,7 @@ namespace engine3d{
         // float tempDt_Y;
         glm::vec2 temp_position = {0.f, 0.f};
         constexpr float sensitivity = 5.0f;
+        constexpr float pos_sensitivity = 2.f;
         constexpr glm::vec2 invert_pos = {-1, 1};
         // ConsoleLogInfo("x = {}, y = {}, z = {}", transform.m_Position.x, transform.m_Position.y, transform.m_Position.z);
         // ConsoleLogInfo("x = {}, y = {}, z = {}\n", cube_transform.m_Position.x, cube_transform.m_Position.y, cube_transform.m_Position.z);
@@ -204,20 +198,20 @@ namespace engine3d{
 
         glm::vec3 rotate{0};
 
+        //! @note Make sure that our mouse controls how camera rotates.
         if(InputPoll::IsMousePressed(Mouse::ButtonRight)){
             // temp_position.x = m_MousePosition.x - InputPoll::GetMouseX();
             rotate.y += (m_MousePosition.x - InputPoll::GetMouseX()) * invert_pos.y;
             rotate.x += (m_MousePosition.y - InputPoll::GetMouseY()) * invert_pos.x;
         }
-        // if(InputPoll::IsKeyPressed(ENGINE_KEY_LEFT)) rotate.y += 1.f;
-        // if(InputPoll::IsKeyPressed(ENGINE_KEY_RIGHT)) rotate.y -= 1.f;
-        // if(InputPoll::IsKeyPressed(ENGINE_KEY_UP)) rotate.x += 1.f;
-        // if(InputPoll::IsKeyPressed(ENGINE_KEY_DOWN)) rotate.x -= 1.f;
 
         m_MousePosition = InputPoll::GetMousePosition();
         
+        //! @note Utilize linear interpolation to get smooth camera rotation. 
         if(glm::dot(rotate, rotate) > std::numeric_limits<float>::epsilon()){
-            transform.m_AxisRotation += m_LookSpeed * SyncUpdateManager::GetInstance()->m_SyncLocalDeltaTime * glm::normalize(rotate) * sensitivity;
+            float dt = SyncUpdateManager::GetInstance()->m_SyncLocalDeltaTime;
+            auto temp_rotation = (m_LookSpeed * glm::normalize(rotate) * sensitivity) + transform.m_AxisRotation;
+            transform.m_AxisRotation = Interpolation::LinearInterpolate(transform.m_AxisRotation, temp_rotation, nullptr, dt);
         }
 
         transform.m_AxisRotation.x = glm::clamp(transform.m_AxisRotation.x, -1.5f, 1.5f);
@@ -238,7 +232,7 @@ namespace engine3d{
         if(InputPoll::IsKeyPressed(ENGINE_KEY_Q)) move_dir -= up_dir;    // DOWN
 
         if(glm::dot(move_dir, move_dir) > std::numeric_limits<float>::epsilon()){
-            transform.m_Position += m_MoveSpeed * (SyncUpdateManager::GetInstance()->m_SyncLocalDeltaTime) * glm::normalize(move_dir);
+            transform.m_Position += m_MoveSpeed * (SyncUpdateManager::GetInstance()->m_SyncLocalDeltaTime) * glm::normalize(move_dir) * pos_sensitivity;
         }
 
         camera.SetViewXYZ(transform.m_Position, transform.m_AxisRotation);

@@ -18,17 +18,18 @@ namespace engine3d
     class Interpolation
     {
         public:
-            template<typename T, typename Func>
-            static T& LinearInterpolate(T start, T end, Func function, float t)
+            template<typename T>
+            static T LinearInterpolate(T start, T end, std::function<float(float)> function, float t)
             {
                 float l_AdjustedTime = 0.0f;
-                if(function == NULL)
+                if(!function)
                 {
                     l_AdjustedTime = t;
                 }
                 else 
                 {
-                    l_AdjustedTime = function(t);
+                    const float f = function(t);
+                    l_AdjustedTime = f;
                 }
                 
 
