@@ -52,6 +52,10 @@ namespace engine3d{
         return Title();
     }
 
+    float Window::GetAspectRatio() const{
+        return (float)GetWidth() / (float)GetHeight();
+    }
+
     void Window::OnUpdateAllFrames(){
 
         GlobalUpdateManager::GetInstance()->GlobalOnTickUpdate();

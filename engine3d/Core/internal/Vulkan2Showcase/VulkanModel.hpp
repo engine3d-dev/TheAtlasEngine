@@ -16,7 +16,7 @@ namespace engine3d::vk{
     public:
         //! @note Can be the way we structure what data types is accepted in our shader.
         struct Vertex{
-            glm::vec2 Position;
+            glm::vec3 Position;
             glm::vec3 Color;
             
             static std::vector<VkVertexInputBindingDescription> GetVertexInputBindDescription();

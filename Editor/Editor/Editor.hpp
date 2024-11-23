@@ -1,8 +1,9 @@
 #pragma once
+// #include <Core/internal/Vulkan2Showcase/VulkanModel.hpp>
 #include <Core/ApplicationInstance.hpp>
-#include <Core/internal/Vulkan2Showcase/Shaders/VulkanShader.hpp>
-#include <vulkan/vulkan_core.h>
-#include <Core/Scene/SceneObject.hpp>
+// #include <Core/Scene/SceneObject.hpp>
+// #include <Core/TimeManagement/GlobalUpdateManager.hpp>
+#include "EditorScene.hpp"
 
 namespace engine3d{
 
@@ -19,20 +20,19 @@ namespace engine3d{
         // void ShutdownEditor();
         // void UpdateThisApplicationInstance() override;
         void OnApplicationUpdate();
-    
-    private:
-        //! @note Basically to differentiate draw calls with initialization tasks
-        void OnRender(uint32_t image_index);
         
     private:
-        //! @note Editor application, Engine, UI Layer.
-        float m_LastFrameTime = 0.0f;
-        //! @note Essentially our VulkanShader is VkPipeline, ShaderModule all in one.
-        Ref<Shader> m_Shader;
-        VkPipelineLayout m_PipelineLayout;
-        VkCommandPool m_CommandPool;
-        std::vector<VkCommandBuffer> m_CommandBuffers;
-        
-        std::vector<SceneObject> m_GameObjects;
+        // Ref<vk::VulkanModel> m_SquareMesh;
+        // Ref<vk::VulkanModel> m_CircleMesh;
+        EditorScene* m_EditorScene;
+        // std::vector<SceneObject> m_SceneGameObjects;
+        // std::vector<SceneObject> m_VectorFields;
+
+        // GravityPhysicsSystem m_GravitySystem;
+        // Vec2FieldSystem m_VectorFieldSystem;
+        // Ref<vk::VulkanModel> m_CubeMesh;
+
+
+
     };
 };

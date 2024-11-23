@@ -48,6 +48,8 @@ namespace engine3d{
         uint32_t GetWidth() const;
         uint32_t GetHeight() const;
         std::string GetTitle() const;
+
+        float GetAspectRatio() const;
         void OnUpdateAllFrames();
 
     protected:

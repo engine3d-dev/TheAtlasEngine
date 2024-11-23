@@ -1,4 +1,5 @@
-#include "TimeManagement/GlobalUpdateManager.hpp"
+#include "Renderer/Renderer.hpp"
+// #include "TimeManagement/GlobalUpdateManager.hpp"
 #include <Core/Event/InputPoll.hpp>
 #include <Core/ApplicationInstance.hpp>
 #include <Core/Timestep.hpp>
@@ -17,6 +18,8 @@ namespace engine3d{
         g_DebugName = p_DebugName;
         SetCurrentAPI(VULKAN);
         m_Window = Window::Create(900, 600, p_DebugName);
+
+        Renderer::Initialize("Engine3D Renderer");
     }
 
     void ApplicationInstance::ExecuteApplicationMainloop(){
@@ -26,16 +29,9 @@ namespace engine3d{
             InputPoll::UpdateEvents();
             // FrameTimer::UpdateFrameTimer(); // give us the frames in flight.
 
-            // Renderer::Presentation();
-            // m_Window->GetCurrentSwapchain()->BeginFrame();
-            // Renderer::BeginFrame();
-
-            // Renderer::SetBackgroundColor({1.0f, 0.0f, 0.0f, 0.0f});
-            // UpdateCurrentApplicationInstance();
-
-            // Renderer::EndFrame();
-
+            Renderer::BeginFrame();
             m_Window->OnUpdateAllFrames();
+            Renderer::EndFrame();
         }
         
         //! @note Cleaning up imgui
