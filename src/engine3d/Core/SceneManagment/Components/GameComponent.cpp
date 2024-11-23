@@ -1,4 +1,5 @@
 #include <Core/SceneManagment/Components/GameComponent.hpp>
+#include <Core/SceneManagment/SceneObjects/SceneObject.hpp>
 
 namespace engine3d
 {

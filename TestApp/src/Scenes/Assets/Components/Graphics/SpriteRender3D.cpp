@@ -1,7 +1,7 @@
 #include <Scenes/Assets/Components/Graphics/SpriteRender3D.hpp>
-// #include "Scene"
-
+#include <Core/SceneManagment/SceneObjects/SceneObject.hpp>
 using namespace engine3d;
+
   const int Radius = 1;
   const int SectorCount = 10;
   const int StackCount = 10;
