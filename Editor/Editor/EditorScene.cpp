@@ -1,6 +1,6 @@
 #include "EditorScene.hpp"
 #include <Core/SceneManagment/Components/SPComps/Transform.hpp>
-#include <Core/internal/Vulkan2Showcase/VulkanModel.hpp>
+// #include <Core/internal/Vulkan2Showcase/VulkanModel.hpp>
 #include <Core/EngineLogger.hpp>
 #include <Core/SceneManagment/Components/SPComps/EditorCamera.hpp>
 #include <Core/TimeManagement/UpdateManagers/SyncUpdateManager.hpp>
@@ -9,15 +9,15 @@
 #include <Core/Event/InputPoll.hpp>
 
 namespace engine3d{
-    Ref<vk::VulkanModel> CreateCubeMesh(glm::vec3 offset){
-        std::vector<vk::VulkanModel::Vertex> vertices{
+    static Ref<VertexBuffer> CreateCubeMesh(glm::vec3 offset){
+        std::vector<Vertex> vertices{
             // left Face (white)
-            vk::VulkanModel::Vertex{.Position{-.5f, -.5f, -.5f}, .Color{.9f, .9f, .9f}},
-            vk::VulkanModel::Vertex{.Position{-.5f, .5f, .5f}, .Color{.9f, .9f, .9f}},
-            vk::VulkanModel::Vertex{.Position ={-.5f, -.5f, .5f}, .Color{.9f, .9f, .9f}},
-            vk::VulkanModel::Vertex{.Position ={-.5f, -.5f, -.5f},.Color {.9f, .9f, .9f}},
-            vk::VulkanModel::Vertex{.Position ={-.5f, .5f, -.5f}, .Color{.9f, .9f, .9f}},
-            vk::VulkanModel::Vertex{.Position ={-.5f, .5f, .5f}, .Color{.9f, .9f, .9f}},
+            {.Position{-.5f, -.5f, -.5f}, .Color{.9f, .9f, .9f}},
+            {.Position{-.5f, .5f, .5f}, .Color{.9f, .9f, .9f}},
+            {.Position ={-.5f, -.5f, .5f}, .Color{.9f, .9f, .9f}},
+            {.Position ={-.5f, -.5f, -.5f},.Color {.9f, .9f, .9f}},
+            {.Position ={-.5f, .5f, -.5f}, .Color{.9f, .9f, .9f}},
+            {.Position ={-.5f, .5f, .5f}, .Color{.9f, .9f, .9f}},
         
             // right face (yellow)
             {{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
@@ -63,7 +63,7 @@ namespace engine3d{
         for (auto& v : vertices) {
             v.Position += offset;
         }
-        return CreateRef<vk::VulkanModel>(vertices, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+        return VertexBuffer::Create(vertices);
     }
 
     EditorScene::EditorScene(){
@@ -133,9 +133,9 @@ namespace engine3d{
         auto cube_transform = m_SceneObjects[0]->SceneGetComponent<Transform>();
         // float tempDt_Y;
         glm::vec2 temp_position = {0.f, 0.f};
-        constexpr float sensitivity = 5.0f;
+        constexpr float sensitivity = 2.0f;
         constexpr float pos_sensitivity = 2.f;
-        constexpr glm::vec2 invert_pos = {-1, 1};
+        constexpr glm::vec2 invert_pos = {1, -1};
         // ConsoleLogInfo("x = {}, y = {}, z = {}", transform.m_Position.x, transform.m_Position.y, transform.m_Position.z);
         // ConsoleLogInfo("x = {}, y = {}, z = {}\n", cube_transform.m_Position.x, cube_transform.m_Position.y, cube_transform.m_Position.z);
 

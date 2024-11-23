@@ -33,12 +33,9 @@ add_library(
     ${ENGINE_INCLUDE_NAME}/Core/Event/KeyEvent.hpp
     ${ENGINE_INCLUDE_NAME}/Core/Event/MouseEvent.hpp
 
-    ${ENGINE_INCLUDE_NAME}/Core/Scene/SceneObject.hpp
-
-
-
     ${ENGINE_INCLUDE_NAME}/Core/GraphicDrivers/GraphicSwapchain.hpp
     ${ENGINE_INCLUDE_NAME}/Core/GraphicDrivers/Shader.hpp
+    ${ENGINE_INCLUDE_NAME}/Core/GraphicDrivers/VertexBuffer.hpp
 
     ${VULKAN_INCLUDE_DIR}/Vulkan.hpp
     ${VULKAN_INCLUDE_DIR}/helper_functions.hpp
@@ -47,7 +44,7 @@ add_library(
     ${VULKAN_INCLUDE_DIR}/VulkanPhysicalDriver.hpp
     ${VULKAN_INCLUDE_DIR}/VulkanDriver.hpp
     ${VULKAN_INCLUDE_DIR}/VulkanSwapchain.hpp
-    ${VULKAN_INCLUDE_DIR}/VulkanModel.hpp
+    ${VULKAN_INCLUDE_DIR}/VulkanVertexBuffer.hpp
 
     ${VULKAN_SHADERS_INCLUDE_DIR}/VulkanShader.hpp
 
@@ -85,10 +82,9 @@ add_library(
     ${ENGINE_SRC_DIR}/Core/ApplicationManager/Scene.cpp
     ${ENGINE_SRC_DIR}/Core/ApplicationManager/ThreadMngr.cpp
 
-    ${ENGINE_SRC_DIR}/Core/Scene/SceneObject.cpp
-
     ${ENGINE_SRC_DIR}/Core/GraphicDrivers/GraphicSwapchain.cpp
     ${ENGINE_SRC_DIR}/Core/GraphicDrivers/Shader.cpp
+    ${ENGINE_SRC_DIR}/Core/GraphicDrivers/VertexBuffer.cpp
 
     ${ENGINE_SRC_DIR}/Core/Event/InputPoll.cpp
 
@@ -98,9 +94,9 @@ add_library(
     ${VULKAN_SRC_DIR}/VulkanPhysicalDriver.cpp
     ${VULKAN_SRC_DIR}/VulkanDriver.cpp
     ${VULKAN_SRC_DIR}/VulkanSwapchain.cpp
+    ${VULKAN_SRC_DIR}/VulkanVertexBuffer.cpp
 
     ${VULKAN_SHADERS_SRC_DIR}/VulkanShader.cpp
-    ${VULKAN_SRC_DIR}/VulkanModel.cpp
 
     ${ENGINE_SRC_DIR}/Core/SceneManagment/SceneObjects/SceneObject.cpp
     ${ENGINE_SRC_DIR}/Core/SceneManagment/Components/GameComponent.cpp

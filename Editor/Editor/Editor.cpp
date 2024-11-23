@@ -1,7 +1,5 @@
 #include "Editor.hpp"
 #include "EditorScene.hpp"
-#include <Core/internal/Vulkan2Showcase/VulkanModel.hpp>
-#include <Core/Scene/SceneTest.hpp>
 #include <Core/TimeManagement/GlobalUpdateManager.hpp>
 #include <Core/Renderer/Renderer.hpp>
 

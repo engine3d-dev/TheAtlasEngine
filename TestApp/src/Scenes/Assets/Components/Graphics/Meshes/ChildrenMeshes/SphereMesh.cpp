@@ -1,6 +1,8 @@
-#include "Core/internal/Vulkan2Showcase/VulkanModel.hpp"
+#include "Core/EngineLogger.hpp"
+#include "Core/GraphicDrivers/VertexBuffer.hpp"
 #include <Scenes/Assets/Components/Graphics/Meshes/ChildrenMeshes/SphereMesh.hpp>
 #include <numbers>
+
 SphereMesh::SphereMesh(int Radius, int SectorCount, int StackCount)
 {
 
@@ -47,5 +49,9 @@ SphereMesh::SphereMesh(int Radius, int SectorCount, int StackCount)
         }
     }
 
-    vertices = engine3d::vk::VulkanModel::CreateVertexVector(verts);
+    vertices = engine3d::VertexBuffer::CreateVertexVector(verts);
+
+    if(vertices != nullptr){
+        ConsoleLogWarn("SphereMesh vertices are a nullptr. Implement VertexBuffer::CreateVertexVector() in VulkanVertexBuffer to get this working and not nullptr");
+    }
 }
