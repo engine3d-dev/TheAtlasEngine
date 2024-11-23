@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.25)
 project(TestApp CXX)
 
+find_package(tinyobjloader REQUIRED)
+
 build_demos(
     SOURCES
     Application.cpp
@@ -40,9 +42,8 @@ build_demos(
     src/Scenes/Assets/Components/Graphics/Meshes/ChildrenMeshes/SphereMesh.cpp
     Scenes/Assets/Components/Graphics/Meshes/MeshContainer.hpp
     src/Scenes/Assets/Components/Graphics/Meshes/MeshContainer.cpp
-    
 
-    LINK_LIBRARIES engine3d
+    LINK_LIBRARIES tinyobjloader::tinyobjloader engine3d
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC ./)

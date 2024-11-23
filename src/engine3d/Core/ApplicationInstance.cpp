@@ -6,6 +6,9 @@
 #include <Core/EngineLogger.hpp>
 #include <entt/entt.hpp>
 
+// #include <imgui/backends/imgui_impl_vulkan.h>
+#include <imgui/backends/imgui_impl_glfw.h>
+
 namespace engine3d{
     static float m_LastFrameTime = 0.0f;
     static std::string g_DebugName = "Engine3D";
@@ -19,6 +22,8 @@ namespace engine3d{
         SetCurrentAPI(VULKAN);
         m_Window = Window::Create(900, 600, p_DebugName);
 
+        // ImGui_ImplVulkanH_Window();
+        // ImGui_ImplGlfw_InitForVulkan(ApplicationInstance::GetWindow().GetNativeWindow(), true);
         Renderer::Initialize("Engine3D Renderer");
     }
 

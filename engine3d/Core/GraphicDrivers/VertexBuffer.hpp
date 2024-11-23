@@ -12,6 +12,12 @@ namespace engine3d{
     struct Vertex{
         glm::vec3 Position;
         glm::vec3 Color;
+        glm::vec3 Normals;
+        glm::vec2 Uv;
+
+        bool operator==(const Vertex& other) const{
+            return (Position == other.Position and Color == other.Color and Normals == other.Normals and Uv == other.Uv);
+        }
     };
 
     class VertexBuffer{

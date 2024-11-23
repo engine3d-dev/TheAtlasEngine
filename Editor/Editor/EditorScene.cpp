@@ -64,7 +64,12 @@ namespace engine3d{
 
         // SyncUpdateManager::GetInstance()->Subscribe(this, &EditorScene::OnUpdate);
 
-        auto cube_mesh = CreateCubeMesh({.0f, .0f, .0f});
+        // auto cube_mesh = CreateCubeMesh({.0f, .0f, .0f});
+
+        //! @note Instead of loading in primitive cubes by hand, we load in .obj's instead.
+        // auto cube_mesh = Mesh::LoadModel("3d_models/tutorial/smooth_vase.obj");
+        // auto cube_mesh = Mesh::LoadModel("3d_models/tutorial/colored_cube.obj");
+        auto cube_mesh = Mesh::LoadModel("3d_models/tutorial/sphere.obj");
 
         //! @note Make this scene object as part of our current scene.
 
