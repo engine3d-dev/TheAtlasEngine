@@ -8,8 +8,8 @@ set(VULKAN_SHADERS_INCLUDE_DIR ${VULKAN_INCLUDE_DIR}/Shaders)
 set(VULKAN_SHADERS_SRC_DIR ${VULKAN_SRC_DIR}/Shaders)
 
 
-build_library(
-    SOURCES
+add_library(
+    ${PROJECT_NAME}
     ${ENGINE_SRC_DIR}/Core/ApplicationInstance.cpp
 
     ${ENGINE_INCLUDE_NAME}/Core/EngineLogger.hpp

@@ -44,3 +44,6 @@ build_demos(
 
     LINK_LIBRARIES engine3d
 )
+
+target_include_directories(${PROJECT_NAME} PUBLIC ./)
+target_include_directories(${PROJECT_NAME} PRIVATE ../)

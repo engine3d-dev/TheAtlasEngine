@@ -8,7 +8,7 @@
 #include <engine3d/Core/Event/KeyCodes.hpp>
 #include <engine3d/Core/TimeManagement/UpdateManagers/SyncUpdateManager.hpp>
 #include <Scenes/Assets/Components/testComp.hpp>
-// #include "Scene"
+#include <Core/SceneManagment/SceneObjects/SceneObject.hpp>
 
 using namespace engine3d;
     void testComp::OnIntegrate()

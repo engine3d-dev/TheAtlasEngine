@@ -1,7 +1,9 @@
+// #include <Scenes/Assets/Components/Physics/PhysicsBody3D.hpp>
 #include <Scenes/Assets/Components/Physics/PhysicsBody3D.hpp>
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Body/BodyID.h>
 #include <glm/fwd.hpp>
+#include <Core/SceneManagment/SceneObjects/SceneObject.hpp>
 using namespace engine3d;
 
 PhysicsBody3D::PhysicsBody3D(BodyContainer * p_bodyCon)
