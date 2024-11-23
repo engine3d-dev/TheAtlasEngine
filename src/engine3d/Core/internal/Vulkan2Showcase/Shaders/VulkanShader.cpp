@@ -121,21 +121,27 @@ namespace engine3d::vk{
     }
 
     std::vector<VkVertexInputAttributeDescription> VulkanShader::GetVertexAttributeDescriptions(){
-        std::vector<VkVertexInputAttributeDescription> attribute_description(2);
-        attribute_description[0] = {
-            .location = 0, // // layout(location = 0)
-            .binding = 0,
-            .format = VK_FORMAT_R32G32B32_SFLOAT,
-            // .offset = 0
-            .offset = offsetof(Vertex, Position)
-        };
+        std::vector<VkVertexInputAttributeDescription> attribute_description{};
 
-        attribute_description[1] = {
-            .location = 1, // layout(location = 1)
-            .binding = 0,
-            .format = VK_FORMAT_R32G32B32_SFLOAT,
-            .offset = offsetof(Vertex, Color)
-        };
+        attribute_description.push_back({0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, Position)});
+        attribute_description.push_back({1, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, Color)});
+        attribute_description.push_back({2, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, Normals)});
+        attribute_description.push_back({3, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, Uv)});
+
+        // attribute_description[0] = {
+        //     .location = 0, // // layout(location = 0)
+        //     .binding = 0,
+        //     .format = VK_FORMAT_R32G32B32_SFLOAT,
+        //     // .offset = 0
+        //     .offset = offsetof(Vertex, Position)
+        // };
+
+        // attribute_description[1] = {
+        //     .location = 1, // layout(location = 1)
+        //     .binding = 0,
+        //     .format = VK_FORMAT_R32G32B32_SFLOAT,
+        //     .offset = offsetof(Vertex, Color)
+        // };
 
         return attribute_description;
     }

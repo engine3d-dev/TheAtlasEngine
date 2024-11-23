@@ -23,7 +23,8 @@ namespace engine3d{
         //! @note Handle Events.
         // m_EditorScene->OnUpdate();
         m_EditorScene->OnMoveCamUpdate();
-        Renderer::RecordSceneGameObjects(m_EditorScene->GetSceneObjects(), m_EditorScene->GetCameraObject());
+        // Renderer::RecordSceneGameObjects(m_EditorScene->GetSceneObjects(), m_EditorScene->GetCameraObject());
+        Renderer::RecordSceneGameObjects(m_EditorScene->GetAllSceneObjects());
     }
 
     ApplicationInstance* InitializeApplication(){
