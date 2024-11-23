@@ -5,8 +5,7 @@
  * @param id - the ID of the SceneObject itself
  * @note actual wrapper for SceneObject for ECS
  * */
-#include <Core/GraphicDrivers/VertexBuffer.hpp>
-// #include <Core/internal/Vulkan2Showcase/VulkanModel.hpp>
+#include <Core/GraphicDrivers/Mesh.hpp>
 #include <Core/ApplicationManager/GameObjManager/UUID.hpp>
 #include <Core/ApplicationManager/Scene.hpp>
 
@@ -70,13 +69,14 @@ namespace engine3d
         m_ParentScene->m_SceneRegistry.remove<T>(SceneObjectHandler);
       }
 
-      void SetModal(Ref<VertexBuffer>& p_Model){
+      void SetMesh(Mesh& p_Model){
         m_Model = p_Model;
       }
 
+
       glm::mat4 toMat4();
 
-      Ref<VertexBuffer>& GetModel() { return m_Model; }
+      Mesh& GetMesh() { return m_Model; }
 
       operator bool() const { return SceneObjectHandler != entt::null; }
 
@@ -103,6 +103,6 @@ namespace engine3d
       entt::entity SceneObjectHandler{entt::null};
       UUID objectID;
       Scene *m_ParentScene = nullptr; // 12 bytes
-      Ref<VertexBuffer> m_Model;
+      Mesh m_Model;
   };
 }; // namespace Engine3D

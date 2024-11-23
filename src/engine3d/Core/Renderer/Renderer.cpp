@@ -201,8 +201,33 @@ namespace engine3d{
                     &push
             );
 
-            obj->GetModel()->Bind(current_cmd_buffer);
-            obj->GetModel()->Draw(current_cmd_buffer);
+            // obj->GetModel()->Bind(current_cmd_buffer);
+            // obj->GetModel()->Draw(current_cmd_buffer);
+            auto& vb = obj->GetMesh().GetVertices();
+            auto ib = obj->GetMesh().GetIndices();
+            vb->Bind(current_cmd_buffer);
+            ib->Bind(current_cmd_buffer);
+
+            if(ib->HasIndicesPresent()){
+                ib->Draw(current_cmd_buffer);
+            }
+            else{
+                vb->Draw(current_cmd_buffer);
+            }
+
+            // if(ib != nullptr){
+            //     ib->Bind(current_cmd_buffer);
+            //     if(ib->HasIndicesPresent()){
+            //         ib->Draw(GetCurrentCommandBuffer());
+            //     }
+            //     else{
+            //         vb->Draw(GetCurrentCommandBuffer());
+            //     }
+            // }
+            // else{
+            //     vb->Draw(GetCurrentCommandBuffer());
+            // }
+
         }
     }
 
