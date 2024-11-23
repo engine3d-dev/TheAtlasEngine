@@ -49,7 +49,7 @@ namespace engine3d{
         auto& cube2_transform = cube2->SceneGetComponent<Transform>();
         // auto aspect_ratio = ApplicationInstance::GetWindow().GetAspectRatio();
         cube2_transform.m_Position = {5.f, .0f, -7.f};
-        cube2_transform.m_Scale = {5.5f.f, 5.5f, 5.5};
+        cube2_transform.m_Scale = {5.5f, 5.5f, 5.5};
 
         cube2->SetMesh(cube_mesh);
 
