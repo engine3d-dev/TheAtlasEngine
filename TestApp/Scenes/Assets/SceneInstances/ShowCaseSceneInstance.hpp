@@ -1,5 +1,12 @@
 #include "Core/ApplicationManager/Scene.hpp"
-#include "Core/SceneManagment/SceneObjects/SceneObject.hpp"
+
+// #include "Core/SceneManagment/SceneObjects/SceneObject.hpp"
+
+
+namespace engine3d{
+    class SceneObject;
+};
+
 class ShowCaseSceneInstance
 {
     public:

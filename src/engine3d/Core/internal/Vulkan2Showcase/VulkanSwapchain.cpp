@@ -25,6 +25,7 @@ namespace engine3d::vk{
 
         if(format_count == 1 and formats[0].format == VK_FORMAT_UNDEFINED){
             m_SurfaceFormat.format = VK_FORMAT_B8G8R8A8_UNORM;
+            // m_SurfaceFormat.format = VK_FORMAT_R32G32B32A32_SFLOAT;
         }
         else{
             m_SurfaceFormat = formats[0];

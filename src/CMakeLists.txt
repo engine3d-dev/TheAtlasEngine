@@ -7,6 +7,7 @@ set(VULKAN_SRC_DIR ${ENGINE_SRC_DIR}/Core/internal/Vulkan2Showcase)
 set(VULKAN_SHADERS_INCLUDE_DIR ${VULKAN_INCLUDE_DIR}/Shaders)
 set(VULKAN_SHADERS_SRC_DIR ${VULKAN_SRC_DIR}/Shaders)
 
+
 build_library(
     SOURCES
     ${ENGINE_SRC_DIR}/Core/ApplicationInstance.cpp
@@ -57,13 +58,16 @@ build_library(
 
     # Special Component Includes
     ${ENGINE_INCLUDE_NAME}/Core/SceneManagment/Components/SPComps/Transform.hpp
+    ${ENGINE_INCLUDE_NAME}/Core/SceneManagment/Components/SPComps/EditorCamera.hpp
 
     # Renderer Includes
     ${ENGINE_INCLUDE_NAME}/Core/Renderer/Renderer.hpp
 
+
     #############################
     # Source .cpp files below
     #############################
+
     ${ENGINE_SRC_DIR}/Core/ApplicationInstance.cpp
 
 
@@ -103,6 +107,7 @@ build_library(
     ${ENGINE_SRC_DIR}/Core/ApplicationManager/GameObjManager/UUID.cpp
 
     ${ENGINE_SRC_DIR}/Core/SceneManagment/Components/SPComps/Transform.cpp
+    ${ENGINE_SRC_DIR}/Core/SceneManagment/Components/SPComps/EditorCamera.cpp
 
     ${ENGINE_SRC_DIR}/Core/Renderer/Renderer.cpp
 

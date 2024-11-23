@@ -1,11 +1,8 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.25)
 project(TestApp CXX)
 
-
-# find_package(Vulkan REQUIRED)
-
-# find_package(engine3d CONFIG REQUIRED)
-add_executable(${PROJECT_NAME}
+build_demos(
+    SOURCES
     Application.cpp
 
     #To Test
@@ -44,33 +41,6 @@ add_executable(${PROJECT_NAME}
     Scenes/Assets/Components/Graphics/Meshes/MeshContainer.hpp
     src/Scenes/Assets/Components/Graphics/Meshes/MeshContainer.cpp
     
-    )
 
-target_include_directories(${PROJECT_NAME} PUBLIC ./ SceneTest)
-target_include_directories(${PROJECT_NAME} PRIVATE ../)
-
-target_compile_definitions(${PROJECT_NAME} PRIVATE ${dev_definitions})
-
-find_package(fmt REQUIRED)
-find_package(spdlog REQUIRED)
-find_package(glm REQUIRED)
-find_package(yaml-cpp REQUIRED)
-find_package(Vulkan REQUIRED)
-find_package(joltphysics REQUIRED)
-find_package(EnTT REQUIRED)
-find_package(imguidocking REQUIRED)
-
-
-target_link_libraries(
-    ${PROJECT_NAME}
-    PRIVATE
-    fmt::fmt
-    spdlog::spdlog
-    glm::glm
-    yaml-cpp::yaml-cpp
-    Vulkan::Vulkan
-    Jolt::Jolt
-    EnTT::EnTT
-   imguidocking::imguidocking
-    engine3d
+    LINK_LIBRARIES engine3d
 )

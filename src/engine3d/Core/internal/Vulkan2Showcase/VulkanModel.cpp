@@ -49,6 +49,7 @@ namespace engine3d::vk{
         vkBindBufferMemory(VulkanContext::GetDriver(), m_VertexBuffer, m_VertexBufferDeviceMemory, 0);
 
         //! @note Mapping memory data.
+        //! @note THIS is how we map our vertices data to our VkBuffer (essentially it is our vertex buffer)
         void* data;
         vkMapMemory(VulkanContext::GetDriver(), m_VertexBufferDeviceMemory, 0, buffer_size, 0, &data);
         memcpy(data, p_Vertices.data(), static_cast<size_t>(buffer_size));
@@ -91,7 +92,7 @@ namespace engine3d::vk{
         attribute_description[0] = {
             .location = 0, // // layout(location = 0)
             .binding = 0,
-            .format = VK_FORMAT_R32G32_SFLOAT,
+            .format = VK_FORMAT_R32G32B32_SFLOAT,
             // .offset = 0
             .offset = offsetof(Vertex, Position)
         };
