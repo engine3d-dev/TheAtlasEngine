@@ -1,4 +1,5 @@
 #include "EditorScene.hpp"
+#include "Core/GraphicDrivers/VertexBuffer.hpp"
 #include <Core/SceneManagment/Components/SPComps/Transform.hpp>
 #include <Core/EngineLogger.hpp>
 #include <Core/SceneManagment/Components/SPComps/EditorCamera.hpp>
@@ -8,7 +9,6 @@
 #include <Core/Event/InputPoll.hpp>
 
 namespace engine3d{
-
     EditorScene::EditorScene(){
         m_Scene = new Scene();
 
@@ -20,7 +20,6 @@ namespace engine3d{
         auto cube_mesh = Mesh::LoadModel("3d_models/tutorial/smooth_vase.obj");
         // auto cube_mesh = Mesh::LoadModel("3d_models/tutorial/colored_cube.obj");
         // auto cube_mesh = Mesh::LoadModel("3d_models/tutorial/sphere.obj");
-
         //! @note Make this scene object as part of our current scene.
 
         // -----------------------------
@@ -50,7 +49,8 @@ namespace engine3d{
         auto& cube2_transform = cube2->SceneGetComponent<Transform>();
         // auto aspect_ratio = ApplicationInstance::GetWindow().GetAspectRatio();
         cube2_transform.m_Position = {5.f, .0f, -7.f};
-        cube2_transform.m_Scale = {50.f, 5.5f, 5.5};
+        cube2_transform.m_Scale = {5.5f.f, 5.5f, 5.5};
+
         cube2->SetMesh(cube_mesh);
 
         SceneObject* sphere_point_light = new SceneObject(m_Scene);
@@ -73,20 +73,6 @@ namespace engine3d{
 
     }
 
-    void EditorScene::OnCreate(){
-    }
-
-    void EditorScene::OnUpdate(){
-        // glm::vec3 m_MoveDirection{0.f};
-        // glm::vec3 m_Rotation{0};
-
-        // for(const auto& obj : m_SceneObjects){
-        //     // auto& transform_compoent = obj->SceneGetComponent<Transform>();
-        //     auto& camera_component = obj->SceneGetComponent<EditorCamera>();
-        //     camera_component.SetPerspectiveProjection(glm::radians(50.f), ApplicationInstance::GetWindow().GetAspectRatio(), 0.1f, 50.f);
-        // }
-    }
-
     void EditorScene::OnMoveCamUpdate(){
 
         auto& cameraObject = m_AllSceneObjecs["Cameras"].at(0);
@@ -98,7 +84,6 @@ namespace engine3d{
         constexpr float sensitivity = 2.0f;
         constexpr float pos_sensitivity = 2.f;
         constexpr glm::vec2 invert_pos = {1, -1};
-
         glm::vec3 rotate{0};
 
         //! @note Make sure that our mouse controls how camera rotates.
@@ -144,10 +129,4 @@ namespace engine3d{
         camera.SetPerspectiveProjection(glm::radians(50.f), ApplicationInstance::GetWindow().GetAspectRatio(), 0.1f, 100.f);
         
     }
-
-    // void EditorScene::OnCameraUpdate(){
-    //     for(const auto& obj : m_SceneObjects){
-    //         obj->SceneGetComponent<EditorCamera>().OnUpdate();
-    //     }
-    // }
 };

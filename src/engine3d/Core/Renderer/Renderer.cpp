@@ -219,6 +219,7 @@ namespace engine3d{
     }
 
     void Renderer::RecordSceneGameObjects(std::unordered_map<std::string, std::vector<SceneObject*>>& p_AllSceneObjects){
+
         auto current_cmd_buffer = GetCurrentCommandBuffer();
 
         //! @note Essentially doing m_Pipeline->Bind(m_CommandBuffer[i])
