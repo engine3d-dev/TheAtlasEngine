@@ -1,7 +1,8 @@
 #pragma once
+// #include <Core/TimeManagement/GlobalUpdateManager.hpp>
 #include <string>
 #include <Core/Core.hpp>
-#include "internal/API.hpp"
+#include <Core/API.hpp>
 #include <Core/Window.hpp>
 
 namespace engine3d{
@@ -13,6 +14,7 @@ namespace engine3d{
     */
     // class Window;
     class ApplicationInstance{
+        // friend class GlobalUpdateManager;
     public:
         ApplicationInstance(const std::string&);
         void ExecuteApplicationMainloop();
@@ -31,9 +33,9 @@ namespace engine3d{
         static API CurrentAPI();
     private:
         //! @note 
-        void UpdateCurrentApplicationInstance();
+        // void UpdateCurrentApplicationInstance();
     private:
-        virtual void UpdateThisApplicationInstance() = 0;
+        // virtual void UpdateThisApplicationInstance() = 0;
 
     private:
         Window* m_Window;

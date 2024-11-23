@@ -1,34 +1,31 @@
 #include "Editor.hpp"
-// #include "Core/Event/InputPoll.hpp"
-// #include "Core/Event/KeyCodes.hpp"
-#include <engine3d/Core/Event/InputPoll.hpp>
-#include <engine3d/Core/Event/KeyCodes.hpp>
-#include <engine3d/Core/EngineLogger.hpp>
-#include <engine3d/Core/Timestep.hpp>
+#include "EditorScene.hpp"
+#include <Core/internal/Vulkan2Showcase/VulkanModel.hpp>
+#include <Core/Scene/SceneTest.hpp>
+#include <Core/TimeManagement/GlobalUpdateManager.hpp>
+#include <Core/Renderer/Renderer.hpp>
 
 namespace engine3d{
 
+    struct SimplePushConstantData{
+        glm::mat2 Transform{1.f};
+        glm::vec2 Offsets;
+        alignas(16) glm::vec3 Color;
+    };
+
     EditorApplication::EditorApplication(const std::string& p_DebugName) : ApplicationInstance(p_DebugName) {
-        // Renderer::Initialize();
-        // Renderer::SetBackgroundColor({1.0f, 0.0f, 0.0f, 0.0f});
+        GlobalUpdateManager::GetInstance()->SubscribeApplicationUpdate(this, &EditorApplication::OnApplicationUpdate);
+        m_EditorScene = new EditorScene();
     }
 
-    EditorApplication::~EditorApplication() {}
+    EditorApplication::~EditorApplication() {
+    }
 
-    void EditorApplication::UpdateThisApplicationInstance(){
-        
-        //! @note Just testing to see if application still closes cleanly.
-        // if(InputPoll::IsKeyPressed(ENGINE_KEY_ESCAPE)){
-        //     exit(0);
-        // }
-
-        //! @note This function will render our primitives
-        //! @note TODO --  Flush should only happens when our scene is given everything that lives within this scene (ref to lifetimes)
-        /* Renderer::FlushScene(); */
-		
-		// Renderer::Presentation();
-        // ImGui::Begin("Hello, world!"); // Create a window called "Hello, world!" and append into it.
-        // ImGui::End();
+    void EditorApplication::OnApplicationUpdate(){
+        //! @note Handle Events.
+        // m_EditorScene->OnUpdate();
+        m_EditorScene->OnMoveCamUpdate();
+        Renderer::RecordSceneGameObjects(m_EditorScene->GetSceneObjects(), m_EditorScene->GetCameraObject());
     }
 
     ApplicationInstance* InitializeApplication(){

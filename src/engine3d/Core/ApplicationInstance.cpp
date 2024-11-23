@@ -1,14 +1,16 @@
-// #include <Core/internal/FrameTimer.hpp>
-#include "Event/InputPoll.hpp"
+#include "Renderer/Renderer.hpp"
+// #include "TimeManagement/GlobalUpdateManager.hpp"
+#include <Core/Event/InputPoll.hpp>
 #include <Core/ApplicationInstance.hpp>
 #include <Core/Timestep.hpp>
-// #include <Core/Renderer/Renderer.hpp>
 #include <Core/EngineLogger.hpp>
+#include <entt/entt.hpp>
 
 namespace engine3d{
     static float m_LastFrameTime = 0.0f;
     static std::string g_DebugName = "Engine3D";
     static API g_CurrentAPI = UNSPECIFIED;
+
     ApplicationInstance* ApplicationInstance::g_ThisInstance = nullptr;
 
     ApplicationInstance::ApplicationInstance(const std::string& p_DebugName){
@@ -16,20 +18,20 @@ namespace engine3d{
         g_DebugName = p_DebugName;
         SetCurrentAPI(VULKAN);
         m_Window = Window::Create(900, 600, p_DebugName);
+
+        Renderer::Initialize("Engine3D Renderer");
     }
 
     void ApplicationInstance::ExecuteApplicationMainloop(){
         ConsoleLogInfo("EditorApplication::RunApplicationMainloop called!");
 
         while(m_Window->IsActive()){
+            InputPoll::UpdateEvents();
             // FrameTimer::UpdateFrameTimer(); // give us the frames in flight.
 
-            // Renderer::Presentation();
-
-            UpdateCurrentApplicationInstance();
+            Renderer::BeginFrame();
             m_Window->OnUpdateAllFrames();
-
-            InputPoll::UpdateEvents();
+            Renderer::EndFrame();
         }
         
         //! @note Cleaning up imgui
@@ -38,9 +40,9 @@ namespace engine3d{
 
     ApplicationInstance& ApplicationInstance::Super(){ return *g_ThisInstance; }
 
-    void ApplicationInstance::UpdateCurrentApplicationInstance(){
-        UpdateThisApplicationInstance();
-    }
+    // void ApplicationInstance::UpdateCurrentApplicationInstance(){
+    //     UpdateThisApplicationInstance();
+    // }
 
     float ApplicationInstance::CurrentFrameTime(){
         return m_LastFrameTime;
