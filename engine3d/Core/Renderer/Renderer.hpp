@@ -18,7 +18,7 @@ namespace engine3d{
         //! @note In the future I'll add API's for submitting draw calls.
         // static void RecordCommandBuffers(VkCommandBuffer p_CommandBuffer);
         static void RecordGameObjects(std::vector<SceneObjectTutorial>& p_Objects);
-        static void RecordSceneGameObjects(std::vector<SceneObject*>& p_SceneObjects);
+        static void RecordSceneGameObjects(std::vector<SceneObject*>& p_SceneObjects, SceneObject* p_CameraObject);
         static void EndFrame();
 
         template<typename UFunction>

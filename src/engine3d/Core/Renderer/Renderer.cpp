@@ -191,7 +191,7 @@ namespace engine3d{
         }
     }
 
-    void Renderer::RecordSceneGameObjects(std::vector<SceneObject*>& p_Objects){
+    void Renderer::RecordSceneGameObjects(std::vector<SceneObject*>& p_Objects, SceneObject* p_CameraObject){
         auto current_cmd_buffer = GetCurrentCommandBuffer();
 
         //! @note Essentially doing m_Pipeline->Bind(m_CommandBuffer[i])
@@ -201,9 +201,11 @@ namespace engine3d{
         // ConsoleLogWarn("Delta Time = {:.7}", delta_time);
         // auto projection_view = 
 
+        auto camera_component = p_CameraObject->SceneGetComponent<EditorCamera>();
+        
         //! @note Only for testing purposes for mesh data.
         for(auto& obj : p_Objects){
-            auto camera_component = obj->SceneGetComponent<EditorCamera>();
+            // auto camera_component = obj->SceneGetComponent<EditorCamera>();
             auto proj_view = camera_component.GetProjection() * camera_component.GetView();
 
             // obj.m_Transform2D.rotation.y = glm::mod(obj.GetTransform().rotation.y + 0.001f, glm::two_pi<float>());
