@@ -121,22 +121,12 @@ namespace engine3d::vk{
     }
 
     std::vector<VkVertexInputAttributeDescription> VulkanShader::GetVertexAttributeDescriptions(){
-        std::vector<VkVertexInputAttributeDescription> attribute_description(2);
-        attribute_description[0] = {
-            .location = 0, // // layout(location = 0)
-            .binding = 0,
-            .format = VK_FORMAT_R32G32B32_SFLOAT,
-            // .offset = 0
-            .offset = offsetof(Vertex, Position)
-        };
+        std::vector<VkVertexInputAttributeDescription> attribute_description{};
 
-        attribute_description[1] = {
-            .location = 1, // layout(location = 1)
-            .binding = 0,
-            .format = VK_FORMAT_R32G32B32_SFLOAT,
-            .offset = offsetof(Vertex, Color)
-        };
-
+        attribute_description.push_back({0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, Position)});
+        attribute_description.push_back({1, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, Color)});
+        attribute_description.push_back({2, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, Normals)});
+        attribute_description.push_back({3, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, Uv)});
         return attribute_description;
     }
 
@@ -176,18 +166,7 @@ namespace engine3d::vk{
             .offset = {0, 0},
             .extent = {p_Width, p_Height}
         };
-
-        // config.PipelineViewportCreateInfo = {
-        // VkPipelineViewportStateCreateInfo PipelineViewportCreateInfo = {
-        //     .sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
-        //     .pNext = nullptr,
-        //     .flags = 0,
-        //     .viewportCount = 1,
-        //     .pViewports = &config.Viewport,
-        //     .scissorCount = 1,
-        //     .pScissors = &config.Scissor
-        // };
-
+      
         config.PipelineRasterizationCreateInfo = {
             .sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
             .pNext = nullptr,

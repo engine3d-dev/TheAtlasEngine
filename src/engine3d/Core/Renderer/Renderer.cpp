@@ -10,6 +10,7 @@
 #include <vulkan/vulkan_core.h>
 #include <vector>
 
+#include <Core/SceneManagment/Components/SPComps/Transform.hpp>
 #include <array>
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -32,8 +33,9 @@ namespace engine3d{
     //! @note vk::VulkanModal is how shaders are going to be 
     struct SimplePushConstantData{
         glm::mat4 Transform{1.f};
-        glm::vec2 iResolution;
-        alignas(16) glm::vec3 Color;
+        glm::mat4 ModelMatrix{1.f};
+        glm::vec3 LightTransform{1.0, -3.0, -1.0};
+        // alignas(16) glm::vec3 Color;
     };
 
     void Renderer::Initialize(const std::string& p_DebugName){
@@ -166,30 +168,25 @@ namespace engine3d{
         //! @note Starts when to start rendering!!
         vkCmdBindPipeline(current_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, g_Shader->GetGraphicsPipeline());
         float delta_time = SyncUpdateManager::GetInstance()->m_SyncLocalDeltaTime;
-        // ConsoleLogWarn("Delta Time = {:.7}", delta_time);
-        // auto projection_view = 
-
         auto camera_component = p_CameraObject->SceneGetComponent<EditorCamera>();
         
         //! @note Only for testing purposes for mesh data.
-        for(auto& obj : p_Objects){
-            // auto camera_component = obj->SceneGetComponent<EditorCamera>();
+        // auto point_light_obj = p_Objects[2];
+        // auto point_light_position = point_light_obj->SceneGetComponent<Transform>().m_Position;
+        
+        // for(size_t i = 0; i <= p_Objects.size()-1; i++){
+            // ConsoleLogWarn("Index (i <= 1) = {}", i);
+        for(const auto& obj : p_Objects){
+            // auto obj = p_Objects[i];
+
             auto proj_view = camera_component.GetProjection() * camera_component.GetView();
 
-            // obj.m_Transform2D.rotation.y = glm::mod(obj.GetTransform().rotation.y + 0.001f, glm::two_pi<float>());
-            // float x = obj->GetRotation().x;
-            // float y = glm::mod(obj->GetRotation().y + (0.1f * delta_time), glm::two_pi<float>());
-            // float x = glm::mod(obj->GetRotation().x + (0.05f * delta_time), glm::two_pi<float>());
-            // float z = obj->GetRotation().z;
-
-            // glm::vec3 new_position = {x, y, z};
-            // new_position = glm::normalize(new_position);
-            // obj->SetRotation(new_position);
+            auto model_matrix = obj->toMat4();
 
             SimplePushConstantData push = {
-                .Transform = proj_view * obj->toMat4(),
-                // .iResolution = {ApplicationInstance::GetWindow().GetWidth(), ApplicationInstance::GetWindow().GetHeight()},
-                // .Color = obj.GetColor(),
+                .Transform = proj_view * model_matrix,
+                .ModelMatrix = model_matrix,
+                // .LightTransform = point_light_position
             };
 
             vkCmdPushConstants(
@@ -201,19 +198,66 @@ namespace engine3d{
                     &push
             );
 
-            // obj->GetModel()->Bind(current_cmd_buffer);
-            // obj->GetModel()->Draw(current_cmd_buffer);
             auto& vb = obj->GetMesh().GetVertices();
             auto ib = obj->GetMesh().GetIndices();
             vb->Bind(current_cmd_buffer);
-            // ib->Bind(current_cmd_buffer);
 
-            // if(ib->HasIndicesPresent()){
-            //     ib->Draw(current_cmd_buffer);
-            // }
-            // else{
-            //     vb->Draw(current_cmd_buffer);
-            // }
+            if(ib != nullptr){
+                ib->Bind(current_cmd_buffer);
+                if(ib->HasIndicesPresent()){
+                    ib->Draw(GetCurrentCommandBuffer());
+                }
+                else{
+                    vb->Draw(GetCurrentCommandBuffer());
+                }
+            }
+            else{
+                vb->Draw(GetCurrentCommandBuffer());
+            }
+
+        }
+    }
+
+    void Renderer::RecordSceneGameObjects(std::unordered_map<std::string, std::vector<SceneObject*>>& p_AllSceneObjects){
+
+        auto current_cmd_buffer = GetCurrentCommandBuffer();
+
+        //! @note Essentially doing m_Pipeline->Bind(m_CommandBuffer[i])
+        //! @note Starts when to start rendering!!
+        vkCmdBindPipeline(current_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, g_Shader->GetGraphicsPipeline());
+        float delta_time = SyncUpdateManager::GetInstance()->m_SyncLocalDeltaTime;
+        auto cameraObject = p_AllSceneObjects["Cameras"][0];
+        auto camera_component = cameraObject->SceneGetComponent<EditorCamera>();
+        
+        //! @note Only for testing purposes for mesh data.
+        // auto point_light_obj = p_Objects[2];
+        // auto point_light_position = point_light_obj->SceneGetComponent<Transform>().m_Position;
+        auto& position = p_AllSceneObjects["Cameras"][0]->SceneGetComponent<Transform>().m_Position;
+
+        for(const auto& obj : p_AllSceneObjects.at("SceneObjects")){
+
+            auto proj_view = camera_component.GetProjection() * camera_component.GetView();
+
+            auto model_matrix = obj->toMat4();
+
+            SimplePushConstantData push = {
+                .Transform = proj_view * model_matrix,
+                .ModelMatrix = model_matrix,
+                .LightTransform = position
+            };
+
+            vkCmdPushConstants(
+                current_cmd_buffer,
+                g_PipelineLayout,
+                VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+                0,
+                    sizeof(SimplePushConstantData), 
+                    &push
+            );
+
+            auto& vb = obj->GetMesh().GetVertices();
+            auto ib = obj->GetMesh().GetIndices();
+            vb->Bind(current_cmd_buffer);
 
             if(ib != nullptr){
                 ib->Bind(current_cmd_buffer);
