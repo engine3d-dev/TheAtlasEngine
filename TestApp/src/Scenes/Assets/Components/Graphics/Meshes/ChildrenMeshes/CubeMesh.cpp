@@ -1,5 +1,6 @@
 
-#include "Core/internal/Vulkan2Showcase/VulkanModel.hpp"
+#include "Core/EngineLogger.hpp"
+#include "Core/GraphicDrivers/VertexBuffer.hpp"
 #include <Scenes/Assets/Components/Graphics/Meshes/ChildrenMeshes/CubeMesh.hpp>
 #include <glm/fwd.hpp>
 #include <vector>
@@ -75,6 +76,8 @@ CubeMesh::CubeMesh()
     {.1f, .8f, .1f}
     };
 
-    vertices = engine3d::vk::VulkanModel::CreateVertexVector(verts, colors);
-    
+    vertices = engine3d::VertexBuffer::CreateVertexVector(verts, colors);
+    if(vertices != nullptr){
+        ConsoleLogWarn("SphereMesh vertices are a nullptr. Implement VertexBuffer::CreateVertexVector() in VulkanVertexBuffer to get this working and not nullptr");
+    }
 }

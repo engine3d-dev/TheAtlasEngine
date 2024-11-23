@@ -5,6 +5,7 @@ namespace engine3d
 class ObjectLayerPairFilterInterface : public JPH::ObjectLayerPairFilter
 {
     public:
+        //! @note TODO: After showcase we should fix this, because doesnt rely on child sub-classes.
         virtual bool ShouldCollide(JPH::ObjectLayer inObject1, JPH::ObjectLayer inObject2) const override
         {
             switch (inObject1)

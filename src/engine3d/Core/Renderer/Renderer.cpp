@@ -1,10 +1,8 @@
-// #include "internal/VulkanCpp/Vulkan.hpp"
-#include "EngineLogger.hpp"
-#include "GraphicDrivers/Shader.hpp"
-#include "TimeManagement/UpdateManagers/SyncUpdateManager.hpp"
+#include <Core/EngineLogger.hpp>
+#include <Core/GraphicDrivers/Shader.hpp>
+#include <Core/TimeManagement/UpdateManagers/SyncUpdateManager.hpp>
 #include "internal/Vulkan2Showcase/Shaders/VulkanShader.hpp"
 #include "internal/Vulkan2Showcase/VulkanContext.hpp"
-#include "internal/Vulkan2Showcase/VulkanModel.hpp"
 #include "internal/Vulkan2Showcase/helper_functions.hpp"
 #include <Core/ApplicationInstance.hpp>
 #include <Core/Renderer/Renderer.hpp>
@@ -161,36 +159,6 @@ namespace engine3d{
 
     }
 
-    void Renderer::RecordGameObjects(std::vector<SceneObjectTutorial>& p_Objects){
-        auto current_cmd_buffer = GetCurrentCommandBuffer();
-        //! @note Essentially doing m_Pipeline->Bind(m_CommandBuffer[i])
-        //! @note Starts when to start rendering!!
-        vkCmdBindPipeline(current_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, g_Shader->GetGraphicsPipeline());
-
-        //! @note Only for testing purposes for mesh data.
-        for(auto& obj : p_Objects){
-            obj.m_Transform2D.rotation.y = glm::mod(obj.GetTransform().rotation.y + 0.001f, glm::two_pi<float>());
-            obj.m_Transform2D.rotation.x = glm::mod(obj.GetTransform().rotation.x + 0.001f, glm::two_pi<float>());
-
-            SimplePushConstantData push = {
-                .Transform = obj.GetTransform().mat4(),
-                .iResolution = {ApplicationInstance::GetWindow().GetWidth(), ApplicationInstance::GetWindow().GetHeight()},
-                .Color = obj.GetColor(),
-            };
-            vkCmdPushConstants(
-                current_cmd_buffer,
-                g_PipelineLayout,
-                VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
-                0,
-                    sizeof(SimplePushConstantData), 
-                    &push
-            );
-
-            obj.GetModel()->Bind(current_cmd_buffer);
-            obj.GetModel()->Draw(current_cmd_buffer);
-        }
-    }
-
     void Renderer::RecordSceneGameObjects(std::vector<SceneObject*>& p_Objects, SceneObject* p_CameraObject){
         auto current_cmd_buffer = GetCurrentCommandBuffer();
 
@@ -233,8 +201,33 @@ namespace engine3d{
                     &push
             );
 
-            obj->GetModel()->Bind(current_cmd_buffer);
-            obj->GetModel()->Draw(current_cmd_buffer);
+            // obj->GetModel()->Bind(current_cmd_buffer);
+            // obj->GetModel()->Draw(current_cmd_buffer);
+            auto& vb = obj->GetMesh().GetVertices();
+            auto ib = obj->GetMesh().GetIndices();
+            vb->Bind(current_cmd_buffer);
+            // ib->Bind(current_cmd_buffer);
+
+            // if(ib->HasIndicesPresent()){
+            //     ib->Draw(current_cmd_buffer);
+            // }
+            // else{
+            //     vb->Draw(current_cmd_buffer);
+            // }
+
+            if(ib != nullptr){
+                ib->Bind(current_cmd_buffer);
+                if(ib->HasIndicesPresent()){
+                    ib->Draw(GetCurrentCommandBuffer());
+                }
+                else{
+                    vb->Draw(GetCurrentCommandBuffer());
+                }
+            }
+            else{
+                vb->Draw(GetCurrentCommandBuffer());
+            }
+
         }
     }
 

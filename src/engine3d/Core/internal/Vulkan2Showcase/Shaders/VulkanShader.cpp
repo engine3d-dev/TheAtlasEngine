@@ -3,7 +3,8 @@
 #include <internal/Vulkan2Showcase/VulkanContext.hpp>
 #include <internal/Vulkan2Showcase/Shaders/VulkanShader.hpp>
 #include <internal/Vulkan2Showcase/Shaders/ShaderSpirvBins.hpp>
-#include <internal/Vulkan2Showcase/VulkanModel.hpp>
+// #include <internal/Vulkan2Showcase/VulkanModel.hpp>
+#include <Core/GraphicDrivers/VertexBuffer.hpp>
 
 #include <fstream>
 #include <vulkan/vulkan_core.h>
@@ -61,8 +62,8 @@ namespace engine3d::vk{
         shader_stages[0] = vert_shader_stage;
         shader_stages[1] = frag_shader_stage;
 
-        auto binding_description = VulkanModel::Vertex::GetVertexInputBindDescription();
-        auto attachment_description = VulkanModel::Vertex::GetVertexAttributeDescriptions();
+        auto binding_description = GetVertexInputBindDescription();
+        auto attachment_description = GetVertexAttributeDescriptions();
 
         VkPipelineVertexInputStateCreateInfo vert_input_create_info = {
             .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
@@ -106,6 +107,37 @@ namespace engine3d::vk{
 
         ConsoleLogWarn("Vertex Shader Size == {}", vert.size());
         ConsoleLogWarn("Fragment Shader Size == {}", frag.size());
+    }
+
+    std::vector<VkVertexInputBindingDescription> VulkanShader::GetVertexInputBindDescription(){
+        std::vector<VkVertexInputBindingDescription> binding_descriptions(1);
+        binding_descriptions[0] = {
+            .binding = 0,
+            .stride = sizeof(Vertex),
+            .inputRate = VK_VERTEX_INPUT_RATE_VERTEX
+        };
+
+        return binding_descriptions;
+    }
+
+    std::vector<VkVertexInputAttributeDescription> VulkanShader::GetVertexAttributeDescriptions(){
+        std::vector<VkVertexInputAttributeDescription> attribute_description(2);
+        attribute_description[0] = {
+            .location = 0, // // layout(location = 0)
+            .binding = 0,
+            .format = VK_FORMAT_R32G32B32_SFLOAT,
+            // .offset = 0
+            .offset = offsetof(Vertex, Position)
+        };
+
+        attribute_description[1] = {
+            .location = 1, // layout(location = 1)
+            .binding = 0,
+            .format = VK_FORMAT_R32G32B32_SFLOAT,
+            .offset = offsetof(Vertex, Color)
+        };
+
+        return attribute_description;
     }
 
     void VulkanShader::initialize_shader_module(const std::vector<char>& p_Bin, VkShaderModule& p_ShaderMod){

@@ -42,6 +42,8 @@ class engine3dRecipe(ConanFile):
         self.requires("imguidocking/1.0")
         self.requires("entt/3.13.2")
 
+        self.requires("tinyobjloader/2.0.0-rc10")
+
 
         self.requires("joltphysics/1.0")
         

@@ -24,6 +24,8 @@ namespace engine3d::vk{
     private:
         VkPipeline GraphicsPipeline() override { return m_GraphicsPipeline; }
     private:
+        std::vector<VkVertexInputBindingDescription> GetVertexInputBindDescription();
+        std::vector<VkVertexInputAttributeDescription> GetVertexAttributeDescriptions();
 
         std::vector<char> read_file(const std::string& p_Filepath);
 

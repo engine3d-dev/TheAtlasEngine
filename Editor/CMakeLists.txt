@@ -6,6 +6,7 @@ project(Editor CXX)
 #     Editor/Editor.hpp
 #     Editor/Editor.cpp
 # )
+find_package(tinyobjloader REQUIRED)
 
 build_demos(
     SOURCES
@@ -14,5 +15,5 @@ build_demos(
 
     Editor/EditorScene.hpp
     Editor/EditorScene.cpp
-    LINK_LIBRARIES engine3d
+    LINK_LIBRARIES tinyobjloader::tinyobjloader engine3d
 )
