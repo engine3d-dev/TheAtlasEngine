@@ -7,6 +7,12 @@
 
 namespace engine3d{
 
+    struct SimplePushConstantData{
+        glm::mat2 Transform{1.f};
+        glm::vec2 Offsets;
+        alignas(16) glm::vec3 Color;
+    };
+
     EditorApplication::EditorApplication(const std::string& p_DebugName) : ApplicationInstance(p_DebugName) {
         GlobalUpdateManager::GetInstance()->SubscribeApplicationUpdate(this, &EditorApplication::OnApplicationUpdate);
         m_EditorScene = new EditorScene();
