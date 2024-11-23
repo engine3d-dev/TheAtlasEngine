@@ -16,7 +16,6 @@ namespace engine3d{
         //! @note Currently the record command buffers just does what "simple_render_system.hpp/.cpp" does already
         //! @note In the future I'll add API's for submitting draw calls.
         static void RecordSceneGameObjects(std::vector<SceneObject*>& p_SceneObjects, SceneObject* p_CameraObject);
-        static void RecordSceneGameObjects(std::unordered_map<std::string, std::vector<SceneObject*>>& p_AllSceneObjects);
         static void EndFrame();
 
         template<typename UFunction>

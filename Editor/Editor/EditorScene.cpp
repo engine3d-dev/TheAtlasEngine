@@ -9,6 +9,56 @@
 #include <Core/Event/InputPoll.hpp>
 
 namespace engine3d{
+    static Mesh CreateCubeMesh(glm::vec3 offset){
+        std::vector<Vertex> vertices = { // left face (white)
+      {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
+      {{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
+      {{-.5f, -.5f, .5f}, {.9f, .9f, .9f}},
+      {{-.5f, .5f, -.5f}, {.9f, .9f, .9f}},
+ 
+      // right face (yellow)
+      {{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
+      {{.5f, .5f, .5f}, {.8f, .8f, .1f}},
+      {{.5f, -.5f, .5f}, {.8f, .8f, .1f}},
+      {{.5f, .5f, -.5f}, {.8f, .8f, .1f}},
+ 
+      // top face (orange, remember y axis points down)
+      {{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
+      {{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
+      {{-.5f, -.5f, .5f}, {.9f, .6f, .1f}},
+      {{.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
+ 
+      // bottom face (red)
+      {{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
+      {{.5f, .5f, .5f}, {.8f, .1f, .1f}},
+      {{-.5f, .5f, .5f}, {.8f, .1f, .1f}},
+      {{.5f, .5f, -.5f}, {.8f, .1f, .1f}},
+ 
+      // nose face (blue)
+      {{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
+      {{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
+      {{-.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
+      {{.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
+ 
+      // tail face (green)
+      {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
+      {{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
+      {{-.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
+      {{.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
+    };
+    for (auto& v : vertices) {
+        v.Position += offset;
+    }
+
+        std::vector<uint32_t> indices = {0,  1,  2,  0,  3,  1,  4,  5,  6,  4,  7,  5,  8,  9,  10, 8,  11, 9,
+                          12, 13, 14, 12, 15, 13, 16, 17, 18, 16, 19, 17, 20, 21, 22, 20, 23, 21};
+        
+        Ref<VertexBuffer> vb = VertexBuffer::Create(vertices);
+        Ref<IndexBuffer> ib = IndexBuffer::Create(indices);
+        // return VertexBuffer::Create(vertices);
+        return Mesh(vb, ib);
+    }
+
     EditorScene::EditorScene(){
         m_Scene = new Scene();
 
@@ -17,21 +67,20 @@ namespace engine3d{
         // auto cube_mesh = CreateCubeMesh({.0f, .0f, .0f});
 
         //! @note Instead of loading in primitive cubes by hand, we load in .obj's instead.
-        auto cube_mesh = Mesh::LoadModel("3d_models/tutorial/smooth_vase.obj");
+        // auto cube_mesh = Mesh::LoadModel("3d_models/tutorial/smooth_vase.obj");
         // auto cube_mesh = Mesh::LoadModel("3d_models/tutorial/colored_cube.obj");
-        // auto cube_mesh = Mesh::LoadModel("3d_models/tutorial/sphere.obj");
+        auto cube_mesh = Mesh::LoadModel("3d_models/tutorial/sphere.obj");
+
         //! @note Make this scene object as part of our current scene.
 
         // -----------------------------
         // Camera Scene Object Creation
         // -----------------------------
-        SceneObject* m_CameraObject = new SceneObject(m_Scene);
+        m_CameraObject = new SceneObject(m_Scene);
         m_CameraObject->AddComponent<EditorCamera>();
         auto& camera_transform = m_CameraObject->SceneGetComponent<Transform>();
         camera_transform.m_Position = {-1.f, -2.f, -20.f};
         auto camera = m_CameraObject->SceneGetComponent<EditorCamera>();
-        m_CameraObjects.push_back(m_CameraObject);
-        
 
         // -----------------------------
         // Cube 1 Scene object Creation
@@ -39,7 +88,7 @@ namespace engine3d{
         SceneObject* cube1 = new SceneObject(m_Scene);
         auto& cube1_transform = cube1->SceneGetComponent<Transform>();
         cube1_transform.m_Position = {.0f, .0f, 2.5};
-        cube1_transform.m_Scale = {10.5f, 10.5f, 10.5};
+        cube1_transform.m_Scale = {.5f, .5f, 0.5};
         cube1->SetMesh(cube_mesh);
 
         // -----------------------------
@@ -49,41 +98,100 @@ namespace engine3d{
         auto& cube2_transform = cube2->SceneGetComponent<Transform>();
         // auto aspect_ratio = ApplicationInstance::GetWindow().GetAspectRatio();
         cube2_transform.m_Position = {5.f, .0f, -7.f};
-        cube2_transform.m_Scale = {5.5f.f, 5.5f, 5.5};
-
+        cube2_transform.m_Scale = {.5f, .5f, 0.5};
         cube2->SetMesh(cube_mesh);
 
-        SceneObject* sphere_point_light = new SceneObject(m_Scene);
-        Mesh mesh = Mesh::LoadModel("3d_models/tutorial/sphere.obj");
-        auto& sphere_transform = sphere_point_light->SceneGetComponent<Transform>();
-        sphere_transform.m_Position = {-10.0, 3.0, -1.0};
-        sphere_transform.m_Scale = {1.f, 1.f, 1.f};
-        sphere_point_light->SetMesh(mesh);
 
 
         //! @note Then we add them to our vector.
         m_SceneObjects.push_back(cube1);
         m_SceneObjects.push_back(cube2);
-        m_PointLightObjects.push_back(sphere_point_light);
-
-        m_AllSceneObjecs.insert({"SceneObjects", m_SceneObjects});
-        m_AllSceneObjecs.insert({"PointLights", m_PointLightObjects});
-        m_AllSceneObjecs.insert({"PointRadioLights", m_PointRadioLights});
-        m_AllSceneObjecs.insert({"Cameras", m_CameraObjects});
 
     }
 
-    void EditorScene::OnMoveCamUpdate(){
+    void EditorScene::OnCreate(){
+    }
 
-        auto& cameraObject = m_AllSceneObjecs["Cameras"].at(0);
-        auto& transform = cameraObject->SceneGetComponent<Transform>();
-        auto& camera = cameraObject->SceneGetComponent<EditorCamera>();
+    void EditorScene::OnUpdate(){
+        // glm::vec3 m_MoveDirection{0.f};
+        // glm::vec3 m_Rotation{0};
+
+        // for(const auto& obj : m_SceneObjects){
+        //     // auto& transform_compoent = obj->SceneGetComponent<Transform>();
+        //     auto& camera_component = obj->SceneGetComponent<EditorCamera>();
+        //     camera_component.SetPerspectiveProjection(glm::radians(50.f), ApplicationInstance::GetWindow().GetAspectRatio(), 0.1f, 50.f);
+        // }
+    }
+
+    void EditorScene::OnMoveCamUpdate(){
+        auto& transform = m_CameraObject->SceneGetComponent<Transform>();
+        auto& camera = m_CameraObject->SceneGetComponent<EditorCamera>();
         auto cube_transform = m_SceneObjects[0]->SceneGetComponent<Transform>();
         // float tempDt_Y;
         glm::vec2 temp_position = {0.f, 0.f};
         constexpr float sensitivity = 2.0f;
         constexpr float pos_sensitivity = 2.f;
         constexpr glm::vec2 invert_pos = {1, -1};
+        // ConsoleLogInfo("x = {}, y = {}, z = {}", transform.m_Position.x, transform.m_Position.y, transform.m_Position.z);
+        // ConsoleLogInfo("x = {}, y = {}, z = {}\n", cube_transform.m_Position.x, cube_transform.m_Position.y, cube_transform.m_Position.z);
+
+        /*
+        move-right = D
+        move-left = A
+        move-forward = W
+        move-backward = S
+
+        move-up = E
+        move-down = Q
+        
+        look-left = LEFT
+        look-right = RIGHT
+        look-up = UP
+        look-down = DOWN
+        */
+
+        /*
+        for(const auto& obj : m_SceneObjects){
+            glm::vec3 rotate{0};
+            if(InputPoll::IsKeyPressed(ENGINE_KEY_LEFT)) rotate.y += 1.f;
+            if(InputPoll::IsKeyPressed(ENGINE_KEY_RIGHT)) rotate.y -= 1.f;
+            if(InputPoll::IsKeyPressed(ENGINE_KEY_UP)) rotate.x += 1.f;
+            if(InputPoll::IsKeyPressed(ENGINE_KEY_DOWN)) rotate.x -= 1.f;
+
+            auto& transform = obj->SceneGetComponent<Transform>();
+            auto& camera = obj->SceneGetComponent<EditorCamera>();
+
+            if(glm::dot(rotate, rotate) > std::numeric_limits<float>::epsilon()){
+                transform.m_AxisRotation += m_LookSpeed * SyncUpdateManager::GetInstance()->m_SyncLocalDeltaTime * glm::normalize(rotate);
+            }
+
+            transform.m_AxisRotation.x = glm::clamp(transform.m_AxisRotation.x, -1.5f, 1.5f);
+            transform.m_AxisRotation.y = glm::mod(transform.m_AxisRotation.y, glm::two_pi<float>());
+
+            float yaw = transform.m_AxisRotation.y;
+            const glm::vec3 forward_dir{sin(yaw), 0.f, cos(yaw)};
+            const glm::vec3 right_dir{forward_dir.z, 0.f, -forward_dir.y};
+            const glm::vec3 up_dir{0.f, -1.f, 0.f};
+
+            glm::vec3 move_dir{0.f};
+
+            if(InputPoll::IsKeyPressed(ENGINE_KEY_W)) move_dir += forward_dir; // FORWARD
+            if(InputPoll::IsKeyPressed(ENGINE_KEY_S)) move_dir -= forward_dir; // BACKWARD
+            if(InputPoll::IsKeyPressed(ENGINE_KEY_D)) move_dir += right_dir; // RIGHT
+            if(InputPoll::IsKeyPressed(ENGINE_KEY_A)) move_dir -= right_dir; // LEFT
+            if(InputPoll::IsKeyPressed(ENGINE_KEY_E)) move_dir += up_dir;    // UP
+            if(InputPoll::IsKeyPressed(ENGINE_KEY_Q)) move_dir -= up_dir;    // DOWN
+
+            if(glm::dot(move_dir, move_dir) > std::numeric_limits<float>::epsilon()){
+                transform.m_Position += m_MoveSpeed * (SyncUpdateManager::GetInstance()->m_SyncLocalDeltaTime) * glm::normalize(move_dir);
+            }
+
+            // camera.SetViewTarget({-1.f, -2.f, -20.f}, transform.m_Position);
+            // camera.SetViewTarget({0.f, 0.f, 0.f}, transform.m_Position);
+            camera.SetViewXYZ(transform.m_Position, transform.m_AxisRotation);
+        }
+        */
+
         glm::vec3 rotate{0};
 
         //! @note Make sure that our mouse controls how camera rotates.
@@ -107,7 +215,7 @@ namespace engine3d{
 
         float yaw = transform.m_AxisRotation.y;
         const glm::vec3 forward_dir{sin(yaw), 0.f, cos(yaw)};
-        const glm::vec3 right_dir{forward_dir.z, 0.f, -forward_dir.x};
+        const glm::vec3 right_dir{forward_dir.z, 0.f, -forward_dir.y};
         const glm::vec3 up_dir{0.f, -1.f, 0.f};
 
         glm::vec3 move_dir{0.f};
@@ -129,4 +237,10 @@ namespace engine3d{
         camera.SetPerspectiveProjection(glm::radians(50.f), ApplicationInstance::GetWindow().GetAspectRatio(), 0.1f, 100.f);
         
     }
+
+    // void EditorScene::OnCameraUpdate(){
+    //     for(const auto& obj : m_SceneObjects){
+    //         obj->SceneGetComponent<EditorCamera>().OnUpdate();
+    //     }
+    // }
 };

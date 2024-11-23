@@ -52,11 +52,18 @@ namespace engine3d{
                         attrib.vertices[3 * index.vertex_index + 2]
                     };
 
-                    vertex.Color = {
-                        attrib.colors[3 * index.vertex_index + 0],
-                        attrib.colors[3 * index.vertex_index + 1],
-                        attrib.colors[3 * index.vertex_index + 2]
-                    };
+                    //! @note Setting the colors
+                    auto color_idx = 3 * index.vertex_index + 2;
+                    if(color_idx < attrib.colors.size()){
+                        vertex.Color = {
+                            attrib.colors[color_idx - 2],
+                            attrib.colors[color_idx - 1],
+                            attrib.colors[color_idx - 0]
+                        };
+                    }
+                    else{
+                        vertex.Color = {0.f, 0.f, 0.f};
+                    }
                 }
 
                 if(index.normal_index >= 0){
