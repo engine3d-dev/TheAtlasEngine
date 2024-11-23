@@ -1,12 +1,9 @@
 #include <Scenes/Assets/Components/Physics/PhysicsBody3D.hpp>
-
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
-#include <Jolt/Math/Vec3.h>
 #include <Jolt/Physics/Body/BodyID.h>
-#include <Jolt/Math/Quat.h>
-#include <Jolt/Physics/EActivation.h>
 #include <glm/fwd.hpp>
 using namespace engine3d;
+
 PhysicsBody3D::PhysicsBody3D(BodyContainer * p_bodyCon)
 {
     bodyType = p_bodyCon;
@@ -30,12 +27,15 @@ void PhysicsBody3D::OnIntegrate()
 void PhysicsBody3D::Begin()
 {
         m_interface = engine3d::JoltHandler::GetInstance()->getInterface();
-        // m_Transform = &m_GameObjectRef->SceneGetComponent<Transform>();
-        // m_Transform = m_GameObjectRef
+        m_Transform = &m_GameObjectRef->SceneGetComponent<Transform>();
 }
 
 void PhysicsBody3D::Update()
 {
+        m_Transform->m_Position.x = m_interface->GetCenterOfMassPosition(bodyType->m_BodyID).GetX();
+        m_Transform->m_Position.y = m_interface->GetCenterOfMassPosition(bodyType->m_BodyID).GetY();
+        m_Transform->m_Position.z = m_interface->GetCenterOfMassPosition(bodyType->m_BodyID).GetZ();
+
 
         //Convert Posiitons
         m_Transform->m_Position.x = m_interface->
@@ -62,12 +62,6 @@ void PhysicsBody3D::Update()
                 GetRotation(bodyType->m_BodyID).GetEulerAngles().GetY();
         m_Transform->m_AxisRotation.z = m_interface->
                 GetRotation(bodyType->m_BodyID).GetEulerAngles().GetZ();
-
-        // std::print("Rotation: (X: {0}, Y: {1}, Z: {2})\n",
-        //         m_Transform->m_AxisRotation.x, 
-        //         m_Transform->m_AxisRotation.y, 
-        //         m_Transform->m_AxisRotation.z);
-        
 }
 
 void PhysicsBody3D::SetScale(float x, float y, float z)

@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.25)
 project(TestApp CXX)
 
-set(SCENE_TEST_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/SceneTest)
-
 build_demos(
     SOURCES
     Application.cpp
@@ -30,8 +28,19 @@ build_demos(
     Scenes/Assets/SceneInstances/ShowCaseSceneInstance.hpp
     src/Scenes/Assets/SceneInstances/ShowCaseSceneInstance.cpp
 
+    #Graphics
+    Scenes/Assets/Components/Graphics/SpriteRender3D.hpp
+    src/Scenes/Assets/Components/Graphics/SpriteRender3D.cpp
+
+    #Graphics Meshes ChildrenMeshes
+    Scenes/Assets/Components/Graphics/Meshes/ChildrenMeshes/CubeMesh.hpp
+    src/Scenes/Assets/Components/Graphics/Meshes/ChildrenMeshes/CubeMesh.cpp
+    Scenes/Assets/Components/Graphics/Meshes/ChildrenMeshes/SphereMesh.hpp
+    # src/Scenes/Assets/Components/Graphics/Meshes/ChildrenMeshes/SphereMesh.cpp
+    src/Scenes/Assets/Components/Graphics/Meshes/ChildrenMeshes/SphereMesh.cpp
+    Scenes/Assets/Components/Graphics/Meshes/MeshContainer.hpp
+    src/Scenes/Assets/Components/Graphics/Meshes/MeshContainer.cpp
+    
+
     LINK_LIBRARIES engine3d
 )
-
-# target_include_directories(${PROJECT_NAME} PUBLIC ${SCENE_TEST_INCLUDE_DIR})
-target_include_directories(${PROJECT_NAME} PUBLIC ./ ../)

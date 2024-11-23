@@ -7,9 +7,10 @@ set(VULKAN_SRC_DIR ${ENGINE_SRC_DIR}/Core/internal/Vulkan2Showcase)
 set(VULKAN_SHADERS_INCLUDE_DIR ${VULKAN_INCLUDE_DIR}/Shaders)
 set(VULKAN_SHADERS_SRC_DIR ${VULKAN_SRC_DIR}/Shaders)
 
-add_library(
-    ${PROJECT_NAME}
-    ${ENGINE_INCLUDE_NAME}/Core/ApplicationInstance.hpp
+
+build_library(
+    SOURCES
+    ${ENGINE_SRC_DIR}/Core/ApplicationInstance.cpp
 
     ${ENGINE_INCLUDE_NAME}/Core/EngineLogger.hpp
     ${ENGINE_INCLUDE_NAME}/Core/Window.hpp
