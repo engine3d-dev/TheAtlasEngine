@@ -29,16 +29,11 @@ void PhysicsBody3D::OnIntegrate()
 void PhysicsBody3D::Begin()
 {
         m_interface = engine3d::JoltHandler::GetInstance()->getInterface();
-        m_Transform = &m_GameObjectRef->SceneGetComponent<Transform>();
+        m_Transform = &m_GameObjectRef->GetComponent<Transform>();
 }
 
 void PhysicsBody3D::Update()
 {
-        m_Transform->m_Position.x = m_interface->GetCenterOfMassPosition(bodyType->m_BodyID).GetX();
-        m_Transform->m_Position.y = m_interface->GetCenterOfMassPosition(bodyType->m_BodyID).GetY();
-        m_Transform->m_Position.z = m_interface->GetCenterOfMassPosition(bodyType->m_BodyID).GetZ();
-
-
         //Convert Posiitons
         m_Transform->m_Position.x = m_interface->
                 GetCenterOfMassPosition(bodyType->m_BodyID).GetX();
@@ -68,11 +63,13 @@ void PhysicsBody3D::Update()
 
 void PhysicsBody3D::SetScale(float x, float y, float z)
 {
+        m_Transform->m_Scale = glm::vec3(x,y,z);
         m_interface->GetShape(bodyType->m_BodyID)->ScaleShape(RVec3(x,y,z));
 }
 
 void PhysicsBody3D::SetPosition(float x, float y, float z)
 {
+        m_Transform->m_Position = glm::vec3(x,y,z);
         m_interface->SetPosition(
                 bodyType->m_BodyID,
                 RVec3(x,y,z),
@@ -85,6 +82,13 @@ void PhysicsBody3D::SetRotation(Quat quaternion)
                 bodyType->m_BodyID, 
                 quaternion,
                 JPH::EActivation::Activate);
+                
+        m_Transform->m_AxisRotation.x = m_interface->GetRotation(
+                bodyType->m_BodyID).GetEulerAngles().GetX();
+        m_Transform->m_AxisRotation.y = m_interface->GetRotation(
+                bodyType->m_BodyID).GetEulerAngles().GetY();
+        m_Transform->m_AxisRotation.z = m_interface->GetRotation(
+                bodyType->m_BodyID).GetEulerAngles().GetZ();
 }
 
 void PhysicsBody3D::LateUpdate()

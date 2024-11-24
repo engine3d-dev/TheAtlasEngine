@@ -68,6 +68,10 @@ namespace engine3d
         {
             m_LocalUpdateCounter++;
         }
+        //! @note I don't understand why this works but localtime doesn't.
+        //! @note My guess is that it needs to be called every frame/ double buffering
+        //! might be an issue.
+        OnSceneRender();
 
         if(m_LocalTimer->ElapsedSec() >= 1.0)
         {
@@ -82,6 +86,14 @@ namespace engine3d
             m_LocalFPS = 0;
         }
         
+    }
+
+    void SyncUpdateManager::OnSceneRender()
+    {
+        for(auto& l_Subscriber : m_SyncRenderSubscribers)
+        {
+            l_Subscriber();
+        }
     }
 
     void SyncUpdateManager::OnPhysicsUpdate()
