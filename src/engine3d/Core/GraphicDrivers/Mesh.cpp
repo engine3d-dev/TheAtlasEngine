@@ -34,6 +34,7 @@ namespace engine3d{
 
         if(!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, p_Filename.c_str())){
             ConsoleLogWarn("Could not Load Mesh!! In Mesh::LoadModel!");
+            exit(0);
         }
 
         std::vector<Vertex> vertices;

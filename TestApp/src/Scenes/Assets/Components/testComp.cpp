@@ -21,7 +21,7 @@ using namespace engine3d;
             (this, &testComp::PhysicsUpdate);
 
         // Need an activation and start funciton
-        m_rb = m_GameObjectRef->SceneGetComponent<PhysicsBody3D>().GetBody();
+        m_rb = m_GameObjectRef->GetComponent<PhysicsBody3D>().GetBody();
 
     }
 

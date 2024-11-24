@@ -26,9 +26,9 @@ build_demos(
     Scenes/Assets/Components/Bodies/Shapes/SphereShaper.hpp
     src/Scenes/Assets/Components/Bodies/Shapes/SphereShaper.cpp
 
-    #Scenes
-    Scenes/Assets/SceneInstances/ShowCaseSceneInstance.hpp
-    src/Scenes/Assets/SceneInstances/ShowCaseSceneInstance.cpp
+    #Worlds
+    Scenes/Assets/WorldInstances/ShowCaseWorldInstance.hpp
+    src/Scenes/Assets/WorldInstances/ShowCaseWorldInstance.cpp
 
     #Graphics
     Scenes/Assets/Components/Graphics/SpriteRender3D.hpp

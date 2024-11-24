@@ -17,7 +17,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 
-#include <Core/SceneManagment/Components/SPComps/EditorCamera.hpp>
+#include <Core/SceneManagment/Components/SPComps/Camera.hpp>
 
 namespace engine3d{
     static std::vector<VkCommandBuffer> g_CommandBuffers;
@@ -168,11 +168,11 @@ namespace engine3d{
         //! @note Starts when to start rendering!!
         vkCmdBindPipeline(current_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, g_Shader->GetGraphicsPipeline());
         float delta_time = SyncUpdateManager::GetInstance()->m_SyncLocalDeltaTime;
-        auto camera_component = p_CameraObject->SceneGetComponent<EditorCamera>();
+        auto camera_component = p_CameraObject->GetComponent<Camera>();
         
         //! @note Only for testing purposes for mesh data.
         // auto point_light_obj = p_Objects[2];
-        // auto point_light_position = point_light_obj->SceneGetComponent<Transform>().m_Position;
+        // auto point_light_position = point_light_obj->GetComponent<Transform>().m_Position;
         
         // for(size_t i = 0; i <= p_Objects.size()-1; i++){
             // ConsoleLogWarn("Index (i <= 1) = {}", i);
@@ -227,14 +227,13 @@ namespace engine3d{
         vkCmdBindPipeline(current_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, g_Shader->GetGraphicsPipeline());
         float delta_time = SyncUpdateManager::GetInstance()->m_SyncLocalDeltaTime;
         auto cameraObject = p_AllSceneObjects["Cameras"][0];
-        auto camera_component = cameraObject->SceneGetComponent<EditorCamera>();
-        
+        auto camera_component = cameraObject->GetComponent<Camera>();
         //! @note Only for testing purposes for mesh data.
         // auto point_light_obj = p_Objects[2];
-        // auto point_light_position = point_light_obj->SceneGetComponent<Transform>().m_Position;
-        auto& position = p_AllSceneObjects["Cameras"][0]->SceneGetComponent<Transform>().m_Position;
+        // auto point_light_position = point_light_obj->GetComponent<Transform>().m_Position;
+        auto& position = p_AllSceneObjects["Cameras"][0]->GetComponent<Transform>().m_Position;
 
-        for(const auto& obj : p_AllSceneObjects.at("SceneObjects")){
+        for(const auto& obj : p_AllSceneObjects.at("RenderedObjects")){
 
             auto proj_view = camera_component.GetProjection() * camera_component.GetView();
 
@@ -243,7 +242,7 @@ namespace engine3d{
             SimplePushConstantData push = {
                 .Transform = proj_view * model_matrix,
                 .ModelMatrix = model_matrix,
-                .LightTransform = position - obj->SceneGetComponent<Transform>().m_Position
+                .LightTransform = position - obj->GetComponent<Transform>().m_Position
                 // .LightTransform = position
             };
 
@@ -255,11 +254,9 @@ namespace engine3d{
                     sizeof(SimplePushConstantData), 
                     &push
             );
-
             auto& vb = obj->GetMesh().GetVertices();
             auto ib = obj->GetMesh().GetIndices();
             vb->Bind(current_cmd_buffer);
-
             if(ib != nullptr){
                 ib->Bind(current_cmd_buffer);
                 if(ib->HasIndicesPresent()){
