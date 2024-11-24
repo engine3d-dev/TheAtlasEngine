@@ -118,6 +118,7 @@ add_library(
     ${ENGINE_SRC_DIR}/Core/Renderer/Renderer.cpp
 
     ${ENGINE_SRC_DIR}/Math/Interpolation.cpp
+    ${ENGINE_SRC_DIR}/Math/Math.cpp
 
     ${ENGINE_SRC_DIR}/Physics/JoltHandler.cpp
 )

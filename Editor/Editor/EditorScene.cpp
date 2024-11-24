@@ -1,5 +1,6 @@
 #include "EditorScene.hpp"
 #include "Core/GraphicDrivers/VertexBuffer.hpp"
+#include "Math/Math.hpp"
 #include <Core/SceneManagment/Components/SPComps/Transform.hpp>
 #include <Core/EngineLogger.hpp>
 #include <Core/SceneManagment/Components/SPComps/EditorCamera.hpp>
@@ -7,6 +8,7 @@
 #include <Math/Interpolation.hpp>
 #include <Core/ApplicationInstance.hpp>
 #include <Core/Event/InputPoll.hpp>
+#include <glm/trigonometric.hpp>
 
 namespace engine3d{
     EditorScene::EditorScene(){
@@ -17,7 +19,10 @@ namespace engine3d{
         // auto cube_mesh = CreateCubeMesh({.0f, .0f, .0f});
 
         //! @note Instead of loading in primitive cubes by hand, we load in .obj's instead.
-        auto cube_mesh = Mesh::LoadModel("3d_models/tutorial/smooth_vase.obj");
+        // auto cube_mesh = Mesh::LoadModel("3d_models/tutorial/smooth_vase.obj");
+        // auto cube_mesh = Mesh::LoadModel("3d_models/tutorial/FinalBaseMesh.obj");
+        // auto cube_mesh = Mesh::LoadModel("3d_models/tutorial/Castelia City.obj");
+        auto cube_mesh = Mesh::LoadModel("3d_models/tutorial/bugatti.obj");
         // auto cube_mesh = Mesh::LoadModel("3d_models/tutorial/colored_cube.obj");
         // auto cube_mesh = Mesh::LoadModel("3d_models/tutorial/sphere.obj");
         //! @note Make this scene object as part of our current scene.
@@ -29,6 +34,7 @@ namespace engine3d{
         m_CameraObject->AddComponent<EditorCamera>();
         auto& camera_transform = m_CameraObject->SceneGetComponent<Transform>();
         camera_transform.m_Position = {-1.f, -2.f, -20.f};
+        // camera_transform.m_AxisRotation = {glm::radians(180.0f), 0.f, 0.f};
         auto camera = m_CameraObject->SceneGetComponent<EditorCamera>();
         m_CameraObjects.push_back(m_CameraObject);
         
@@ -39,7 +45,9 @@ namespace engine3d{
         SceneObject* cube1 = new SceneObject(m_Scene);
         auto& cube1_transform = cube1->SceneGetComponent<Transform>();
         cube1_transform.m_Position = {.0f, .0f, 2.5};
-        cube1_transform.m_Scale = {10.5f, 10.5f, 10.5};
+        cube1_transform.m_Scale = {.5f, .5f, .5f};
+        // cube1_transform.m_AxisRotation = ToQuat(glm::vec3(glm::radians(180.0f), 0.f, 0.f));
+        cube1_transform.m_AxisRotation = {glm::radians(180.0f), 0.0f, 0.0f};
         cube1->SetMesh(cube_mesh);
 
         // -----------------------------
@@ -63,7 +71,7 @@ namespace engine3d{
 
         //! @note Then we add them to our vector.
         m_SceneObjects.push_back(cube1);
-        m_SceneObjects.push_back(cube2);
+        // m_SceneObjects.push_back(cube2);
         m_PointLightObjects.push_back(sphere_point_light);
 
         m_AllSceneObjecs.insert({"SceneObjects", m_SceneObjects});
@@ -82,7 +90,7 @@ namespace engine3d{
         // float tempDt_Y;
         glm::vec2 temp_position = {0.f, 0.f};
         constexpr float sensitivity = 2.0f;
-        constexpr float pos_sensitivity = 2.f;
+        float pos_sensitivity = 2.f;
         constexpr glm::vec2 invert_pos = {1, -1};
         glm::vec3 rotate{0};
 
@@ -116,8 +124,12 @@ namespace engine3d{
         if(InputPoll::IsKeyPressed(ENGINE_KEY_S)) move_dir -= forward_dir; // BACKWARD
         if(InputPoll::IsKeyPressed(ENGINE_KEY_D)) move_dir += right_dir; // RIGHT
         if(InputPoll::IsKeyPressed(ENGINE_KEY_A)) move_dir -= right_dir; // LEFT
-        if(InputPoll::IsKeyPressed(ENGINE_KEY_E)) move_dir += up_dir;    // UP
-        if(InputPoll::IsKeyPressed(ENGINE_KEY_Q)) move_dir -= up_dir;    // DOWN
+        if(InputPoll::IsKeyPressed(ENGINE_KEY_SPACE)) move_dir += up_dir;    // UP
+        if(InputPoll::IsKeyPressed(ENGINE_KEY_LEFT_SHIFT)) move_dir -= up_dir;    // DOWN
+
+        if(InputPoll::IsMousePressed(ENGINE_MOUSE_BUTTON_MIDDLE)){
+            pos_sensitivity += (m_MousePosition.y - InputPoll::GetMouseY()) * invert_pos.x;
+        }
 
         if(glm::dot(move_dir, move_dir) > std::numeric_limits<float>::epsilon()){
             transform.m_Position += m_MoveSpeed * (SyncUpdateManager::GetInstance()->m_SyncLocalDeltaTime) * glm::normalize(move_dir) * pos_sensitivity;
@@ -126,7 +138,7 @@ namespace engine3d{
         camera.SetViewXYZ(transform.m_Position, transform.m_AxisRotation);
 
 
-        camera.SetPerspectiveProjection(glm::radians(50.f), ApplicationInstance::GetWindow().GetAspectRatio(), 0.1f, 100.f);
+        camera.SetPerspectiveProjection(glm::radians(50.f), ApplicationInstance::GetWindow().GetAspectRatio(), 0.1f, 1000.f);
         
     }
 };

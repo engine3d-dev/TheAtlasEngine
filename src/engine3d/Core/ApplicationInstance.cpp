@@ -20,7 +20,7 @@ namespace engine3d{
         g_ThisInstance = this;
         g_DebugName = p_DebugName;
         SetCurrentAPI(VULKAN);
-        m_Window = Window::Create(900, 600, p_DebugName);
+        m_Window = Window::Create(1960, 1080, p_DebugName);
 
         // ImGui_ImplVulkanH_Window();
         // ImGui_ImplGlfw_InitForVulkan(ApplicationInstance::GetWindow().GetNativeWindow(), true);
