@@ -30,6 +30,15 @@ namespace engine3d
             // Varied by random frames
             void OnUpdate();
             void OnLateUpdate();
+            void OnSceneRender();
+
+            //! @note update specialization
+            template<typename, typename = std::void_t<>>
+            struct m_IsRenderer : std::false_type{};
+
+            template<typename UCompClass>
+            struct m_IsRenderer<UCompClass, std::void_t<decltype(
+                std::declval<UCompClass>().RenderScenes())>> : std::true_type {};
 
             //! @note update specialization
             template<typename, typename = std::void_t<>>
@@ -59,6 +68,7 @@ namespace engine3d
             std::vector<std::function<void()>> m_SyncLateUpdateSubscribers;
             std::vector<std::function<void()>> m_SyncUpdateSubscribers;
             std::vector<std::function<void()>> m_SyncOnTickUpdateSubscribers;
+            std::vector<std::function<void()>> m_SyncRenderSubscribers;
 
             SyncUpdateManager();
             ~SyncUpdateManager();
@@ -98,6 +108,19 @@ namespace engine3d
                     if(&UComponent::PhysicsUpdate == p_Update)
                     {
                         m_SyncOnTickUpdateSubscribers.push_back([p_Instance, p_Update]() 
+                        {
+                            (p_Instance->*p_Update)();
+                        });
+                        return;
+                    }
+                }
+
+                // For scenes not components
+                if constexpr (m_IsRenderer<UComponent>::value)
+                {
+                    if(&UComponent::RenderScenes == p_Update)
+                    {
+                        m_SyncRenderSubscribers.push_back([p_Instance, p_Update]() 
                         {
                             (p_Instance->*p_Update)();
                         });

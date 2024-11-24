@@ -2,6 +2,8 @@
 #include <entt/entt.hpp>
 
 namespace engine3d {
+
+  class SceneObject;
   //! @note TODO: Move this into Core/Scene/ directory. Not in Application Manager.
   class Scene {
     public:
@@ -9,7 +11,6 @@ namespace engine3d {
       ~Scene();
 
     private:
-      // Add more later
 
   };
 };

@@ -16,19 +16,19 @@ namespace engine3d {
     }
 
     void SceneObject::SetPosition(const glm::vec3& p_Position){
-        SceneGetComponent<Transform>().m_Position = p_Position;
+        GetComponent<Transform>().m_Position = p_Position;
     }
 
     void SceneObject::SetRotation(const glm::vec3& p_Rotation){
-        SceneGetComponent<Transform>().m_AxisRotation = p_Rotation;
+        GetComponent<Transform>().m_AxisRotation = p_Rotation;
     }
 
     glm::vec3 SceneObject::GetRotation(){
-        return SceneGetComponent<Transform>().m_AxisRotation;
+        return GetComponent<Transform>().m_AxisRotation;
     }
 
     glm::mat4 SceneObject::toMat4(){
-        auto transform_component = SceneGetComponent<Transform>();
+        auto transform_component = GetComponent<Transform>();
 
         auto transform = glm::translate(glm::mat4{1.f}, transform_component.m_Position);
         transform[0][0] *= transform_component.m_Scale.x;

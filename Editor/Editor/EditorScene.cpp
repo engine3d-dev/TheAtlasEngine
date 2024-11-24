@@ -3,7 +3,7 @@
 #include "Math/Math.hpp"
 #include <Core/SceneManagment/Components/SPComps/Transform.hpp>
 #include <Core/EngineLogger.hpp>
-#include <Core/SceneManagment/Components/SPComps/EditorCamera.hpp>
+#include <Core/SceneManagment/Components/SPComps/Camera.hpp>
 #include <Core/TimeManagement/UpdateManagers/SyncUpdateManager.hpp>
 #include <Math/Interpolation.hpp>
 #include <Core/ApplicationInstance.hpp>
@@ -22,7 +22,7 @@ namespace engine3d{
         // auto cube_mesh = Mesh::LoadModel("3d_models/tutorial/smooth_vase.obj");
         // auto cube_mesh = Mesh::LoadModel("3d_models/tutorial/FinalBaseMesh.obj");
         // auto cube_mesh = Mesh::LoadModel("3d_models/tutorial/Castelia City.obj");
-        auto cube_mesh = Mesh::LoadModel("3d_models/tutorial/bugatti.obj");
+        auto cube_mesh = Mesh::LoadModel("3d_models/tutorial/smooth_vase.obj");
         // auto cube_mesh = Mesh::LoadModel("3d_models/tutorial/colored_cube.obj");
         // auto cube_mesh = Mesh::LoadModel("3d_models/tutorial/sphere.obj");
         //! @note Make this scene object as part of our current scene.
@@ -31,11 +31,11 @@ namespace engine3d{
         // Camera Scene Object Creation
         // -----------------------------
         SceneObject* m_CameraObject = new SceneObject(m_Scene);
-        m_CameraObject->AddComponent<EditorCamera>();
-        auto& camera_transform = m_CameraObject->SceneGetComponent<Transform>();
-        camera_transform.m_Position = {-1.f, -2.f, -20.f};
+        m_CameraObject->AddComponent<Camera>();
+        auto& camera_transform = m_CameraObject->GetComponent<Transform>();
+        camera_transform.m_Position = {-1.f, 5.f, -20.f};
         // camera_transform.m_AxisRotation = {glm::radians(180.0f), 0.f, 0.f};
-        auto camera = m_CameraObject->SceneGetComponent<EditorCamera>();
+        auto camera = m_CameraObject->GetComponent<Camera>();
         m_CameraObjects.push_back(m_CameraObject);
         
 
@@ -43,18 +43,21 @@ namespace engine3d{
         // Cube 1 Scene object Creation
         // -----------------------------
         SceneObject* cube1 = new SceneObject(m_Scene);
-        auto& cube1_transform = cube1->SceneGetComponent<Transform>();
+        auto& cube1_transform = cube1->GetComponent<Transform>();
         cube1_transform.m_Position = {.0f, .0f, 2.5};
-        cube1_transform.m_Scale = {.5f, .5f, .5f};
+        cube1_transform.m_Scale = {10.5f, 10.5f, 10.5f};
         // cube1_transform.m_AxisRotation = ToQuat(glm::vec3(glm::radians(180.0f), 0.f, 0.f));
-        cube1_transform.m_AxisRotation = {glm::radians(180.0f), 0.0f, 0.0f};
+        cube1_transform.m_AxisRotation = {
+            glm::radians(0.0f),
+            glm::radians(0.0f),
+            glm::radians(0.0f)};
         cube1->SetMesh(cube_mesh);
 
         // -----------------------------
         // Cube 2 Scene object Creation
         // -----------------------------
         SceneObject* cube2 = new SceneObject(m_Scene);
-        auto& cube2_transform = cube2->SceneGetComponent<Transform>();
+        auto& cube2_transform = cube2->GetComponent<Transform>();
         // auto aspect_ratio = ApplicationInstance::GetWindow().GetAspectRatio();
         cube2_transform.m_Position = {5.f, .0f, -7.f};
         cube2_transform.m_Scale = {5.5f, 5.5f, 5.5};
@@ -63,7 +66,7 @@ namespace engine3d{
 
         SceneObject* sphere_point_light = new SceneObject(m_Scene);
         Mesh mesh = Mesh::LoadModel("3d_models/tutorial/sphere.obj");
-        auto& sphere_transform = sphere_point_light->SceneGetComponent<Transform>();
+        auto& sphere_transform = sphere_point_light->GetComponent<Transform>();
         sphere_transform.m_Position = {-10.0, 3.0, -1.0};
         sphere_transform.m_Scale = {1.f, 1.f, 1.f};
         sphere_point_light->SetMesh(mesh);
@@ -71,12 +74,12 @@ namespace engine3d{
 
         //! @note Then we add them to our vector.
         m_SceneObjects.push_back(cube1);
-        // m_SceneObjects.push_back(cube2);
+        m_SceneObjects.push_back(cube2);
         m_PointLightObjects.push_back(sphere_point_light);
 
-        m_AllSceneObjecs.insert({"SceneObjects", m_SceneObjects});
+        m_AllSceneObjecs.insert({"RenderedObjects", m_SceneObjects});
         m_AllSceneObjecs.insert({"PointLights", m_PointLightObjects});
-        m_AllSceneObjecs.insert({"PointRadioLights", m_PointRadioLights});
+        m_AllSceneObjecs.insert({"PointRadiusLights", m_PointRadioLights});
         m_AllSceneObjecs.insert({"Cameras", m_CameraObjects});
 
     }
@@ -84,14 +87,14 @@ namespace engine3d{
     void EditorScene::OnMoveCamUpdate(){
 
         auto& cameraObject = m_AllSceneObjecs["Cameras"].at(0);
-        auto& transform = cameraObject->SceneGetComponent<Transform>();
-        auto& camera = cameraObject->SceneGetComponent<EditorCamera>();
-        auto cube_transform = m_SceneObjects[0]->SceneGetComponent<Transform>();
+        auto& transform = cameraObject->GetComponent<Transform>();
+        auto& camera = cameraObject->GetComponent<Camera>();
+        auto cube_transform = m_SceneObjects[0]->GetComponent<Transform>();
         // float tempDt_Y;
         glm::vec2 temp_position = {0.f, 0.f};
         constexpr float sensitivity = 2.0f;
         float pos_sensitivity = 2.f;
-        constexpr glm::vec2 invert_pos = {1, -1};
+        constexpr glm::vec2 invert_pos = {-1, -1};
         glm::vec3 rotate{0};
 
         //! @note Make sure that our mouse controls how camera rotates.
@@ -138,7 +141,7 @@ namespace engine3d{
         camera.SetViewXYZ(transform.m_Position, transform.m_AxisRotation);
 
 
-        camera.SetPerspectiveProjection(glm::radians(50.f), ApplicationInstance::GetWindow().GetAspectRatio(), 0.1f, 1000.f);
+        camera.SetPerspectiveProjection(glm::radians(50.f), ApplicationInstance::GetWindow().GetAspectRatio(), 1.f, 1000.f);
         
     }
 };

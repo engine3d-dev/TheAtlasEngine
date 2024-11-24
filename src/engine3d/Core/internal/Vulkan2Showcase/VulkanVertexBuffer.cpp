@@ -41,7 +41,6 @@ namespace engine3d::vk{
         vkMapMemory(VulkanContext::GetDriver(), m_VertexBufferDeviceMemoryHandler, 0, buffer_size, 0, &data);
         memcpy(data, p_Vertices.data(), static_cast<size_t>(buffer_size));
         vkUnmapMemory(VulkanContext::GetDriver(), m_VertexBufferDeviceMemoryHandler);
-
         ConsoleLogWarn("Vulkan2Showcase: Vulkan VertexBuffer Initialized Completed!!!");
     }
 

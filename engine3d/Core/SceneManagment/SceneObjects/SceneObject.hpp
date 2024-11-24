@@ -42,7 +42,7 @@ namespace engine3d
         component.OnIntegrate();
       }
 
-      template <typename T> T &SceneGetComponent() 
+      template <typename T> T &GetComponent() 
       {
         // Checking if SceneObject contains this component.
         if (!this->HasComponent<T>())
