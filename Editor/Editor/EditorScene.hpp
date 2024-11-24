@@ -34,7 +34,7 @@ namespace engine3d{
         Scene* m_Scene;
         // SceneObject* m_CameraObject;
         glm::vec2 m_MousePosition;
-        float m_MoveSpeed = {3.f};
+        float m_MoveSpeed = {5.f};
         float m_LookSpeed = {1.5f};
     };
 };

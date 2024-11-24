@@ -243,7 +243,8 @@ namespace engine3d{
             SimplePushConstantData push = {
                 .Transform = proj_view * model_matrix,
                 .ModelMatrix = model_matrix,
-                .LightTransform = position
+                .LightTransform = position - obj->SceneGetComponent<Transform>().m_Position
+                // .LightTransform = position
             };
 
             vkCmdPushConstants(
