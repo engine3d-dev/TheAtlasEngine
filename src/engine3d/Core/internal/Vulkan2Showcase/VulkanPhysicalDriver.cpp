@@ -25,7 +25,7 @@ namespace engine3d::vk{
             vkGetPhysicalDeviceFeatures(device, &device_features);
 
             //! @note VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU checks if our device is an external device.
-            if(device_properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU || device_properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU){
+            if(device_properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU){
                 m_PhysicalDevice = device;
                 break;
             }
