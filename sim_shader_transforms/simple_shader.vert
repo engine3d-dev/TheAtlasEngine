@@ -23,8 +23,9 @@ layout(push_constant) uniform Push {
 vec3 dir_to_light = normalize(push.LightTransform);
 
 void main(){
-    // vec4 worldPositionSpace = push.ModelMatrix * vec3(Position, 1.0);
-    gl_Position = push.Transform * vec4(Position, 1.0);
+    vec3 newPos = vec3(Position.x,Position.y-.5f,Position.z);
+    // vec4 worldPositionSpace = push.ModelMatrix * vec4(newPos, 1.0);
+    gl_Position = push.Transform * vec4(newPos,1.0);
 
     // mat3 normal_mat = transpose(inverse(mat3(push.ModelMatrix)));
     vec3 normalize_world_space = normalize(mat3(push.ModelMatrix) * Normals);

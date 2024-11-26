@@ -36,6 +36,42 @@ using namespace engine3d;
                     EActivation::Activate
                 );
         }
+        if(InputPoll::IsKeyPressed(KeyCode::Up))
+        {
+            JoltHandler::GetInstance()->
+                getInterface()->AddForce(
+                    m_rb->m_BodyID,
+                    RVec3(0.0f,0.0f,100000.0f),
+                    EActivation::Activate
+                );
+        }
+        if(InputPoll::IsKeyPressed(KeyCode::Down))
+        {
+            JoltHandler::GetInstance()->
+                getInterface()->AddForce(
+                    m_rb->m_BodyID,
+                    RVec3(0.0f,0.0f,-100000.0f),
+                    EActivation::Activate
+                );
+        }
+        if(InputPoll::IsKeyPressed(KeyCode::Left))
+        {
+            JoltHandler::GetInstance()->
+                getInterface()->AddForce(
+                    m_rb->m_BodyID,
+                    RVec3(-100000.0f,0.0f,0.0f),
+                    EActivation::Activate
+                );
+        }
+        if(InputPoll::IsKeyPressed(KeyCode::Right))
+        {
+            JoltHandler::GetInstance()->
+                getInterface()->AddForce(
+                    m_rb->m_BodyID,
+                    RVec3(100000.0f,0.0f,0.0f),
+                    EActivation::Activate
+                );
+        }
     }
 
     void testComp::LateUpdate()

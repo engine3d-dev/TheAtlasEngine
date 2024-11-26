@@ -1,19 +1,11 @@
 #include <Scenes/Assets/Components/Bodies/Shapes/BoxShaper.hpp>
-using namespace JPH;
-using namespace JPH::literals;
-using namespace engine3d;
-BoxShaper::BoxShaper()
+#include <Jolt/Physics/Collision/Shape/BoxShape.h>
+BoxShaper::BoxShaper(JPH::EMotionType p_MotionType, const JPH::ObjectLayer p_LayerType)
 {
-    JoltHandler * temp = engine3d::JoltHandler::GetInstance();
-    m_BodySettings = BodyCreationSettings(
-        temp->m_BoxShapeScaled,
-        RVec3(0.0_r, -1.0_r, 0.0_r),
-        Quat::sIdentity(),
-        EMotionType::Static,
-        Engine3DLayers::Static
-        );
-        
-    m_BodyID = temp->getInterface()->CreateAndAddBody(
-                    m_BodySettings, 
-                    EActivation::DontActivate);
+    printf("Getting here2\n");
+    BaseShape = new JPH::BoxShape(Vec3(1.0f, 1.0f, 1.0f));
+    ParentShape = BaseShape;
+    printf("Getting here3\n");
+    m_MotionType = p_MotionType;
+    m_LayerType = p_LayerType;
 }

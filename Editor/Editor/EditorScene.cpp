@@ -33,7 +33,7 @@ namespace engine3d{
         SceneObject* m_CameraObject = new SceneObject(m_Scene);
         m_CameraObject->AddComponent<Camera>();
         auto& camera_transform = m_CameraObject->GetComponent<Transform>();
-        camera_transform.m_Position = {-1.f, 5.f, -20.f};
+        camera_transform.SetPos<glm::vec3>( {-1.f, 5.f, -20.f});
         // camera_transform.m_AxisRotation = {glm::radians(180.0f), 0.f, 0.f};
         auto camera = m_CameraObject->GetComponent<Camera>();
         m_CameraObjects.push_back(m_CameraObject);
@@ -44,7 +44,7 @@ namespace engine3d{
         // -----------------------------
         SceneObject* cube1 = new SceneObject(m_Scene);
         auto& cube1_transform = cube1->GetComponent<Transform>();
-        cube1_transform.m_Position = {.0f, .0f, 2.5};
+        cube1_transform.SetPos<glm::vec3>( {.0f, .0f, 2.5});
         cube1_transform.m_Scale = {10.5f, 10.5f, 10.5f};
         // cube1_transform.m_AxisRotation = ToQuat(glm::vec3(glm::radians(180.0f), 0.f, 0.f));
         cube1_transform.m_AxisRotation = {
@@ -59,7 +59,7 @@ namespace engine3d{
         SceneObject* cube2 = new SceneObject(m_Scene);
         auto& cube2_transform = cube2->GetComponent<Transform>();
         // auto aspect_ratio = ApplicationInstance::GetWindow().GetAspectRatio();
-        cube2_transform.m_Position = {5.f, .0f, -7.f};
+        cube2_transform.SetPos<glm::vec3>( {5.f, .0f, -7.f});
         cube2_transform.m_Scale = {5.5f, 5.5f, 5.5};
 
         cube2->SetMesh(cube_mesh);
@@ -67,7 +67,7 @@ namespace engine3d{
         SceneObject* sphere_point_light = new SceneObject(m_Scene);
         Mesh mesh = Mesh::LoadModel("3d_models/tutorial/sphere.obj");
         auto& sphere_transform = sphere_point_light->GetComponent<Transform>();
-        sphere_transform.m_Position = {-10.0, 3.0, -1.0};
+        sphere_transform.SetPos<glm::vec3>( {-10.0, 3.0, -1.0});
         sphere_transform.m_Scale = {1.f, 1.f, 1.f};
         sphere_point_light->SetMesh(mesh);
 
@@ -134,11 +134,16 @@ namespace engine3d{
             pos_sensitivity += (m_MousePosition.y - InputPoll::GetMouseY()) * invert_pos.x;
         }
 
-        if(glm::dot(move_dir, move_dir) > std::numeric_limits<float>::epsilon()){
-            transform.m_Position += m_MoveSpeed * (SyncUpdateManager::GetInstance()->m_SyncLocalDeltaTime) * glm::normalize(move_dir) * pos_sensitivity;
+        if(glm::dot(move_dir, move_dir) > std::numeric_limits<float>::epsilon())
+        {
+            transform.SetPos<glm::vec3>(
+                transform.GetPos<glm::vec3>() +
+                m_MoveSpeed *
+                (SyncUpdateManager::GetInstance()->m_SyncLocalDeltaTime) *
+                glm::normalize(move_dir) * pos_sensitivity);
         }
 
-        camera.SetViewXYZ(transform.m_Position, transform.m_AxisRotation);
+        camera.SetViewXYZ(transform.GetPos<glm::vec3>(), transform.m_AxisRotation);
 
 
         camera.SetPerspectiveProjection(glm::radians(50.f), ApplicationInstance::GetWindow().GetAspectRatio(), 1.f, 1000.f);

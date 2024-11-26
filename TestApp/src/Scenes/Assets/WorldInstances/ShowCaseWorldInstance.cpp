@@ -1,5 +1,7 @@
-#include "Core/Event/InputPoll.hpp"
-#include "Core/Renderer/Renderer.hpp"
+#include "Core/EngineLogger.hpp"
+#include <Core/Event/InputPoll.hpp>
+#include <Core/Renderer/Renderer.hpp>
+#include <Physics/Interfaces/BPLayerInterfaceHandler.hpp>
 #include <Core/ApplicationManager/Scene.hpp>
 #include <Core/SceneManagment/Components/SPComps/Camera.hpp>
 #include <Core/SceneManagment/SceneObjects/SceneObject.hpp>
@@ -16,6 +18,7 @@
 #include <Scenes/Assets/Components/Graphics/Meshes/ChildrenMeshes/SphereMesh.hpp>
 #include <Math/Math.hpp>
 #include <Math/Interpolation.hpp>
+#include <glm/fwd.hpp>
 #include <glm/trigonometric.hpp>
 #include <stdlib.h>
 using namespace engine3d;
@@ -28,7 +31,6 @@ ShowCaseWorldInstance::ShowCaseWorldInstance()
         Subscribe(this,&ShowCaseWorldInstance::RenderScenes);
 
     m_Scenes.push_back(new engine3d::Scene());
-    CreateObjects();
 
 }
 
@@ -36,46 +38,49 @@ void ShowCaseWorldInstance::CreateObjects()
 {
     //Platform
     engine3d::SceneObject* platform = new engine3d::SceneObject(m_Scenes[0]);
-    BodyContainer * l_Body = new BoxShaper();
+    printf("Getting here\n");
+    BodyContainer * l_Body = new BoxShaper(JPH::EMotionType::Static, Engine3DLayers::Static);
     platform->AddComponent<PhysicsBody3D>(l_Body);
+    printf("Getting here4\n");
     auto& platformPhysicsBody = platform->GetComponent<PhysicsBody3D>();
-    platformPhysicsBody.SetScale(10.0f, .5f, 10.0f); 
+    printf("Getting here5\n");
+    platformPhysicsBody.ForcedSetScale(100.0f, .50f, 100.0f); 
+    platformPhysicsBody.ForcedSetPosition(0.0f, 0.0f, 0.0f);
+    printf("Getting here6\n");
     platform->name = "Platform1";
     platform->AddComponent<SpriteRender3D>("3d_models/tutorial/cube.obj", platform);
     m_RenderedObjectList.push_back(platform);
-
-    //Platform
-    engine3d::SceneObject* platform1 = new engine3d::SceneObject(m_Scenes[0]);
-    BodyContainer * l_Body1 = new BoxShaper();
-    platform1->AddComponent<PhysicsBody3D>(l_Body1);
-    auto& platformPhysicsBody1 = platform1->GetComponent<PhysicsBody3D>();
-    platformPhysicsBody1.SetPosition(0.0f, 5.f, 0.0f);
-    platformPhysicsBody1.SetScale(10.0f, 2.0f, 2.0f);
-    JPH::Vec3 eulerangles(glm::radians(45.f),0.f,0.f); 
-    platformPhysicsBody1.SetRotation(Quat::sEulerAngles(eulerangles));
-    platform1->name = "Platform1";
-    platform1->AddComponent<SpriteRender3D>("3d_models/tutorial/cube.obj", platform1);
-    m_RenderedObjectList.push_back(platform1);
+    // //Platform
+    // engine3d::SceneObject* platform1 = new engine3d::SceneObject(m_Scenes[0]);
+    // BodyContainer * l_Body1 = new BoxShaper(JPH::EMotionType::Static, Engine3DLayers::Static);
+    // platform1->AddComponent<PhysicsBody3D>(l_Body1);
+    // auto& platformPhysicsBody1 = platform1->GetComponent<PhysicsBody3D>();
+    // platformPhysicsBody1.ForcedSetPosition(0.0f, 5.f, 0.0f);
+    // platformPhysicsBody1.ForcedSetScale(10.0f, 2.0f, 2.0f);
+    // JPH::Vec3 eulerangles(glm::radians(45.f),0.f,0.f); 
+    // platformPhysicsBody1.ForcedSetRotation(JPH::Quat::sEulerAngles(eulerangles));
+    // platform1->name = "Platform1";
+    // platform1->AddComponent<SpriteRender3D>("3d_models/tutorial/cube.obj", platform1);
+    // m_RenderedObjectList.push_back(platform1);
 
     //Sphere
     engine3d::SceneObject* player = new engine3d::SceneObject(m_Scenes[0]);
-    l_Body = new SphereShaper();
+    l_Body = new SphereShaper(JPH::EMotionType::Dynamic, Engine3DLayers::Dynamic);
     player->AddComponent<PhysicsBody3D>(l_Body);
     auto& player_physicsBody = player->GetComponent<PhysicsBody3D>();
-    player_physicsBody.SetScale(.5f, .5f, .5f);
-    player_physicsBody.SetPosition(0.0f, 10.0f, 0.0f);
+    player_physicsBody.ForcedSetScale(.5f, .5f, .5f);
+    player_physicsBody.ForcedSetPosition(0.0f, 10.0f, 0.0f);
     player->AddComponent<SpriteRender3D>("3d_models/tutorial/sphere.obj", player);
     player->AddComponent<testComp>();
     player->name = "Player";
     m_RenderedObjectList.push_back(player);
 
-
     //Main Game Camera
     engine3d::SceneObject* MainCamera = new engine3d::SceneObject(m_Scenes[0]);
     auto& camera_transform = MainCamera->GetComponent<engine3d::Transform>();
     
-    camera_transform.m_Position = {-.2f,-.2f,20.f};
-    camera_transform.m_AxisRotation = {0.f,180.f,0.f};
+    camera_transform.m_Position = {2.f,3.f,0.f};
+    camera_transform.m_AxisRotation = {0.f,0.f,0.f};
     MainCamera->AddComponent<engine3d::Camera>();
     m_CameraObjectList.push_back(MainCamera);
 
@@ -88,6 +93,11 @@ void ShowCaseWorldInstance::CreateObjects()
 
 void ShowCaseWorldInstance::RenderScenes()
 {
+    if(!callOnce)
+    {
+        CreateObjects();
+        callOnce = true;
+    }
     // auto& cameraObj = m_AllSceneObjecs["Cameras"][0];
     // auto& camera = cameraObj->GetComponent<engine3d::Camera>();
     // for(const auto& m_RenderedObjects : m_RenderedObjectList)
@@ -106,6 +116,15 @@ auto& cameraObject = m_AllSceneObjecs["Cameras"].at(0);
     float pos_sensitivity = 2.f;
     constexpr glm::vec2 invert_pos = {-1, -1};
     glm::vec3 rotate{0};
+
+    ConsoleLogWarn("SphereCords: {}", m_AllSceneObjecs["RenderedObjects"][1]->GetComponent<Transform>().GetPos<glm::vec3>().x);
+    ConsoleLogWarn("SphereCords: {}", m_AllSceneObjecs["RenderedObjects"][1]->GetComponent<Transform>().GetPos<glm::vec3>().y);
+    ConsoleLogWarn("SphereCords: {}", m_AllSceneObjecs["RenderedObjects"][1]->GetComponent<Transform>().GetPos<glm::vec3>().z);
+    ConsoleLogWarn("SphereRot: {}", m_AllSceneObjecs["RenderedObjects"][1]->GetComponent<Transform>().GetAxisRot<glm::vec3>().x);
+    ConsoleLogWarn("SphereRot: {}", m_AllSceneObjecs["RenderedObjects"][1]->GetComponent<Transform>().GetAxisRot<glm::vec3>().y);
+    ConsoleLogWarn("SphereRot: {}", m_AllSceneObjecs["RenderedObjects"][1]->GetComponent<Transform>().GetAxisRot<glm::vec3>().z);
+    // ConsoleLogError("SphereCords: {},{},{}", transform.GetAxisRot<glm::vec3>().x,transform.GetAxisRot<glm::vec3>().y,transform.GetAxisRot<glm::vec3>().z);
+    
 
     //! @note Make sure that our mouse controls how camera rotates.
     if(InputPoll::IsMousePressed(Mouse::ButtonRight)){
