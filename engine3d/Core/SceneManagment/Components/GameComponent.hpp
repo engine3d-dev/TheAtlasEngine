@@ -1,11 +1,10 @@
 #pragma once
 
-// #include <Core\SceneManagment\SceneObjects\SceneObject.hpp>
+#include <Core\SceneManagment\SceneObjects\SceneObject.hpp>
 #include <cstdint>
 
 namespace engine3d 
 {
-  class SceneObject;
   class GameComponent
   {
     public:

@@ -3,8 +3,6 @@
 
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Collision/Shape/ScaledShape.h>
-#include <Jolt/Physics/Collision/Shape/SphereShape.h>
-#include <Jolt/Physics/Collision/Shape/BoxShape.h>
 #include <Jolt/Physics/Collision/Shape/Shape.h>
 #include <Jolt/Physics/EActivation.h>
 #include <Jolt/Physics/Body/Body.h>
@@ -100,12 +98,6 @@ namespace engine3d
 
         body_interface = &(physics_system.GetBodyInterface());
 
-        m_BoxShape = new BoxShape(Vec3(1.0f, 1.0f, 1.0f));
-        m_SphereShape = new SphereShape(1.0f);
-
-        m_BoxShapeScaled = new ScaledShape(m_BoxShape, RVec3(1,1,1));
-        m_SphereShapeScaled = new ScaledShape(m_SphereShape,RVec3(1,1,1));
-
     }
 
     BodyInterface* JoltHandler::getInterface()
@@ -117,10 +109,6 @@ namespace engine3d
     {
         JPH::UnregisterTypes();
         std::print("Deleting Physics Factory...\n");
-        delete m_SphereShapeScaled;
-        delete m_BoxShapeScaled;
-        delete m_BoxShape;
-        delete m_SphereShape;
         delete JPH::Factory::sInstance;
         JPH::Factory::sInstance = nullptr;
     }
