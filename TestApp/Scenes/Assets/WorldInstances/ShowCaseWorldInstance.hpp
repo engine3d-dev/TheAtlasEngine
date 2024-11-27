@@ -27,4 +27,6 @@ class ShowCaseWorldInstance
         glm::vec2 m_MousePosition;
         float m_MoveSpeed = {5.f};
         float m_LookSpeed = {1.5f};
+
+        bool callOnce = false;
 };

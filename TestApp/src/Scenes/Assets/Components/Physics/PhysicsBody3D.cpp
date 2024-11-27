@@ -30,65 +30,59 @@ void PhysicsBody3D::Begin()
 {
         m_interface = engine3d::JoltHandler::GetInstance()->getInterface();
         m_Transform = &m_GameObjectRef->GetComponent<Transform>();
+        
+        auto position = m_Transform->GetPos<glm::vec3>();
+        bodyType->CreateBody(
+                EActivation::Activate, 
+                JPH::RVec3(position.x,position.y,position.z));
 }
 
 void PhysicsBody3D::Update()
-{
+{       
         //Convert Posiitons
-        m_Transform->m_Position.x = m_interface->
-                GetCenterOfMassPosition(bodyType->m_BodyID).GetX();
-        m_Transform->m_Position.y = m_interface->
-                GetCenterOfMassPosition(bodyType->m_BodyID).GetY();
-        m_Transform->m_Position.z = m_interface->
-                GetCenterOfMassPosition(bodyType->m_BodyID).GetZ();
+        m_Transform->SetPos<JPH::Vec3>(
+                m_interface->GetWorldTransform(bodyType->m_BodyID).GetTranslation()); 
         
         //Convert Rotations
-        m_Transform->m_QuaterionRot.x = m_interface->
-                GetRotation(bodyType->m_BodyID).GetX();
-        m_Transform->m_QuaterionRot.y = m_interface->
-                GetRotation(bodyType->m_BodyID).GetY();
-        m_Transform->m_QuaterionRot.z = m_interface->
-                GetRotation(bodyType->m_BodyID).GetZ();
-        m_Transform->m_QuaterionRot.w = m_interface->
-                GetRotation(bodyType->m_BodyID).GetW();
+        m_Transform->SetQuat<JPH::Quat>(
+                m_interface->GetRotation(bodyType->m_BodyID));
 
         //Convert Rotations
-        m_Transform->m_AxisRotation.x = m_interface->
-                GetRotation(bodyType->m_BodyID).GetEulerAngles().GetX();
-        m_Transform->m_AxisRotation.y = m_interface->
-                GetRotation(bodyType->m_BodyID).GetEulerAngles().GetY();
-        m_Transform->m_AxisRotation.z = m_interface->
-                GetRotation(bodyType->m_BodyID).GetEulerAngles().GetZ();
+        m_Transform->SetAxisRot<JPH::Vec3>(
+        m_interface->GetRotation(bodyType->m_BodyID).GetEulerAngles());
 }
 
-void PhysicsBody3D::SetScale(float x, float y, float z)
+void PhysicsBody3D::ForcedSetScale(float x, float y, float z)
 {
-        m_Transform->m_Scale = glm::vec3(x,y,z);
-        m_interface->GetShape(bodyType->m_BodyID)->ScaleShape(RVec3(x,y,z));
+        bodyType->CreateScaledType(JPH::Vec3(x,y,z));
+        bodyType->m_BodyID = bodyType->CreateBody(
+                JPH::EActivation::Activate,
+                m_Transform->GetPos<JPH::RVec3>()
+                );
+        m_Transform->SetScale<glm::vec3>({x,y,z});
 }
 
-void PhysicsBody3D::SetPosition(float x, float y, float z)
+void PhysicsBody3D::ForcedSetPosition(float x, float y, float z)
 {
-        m_Transform->m_Position = glm::vec3(x,y,z);
         m_interface->SetPosition(
                 bodyType->m_BodyID,
                 RVec3(x,y,z),
                 JPH::EActivation::Activate);
+        m_Transform->SetPos<glm::vec3>({x,y,z});
 }
 
-void PhysicsBody3D::SetRotation(Quat quaternion)
+void PhysicsBody3D::ForcedSetRotation(Quat quaternion)
 {
         m_interface->SetRotation(
                 bodyType->m_BodyID, 
                 quaternion,
                 JPH::EActivation::Activate);
-                
-        m_Transform->m_AxisRotation.x = m_interface->GetRotation(
-                bodyType->m_BodyID).GetEulerAngles().GetX();
-        m_Transform->m_AxisRotation.y = m_interface->GetRotation(
-                bodyType->m_BodyID).GetEulerAngles().GetY();
-        m_Transform->m_AxisRotation.z = m_interface->GetRotation(
-                bodyType->m_BodyID).GetEulerAngles().GetZ();
+
+        m_Transform->SetQuat<JPH::Quat>(
+                quaternion);
+
+        m_Transform->SetAxisRot<JPH::Vec3>(
+        m_interface->GetRotation(bodyType->m_BodyID).GetEulerAngles());
 }
 
 void PhysicsBody3D::LateUpdate()

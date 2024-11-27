@@ -30,6 +30,10 @@ build_demos(
     Scenes/Assets/WorldInstances/ShowCaseWorldInstance.hpp
     src/Scenes/Assets/WorldInstances/ShowCaseWorldInstance.cpp
 
+    #Camera
+    Scenes/Assets/Components/Camera/CameraFollow.hpp
+    src/Scenes/Assets/Components/Camera/CameraFollow.cpp
+
     #Graphics
     Scenes/Assets/Components/Graphics/SpriteRender3D.hpp
     src/Scenes/Assets/Components/Graphics/SpriteRender3D.cpp

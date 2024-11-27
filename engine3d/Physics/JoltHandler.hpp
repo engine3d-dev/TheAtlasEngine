@@ -37,11 +37,6 @@ namespace engine3d
             }
 
             BodyInterface* getInterface();
-            JPH::Shape* m_BoxShape;
-            JPH::Shape* m_SphereShape;
-
-            JPH::ScaledShape* m_BoxShapeScaled;
-            JPH::ScaledShape* m_SphereShapeScaled;
 
             // Actuall physics part
             JPH::PhysicsSystem physics_system;

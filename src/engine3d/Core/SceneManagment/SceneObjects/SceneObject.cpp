@@ -1,5 +1,8 @@
 #include <Core/SceneManagment/SceneObjects/SceneObject.hpp>
 #include <Core/SceneManagment/Components/SPComps/Transform.hpp>
+#include <glm/fwd.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <numbers>
 
 namespace engine3d {
     SceneObject::SceneObject(entt::entity handle, Scene *scene)
@@ -31,13 +34,16 @@ namespace engine3d {
         auto transform_component = GetComponent<Transform>();
 
         auto transform = glm::translate(glm::mat4{1.f}, transform_component.m_Position);
-        transform[0][0] *= transform_component.m_Scale.x;
-        transform[1][1] *= transform_component.m_Scale.y;
-        transform[2][2] *= transform_component.m_Scale.z;
 
-        transform = glm::rotate(transform, transform_component.m_AxisRotation.y, {0.f, 1.f, 0.f});
-        transform = glm::rotate(transform, transform_component.m_AxisRotation.x, {1.f, 0.f, 0.f});
-        transform = glm::rotate(transform, transform_component.m_AxisRotation.z, {0.f, 0.f, 1.f});
+        glm::quat quaterion{
+            transform_component.m_QuaterionRot.w,
+            transform_component.m_QuaterionRot.x,
+            transform_component.m_QuaterionRot.y,
+            transform_component.m_QuaterionRot.z,
+        };
+
+        transform *= glm::mat4_cast(quaterion);
+        transform = glm::scale(transform, transform_component.m_Scale);
         return transform;
     }
 }; // namespace Engine3D

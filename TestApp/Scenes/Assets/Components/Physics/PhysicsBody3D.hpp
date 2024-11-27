@@ -21,9 +21,9 @@ class PhysicsBody3D: public engine3d::GameComponent
         void Begin();
         BodyContainer* GetBody();
 
-        void SetScale(float x, float y, float z);
-        void SetPosition(float x, float y, float z);
-        void SetRotation(Quat quaternion);
+        void ForcedSetScale(float x, float y, float z);
+        void ForcedSetPosition(float x, float y, float z);
+        void ForcedSetRotation(Quat quaternion);
 
     private:
         engine3d::Transform* m_Transform;

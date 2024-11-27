@@ -1,21 +1,9 @@
 #include <Scenes/Assets/Components/Bodies/Shapes/SphereShaper.hpp>
-using namespace JPH;
-using namespace JPH::literals;
-using namespace engine3d;
-SphereShaper::SphereShaper()
+#include <Jolt/Physics/Collision/Shape/SphereShape.h>
+SphereShaper::SphereShaper(JPH::EMotionType p_MotionType, const JPH::ObjectLayer p_LayerType)
 {
-    JoltHandler * temp = engine3d::JoltHandler::GetInstance();
-
-
-    m_BodySettings = BodyCreationSettings(
-        temp->m_SphereShapeScaled,
-        RVec3(0.0_r, 4.0_r, 0.0_r),
-        Quat::sIdentity(),
-        EMotionType::Dynamic,
-        Engine3DLayers::Dynamic
-        );
-        
-    m_BodyID = temp->getInterface()->CreateAndAddBody(
-                    m_BodySettings, 
-                    EActivation::Activate);
+    BaseShape = new SphereShape(2.5f);
+    ParentShape = BaseShape;
+    m_MotionType = p_MotionType;
+    m_LayerType = p_LayerType;
 }
