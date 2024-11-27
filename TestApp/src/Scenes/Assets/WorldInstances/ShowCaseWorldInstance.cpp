@@ -6,6 +6,7 @@
 #include <Core/SceneManagment/Components/SPComps/Camera.hpp>
 #include <Core/SceneManagment/SceneObjects/SceneObject.hpp>
 #include <Core/TimeManagement/UpdateManagers/SyncUpdateManager.hpp>
+#include <Scenes/Assets/Components/Camera/CameraFollow.hpp>
 #include <Scenes/Assets/Components/Physics/PhysicsBody3D.hpp>
 #include <Scenes/Assets/Components/testComp.hpp>
 #include <Core/ApplicationInstance.hpp>
@@ -84,11 +85,20 @@ void ShowCaseWorldInstance::CreateObjects()
     MainCamera->AddComponent<engine3d::Camera>();
     m_CameraObjectList.push_back(MainCamera);
 
+    MainCamera->AddComponent<CameraFollow>(player->GetComponent<Transform>());
+
     m_AllSceneObjecs.insert({"PointLights", m_PointLightObjectList});
     m_AllSceneObjecs.insert({"RadiusLights", m_PointRadiusLightList});
     m_AllSceneObjecs.insert({"SceneObjects", m_SceneObjectList});
     m_AllSceneObjecs.insert({"RenderedObjects", m_RenderedObjectList});
     m_AllSceneObjecs.insert({"Cameras", m_CameraObjectList});
+
+
+    //Set camera perspective
+    auto& camera =  m_AllSceneObjecs["Cameras"].at(0)->GetComponent<Camera>();
+    camera.SetPerspectiveProjection(glm::radians(50.f), engine3d::ApplicationInstance::GetWindow().GetAspectRatio(), 1.f, 1000.f);
+
+
 }
 
 void ShowCaseWorldInstance::RenderScenes()
@@ -107,69 +117,68 @@ void ShowCaseWorldInstance::RenderScenes()
     // }
     // auto& camera_transform = cameraObj->GetComponent<engine3d::Transform>();
 
-auto& cameraObject = m_AllSceneObjecs["Cameras"].at(0);
+    auto& cameraObject = m_AllSceneObjecs["Cameras"].at(0);
     auto& transform = cameraObject->GetComponent<Transform>();
     auto& camera = cameraObject->GetComponent<Camera>();
-    // float tempDt_Y;
-    glm::vec2 temp_position = {0.f, 0.f};
-    constexpr float sensitivity = 2.0f;
-    float pos_sensitivity = 2.f;
-    constexpr glm::vec2 invert_pos = {-1, -1};
-    glm::vec3 rotate{0};
+//     // float tempDt_Y;
+//     glm::vec2 temp_position = {0.f, 0.f};
+//     constexpr float sensitivity = 2.0f;
+//     float pos_sensitivity = 2.f;
+//     constexpr glm::vec2 invert_pos = {-1, -1};
+//     glm::vec3 rotate{0}; 
 
-    ConsoleLogWarn("SphereCords: {}", m_AllSceneObjecs["RenderedObjects"][1]->GetComponent<Transform>().GetPos<glm::vec3>().x);
-    ConsoleLogWarn("SphereCords: {}", m_AllSceneObjecs["RenderedObjects"][1]->GetComponent<Transform>().GetPos<glm::vec3>().y);
-    ConsoleLogWarn("SphereCords: {}", m_AllSceneObjecs["RenderedObjects"][1]->GetComponent<Transform>().GetPos<glm::vec3>().z);
-    ConsoleLogWarn("SphereRot: {}", m_AllSceneObjecs["RenderedObjects"][1]->GetComponent<Transform>().GetAxisRot<glm::vec3>().x);
-    ConsoleLogWarn("SphereRot: {}", m_AllSceneObjecs["RenderedObjects"][1]->GetComponent<Transform>().GetAxisRot<glm::vec3>().y);
-    ConsoleLogWarn("SphereRot: {}", m_AllSceneObjecs["RenderedObjects"][1]->GetComponent<Transform>().GetAxisRot<glm::vec3>().z);
-    // ConsoleLogError("SphereCords: {},{},{}", transform.GetAxisRot<glm::vec3>().x,transform.GetAxisRot<glm::vec3>().y,transform.GetAxisRot<glm::vec3>().z);
+//     ConsoleLogWarn("SphereCords: {}", m_AllSceneObjecs["RenderedObjects"][1]->GetComponent<Transform>().GetPos<glm::vec3>().x);
+//     ConsoleLogWarn("SphereCords: {}", m_AllSceneObjecs["RenderedObjects"][1]->GetComponent<Transform>().GetPos<glm::vec3>().y);
+//     ConsoleLogWarn("SphereCords: {}", m_AllSceneObjecs["RenderedObjects"][1]->GetComponent<Transform>().GetPos<glm::vec3>().z);
+//     ConsoleLogWarn("SphereRot: {}", m_AllSceneObjecs["RenderedObjects"][1]->GetComponent<Transform>().GetAxisRot<glm::vec3>().x);
+//     ConsoleLogWarn("SphereRot: {}", m_AllSceneObjecs["RenderedObjects"][1]->GetComponent<Transform>().GetAxisRot<glm::vec3>().y);
+//     ConsoleLogWarn("SphereRot: {}", m_AllSceneObjecs["RenderedObjects"][1]->GetComponent<Transform>().GetAxisRot<glm::vec3>().z);
+//     // ConsoleLogError("SphereCords: {},{},{}", transform.GetAxisRot<glm::vec3>().x,transform.GetAxisRot<glm::vec3>().y,transform.GetAxisRot<glm::vec3>().z);
     
 
-    //! @note Make sure that our mouse controls how camera rotates.
-    if(InputPoll::IsMousePressed(Mouse::ButtonRight)){
-        // temp_position.x = m_MousePosition.x - InputPoll::GetMouseX();
-        rotate.y += (m_MousePosition.x - InputPoll::GetMouseX()) * invert_pos.y;
-        rotate.x += (m_MousePosition.y - InputPoll::GetMouseY()) * invert_pos.x;
-    }
+//     //! @note Make sure that our mouse controls how camera rotates.
+//     if(InputPoll::IsMousePressed(Mouse::ButtonRight)){
+//         // temp_position.x = m_MousePosition.x - InputPoll::GetMouseX();
+//         rotate.y += (m_MousePosition.x - InputPoll::GetMouseX()) * invert_pos.y;
+//         rotate.x += (m_MousePosition.y - InputPoll::GetMouseY()) * invert_pos.x;
+//     }
 
-    m_MousePosition = InputPoll::GetMousePosition();
+//     m_MousePosition = InputPoll::GetMousePosition();
     
-    //! @note Utilize linear interpolation to get smooth camera rotation. 
-    if(glm::dot(rotate, rotate) > std::numeric_limits<float>::epsilon()){
-        float dt = SyncUpdateManager::GetInstance()->m_SyncLocalDeltaTime;
-        auto temp_rotation = (m_LookSpeed * glm::normalize(rotate) * sensitivity) + transform.m_AxisRotation;
-        transform.m_AxisRotation = engine3d::Interpolation::LinearInterpolate(transform.m_AxisRotation, temp_rotation, nullptr, dt);
-    }
+//     //! @note Utilize linear interpolation to get smooth camera rotation. 
+//     if(glm::dot(rotate, rotate) > std::numeric_limits<float>::epsilon()){
+//         float dt = SyncUpdateManager::GetInstance()->m_SyncLocalDeltaTime;
+//         auto temp_rotation = (m_LookSpeed * glm::normalize(rotate) * sensitivity) + transform.m_AxisRotation;
+//         transform.m_AxisRotation = engine3d::Interpolation::LinearInterpolate(transform.m_AxisRotation, temp_rotation, nullptr, dt);
+//     }
 
-    transform.m_AxisRotation.x = glm::clamp(transform.m_AxisRotation.x, -1.5f, 1.5f);
-    transform.m_AxisRotation.y = glm::mod(transform.m_AxisRotation.y, glm::two_pi<float>());
+//     transform.m_AxisRotation.x = glm::clamp(transform.m_AxisRotation.x, -1.5f, 1.5f);
+//     transform.m_AxisRotation.y = glm::mod(transform.m_AxisRotation.y, glm::two_pi<float>());
 
-    float yaw = transform.m_AxisRotation.y;
-    const glm::vec3 forward_dir{sin(yaw), 0.f, cos(yaw)};
-    const glm::vec3 right_dir{forward_dir.z, 0.f, -forward_dir.x};
-    const glm::vec3 up_dir{0.f, -1.f, 0.f};
+//     float yaw = transform.m_AxisRotation.y;
+//     const glm::vec3 forward_dir{sin(yaw), 0.f, cos(yaw)};
+//     const glm::vec3 right_dir{forward_dir.z, 0.f, -forward_dir.x};
+//     const glm::vec3 up_dir{0.f, -1.f, 0.f};
 
-    glm::vec3 move_dir{0.f};
+//     glm::vec3 move_dir{0.f};
 
-    if(InputPoll::IsKeyPressed(ENGINE_KEY_W)) move_dir += forward_dir; // FORWARD
-    if(InputPoll::IsKeyPressed(ENGINE_KEY_S)) move_dir -= forward_dir; // BACKWARD
-    if(InputPoll::IsKeyPressed(ENGINE_KEY_D)) move_dir += right_dir; // RIGHT
-    if(InputPoll::IsKeyPressed(ENGINE_KEY_A)) move_dir -= right_dir; // LEFT
-    if(InputPoll::IsKeyPressed(ENGINE_KEY_SPACE)) move_dir -= up_dir;    // UP
-    if(InputPoll::IsKeyPressed(ENGINE_KEY_LEFT_SHIFT)) move_dir += up_dir;    // DOWN
+//     if(InputPoll::IsKeyPressed(ENGINE_KEY_W)) move_dir += forward_dir; // FORWARD
+//     if(InputPoll::IsKeyPressed(ENGINE_KEY_S)) move_dir -= forward_dir; // BACKWARD
+//     if(InputPoll::IsKeyPressed(ENGINE_KEY_D)) move_dir += right_dir; // RIGHT
+//     if(InputPoll::IsKeyPressed(ENGINE_KEY_A)) move_dir -= right_dir; // LEFT
+//     if(InputPoll::IsKeyPressed(ENGINE_KEY_SPACE)) move_dir -= up_dir;    // UP
+//     if(InputPoll::IsKeyPressed(ENGINE_KEY_LEFT_SHIFT)) move_dir += up_dir;    // DOWN
 
-    if(InputPoll::IsMousePressed(ENGINE_MOUSE_BUTTON_MIDDLE)){
-        pos_sensitivity += (m_MousePosition.y - InputPoll::GetMouseY()) * invert_pos.x;
-    }
+//     if(InputPoll::IsMousePressed(ENGINE_MOUSE_BUTTON_MIDDLE)){
+//         pos_sensitivity += (m_MousePosition.y - InputPoll::GetMouseY()) * invert_pos.x;
+//     }
 
-    if(glm::dot(move_dir, move_dir) > std::numeric_limits<float>::epsilon()){
-        transform.m_Position += m_MoveSpeed * (SyncUpdateManager::GetInstance()->m_SyncLocalDeltaTime) * glm::normalize(move_dir) * pos_sensitivity;
-    }
+//     if(glm::dot(move_dir, move_dir) > std::numeric_limits<float>::epsilon()){
+//         transform.m_Position += m_MoveSpeed * (SyncUpdateManager::GetInstance()->m_SyncLocalDeltaTime) * glm::normalize(move_dir) * pos_sensitivity;
+//     }
 
-    //auto& sphere_transform = m_AllSceneObjecs["RenderedObjects"][0]->GetComponent<engine3d::Transform>();
-    camera.SetViewXYZ(transform.m_Position, transform.m_AxisRotation);
-    camera.SetPerspectiveProjection(glm::radians(50.f), engine3d::ApplicationInstance::GetWindow().GetAspectRatio(), 1.f, 1000.f);
+//     //auto& sphere_transform = m_AllSceneObjecs["RenderedObjects"][0]->GetComponent<engine3d::Transform>();
+    //camera.SetViewXYZ(transform.m_Position, transform.m_AxisRotation);
     engine3d::Renderer::RecordSceneGameObjects(m_AllSceneObjecs);
 }
 

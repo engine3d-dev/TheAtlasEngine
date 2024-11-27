@@ -1,3 +1,4 @@
+#pragma once
 #include <Jolt/Jolt.h>
 #include <Core/SceneManagment/Components/GameComponent.hpp>
 #include <Jolt/Math/Real.h>
@@ -175,6 +176,8 @@ namespace engine3d
             glm::highp_vec4 m_QuaterionRot;
             glm::highp_vec3 m_AxisRotation;
             glm::highp_vec3 m_Scale;
+
+            SceneObject* GetParent() {return m_GameObjectRef;}
 
     };
 };
