@@ -48,6 +48,10 @@ namespace engine3d::vk{
         //! @note Loading queue family data from the physical device that we have selected.
         vkGetPhysicalDeviceQueueFamilyProperties(m_PhysicalDevice, &queue_family_count, m_QueueFamilyProperties.data());
 
+
+        //! @note Getting our actual physical device properties that have been currently selected.
+        vkGetPhysicalDeviceProperties(m_PhysicalDevice, &m_CurrentPhysicalDeviceProperties);
+
         m_QueueFamilyIndices = SelectQueueFamilyIndices();
 
         ConsoleLogWarn("Vulkan2Showcase: VulkanPhysicalDriver Initialized Completed!!!");

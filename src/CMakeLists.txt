@@ -37,6 +37,7 @@ add_library(
     ${ENGINE_INCLUDE_NAME}/Core/GraphicDrivers/Shader.hpp
     ${ENGINE_INCLUDE_NAME}/Core/GraphicDrivers/VertexBuffer.hpp
     ${ENGINE_INCLUDE_NAME}/Core/GraphicDrivers/IndexBuffer.hpp
+    ${ENGINE_INCLUDE_NAME}/Core/GraphicDrivers/UniformBuffer.hpp
 
     # Mesh stuff
     ${ENGINE_INCLUDE_NAME}/Core/GraphicDrivers/Mesh.hpp
@@ -92,6 +93,7 @@ add_library(
     ${ENGINE_SRC_DIR}/Core/GraphicDrivers/Shader.cpp
     ${ENGINE_SRC_DIR}/Core/GraphicDrivers/VertexBuffer.cpp
     ${ENGINE_SRC_DIR}/Core/GraphicDrivers/IndexBuffer.cpp
+    ${ENGINE_SRC_DIR}/Core/GraphicDrivers/UniformBuffer.cpp
 
     # Mesh stuff
     ${ENGINE_SRC_DIR}/Core/GraphicDrivers/Mesh.cpp

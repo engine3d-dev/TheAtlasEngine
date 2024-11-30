@@ -22,7 +22,7 @@ namespace engine3d::vk{
         vk::VulkanContext::Initialize();
         vk_check(glfwCreateWindowSurface(vk::VulkanContext::GetVkInstance(),m_Window, nullptr, &m_Surface), "glfwCreateWindowSurface", __FILE__, __LINE__, __FUNCTION__);
         ConsoleLogWarn("glfwCreateWindowSurface Initialized!");
-        // m_Swapchain = VulkanSwapchain(VulkanContext::GetPhysicalDriver(), VulkanContext::GetDriver(), m_Surface);
+
         m_Swapchain = GraphicSwapchain::InitializeSwapchain(m_Surface);
 
         ConsoleLogInfo("Vulkan2Showcase VulkanWindow Initialized Complete!!!");

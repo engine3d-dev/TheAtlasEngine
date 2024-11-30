@@ -1,12 +1,15 @@
 #include <Core/EngineLogger.hpp>
 #include <Core/GraphicDrivers/Shader.hpp>
 #include <Core/TimeManagement/UpdateManagers/SyncUpdateManager.hpp>
+#include "GraphicDrivers/UniformBuffer.hpp"
 #include "internal/Vulkan2Showcase/Shaders/VulkanShader.hpp"
 #include "internal/Vulkan2Showcase/VulkanContext.hpp"
+#include "internal/Vulkan2Showcase/VulkanSwapchain.hpp"
 #include "internal/Vulkan2Showcase/helper_functions.hpp"
 #include <Core/ApplicationInstance.hpp>
 #include <Core/Renderer/Renderer.hpp>
 #include <glm/geometric.hpp>
+#include <numeric>
 #include <vulkan/vulkan_core.h>
 #include <vector>
 
@@ -20,6 +23,16 @@
 #include <Core/SceneManagment/Components/SPComps/Camera.hpp>
 
 namespace engine3d{
+    //! @note Containing relevant frame information to be provided to the renderer
+    //! @note In the tutorial, he uses this struct to contain properties such as camera, command buffer, etc to keep track of the data used throughout the renderer.
+    //! @note For our use-case we may not want to do it this way, and it is going to change soon....
+    //! @note Leaving it here though, for reference.
+    // struct FrameInfo{
+    //     int FrameIndex;
+    //     float FrameTime;
+    //     VkCommandBuffer CommandBuffer;
+    // };
+
     static std::vector<VkCommandBuffer> g_CommandBuffers;
     VkCommandPool g_CmdPool;
     uint32_t g_CurrentFrameIndex = -1;
@@ -29,6 +42,9 @@ namespace engine3d{
     static VkPipelineLayout g_PipelineLayout;
     static VkPipeline g_Pipeline;
 
+    //! TODO: UniformBuffer will be initialized here, but should be moved out of the renderer into some mesh struct or something like that.
+    static UniformBuffer s_Ubo;
+
     //! @note Push Constants to apply data to the shaders.
     //! @note vk::VulkanModal is how shaders are going to be 
     struct SimplePushConstantData{
@@ -36,6 +52,11 @@ namespace engine3d{
         glm::mat4 ModelMatrix{1.f};
         glm::vec3 LightTransform{1.0, -3.0, -1.0};
         // alignas(16) glm::vec3 Color;
+    };
+
+    struct GlobalUbo {
+        glm::mat4 ProjectionView{1.f};
+        glm::vec3 LightDirection = glm::normalize(glm::vec3{1.f, -3.f, -1.f});
     };
 
     void Renderer::Initialize(const std::string& p_DebugName){
@@ -101,6 +122,27 @@ namespace engine3d{
         };
 
         vk::vk_check(vkAllocateCommandBuffers(vk::VulkanContext::GetDriver(), &cmd_buffer_alloc_info, g_CommandBuffers.data()), "vkAllocateCommandBuffers", __FILE__, __LINE__, __FUNCTION__);
+
+
+        //! @note Setting up Uniform Buffers here
+        //! TODO: Move uniform buffers...
+        //! @note Bandage fix for NonCoherentAtomSize bug.
+        auto phys_driver_props = vk::VulkanContext::GetPhysicalDriver().GetProperties();
+        auto min_offset_alignment = std::lcm(phys_driver_props.limits.minUniformBufferOffsetAlignment, phys_driver_props.limits.nonCoherentAtomSize);
+
+        s_Ubo = UniformBuffer(
+            sizeof(GlobalUbo),
+            vk::VulkanSwapchain::MaxFramesInFlight,
+            VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
+            min_offset_alignment
+        );
+
+        //! @note In tutorial referenced to as .map(), I just changed it to be explicitly called MapData
+        s_Ubo.MapData();
+
+
+
 
         ConsoleLogInfo("CommandBuffers Size === {}", g_CommandBuffers.size());
     }
@@ -254,6 +296,75 @@ namespace engine3d{
                     sizeof(SimplePushConstantData), 
                     &push
             );
+            auto& vb = obj->GetMesh().GetVertices();
+            auto ib = obj->GetMesh().GetIndices();
+            vb->Bind(current_cmd_buffer);
+            if(ib != nullptr){
+                ib->Bind(current_cmd_buffer);
+                if(ib->HasIndicesPresent()){
+                    ib->Draw(GetCurrentCommandBuffer());
+                }
+                else{
+                    vb->Draw(GetCurrentCommandBuffer());
+                }
+            }
+            else{
+                vb->Draw(GetCurrentCommandBuffer());
+            }
+
+        }
+    }
+
+
+    void Renderer::RecordSceneGameObjectsWithUniformBuffers(std::unordered_map<std::string, std::vector<SceneObject*>>& p_AllSceneObjects){
+        auto current_cmd_buffer = GetCurrentCommandBuffer();
+
+        //! @note Essentially doing m_Pipeline->Bind(m_CommandBuffer[i])
+        //! @note Starts when to start rendering!!
+        vkCmdBindPipeline(current_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, g_Shader->GetGraphicsPipeline());
+        float delta_time = SyncUpdateManager::GetInstance()->m_SyncLocalDeltaTime;
+        auto cameraObject = p_AllSceneObjects["Cameras"][0];
+        auto camera_component = cameraObject->GetComponent<Camera>();
+        //! @note Only for testing purposes for mesh data.
+        // auto point_light_obj = p_Objects[2];
+        // auto point_light_position = point_light_obj->GetComponent<Transform>().m_Position;
+        auto& position = p_AllSceneObjects["Cameras"][0]->GetComponent<Transform>().m_Position;
+
+        for(const auto& obj : p_AllSceneObjects.at("RenderedObjects")){
+
+            auto proj_view = camera_component.GetProjection() * camera_component.GetView();
+
+            auto model_matrix = obj->toMat4();
+
+            SimplePushConstantData push = {
+                .Transform = proj_view * model_matrix,
+                .ModelMatrix = model_matrix,
+                .LightTransform = position - obj->GetComponent<Transform>().m_Position
+                // .LightTransform = position
+            };
+
+            //! @note This is new here.
+            //! @note We are writing our buffer data to the uniform buffer, and specifying at the
+            //        current frame we are on this uniform buffer is being written to.
+            GlobalUbo ubo{};
+            ubo.ProjectionView = proj_view;
+            s_Ubo.WriteAt(&ubo, g_CurrentFrameIndex);
+            s_Ubo.FlushAt(g_CurrentFrameIndex);
+
+            
+            vkCmdPushConstants(
+                current_cmd_buffer,
+                g_PipelineLayout,
+                VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+                0,
+                    sizeof(SimplePushConstantData), 
+                    &push
+            );
+            
+
+
+            //! @note This makes sure our meshes gets rendered utilizing their vertices and indices.
+            //! @note While handling our edge cases.
             auto& vb = obj->GetMesh().GetVertices();
             auto ib = obj->GetMesh().GetIndices();
             vb->Bind(current_cmd_buffer);

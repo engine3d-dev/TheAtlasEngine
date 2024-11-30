@@ -18,6 +18,8 @@ namespace engine3d::vk{
         
         PhysicalQueueFamilyIndices GetQueueIndices() { return m_QueueFamilyIndices; }
 
+        VkPhysicalDeviceProperties GetProperties() { return m_CurrentPhysicalDeviceProperties; }
+        
         operator VkPhysicalDevice(){
             return m_PhysicalDevice;
         }
@@ -27,7 +29,7 @@ namespace engine3d::vk{
 
     private:
         VkPhysicalDevice m_PhysicalDevice;
-        // VkPhysicalDeviceMemoryProperties m_DeviceMemoryProperties;
+        VkPhysicalDeviceProperties m_CurrentPhysicalDeviceProperties;
         std::vector<VkQueueFamilyProperties> m_QueueFamilyProperties;
 
         // checking if queue families have queues and they are graphical, compute (optional atm), transfer(optional atm)
