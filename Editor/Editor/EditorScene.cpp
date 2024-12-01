@@ -38,19 +38,35 @@ namespace engine3d{
         auto camera = m_CameraObject->GetComponent<Camera>();
         m_CameraObjects.push_back(m_CameraObject);
         
+        // -----------------------------
+        // Bob Scene object Creation
+        // -----------------------------
+        auto bob_mesh = Mesh::LoadModel("3d_models/tutorial/bugatti.obj");
+
+        SceneObject* bob = new SceneObject(m_Scene);
+        auto& transform = bob->GetComponent<Transform>();
+        transform.SetPos<glm::vec3>({0.f, 0.5f, 2.5f});
+        transform.SetScale<glm::vec3>({1.0f, 1.0f, 1.0f});
+        bob->SetMesh(bob_mesh);
+
 
         // -----------------------------
         // Cube 1 Scene object Creation
         // -----------------------------
         SceneObject* cube1 = new SceneObject(m_Scene);
         auto& cube1_transform = cube1->GetComponent<Transform>();
-        cube1_transform.SetPos<glm::vec3>( {.0f, .0f, 2.5});
+        cube1_transform.SetPos<glm::vec3>( {.0f, 15.0f, 2.5});
+        // cube1_transform.SetPos<glm::vec3>({glm::radians(180.0f), 0.f, 0.f});
         cube1_transform.m_Scale = {10.5f, 10.5f, 10.5f};
+        // cube1_transform.SetAxisRot<glm::vec3>({glm::radians(180.0f), 0.f, 0.f});
+        // cube1_transform.m_AxisRotation = {0.0f, glm::radians(90.0f), 0.f};
         // cube1_transform.m_AxisRotation = ToQuat(glm::vec3(glm::radians(180.0f), 0.f, 0.f));
-        cube1_transform.m_AxisRotation = {
-            glm::radians(0.0f),
-            glm::radians(0.0f),
-            glm::radians(0.0f)};
+        cube1_transform.m_AxisRotation = {glm::radians(180.0f), 0.0f, 0.0f};
+        // cube1_transform.m_AxisRotation = {
+        //     glm::radians(180.0f),
+        //     glm::radians(0.0),
+        //     glm::radians(0.0f)};
+        // cube1_transform.SetAxisRot<glm::vec3>({0.0f, glm::radians(180.0f), 0.f});
         cube1->SetMesh(cube_mesh);
 
         // -----------------------------
@@ -59,7 +75,8 @@ namespace engine3d{
         SceneObject* cube2 = new SceneObject(m_Scene);
         auto& cube2_transform = cube2->GetComponent<Transform>();
         // auto aspect_ratio = ApplicationInstance::GetWindow().GetAspectRatio();
-        cube2_transform.SetPos<glm::vec3>( {5.f, .0f, -7.f});
+        cube2_transform.SetPos<glm::vec3>( {0.f, 15.0f, -2.5f});
+        cube2_transform.m_AxisRotation = {0.0f, glm::radians(90.0f), 0.f};
         cube2_transform.m_Scale = {5.5f, 5.5f, 5.5};
 
         cube2->SetMesh(cube_mesh);
@@ -74,7 +91,8 @@ namespace engine3d{
 
         //! @note Then we add them to our vector.
         m_SceneObjects.push_back(cube1);
-        m_SceneObjects.push_back(cube2);
+        // m_SceneObjects.push_back(cube2);
+        m_SceneObjects.push_back(bob);
         m_PointLightObjects.push_back(sphere_point_light);
 
         m_AllSceneObjecs.insert({"RenderedObjects", m_SceneObjects});

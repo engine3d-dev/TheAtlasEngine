@@ -67,9 +67,12 @@ namespace engine3d{
     };
 
     struct GlobalUbo {
-        // glm::mat4 ProjectionView{1.f};
+        glm::mat4 ProjectionView{1.f};
         // glm::vec3 LightDirection = glm::normalize(glm::vec3{1.f, -3.f, -1.f});
-        glm::vec3 DirectionToLight{1.0f, -3.0f, -1.0f}; // Dir To Light Transform
+        // glm::vec3 DirectionToLight{1.0f, -3.0f, -1.0f}; // Dir To Light Transform
+        glm::vec4 AmbientLightColor = {1.f, 1.f, 1.f, .02f}; // w = intensity
+        glm::vec3 LightPosition{-1.f};
+        alignas(16) glm::vec4 LightColor{1.f}; // w - is light intensity
     };
 
     // *********************************************************************
@@ -436,7 +439,8 @@ namespace engine3d{
             //        current frame we are on this uniform buffer is being written to.
             //! @note Uniform buffer data that gets used by the descriptor set that wont get updated as continuously as push constants
             GlobalUbo ubo{
-                .DirectionToLight = position - obj->GetComponent<Transform>().m_Position,
+                .ProjectionView = proj_view
+                // .DirectionToLight = position - obj->GetComponent<Transform>().m_Position,
                 // .ProjectionView = proj_view
             };
 
@@ -444,7 +448,7 @@ namespace engine3d{
             g_UniformBuffers[g_CurrentFrameIndex].Flush();
 
             //! @note Push constanst for data we want to continously update
-            SimplePushConstantData push = {
+            OldSimplePushConstantData push = {
                 .Transform = proj_view * model_matrix,
                 .ModelMatrix = model_matrix,
                 // .LightTransform = position - obj->GetComponent<Transform>().m_Position
@@ -457,7 +461,7 @@ namespace engine3d{
                 g_PipelineLayout,
                 VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
                 0,
-                    sizeof(SimplePushConstantData), 
+                    sizeof(OldSimplePushConstantData), 
                     &push
             );
             
