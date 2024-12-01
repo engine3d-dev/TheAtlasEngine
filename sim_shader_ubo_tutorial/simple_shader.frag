@@ -4,10 +4,14 @@
 layout(location = 0) in vec3 fragColor;
 layout(location = 0) out vec4 outColor;
 
+layout(set = 0, binding = 0) uniform GlobalUbo {
+    vec3 DirectionToLight;
+} ubo;
 
 layout(push_constant) uniform Push {
     mat4 Transform; // proj * view * model
     mat4 ModelMatrix;
+    vec3 LightTransform;
 } push;
 
 void main(){

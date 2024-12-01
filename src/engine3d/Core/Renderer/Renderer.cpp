@@ -62,14 +62,14 @@ namespace engine3d{
     //! @note This is the tutorial's push const data struct
     struct OldSimplePushConstantData{
         glm::mat4 Transform{1.f};
-        glm::mat3 NormalMatrix{1.f}; // Model Matrix
-        glm::vec3 LightTransform{1.0, -3.0, -1.0};
+        glm::mat3 ModelMatrix{1.f}; // Model Matrix
+        glm::vec3 LightTransform{1.0f, -3.0f, -1.0f};
     };
 
     struct GlobalUbo {
         // glm::mat4 ProjectionView{1.f};
         // glm::vec3 LightDirection = glm::normalize(glm::vec3{1.f, -3.f, -1.f});
-        glm::vec3 DirectionToLight{1.0, -3.0, -1.0}; // Dir To Light Transform
+        glm::vec3 DirectionToLight{1.0f, -3.0f, -1.0f}; // Dir To Light Transform
     };
 
     // *********************************************************************
@@ -405,7 +405,6 @@ namespace engine3d{
         
         //! @note Only for testing purposes for mesh data.
         auto& position = p_AllSceneObjects["Cameras"][0]->GetComponent<Transform>().m_Position;
-        auto proj_view = camera_component.GetProjection() * camera_component.GetView();
 
         //! @note Bind descriptor sets per frame (frames-in-flight)
         vkCmdBindDescriptorSets(
@@ -420,23 +419,35 @@ namespace engine3d{
         );
 
         for(const auto& obj : p_AllSceneObjects.at("RenderedObjects")){
+            auto proj_view = camera_component.GetProjection() * camera_component.GetView();
             auto model_matrix = obj->toMat4();
 
+            /*
+            // Using this for reference
+            SimplePushConstantData push = {
+                .Transform = proj_view * model_matrix,
+                .ModelMatrix = model_matrix,
+                .LightTransform = position - obj->GetComponent<Transform>().m_Position
+            };
+            */
 
             //! @note This is new here.
             //! @note We are writing our buffer data to the uniform buffer, and specifying at the
             //        current frame we are on this uniform buffer is being written to.
-            GlobalUbo ubo{};
-            // ubo.ProjectionView = proj_view;
-            ubo.DirectionToLight = position - obj->GetComponent<Transform>().m_Position; 
-            // ConsoleLogError("Current Frame Index == {}", g_CurrentFrameIndex);
-            g_UniformBuffers[g_CurrentFrameIndex].WriteAt(&ubo, g_CurrentFrameIndex);
-            g_UniformBuffers[g_CurrentFrameIndex].Flush(g_CurrentFrameIndex);
+            //! @note Uniform buffer data that gets used by the descriptor set that wont get updated as continuously as push constants
+            GlobalUbo ubo{
+                .DirectionToLight = position - obj->GetComponent<Transform>().m_Position,
+                // .ProjectionView = proj_view
+            };
 
-            OldSimplePushConstantData push = {
+            g_UniformBuffers[g_CurrentFrameIndex].CopyTo(&ubo);
+            g_UniformBuffers[g_CurrentFrameIndex].Flush();
+
+            //! @note Push constanst for data we want to continously update
+            SimplePushConstantData push = {
                 .Transform = proj_view * model_matrix,
-                .NormalMatrix = model_matrix,
-                .LightTransform = position - obj->GetComponent<Transform>().m_Position
+                .ModelMatrix = model_matrix,
+                // .LightTransform = position - obj->GetComponent<Transform>().m_Position
                 // .LightTransform = position
             };
 
@@ -446,7 +457,7 @@ namespace engine3d{
                 g_PipelineLayout,
                 VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
                 0,
-                    sizeof(OldSimplePushConstantData), 
+                    sizeof(SimplePushConstantData), 
                     &push
             );
             
