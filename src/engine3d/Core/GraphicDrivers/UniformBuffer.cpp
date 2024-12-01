@@ -89,14 +89,20 @@ namespace engine3d{
     }
 
     void UniformBuffer::CopyTo(void* p_Data, uint64_t p_BufferSize, uint64_t p_Offset){
+        if(m_MappedData == nullptr){
+            ConsoleLogError("Could not map m_MappedData because it was nullptr!");
+            return;
+        }
+
         if(p_BufferSize == VK_WHOLE_SIZE){
             memcpy(m_MappedData, p_Data, m_BufferSize);
         }
         else{
-            char* mem_offset = (char*)m_MappedData;
+            char* mem_offset = (char *)m_MappedData;
             mem_offset += p_Offset;
             memcpy(mem_offset, p_Data, p_BufferSize);
         }
+
     }
 
     void UniformBuffer::Flush(uint64_t p_Size, uint64_t p_Offset){

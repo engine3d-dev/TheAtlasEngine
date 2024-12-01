@@ -25,13 +25,13 @@ namespace engine3d{
         void UnmapData();
 
         //! @note WriteToBuffer
-        void CopyTo(void* p_Data, uint64_t p_Size, uint64_t p_Offset);
+        void CopyTo(void* p_Data, uint64_t p_Size = VK_WHOLE_SIZE, uint64_t p_Offset=0);
 
-        void Flush(uint64_t p_Size, uint64_t p_Offset);
+        void Flush(uint64_t p_Size=VK_WHOLE_SIZE, uint64_t p_Offset=0);
 
-        void Invalidate(uint64_t p_Size, uint64_t p_Offset);
+        void Invalidate(uint64_t p_Size = VK_WHOLE_SIZE, uint64_t p_Offset = 0);
 
-        VkDescriptorBufferInfo InitializeDescriptorInfo(uint64_t p_Size, uint64_t p_Offset);
+        VkDescriptorBufferInfo InitializeDescriptorInfo(uint64_t p_Size=VK_WHOLE_SIZE, uint64_t p_Offset=0);
 
         void WriteAt(void* p_Data, int p_Index);
 

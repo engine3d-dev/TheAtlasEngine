@@ -22,6 +22,8 @@
 
 #include <Core/SceneManagment/Components/SPComps/Camera.hpp>
 
+#include <Core/internal/Vulkan2Showcase/VulkanDescriptors.hpp>
+
 namespace engine3d{
     //! @note Containing relevant frame information to be provided to the renderer
     //! @note In the tutorial, he uses this struct to contain properties such as camera, command buffer, etc to keep track of the data used throughout the renderer.
@@ -34,30 +36,56 @@ namespace engine3d{
     // };
 
     static std::vector<VkCommandBuffer> g_CommandBuffers;
+
     VkCommandPool g_CmdPool;
+    //! @note Keeping track of our current frames in flight at rendering.
     uint32_t g_CurrentFrameIndex = -1;
     static bool g_IsFrameStarted = false;
 
     static Ref<Shader> g_Shader = nullptr;
+    static Ref<Shader> g_UboShaderTutorial = nullptr;
     static VkPipelineLayout g_PipelineLayout;
     static VkPipeline g_Pipeline;
 
     //! TODO: UniformBuffer will be initialized here, but should be moved out of the renderer into some mesh struct or something like that.
-    static UniformBuffer s_Ubo;
+    // static UniformBuffer s_Ubo;
 
     //! @note Push Constants to apply data to the shaders.
     //! @note vk::VulkanModal is how shaders are going to be 
     struct SimplePushConstantData{
         glm::mat4 Transform{1.f};
-        glm::mat4 ModelMatrix{1.f};
+        glm::mat4 ModelMatrix{1.f}; // I think this replaced model matrix.
         glm::vec3 LightTransform{1.0, -3.0, -1.0};
         // alignas(16) glm::vec3 Color;
     };
 
-    struct GlobalUbo {
-        glm::mat4 ProjectionView{1.f};
-        glm::vec3 LightDirection = glm::normalize(glm::vec3{1.f, -3.f, -1.f});
+    //! @note This is the tutorial's push const data struct
+    struct OldSimplePushConstantData{
+        glm::mat4 Transform{1.f};
+        glm::mat3 NormalMatrix{1.f}; // Model Matrix
+        glm::vec3 LightTransform{1.0, -3.0, -1.0};
     };
+
+    struct GlobalUbo {
+        // glm::mat4 ProjectionView{1.f};
+        // glm::vec3 LightDirection = glm::normalize(glm::vec3{1.f, -3.f, -1.f});
+        glm::vec3 DirectionToLight{1.0, -3.0, -1.0}; // Dir To Light Transform
+    };
+
+    // *********************************************************************
+    //! @note NEW: We have uniform buffers that correspond to the index.
+    static std::vector<UniformBuffer> g_UniformBuffers;
+    // static UniformBuffer g_Ubo;
+
+    //! @note NEW: Descriptor Stuff....
+    static Scope<vk::VulkanDescriptorPool> g_GlobalPool;
+
+    //! @note NEW: In tutorial VkDescriptrSet globalDescriptorSet is added to FrameInfo. Because we dont have a FrameInfo (am doing it differently), we just put it here.
+    static VkDescriptorSet g_GlobalDescriptorSet;
+    static std::vector<VkDescriptorSetLayout> g_DescriptorSetLayoutVector;
+
+    static std::vector<VkDescriptorSet> g_Global_desc_sets;
+    // *********************************************************************
 
     void Renderer::Initialize(const std::string& p_DebugName){
         ConsoleLogInfo("RENDERER BEGIN INTIALIZATION!!!");
@@ -74,19 +102,44 @@ namespace engine3d{
             .size = sizeof(SimplePushConstantData)
         };
 
+        
+        //! @note NEW: Adding the descriptors here
+        //! @note This was added after adding uniform buffers.
+        g_GlobalPool = vk::VulkanDescriptorPool::Builder()
+                        .SetMaxSets(vk::VulkanSwapchain::MaxFramesInFlight)
+                        .AddPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, vk::VulkanSwapchain::MaxFramesInFlight)
+                        .Build();
+        
+
+        auto glob_set_layout = vk::VulkanDescriptorSetLayout::Builder()
+                               .AddBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
+                               .Build();
+
+        // *******************************************************
+        // ***************[Creating Pipeline Layout]**************
+        // *******************************************************
+        //! @note New after adding descriptor set layouts
+        g_DescriptorSetLayoutVector = std::vector<VkDescriptorSetLayout>{glob_set_layout->GetDescriptorSetLayout()};
+
+
         //! @note First initializing pipeline layout create info
         VkPipelineLayoutCreateInfo pipeline_layout_create_info = {
             .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
             .pNext = nullptr,
             .flags = 0,
-            .setLayoutCount = 0,
-            .pSetLayouts = nullptr,
+            // .setLayoutCount = 0,
+            // .pSetLayouts = nullptr,
+            .setLayoutCount = static_cast<uint32_t>(g_DescriptorSetLayoutVector.size()),
+            .pSetLayouts = g_DescriptorSetLayoutVector.data(),
             .pushConstantRangeCount = 1,
             .pPushConstantRanges = &push_const_range
         };
 
         vk::vk_check(vkCreatePipelineLayout(vk::VulkanContext::GetDriver(), &pipeline_layout_create_info, nullptr, &g_PipelineLayout), "vkCreatePipelineLayout", __FILE__, __LINE__, __FUNCTION__);
         
+        // *******************************************************
+        // ****************[End of Pipeline Layout]**************
+        // *******************************************************
 
         //! @note We are setting our shader pipeline to utilize our current window's swapchain
         //! @note a TODO is to utilize different render passes utiization for shader pipelines, potentially.
@@ -94,7 +147,8 @@ namespace engine3d{
         pipeline_config.PipelineLayout = g_PipelineLayout;
 
         // m_Shader = Shader::Create("simple_shader/simple_shader.vert.spv", "simple_shader/simple_shader.frag.spv", pipeline_config);
-        g_Shader = Shader::Create("sim_shader_transforms/simple_shader.vert.spv", "sim_shader_transforms/simple_shader.frag.spv", pipeline_config);
+        g_Shader = Shader::Create("showcase_shaders/simple_shader.vert.spv", "showcase_shaders/simple_shader.frag.spv", pipeline_config);
+        g_UboShaderTutorial = Shader::Create("sim_shader_ubo_tutorial/simple_shader.vert.spv", "sim_shader_ubo_tutorial/simple_shader.frag.spv", pipeline_config);
 
         ConsoleLogError("NOT AN ERROR: Shader Loaded Successfully!");
 
@@ -127,20 +181,41 @@ namespace engine3d{
         //! @note Setting up Uniform Buffers here
         //! TODO: Move uniform buffers...
         //! @note Bandage fix for NonCoherentAtomSize bug.
+
+
         auto phys_driver_props = vk::VulkanContext::GetPhysicalDriver().GetProperties();
         auto min_offset_alignment = std::lcm(phys_driver_props.limits.minUniformBufferOffsetAlignment, phys_driver_props.limits.nonCoherentAtomSize);
 
-        s_Ubo = UniformBuffer(
-            sizeof(GlobalUbo),
-            vk::VulkanSwapchain::MaxFramesInFlight,
-            VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
-            min_offset_alignment
-        );
+        //! @note We want their to be the same amount of uniform buffers as our current frames in flight.
+        //! @note Uniform buffers are how we are going to be sending data to our pipelines.
+        ConsoleLogInfo("Renderer --- Begin Initializing Uniform Buffers at Max_Frames_In_Flight = {}", vk::VulkanSwapchain::MaxFramesInFlight);
+        g_UniformBuffers = std::vector<UniformBuffer>(vk::VulkanSwapchain::MaxFramesInFlight);
+        ConsoleLogTrace("g_UniformBuffers.size() === {}", g_UniformBuffers.size());
+        // uint32_t instance_count = vk::VulkanSwapchain::MaxFramesInFlight;
+        uint32_t instance_count = 1;
+        for(int i = 0; i <= g_UniformBuffers.size(); i++){
+            g_UniformBuffers[i] = UniformBuffer(
+                sizeof(GlobalUbo),
+                instance_count,
+                VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
+                min_offset_alignment
+            );
+            
+            //! @note In tutorial referenced to as .map(), I just changed it to be explicitly called MapData
+            g_UniformBuffers[i].MapData();
+        }
 
-        //! @note In tutorial referenced to as .map(), I just changed it to be explicitly called MapData
-        s_Ubo.MapData();
+        ConsoleLogWarn("Renderer --- g_UniformBuffers Initialized Correctly!!");
+        
+        g_Global_desc_sets = std::vector<VkDescriptorSet>(vk::VulkanSwapchain::MaxFramesInFlight);
 
+        for(int i = 0; i <= g_Global_desc_sets.size(); i++){
+            auto buffer_info = g_UniformBuffers[i].InitializeDescriptorInfo();
+            vk::VulkanDescriptorWriter(*glob_set_layout, *g_GlobalPool)
+            .WriteBuffer(0, &buffer_info)
+            .Build(g_Global_desc_sets[i]);
+        }
 
 
 
@@ -321,35 +396,49 @@ namespace engine3d{
 
         //! @note Essentially doing m_Pipeline->Bind(m_CommandBuffer[i])
         //! @note Starts when to start rendering!!
-        vkCmdBindPipeline(current_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, g_Shader->GetGraphicsPipeline());
+
+        //! @note Utilizing our shader pipeline here for the ubo/descriptor sets tutorial.
+        vkCmdBindPipeline(current_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, g_UboShaderTutorial->GetGraphicsPipeline());
         float delta_time = SyncUpdateManager::GetInstance()->m_SyncLocalDeltaTime;
         auto cameraObject = p_AllSceneObjects["Cameras"][0];
         auto camera_component = cameraObject->GetComponent<Camera>();
+        
         //! @note Only for testing purposes for mesh data.
-        // auto point_light_obj = p_Objects[2];
-        // auto point_light_position = point_light_obj->GetComponent<Transform>().m_Position;
         auto& position = p_AllSceneObjects["Cameras"][0]->GetComponent<Transform>().m_Position;
+        auto proj_view = camera_component.GetProjection() * camera_component.GetView();
+
+        //! @note Bind descriptor sets per frame (frames-in-flight)
+        vkCmdBindDescriptorSets(
+            current_cmd_buffer, 
+            VK_PIPELINE_BIND_POINT_GRAPHICS, 
+            g_PipelineLayout,
+            0,
+            1,
+            &g_Global_desc_sets[g_CurrentFrameIndex],
+            0,
+            nullptr
+        );
 
         for(const auto& obj : p_AllSceneObjects.at("RenderedObjects")){
-
-            auto proj_view = camera_component.GetProjection() * camera_component.GetView();
-
             auto model_matrix = obj->toMat4();
 
-            SimplePushConstantData push = {
-                .Transform = proj_view * model_matrix,
-                .ModelMatrix = model_matrix,
-                .LightTransform = position - obj->GetComponent<Transform>().m_Position
-                // .LightTransform = position
-            };
 
             //! @note This is new here.
             //! @note We are writing our buffer data to the uniform buffer, and specifying at the
             //        current frame we are on this uniform buffer is being written to.
             GlobalUbo ubo{};
-            ubo.ProjectionView = proj_view;
-            s_Ubo.WriteAt(&ubo, g_CurrentFrameIndex);
-            s_Ubo.FlushAt(g_CurrentFrameIndex);
+            // ubo.ProjectionView = proj_view;
+            ubo.DirectionToLight = position - obj->GetComponent<Transform>().m_Position; 
+            // ConsoleLogError("Current Frame Index == {}", g_CurrentFrameIndex);
+            g_UniformBuffers[g_CurrentFrameIndex].WriteAt(&ubo, g_CurrentFrameIndex);
+            g_UniformBuffers[g_CurrentFrameIndex].Flush(g_CurrentFrameIndex);
+
+            OldSimplePushConstantData push = {
+                .Transform = proj_view * model_matrix,
+                .NormalMatrix = model_matrix,
+                .LightTransform = position - obj->GetComponent<Transform>().m_Position
+                // .LightTransform = position
+            };
 
             
             vkCmdPushConstants(
@@ -357,7 +446,7 @@ namespace engine3d{
                 g_PipelineLayout,
                 VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
                 0,
-                    sizeof(SimplePushConstantData), 
+                    sizeof(OldSimplePushConstantData), 
                     &push
             );
             

@@ -53,6 +53,7 @@ add_library(
     ${VULKAN_INCLUDE_DIR}/VulkanIndexBuffer.hpp
 
     ${VULKAN_SHADERS_INCLUDE_DIR}/VulkanShader.hpp
+    ${VULKAN_INCLUDE_DIR}/VulkanDescriptors.hpp
 
     # Scene Managment Includes
     ${ENGINE_INCLUDE_NAME}/Core/SceneManagment/Components/GameComponent.hpp
@@ -110,6 +111,7 @@ add_library(
     ${VULKAN_SRC_DIR}/VulkanIndexBuffer.cpp
 
     ${VULKAN_SHADERS_SRC_DIR}/VulkanShader.cpp
+    ${VULKAN_SRC_DIR}/VulkanDescriptors.cpp
 
     ${ENGINE_SRC_DIR}/Core/SceneManagment/SceneObjects/SceneObject.cpp
     ${ENGINE_SRC_DIR}/Core/SceneManagment/Components/GameComponent.cpp
