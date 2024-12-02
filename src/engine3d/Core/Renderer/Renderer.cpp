@@ -115,7 +115,7 @@ namespace engine3d{
         
 
         auto glob_set_layout = vk::VulkanDescriptorSetLayout::Builder()
-                               .AddBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
+                               .AddBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
                                .Build();
 
         // *******************************************************
