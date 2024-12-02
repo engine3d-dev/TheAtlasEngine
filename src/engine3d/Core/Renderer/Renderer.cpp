@@ -406,6 +406,10 @@ namespace engine3d{
         auto cameraObject = p_AllSceneObjects["Cameras"][0];
         auto camera_component = cameraObject->GetComponent<Camera>();
         
+        // Calling point light
+        auto point_light_transform = p_AllSceneObjects["PointLights"][0]->GetComponent<Transform>();
+
+
         //! @note Only for testing purposes for mesh data.
         auto& position = p_AllSceneObjects["Cameras"][0]->GetComponent<Transform>().m_Position;
 
@@ -439,7 +443,9 @@ namespace engine3d{
             //        current frame we are on this uniform buffer is being written to.
             //! @note Uniform buffer data that gets used by the descriptor set that wont get updated as continuously as push constants
             GlobalUbo ubo{
-                .ProjectionView = proj_view
+                .ProjectionView = proj_view,
+                .LightPosition = {point_light_transform.m_Position.x, point_light_transform.m_Position.y, point_light_transform.m_Position.z},
+                .LightColor = {1.f, 0.f, 0.f, 1.f}
                 // .DirectionToLight = position - obj->GetComponent<Transform>().m_Position,
                 // .ProjectionView = proj_view
             };
@@ -448,7 +454,7 @@ namespace engine3d{
             g_UniformBuffers[g_CurrentFrameIndex].Flush();
 
             //! @note Push constanst for data we want to continously update
-            OldSimplePushConstantData push = {
+            SimplePushConstantData push = {
                 .Transform = proj_view * model_matrix,
                 .ModelMatrix = model_matrix,
                 // .LightTransform = position - obj->GetComponent<Transform>().m_Position
@@ -461,7 +467,7 @@ namespace engine3d{
                 g_PipelineLayout,
                 VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
                 0,
-                    sizeof(OldSimplePushConstantData), 
+                    sizeof(SimplePushConstantData), 
                     &push
             );
             

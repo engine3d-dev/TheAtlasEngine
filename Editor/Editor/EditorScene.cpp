@@ -5,12 +5,15 @@
 #include <Core/EngineLogger.hpp>
 #include <Core/SceneManagment/Components/SPComps/Camera.hpp>
 #include <Core/TimeManagement/UpdateManagers/SyncUpdateManager.hpp>
+#include <Jolt/Math/Quat.h>
 #include <Math/Interpolation.hpp>
 #include <Core/ApplicationInstance.hpp>
 #include <Core/Event/InputPoll.hpp>
+#include <glm/gtc/constants.hpp>
 #include <glm/trigonometric.hpp>
 
 namespace engine3d{
+
     EditorScene::EditorScene(){
         m_Scene = new Scene();
 
@@ -22,9 +25,9 @@ namespace engine3d{
         // auto cube_mesh = Mesh::LoadModel("3d_models/tutorial/smooth_vase.obj");
         // auto cube_mesh = Mesh::LoadModel("3d_models/tutorial/FinalBaseMesh.obj");
         // auto cube_mesh = Mesh::LoadModel("3d_models/tutorial/Castelia City.obj");
-        auto cube_mesh = Mesh::LoadModel("3d_models/tutorial/smooth_vase.obj");
+        // auto cube_mesh = Mesh::LoadModel("3d_models/tutorial/smooth_vase.obj");
         // auto cube_mesh = Mesh::LoadModel("3d_models/tutorial/colored_cube.obj");
-        // auto cube_mesh = Mesh::LoadModel("3d_models/tutorial/sphere.obj");
+        auto cube_mesh = Mesh::LoadModel("3d_models/tutorial/sphere.obj");
         //! @note Make this scene object as part of our current scene.
 
         // -----------------------------
@@ -42,7 +45,6 @@ namespace engine3d{
         // Bob Scene object Creation
         // -----------------------------
         auto bob_mesh = Mesh::LoadModel("3d_models/tutorial/bugatti.obj");
-
         SceneObject* bob = new SceneObject(m_Scene);
         auto& transform = bob->GetComponent<Transform>();
         transform.SetPos<glm::vec3>({0.f, 0.5f, 2.5f});
@@ -57,11 +59,13 @@ namespace engine3d{
         auto& cube1_transform = cube1->GetComponent<Transform>();
         cube1_transform.SetPos<glm::vec3>( {.0f, 15.0f, 2.5});
         // cube1_transform.SetPos<glm::vec3>({glm::radians(180.0f), 0.f, 0.f});
-        cube1_transform.m_Scale = {10.5f, 10.5f, 10.5f};
+        cube1_transform.m_Scale = {2.0f, 2.0f, 2.0f};
         // cube1_transform.SetAxisRot<glm::vec3>({glm::radians(180.0f), 0.f, 0.f});
         // cube1_transform.m_AxisRotation = {0.0f, glm::radians(90.0f), 0.f};
-        // cube1_transform.m_AxisRotation = ToQuat(glm::vec3(glm::radians(180.0f), 0.f, 0.f));
-        cube1_transform.m_AxisRotation = {glm::radians(180.0f), 0.0f, 0.0f};
+        cube1_transform.m_QuaterionRot = ToQuat(glm::vec3(glm::radians(180.0f), 0.f, 0.f));
+        cube1_transform.SetAxisRot<JPH::Vec3>(cube1_transform.GetQuat<JPH::Quat>().GetEulerAngles());
+        
+        // cube1_transform.m_AxisRotation = {glm::radians(0.0f), 0.0f, 0.0f};
         // cube1_transform.m_AxisRotation = {
         //     glm::radians(180.0f),
         //     glm::radians(0.0),
@@ -70,28 +74,34 @@ namespace engine3d{
         cube1->SetMesh(cube_mesh);
 
         // -----------------------------
-        // Cube 2 Scene object Creation
+        // Point Light Scene object Creation
         // -----------------------------
-        SceneObject* cube2 = new SceneObject(m_Scene);
-        auto& cube2_transform = cube2->GetComponent<Transform>();
-        // auto aspect_ratio = ApplicationInstance::GetWindow().GetAspectRatio();
-        cube2_transform.SetPos<glm::vec3>( {0.f, 15.0f, -2.5f});
-        cube2_transform.m_AxisRotation = {0.0f, glm::radians(90.0f), 0.f};
-        cube2_transform.m_Scale = {5.5f, 5.5f, 5.5};
-
-        cube2->SetMesh(cube_mesh);
-
         SceneObject* sphere_point_light = new SceneObject(m_Scene);
         Mesh mesh = Mesh::LoadModel("3d_models/tutorial/sphere.obj");
         auto& sphere_transform = sphere_point_light->GetComponent<Transform>();
-        sphere_transform.SetPos<glm::vec3>( {-10.0, 3.0, -1.0});
+        sphere_transform.SetPos<glm::vec3>( {-10.0f, -15.0f, -1.0f});
         sphere_transform.m_Scale = {1.f, 1.f, 1.f};
         sphere_point_light->SetMesh(mesh);
+
+        // -----------------------------
+        // Cube 2 Scene object Creation
+        // -----------------------------
+        SceneObject* cube2 = new SceneObject(m_Scene);
+        auto cube2_mesh = Mesh::LoadModel("3d_models/tutorial/cube.obj");
+        auto& cube2_transform = cube2->GetComponent<Transform>();
+        // auto aspect_ratio = ApplicationInstance::GetWindow().GetAspectRatio();
+        // cube2_transform.SetPos<glm::vec3>( {0.f, 15.0f, -2.5f});
+        cube2_transform.m_QuaterionRot = ToQuat(glm::vec3(glm::radians(90.0f), 0.f, 0.f));
+        cube2_transform.SetAxisRot<JPH::Vec3>(cube2_transform.GetQuat<JPH::Quat>().GetEulerAngles());
+        cube2_transform.SetPos(sphere_transform.m_Position);
+        // cube2_transform.m_AxisRotation = {0.0f, glm::radians(90.0f), 0.f};
+        cube2_transform.m_Scale = {.2f, .2f, .2f};
+        cube2->SetMesh(cube2_mesh);
 
 
         //! @note Then we add them to our vector.
         m_SceneObjects.push_back(cube1);
-        // m_SceneObjects.push_back(cube2);
+        m_SceneObjects.push_back(cube2);
         m_SceneObjects.push_back(bob);
         m_PointLightObjects.push_back(sphere_point_light);
 
@@ -103,6 +113,36 @@ namespace engine3d{
     }
 
     void EditorScene::OnMoveCamUpdate(){
+
+        auto point_light_object = m_AllSceneObjecs["PointLights"][0];
+        auto& point_light_transform = point_light_object->GetComponent<Transform>();
+        auto& cube2_transform = m_AllSceneObjecs["RenderedObjects"][1]->GetComponent<Transform>();
+        // point_light_transform.SetQuat(ToQuat(glm::vec3(0.0f, glm::mod(point_light_transform.GetAxisRot<glm::vec3>().y+.1f, glm::two_pi<float>()), 0.f)));
+
+        if(InputPoll::IsKeyPressed(ENGINE_KEY_E)){
+            // ConsoleLogWarn("If E is pressed!");
+            // point_light_transform.SetQuat(ToQuat(glm::vec3(0.0f, glm::mod(point_light_transform.GetAxisRot<glm::vec3>().y+.1f, glm::two_pi<float>()), 0.f)));
+            point_light_transform.m_Position.y += 1.0f;
+            // point_light_transform.m_Position.x = glm::mod(point_light_transform.m_Position.x, glm::two_pi<float>());
+            // point_light_transform.SetPos(point_light_transform.GetPos<glm::vec3>());
+            // cube2_transform.SetPos(point_light_transform.m_Position);
+        }
+
+        if(InputPoll::IsKeyPressed(ENGINE_KEY_Q)){
+            point_light_transform.m_Position.y -= 1.0f;
+            // cube2_transform.SetPos(point_light_transform.m_Position);
+        }
+
+        if(InputPoll::IsKeyPressed(ENGINE_KEY_UP)){
+            point_light_transform.m_Position.x += 1.0f;
+        }
+
+        if(InputPoll::IsKeyPressed(ENGINE_KEY_DOWN)){
+            point_light_transform.m_Position.x -= 1.0f;
+        }
+
+        cube2_transform.SetPos(point_light_transform.m_Position);
+
 
         auto& cameraObject = m_AllSceneObjecs["Cameras"].at(0);
         auto& transform = cameraObject->GetComponent<Transform>();

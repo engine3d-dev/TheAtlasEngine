@@ -18,6 +18,7 @@ layout(push_constant) uniform Push {
     mat4 ModelMatrix;
     vec3 LightTransform;
 } push;
+
 void main(){
     // outColor = vec4(fragColor, 0.0);
     outColor = vec4(fragColor, 1.0);

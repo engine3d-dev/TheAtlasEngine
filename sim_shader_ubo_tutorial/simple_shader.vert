@@ -60,7 +60,8 @@ layout(push_constant) uniform Push {
 // NEW: 
 
 void main(){
-    vec3 newPos = vec3(Position.x, Position.y-.5f, Position.z);
+    vec3 newPos = vec3(Position.x, Position.y, Position.z);
+    vec3 dir_to_light = ubo.LightPosition;
     // vec4 positionWorld = push.ModelMatrix * vec4(Position, 1.0);
     
     // vec4 worldPositionSpace = push.ModelMatrix * vec4(newPos, 1.0);
@@ -68,10 +69,11 @@ void main(){
     // gl_Position = push.Transform * positionWorld;
 
     // mat3 normal_mat = transpose(inverse(mat3(push.ModelMatrix)));
-    vec3 normalize_world_space = normalize(mat3(push.ModelMatrix) * Normals);
+    vec3 normalize_world_space = normalize(mat3(push.ModelMatrix) * vec3(Normals.x, Normals.y, Normals.z));
 
     // vec3 DirectionToLight = ubo.LightPosition - positionWorld.xyz;
-    vec3 DirectionToLight = ubo.LightPosition - newPos.xyz;
+    // vec3 DirectionToLight = ubo.LightPosition - newPos.xyz;
+    vec3 DirectionToLight = dir_to_light - newPos.xyz;
     float attenuation = 1.0 / dot(DirectionToLight, DirectionToLight);
 
     vec3 LightColor = ubo.LightColor.xyz * ubo.LightColor.w;

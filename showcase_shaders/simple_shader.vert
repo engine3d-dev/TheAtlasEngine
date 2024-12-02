@@ -23,6 +23,7 @@ layout(push_constant) uniform Push {
 vec3 dir_to_light = normalize(push.LightTransform);
 
 void main(){
+    // -.5f is to temp fix the rolling issue with the sphere.
     vec3 newPos = vec3(Position.x,Position.y-.5f,Position.z);
     // vec4 worldPositionSpace = push.ModelMatrix * vec4(newPos, 1.0);
     gl_Position = push.Transform * vec4(newPos,1.0);
