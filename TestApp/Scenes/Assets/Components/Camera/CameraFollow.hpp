@@ -9,8 +9,10 @@ class CameraFollow : public engine3d::GameComponent
         CameraFollow(engine3d::Transform &p_transform);
 
         void OnIntegrate();
+        void PhysicsUpdate();
         void LateUpdate();
     private:
         engine3d::Transform* m_PlayerTransform;
         engine3d::Transform* m_Transform;
+        glm::vec3 playerVelocity;
 };

@@ -28,8 +28,8 @@ class BodyContainer
         JPH::BodyID CreateBody(EActivation p_ActivationType ,JPH::RVec3 p_Position);
 
     protected:
-        Shape* BaseShape = nullptr;
-        Shape* ParentShape = nullptr;
+        Ref<Shape> BaseShape = nullptr;
+        Ref<Shape> ParentShape = nullptr;
         JPH::EMotionType m_MotionType = EMotionType::Static;
         JPH::ObjectLayer m_LayerType = Engine3DLayers::Static;
     
