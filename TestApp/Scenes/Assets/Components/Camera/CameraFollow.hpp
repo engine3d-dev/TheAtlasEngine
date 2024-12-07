@@ -12,6 +12,8 @@ class CameraFollow : public engine3d::GameComponent
         void PhysicsUpdate();
         void LateUpdate();
     private:
+
+        float m_CameraViewDistance = 0.0f;
         engine3d::Transform* m_PlayerTransform;
         engine3d::Transform* m_Transform;
         glm::vec3 playerVelocity;

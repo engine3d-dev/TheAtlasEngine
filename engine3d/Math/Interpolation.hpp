@@ -1,8 +1,13 @@
+#pragma once
 #include <concepts>
+#include <glm/glm.hpp>
 #include <functional>
 #include <glm/detail/qualifier.hpp>
 #include <glm/fwd.hpp>
 #include <type_traits>
+#include <glm/gtc/constants.hpp> // For glm::epsilon
+#include <cmath>
+
 
 namespace engine3d
 {
@@ -19,16 +24,16 @@ namespace engine3d
     {
         public:
             template<typename T>
-            static T LinearInterpolate(T start, T end, std::function<float(float)> function, float t)
+            static T LinearInterpolate(T start, T end, std::function<float(float)> function, float dt)
             {
                 float l_AdjustedTime = 0.0f;
                 if(!function)
                 {
-                    l_AdjustedTime = t;
+                    l_AdjustedTime = dt;
                 }
                 else 
                 {
-                    const float f = function(t);
+                    const float f = function(dt);
                     l_AdjustedTime = f;
                 }
                 
@@ -45,6 +50,49 @@ namespace engine3d
                 float timeDif = 1.0f - l_AdjustedTime;
 
                 return start * timeDif + end * l_AdjustedTime;
+            }
+
+            template <typename T>
+            static T SphericalInterpolate(T start, T end, std::function<float(float)> function, float dt) 
+            {
+                float adjustedTime = 0.0f;
+
+                if (!function) 
+                {
+                    adjustedTime = dt;
+                } else {
+                    const float f = function(dt);
+                    adjustedTime = f;
+                }
+
+                if (adjustedTime < 0.0f) 
+                {
+                    adjustedTime = 0.0f;
+                }
+                if (adjustedTime > 1.0f) 
+                {
+                    adjustedTime = 1.0f;
+                }
+
+                start = glm::normalize(start);
+                end = glm::normalize(end);
+
+                float dot = glm::dot(start, end);
+
+                dot = glm::clamp(dot, -1.0f, 1.0f);
+
+                if (glm::abs(dot) > 1.0f - glm::epsilon<float>()) 
+                {
+                    return glm::mix(start, end, adjustedTime);
+                }
+
+                float theta = glm::acos(dot);
+
+                float sinTheta = glm::sin(theta);
+                float factorStart = glm::sin((1.0f - adjustedTime) * theta) / sinTheta;
+                float factorEnd = glm::sin(adjustedTime * theta) / sinTheta;
+
+                return factorStart * start + factorEnd * end;
             }
 
             template<typename T>

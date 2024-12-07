@@ -50,7 +50,7 @@ using namespace engine3d;
         else {
             pushForce = PUSHFORCE;
         }
-        ConsoleLogWarn("Forward: {},{},{}", player_velocity.x,forward.y,player_velocity.z);
+        //ConsoleLogWarn("Forward: {},{},{}", player_velocity.x,forward.y,player_velocity.z);
 
         if(InputPoll::IsKeyPressed(KeyCode::F5))
         {

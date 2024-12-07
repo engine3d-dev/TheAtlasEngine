@@ -3,6 +3,7 @@
 #include <Core/Event/InputPoll.hpp>
 #include <Core/TimeManagement/UpdateManagers/SyncUpdateManager.hpp>
 #include <Core/ApplicationInstance.hpp>
+#include <glm/fwd.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -75,29 +76,34 @@ namespace engine3d{
     }
 
     //! @note Euler angles to specify the rotation of transforms for orienting the camera.
-    void Camera::SetViewXYZ(glm::vec3 Position, glm::vec3 Rotation){
-        const float c3 = glm::cos(Rotation.z);
-        const float s3 = glm::sin(Rotation.z);
-        const float c2 = glm::cos(Rotation.x);
-        const float s2 = glm::sin(Rotation.x);
-        const float c1 = glm::cos(Rotation.y);
-        const float s1 = glm::sin(Rotation.y);
-        const glm::vec3 u{(c1 * c3 + s1 * s2 * s3), (c2 * s3), (c1 * s2 * s3 - c3 * s1)};
-        const glm::vec3 v{(c3 * s1 * s2 - c1 * s3), (c2 * c3), (c1 * c3 * s2 + s1 * s3)};
-        const glm::vec3 w{(c2 * s1), (-s2), (c1 * c2)};
-        m_ViewMatrix = glm::mat4{1.f};
-        m_ViewMatrix[0][0] = u.x;
-        m_ViewMatrix[1][0] = u.y;
-        m_ViewMatrix[2][0] = u.z;
-        m_ViewMatrix[0][1] = v.x;
-        m_ViewMatrix[1][1] = v.y;
-        m_ViewMatrix[2][1] = v.z;
-        m_ViewMatrix[0][2] = w.x;
-        m_ViewMatrix[1][2] = w.y;
-        m_ViewMatrix[2][2] = w.z;
-        m_ViewMatrix[3][0] = -glm::dot(u, Position);
-        m_ViewMatrix[3][1] = -glm::dot(v, Position);
-        m_ViewMatrix[3][2] = -glm::dot(w, Position);
+    void Camera::SetViewXYZ(const glm::vec3 &Position, const glm::quat &Rotation){
+            // Extract basis vectors from the quaternion
+        glm::vec3 newPos = glm::vec3{Position.x, Position.y - .05f, Position.z};
+        const glm::vec3 u = Rotation * glm::vec3(1.0f, 0.0f, 0.0f); // Right vector
+        const glm::vec3 v = Rotation * glm::vec3(0.0f, 1.0f, 0.0f); // Up vector
+        const glm::vec3 w = Rotation * glm::vec3(0.0f, 0.0f, 1.0f); // Forward vector (negated for view space)
+
+        // Initialize the view matrix
+        glm::mat4 viewMatrix = glm::mat4(1.0f);
+
+        // Set the rotation part of the view matrix
+        viewMatrix[0][0] = u.x;
+        viewMatrix[1][0] = u.y;
+        viewMatrix[2][0] = u.z;
+        viewMatrix[0][1] = v.x;
+        viewMatrix[1][1] = v.y;
+        viewMatrix[2][1] = v.z;
+        viewMatrix[0][2] = w.x;
+        viewMatrix[1][2] = w.y;
+        viewMatrix[2][2] = w.z;
+
+        // Set the translation part of the view matrix
+        viewMatrix[3][0] = -glm::dot(u, newPos);
+        viewMatrix[3][1] = -glm::dot(v, newPos);
+        viewMatrix[3][2] = -glm::dot(w, newPos);
+
+        // Assign the resulting view matrix (assuming a class member variable `m_ViewMatrix`)
+        m_ViewMatrix = viewMatrix;
     }
 
 
