@@ -10,6 +10,37 @@
 
 
 
+namespace VectorConversion {
+    template <typename Vector3>
+        concept IsVec3 = requires(Vector3 vector)
+        {
+            vector.x;
+            vector.y;
+            vector.z;
+        };
+
+    template <typename Vector4>
+        concept IsVec4 = IsVec3<Vector4> && requires(Vector4 vector)
+        {
+            vector.w;
+        };
+
+    template <typename Vector3>
+        concept IsGetterVec3 = requires(Vector3 vector)
+        {
+            vector.GetX();
+            vector.GetY();
+            vector.GetZ();
+        };
+
+    template <typename Vector4>
+        concept IsGetterVec4 = IsGetterVec3<Vector4> && requires(Vector4 vector)
+        {
+            vector.GetW();
+        };
+}
+
+
 namespace engine3d 
 {
     class Transform : public GameComponent
@@ -19,6 +50,7 @@ namespace engine3d
 
             //Getters
             template<VectorConversion::GLMVec3 T>
+
             T GetPos()
             {
                 T position(m_Position.x,m_Position.y,m_Position.z);
@@ -26,6 +58,7 @@ namespace engine3d
             }
 
             template<VectorConversion::GLMVec4 Q>
+
             Q GetQuat()
             {
                 Q quat(m_QuaterionRot.x,m_QuaterionRot.y,m_QuaterionRot.z,m_QuaterionRot.w);
@@ -84,6 +117,7 @@ namespace engine3d
                 m_Position.z = position.z;
             }
 
+
             template<VectorConversion::GLMVec4 Q>
             void SetQuat(Q quat)
             {
@@ -92,6 +126,7 @@ namespace engine3d
                 m_QuaterionRot.z = quat.z;
                 m_QuaterionRot.w = quat.w;
             }
+
 
             template<VectorConversion::GLMVec3 T>
             void SetAxisRot(T axisRotation)

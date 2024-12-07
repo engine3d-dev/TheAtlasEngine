@@ -136,10 +136,11 @@ void ShowCaseWorldInstance::RenderScenes()
     auto& cameraObject = m_AllSceneObjecs["Cameras"].at(0);
     auto& transform = cameraObject->GetComponent<Transform>();
     auto& camera = cameraObject->GetComponent<Camera>();
+  
     camera.SetViewXYZ(
     transform.m_Position, 
     transform.m_AxisRotation);
-    
+  
     engine3d::Renderer::RecordSceneGameObjects(m_AllSceneObjecs);
 }
 
