@@ -5,6 +5,10 @@
 #include <glm/detail/qualifier.hpp>
 #include <glm/glm.hpp>
 #include <glm/fwd.hpp>
+#include <Math/Math.hpp>
+#include <Physics/JoltPhysics.hpp>
+
+
 
 namespace VectorConversion {
     template <typename Vector3>
@@ -45,28 +49,30 @@ namespace engine3d
             Transform();
 
             //Getters
-            template<VectorConversion::IsVec3 T>
+            template<VectorConversion::GLMVec3 T>
+
             T GetPos()
             {
                 T position(m_Position.x,m_Position.y,m_Position.z);
                 return position;
             }
 
-            template<VectorConversion::IsVec4 Q>
+            template<VectorConversion::GLMVec4 Q>
+
             Q GetQuat()
             {
                 Q quat(m_QuaterionRot.x,m_QuaterionRot.y,m_QuaterionRot.z,m_QuaterionRot.w);
                 return quat;
             }
 
-            template<VectorConversion::IsVec3 T>
+            template<VectorConversion::GLMVec3 T>
             T GetAxisRot()
             {
                 T axisRotation(m_AxisRotation.x,m_AxisRotation.y,m_AxisRotation.z);
                 return axisRotation;
             }
 
-            template<VectorConversion::IsVec3 T>
+            template<VectorConversion::GLMVec3 T>
             T GetScale()
             {
                 T scale(m_Scale.x,m_Scale.y,m_Scale.z);
@@ -74,28 +80,28 @@ namespace engine3d
             }
 
             //JPH Getters
-            template<VectorConversion::IsGetterVec3 T>
+            template<VectorConversion::JPHVec3 T>
             T GetPos()
             {
                 T position(m_Position.x,m_Position.y,m_Position.z);
                 return position;
             }
 
-            template<VectorConversion::IsGetterVec4 Q>
+            template<VectorConversion::JPHVec4 Q>
             Q GetQuat()
             {
                 Q quat(m_QuaterionRot.x,m_QuaterionRot.y,m_QuaterionRot.z,m_QuaterionRot.w);
                 return quat;
             }
 
-            template<VectorConversion::IsGetterVec3 T>
+            template<VectorConversion::JPHVec3 T>
             T GetAxisRot()
             {
                 T axisRotation(m_AxisRotation.x,m_AxisRotation.y,m_AxisRotation.z);
                 return axisRotation;
             }
 
-            template<VectorConversion::IsGetterVec3 T>
+            template<VectorConversion::JPHVec3 T>
             T GetScale()
             {
                 T scale(m_Scale.x,m_Scale.y,m_Scale.z);
@@ -103,7 +109,7 @@ namespace engine3d
             }
 
             //Setters
-            template<VectorConversion::IsVec3 T>
+            template<VectorConversion::GLMVec3 T>
             void SetPos(T position)
             {
                 m_Position.x = position.x;
@@ -111,7 +117,8 @@ namespace engine3d
                 m_Position.z = position.z;
             }
 
-            template<VectorConversion::IsVec4 Q>
+
+            template<VectorConversion::GLMVec4 Q>
             void SetQuat(Q quat)
             {
                 m_QuaterionRot.x = quat.x;
@@ -120,7 +127,8 @@ namespace engine3d
                 m_QuaterionRot.w = quat.w;
             }
 
-            template<VectorConversion::IsVec3 T>
+
+            template<VectorConversion::GLMVec3 T>
             void SetAxisRot(T axisRotation)
             {
                 m_AxisRotation.x = axisRotation.x;
@@ -128,7 +136,7 @@ namespace engine3d
                 m_AxisRotation.z = axisRotation.z;
             }
 
-            template<VectorConversion::IsVec3 T>
+            template<VectorConversion::GLMVec3 T>
             void SetScale(T scale)
             {
                 m_Scale.x = scale.x;
@@ -137,7 +145,7 @@ namespace engine3d
             }
 
             //Setters JPH
-            template<VectorConversion::IsGetterVec3 T>
+            template<VectorConversion::JPHVec3 T>
             void SetPos(T position)
             {
                 m_Position.x = position.GetX();
@@ -145,7 +153,7 @@ namespace engine3d
                 m_Position.z = position.GetZ();
             }
 
-            template<VectorConversion::IsGetterVec4 Q>
+            template<VectorConversion::JPHVec4 Q>
             void SetQuat(Q quat)
             {
                 m_QuaterionRot.x = quat.GetX();
@@ -154,7 +162,7 @@ namespace engine3d
                 m_QuaterionRot.w = quat.GetW();
             }
 
-            template<VectorConversion::IsGetterVec3 T>
+            template<VectorConversion::JPHVec3 T>
             void SetAxisRot(T axisRotation)
             {
                 m_AxisRotation.x = axisRotation.GetX();
@@ -162,7 +170,7 @@ namespace engine3d
                 m_AxisRotation.z = axisRotation.GetZ();
             }
 
-            template<VectorConversion::IsGetterVec3 T>
+            template<VectorConversion::JPHVec3 T>
             void SetScale(T scale)
             {
                 m_Scale.x = scale.GetX();

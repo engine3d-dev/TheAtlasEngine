@@ -49,6 +49,7 @@ namespace engine3d
             collisionSteps, 
             p_joltHandler->physics_allocator, 
             p_joltHandler->job_system);
+
         if(m_RandomFrame <= m_LocalUpdateCounter)
         {
             m_RandomFrame = (rand() % m_MaxVariance) + m_MinFrames;
@@ -72,7 +73,6 @@ namespace engine3d
         //! @note My guess is that it needs to be called every frame/ double buffering
         //! might be an issue.
         OnSceneRender();
-
         if(m_LocalTimer->ElapsedSec() >= 1.0)
         {
             m_LocalTimer->Reset();

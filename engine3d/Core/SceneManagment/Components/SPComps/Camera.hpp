@@ -41,7 +41,7 @@ namespace engine3d{
         void SetViewTarget(glm::vec3 Position, glm::vec3 Target, glm::vec3 Up = glm::vec3(0.f, -1.f, 0.f));
 
         //! @note Euler angles to specify the rotation of transforms for orienting the camera.
-        void SetViewXYZ(glm::vec3 Position, glm::vec3 Rotation);
+        void SetViewXYZ(const glm::vec3 &Position, const glm::quat &Rotation);
         // ---------------------
         //! @note From tutorial.
         // ---------------------
