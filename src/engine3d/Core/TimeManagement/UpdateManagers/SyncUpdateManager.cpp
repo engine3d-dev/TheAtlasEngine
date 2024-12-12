@@ -39,6 +39,7 @@ namespace engine3d
         * human to catch wether the render is correct or not.
         * Benchmark later.
         */
+        m_SyncGlobalDeltaTime = deltaTime;
         OnPhysicsUpdate();
         const int collisionSteps = 1 + (60*(deltaTime));
 
@@ -78,7 +79,7 @@ namespace engine3d
             m_LocalTimer->Reset();
 
             //! @note Key event added to allow switch between global and local.
-            if(InputPoll::IsKeyPressed(KeyCode::F2))
+            if(InputPoll::IsKeyPressed(KeyCode::K))
             {
                 ConsoleLogInfo("Local FPS: {0}, Local Delta Time: {1}",
                     m_LocalFPS, m_SyncLocalDeltaTime);
