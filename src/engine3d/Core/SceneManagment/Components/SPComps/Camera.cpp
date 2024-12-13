@@ -106,6 +106,11 @@ namespace engine3d{
         m_ViewMatrix = viewMatrix;
     }
 
+    void Camera::SetView(const glm::mat4x4 &matrix)
+    {
+        m_ViewMatrix = matrix;
+    }
+
 
     void Camera::SetOrthoProjection(float left, float right, float top, float bottom, float near, float far){
         m_ProjectionMatrix = glm::mat4{1.0f};
