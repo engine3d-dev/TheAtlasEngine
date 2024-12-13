@@ -73,6 +73,7 @@ namespace engine3d
             SyncUpdateManager();
             ~SyncUpdateManager();
             float m_SyncLocalDeltaTime;
+            float m_SyncGlobalDeltaTime;
             //Called by threadManager
             void RunUpdate(float deltaTime);
 

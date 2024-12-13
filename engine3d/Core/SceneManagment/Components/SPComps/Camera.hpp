@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Core/SceneManagment/Components/GameComponent.hpp>
+#include <glm/fwd.hpp>
 #include <glm/glm.hpp>
 #include <string>
 
@@ -45,6 +46,8 @@ namespace engine3d{
         // ---------------------
         //! @note From tutorial.
         // ---------------------
+
+        void SetView(const glm::mat4x4 &matrix);
 
 
 
