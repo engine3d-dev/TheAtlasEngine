@@ -1,3 +1,4 @@
+#include "internal/Vulkan2Showcase/VulkanSwapchain.hpp"
 #include <internal/Vulkan2Showcase/VulkanContext.hpp>
 #include <internal/Vulkan2Showcase/helper_functions.hpp>
 #include <internal/Vulkan2Showcase/VulkanDescriptors.hpp>
@@ -170,5 +171,75 @@ namespace engine3d::vk{
 
         vkUpdateDescriptorSets(VulkanContext::GetDriver(), m_Writes.size(), m_Writes.data(), 0, nullptr);
     }
+
+
+
+
+
+    /******************************************/
+    /******************************************/
+    /******************************************/
+    /*******[Descriptor Sets Refactored]*******/
+
+    /*
+        --------------
+        Shader Example
+        --------------
+
+        // We want to correspond the descriptors sets to match our binding properties here
+        layout(set = 0, binding = 0) uniform GlobalUbo {
+            mat4 LightTransform;
+        } ubo;
+
+        void main(){
+            fragLightPos = ubo.LightTransform
+        }
+    
+        --------------
+        Descriptors Example
+        --------------
+
+        SetDescriptorLayoutBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS);
+    
+    */
+
+    void VulkanDescriptors::InitDescriptorPool(){
+        //! @note Replace this with the std::vector
+        // VkDescriptorPoolSize pool_size = {
+        //     .type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+        //     .descriptorCount = VulkanSwapchain::MaxFramesInFlight
+        // };
+
+        std::vector<VkDescriptorPoolSize> sizes = {
+            { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VulkanSwapchain::MaxFramesInFlight}
+        };
+
+        VkDescriptorPoolCreateInfo pool_ci = {
+            .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            .maxSets = VulkanSwapchain::MaxFramesInFlight,
+            .poolSizeCount = static_cast<uint32_t>(sizes.size()),
+            .pPoolSizes = sizes.data()
+        };
+
+        vk_check(vkCreateDescriptorPool(VulkanContext::GetDriver(), &pool_ci, nullptr, &m_DescriptorPool), "vkCreateDescriptorPool", __FILE__, __LINE__, __FUNCTION__);
+    }
+
+    void VulkanDescriptors::InitDescriptorSets(){
+        std::vector<VkDescriptorSetLayout> layouts(VulkanSwapchain::MaxFramesInFlight, m_DescriptorSetLayout);
+
+        VkDescriptorSetAllocateInfo alloc_info = {
+            .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+            .descriptorPool = m_DescriptorPool,
+            .descriptorSetCount = 1,
+            .pSetLayouts = layouts.data()
+        };
+
+        vk_check(vkAllocateDescriptorSets(VulkanContext::GetDriver(), &alloc_info, m_DescriptorSets.data()), "vkAllocateDescriptorSets", __FILE__, __LINE__, __FUNCTION__);
+
+
+    }
+
 
 };

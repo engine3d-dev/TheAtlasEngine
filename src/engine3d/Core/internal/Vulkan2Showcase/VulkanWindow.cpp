@@ -6,6 +6,7 @@
 #include <internal/Vulkan2Showcase/helper_functions.hpp>
 
 namespace engine3d::vk{
+
     VulkanWindow::VulkanWindow(const std::string& p_Tag, uint32_t w, uint32_t h) : m_Width(w), m_Height(h){
         if(!glfwInit()){
             ConsoleLogError("glfwInit failed!");

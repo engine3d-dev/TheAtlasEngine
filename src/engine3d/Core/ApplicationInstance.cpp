@@ -7,7 +7,8 @@
 #include <entt/entt.hpp>
 
 // #include <imgui/backends/imgui_impl_vulkan.h>
-#include <imgui/backends/imgui_impl_glfw.h>
+// #include <imgui/backends/imgui_impl_glfw.h>
+#include <internal/Vulkan2Showcase/VulkanImGuiLayer.hpp>
 
 namespace engine3d{
     static float m_LastFrameTime = 0.0f;
@@ -25,6 +26,8 @@ namespace engine3d{
         // ImGui_ImplVulkanH_Window();
         // ImGui_ImplGlfw_InitForVulkan(ApplicationInstance::GetWindow().GetNativeWindow(), true);
         Renderer::Initialize("Engine3D Renderer");
+        // vk::VulkanImGuiLayer layer;
+        // layer.Initialize();
     }
 
     void ApplicationInstance::ExecuteApplicationMainloop(){

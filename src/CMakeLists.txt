@@ -126,5 +126,8 @@ add_library(
     ${ENGINE_SRC_DIR}/Math/Interpolation.cpp
     ${ENGINE_SRC_DIR}/Math/Math.cpp
 
+    ${VULKAN_INCLUDE_DIR}/VulkanImGuiLayer.hpp
+    ${VULKAN_SRC_DIR}/VulkanImGuiLayer.cpp
+
     ${ENGINE_SRC_DIR}/Physics/JoltHandler.cpp
 )
