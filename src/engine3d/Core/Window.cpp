@@ -1,63 +1,44 @@
-#include <internal/Vulkan2Showcase/VulkanWindow.hpp>
-#include <Core/ApplicationInstance.hpp>
-#include <Core/EngineLogger.hpp>
-#include <stdexcept>
+#include <GLFW/glfw3.h>
+#include <core/application_instance.hpp>
+#include <core/window.hpp>
+#include <core/engine_logger.hpp>
 #include <string>
-#include <vulkan/vulkan_core.h>
-#include <Core/TimeManagement/GlobalUpdateManager.hpp>
+// #include <imgui/backends/imgui_impl_glfw.h>
+#include <drivers/vulkan/vulkan_window.hpp>
 
 namespace engine3d{
-    
-    static Window* g_WindowAPI = nullptr;
+    static uint32_t g_WindowWidth = -1;
+    static uint32_t g_WindowHeight = -1;
 
-    Window* Window::Create(uint32_t p_Width, uint32_t p_Height, const std::string &p_Title){
+    Ref<Window> Window::Create(uint32_t Width, uint32_t Height, const std::string& Tag){
+        g_WindowWidth = Width;
+        g_WindowHeight = Height;
         switch (ApplicationInstance::CurrentAPI()){
-        case API::VULKAN:
-            return new vk::VulkanWindow(p_Title, p_Width, p_Height);
+        case VULKAN:
+            return CreateRef<vk::VulkanWindow>(Width, Height, Tag);
         default:
-            throw std::runtime_error("API was unspecified!");
+            ConsoleLogError("API that was input was not specifiying valid backend!");
+            return nullptr;
         }
+
         return nullptr;
     }
 
-    bool Window::IsActive() const{
-        return CurrentWindowActive();
+    Ref<Swapchain> Window::GetCurrentSwapchain(){
+        return CurrentSwapchain();
     }
 
-    VkSurfaceKHR& Window::GetVkSurface(){
-        return VkSurface();
+    uint32_t Window::GetWidth() const { return g_WindowWidth; }
+
+    uint32_t Window::GetHeight() const { return g_WindowHeight; }
+
+    bool Window::IsWindowActive() const { return !glfwWindowShouldClose(GetNativeWindow()); }
+
+    void Window::Close(){
+        glfwDestroyWindow(GetNativeWindow());
     }
 
-    //! @note Eventually, I'll wanna change the Graphic
-    // graphic_swapchain& Window::GetCurrentSwapchain(){
-    //     return CurrentSwapchain();
-    // }
-    Ref<GraphicSwapchain> Window::GetCurrentSwapchain(){
-        return Swapchain();
-    }
+    float Window::GetAspectRatio() const { return (float)GetWidth() / GetHeight(); }
 
-    GLFWwindow* Window::GetNativeWindow(){
-        return NativeWindow();
-    }
-
-    uint32_t Window::GetWidth() const{
-        return Width();
-    }
-
-    uint32_t Window::GetHeight() const{
-        return Height();
-    }
-
-    std::string Window::GetTitle() const{
-        return Title();
-    }
-
-    float Window::GetAspectRatio() const{
-        return (float)GetWidth() / (float)GetHeight();
-    }
-
-    void Window::OnUpdateAllFrames(){
-
-        GlobalUpdateManager::GetInstance()->GlobalOnTickUpdate();
-    }
+    GLFWwindow* Window::GetNativeWindow() const{ return NativeWindow(); }
 };

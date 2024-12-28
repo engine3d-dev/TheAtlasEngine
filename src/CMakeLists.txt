@@ -1,133 +1,89 @@
-set(ENGINE_INCLUDE_NAME ../engine3d)
-# set(ENGINE_INTERNAL_INCLUDE ${ENGINE_INCLUDE_NAME}/Core/internal)
-set(ENGINE_SRC_DIR engine3d)
-set(VULKAN_INCLUDE_DIR ${ENGINE_INCLUDE_NAME}/Core/internal/Vulkan2Showcase)
-set(VULKAN_SRC_DIR ${ENGINE_SRC_DIR}/Core/internal/Vulkan2Showcase)
+set(INCLUDE_DIR ../engine3d)
+set(SRC_DIR engine3d)
+
+set(VULKAN_INCLUDE_DIR ${INCLUDE_DIR}/drivers/vulkan)
+set(VULKAN_SRC_DIR ${SRC_DIR}/drivers/vulkan)
 
 set(VULKAN_SHADERS_INCLUDE_DIR ${VULKAN_INCLUDE_DIR}/Shaders)
 set(VULKAN_SHADERS_SRC_DIR ${VULKAN_SRC_DIR}/Shaders)
 
+set(
+    all_headers
 
-add_library(
-    ${PROJECT_NAME}
-    ${ENGINE_SRC_DIR}/Core/ApplicationInstance.cpp
+    # Event stuff
+    ${INCLUDE_DIR}/core/event/key_codes.hpp
+    ${INCLUDE_DIR}/core/event/mouse_codes.hpp
+    ${INCLUDE_DIR}/core/event/event.hpp
+    ${INCLUDE_DIR}/core/event/input_poll.hpp
+    ${INCLUDE_DIR}/core/event/key_event.hpp
+    ${INCLUDE_DIR}/core/event/mouse_event.hpp
 
-    ${ENGINE_INCLUDE_NAME}/Core/EngineLogger.hpp
-    ${ENGINE_INCLUDE_NAME}/Core/Window.hpp
+    ${INCLUDE_DIR}/thread_utils/thread_utils.hpp
+    # ====================================================================================
+    # ====================================================================================
+    # ====================================================================================
+    ${INCLUDE_DIR}/core/engine_logger.hpp
+    ${INCLUDE_DIR}/core/window.hpp
+    ${INCLUDE_DIR}/core/update_handlers/thread_manager.hpp
+    ${INCLUDE_DIR}/core/update_handlers/global_update_manager.hpp
+    ${INCLUDE_DIR}/core/update_handlers/sync_update_manager.hpp
 
-    # Update Management includes
-    ${ENGINE_INCLUDE_NAME}/Core/TimeManagement/GlobalUpdateManager.hpp
-    ${ENGINE_INCLUDE_NAME}/Core/TimeManagement/Timer.hpp
-    ${ENGINE_INCLUDE_NAME}/Core/TimeManagement/UpdateManagers/SyncUpdateManager.hpp
-    ${ENGINE_INCLUDE_NAME}/Core/TimeManagement/UpdateManagers/ParallelFrameUpdateManager.hpp
+    ## Renderer stuff
+    ${INCLUDE_DIR}/renderer/renderer.hpp
+    ${INCLUDE_DIR}/drivers/renderer_backend.hpp
 
-    # Application Manager
-    ${ENGINE_INCLUDE_NAME}/Core/ApplicationManager/Scene.hpp
-    ${ENGINE_INCLUDE_NAME}/Core/ApplicationManager/ThreadMngr.hpp
+    ## ui-stuff backend
+    ${INCLUDE_DIR}/drivers/ui/imgui_backend.hpp
 
-    # Event system includes
-    ${ENGINE_INCLUDE_NAME}/Core/Event/KeyCodes.hpp
-    ${ENGINE_INCLUDE_NAME}/Core/Event/MouseCodes.hpp
-    ${ENGINE_INCLUDE_NAME}/Core/Event/Event.hpp
-    ${ENGINE_INCLUDE_NAME}/Core/Event/InputPoll.hpp
-    ${ENGINE_INCLUDE_NAME}/Core/Event/KeyEvent.hpp
-    ${ENGINE_INCLUDE_NAME}/Core/Event/MouseEvent.hpp
+    ## graphic-agnostic drivers
+    ${INCLUDE_DIR}/drivers/swapchain.hpp
 
-    ${ENGINE_INCLUDE_NAME}/Core/GraphicDrivers/GraphicSwapchain.hpp
-    ${ENGINE_INCLUDE_NAME}/Core/GraphicDrivers/Shader.hpp
-    ${ENGINE_INCLUDE_NAME}/Core/GraphicDrivers/VertexBuffer.hpp
-    ${ENGINE_INCLUDE_NAME}/Core/GraphicDrivers/IndexBuffer.hpp
-    ${ENGINE_INCLUDE_NAME}/Core/GraphicDrivers/UniformBuffer.hpp
-
-    # Mesh stuff
-    ${ENGINE_INCLUDE_NAME}/Core/GraphicDrivers/Mesh.hpp
-
-    ${VULKAN_INCLUDE_DIR}/Vulkan.hpp
+    ## Vulkan Driver stuff
+    ${VULKAN_INCLUDE_DIR}/vulkan_window.hpp
     ${VULKAN_INCLUDE_DIR}/helper_functions.hpp
-    ${VULKAN_INCLUDE_DIR}/VulkanContext.hpp
-    ${VULKAN_INCLUDE_DIR}/VulkanWindow.hpp
-    ${VULKAN_INCLUDE_DIR}/VulkanPhysicalDriver.hpp
-    ${VULKAN_INCLUDE_DIR}/VulkanDriver.hpp
-    ${VULKAN_INCLUDE_DIR}/VulkanSwapchain.hpp
-    ${VULKAN_INCLUDE_DIR}/VulkanVertexBuffer.hpp
-    ${VULKAN_INCLUDE_DIR}/VulkanIndexBuffer.hpp
+    ${VULKAN_INCLUDE_DIR}/vulkan_context.hpp
+    ${VULKAN_INCLUDE_DIR}/vulkan_physical_driver.hpp
+    ${VULKAN_INCLUDE_DIR}/vulkan_driver.hpp
+    ${VULKAN_INCLUDE_DIR}/vulkan_swapchain.hpp
+    ${VULKAN_INCLUDE_DIR}/vulkan_renderer.hpp
 
-    ${VULKAN_SHADERS_INCLUDE_DIR}/VulkanShader.hpp
-    ${VULKAN_INCLUDE_DIR}/VulkanDescriptors.hpp
-
-    # Scene Managment Includes
-    ${ENGINE_INCLUDE_NAME}/Core/SceneManagment/Components/GameComponent.hpp
-    ${ENGINE_INCLUDE_NAME}/Core/SceneManagment/SceneObjects/SceneObject.hpp
-    ${ENGINE_INCLUDE_NAME}/Core/ApplicationManager/GameObjManager/UUID.hpp
-
-    # Special Component Includes
-    ${ENGINE_INCLUDE_NAME}/Core/SceneManagment/Components/SPComps/Transform.hpp
-    ${ENGINE_INCLUDE_NAME}/Core/SceneManagment/Components/SPComps/Camera.hpp
-    ${ENGINE_INCLUDE_NAME}/Core/SceneManagment/Components/SPComps/EditorCamera.hpp
-
-    # Renderer Includes
-    ${ENGINE_INCLUDE_NAME}/Core/Renderer/Renderer.hpp
-
-
-    #############################
-    # Source .cpp files below
-    #############################
-
-    ${ENGINE_SRC_DIR}/Core/ApplicationInstance.cpp
-
-
-    ${ENGINE_SRC_DIR}/Core/platforms/main.cpp
-    ${ENGINE_SRC_DIR}/Core/platforms/win32.cpp
-
-    ${ENGINE_SRC_DIR}/Core/Window.cpp
-    ${ENGINE_SRC_DIR}/Core/EngineLogger.cpp
-
-    ${ENGINE_SRC_DIR}/Core/TimeManagement/GlobalUpdateManager.cpp
-    ${ENGINE_SRC_DIR}/Core/TimeManagement/Timer.cpp
-    ${ENGINE_SRC_DIR}/Core/TimeManagement/UpdateManagers/SyncUpdateManager.cpp
-    ${ENGINE_SRC_DIR}/Core/TimeManagement/UpdateManagers/ParallelFrameUpdateManager.cpp
-
-    ${ENGINE_SRC_DIR}/Core/ApplicationManager/Scene.cpp
-    ${ENGINE_SRC_DIR}/Core/ApplicationManager/ThreadMngr.cpp
-
-    ${ENGINE_SRC_DIR}/Core/GraphicDrivers/GraphicSwapchain.cpp
-    ${ENGINE_SRC_DIR}/Core/GraphicDrivers/Shader.cpp
-    ${ENGINE_SRC_DIR}/Core/GraphicDrivers/VertexBuffer.cpp
-    ${ENGINE_SRC_DIR}/Core/GraphicDrivers/IndexBuffer.cpp
-    ${ENGINE_SRC_DIR}/Core/GraphicDrivers/UniformBuffer.cpp
-
-    # Mesh stuff
-    ${ENGINE_SRC_DIR}/Core/GraphicDrivers/Mesh.cpp
-
-    ${ENGINE_SRC_DIR}/Core/Event/InputPoll.cpp
-
-    ${VULKAN_SRC_DIR}//helper_functions.cpp
-    ${VULKAN_SRC_DIR}/VulkanWindow.cpp
-    ${VULKAN_SRC_DIR}/VulkanContext.cpp
-    ${VULKAN_SRC_DIR}/VulkanPhysicalDriver.cpp
-    ${VULKAN_SRC_DIR}/VulkanDriver.cpp
-    ${VULKAN_SRC_DIR}/VulkanSwapchain.cpp
-    ${VULKAN_SRC_DIR}/VulkanVertexBuffer.cpp
-    ${VULKAN_SRC_DIR}/VulkanIndexBuffer.cpp
-
-    ${VULKAN_SHADERS_SRC_DIR}/VulkanShader.cpp
-    ${VULKAN_SRC_DIR}/VulkanDescriptors.cpp
-
-    ${ENGINE_SRC_DIR}/Core/SceneManagment/SceneObjects/SceneObject.cpp
-    ${ENGINE_SRC_DIR}/Core/SceneManagment/Components/GameComponent.cpp
-    ${ENGINE_SRC_DIR}/Core/ApplicationManager/GameObjManager/UUID.cpp
-
-    ${ENGINE_SRC_DIR}/Core/SceneManagment/Components/SPComps/Transform.cpp
-    ${ENGINE_SRC_DIR}/Core/SceneManagment/Components/SPComps/Camera.cpp
-    ${ENGINE_SRC_DIR}/Core/SceneManagment/Components/SPComps/EditorCamera.cpp
-
-    ${ENGINE_SRC_DIR}/Core/Renderer/Renderer.cpp
-
-    ${ENGINE_SRC_DIR}/Math/Interpolation.cpp
-    ${ENGINE_SRC_DIR}/Math/Math.cpp
-
-    ${VULKAN_INCLUDE_DIR}/VulkanImGuiLayer.hpp
-    ${VULKAN_SRC_DIR}/VulkanImGuiLayer.cpp
-
-    ${ENGINE_SRC_DIR}/Physics/JoltHandler.cpp
 )
+
+set(
+    all_src
+    ${SRC_DIR}/core/application_instance.cpp
+    ${SRC_DIR}/core/event/input_poll.cpp
+
+    ${SRC_DIR}/thread_utils/thread_utils.cpp
+
+    ${SRC_DIR}/core/engine_logger.cpp
+    ${SRC_DIR}/core/window.cpp
+    ${SRC_DIR}/core/update_handlers/thread_manager.cpp
+    ${SRC_DIR}/core/update_handlers/global_update_manager.cpp
+    ${SRC_DIR}/core/update_handlers/sync_update_manager.cpp
+    ${SRC_DIR}/core/update_handlers/timer.cpp
+
+    ${SRC_DIR}/core/platforms/main.cpp
+    ${SRC_DIR}/core/platforms/win32.cpp
+
+    # Renderer-stuff
+    ${SRC_DIR}/renderer/renderer.cpp
+    ${SRC_DIR}/drivers/renderer_backend.cpp
+
+    ## ui-stuff backend
+    ${SRC_DIR}/drivers/ui/imgui_backend.cpp
+
+    ## graphic drivers backend-agnostic
+    ${SRC_DIR}/drivers/swapchain.cpp
+
+    ## Vulkan Driver stuff
+    ${VULKAN_SRC_DIR}/vulkan_window.cpp
+    ${VULKAN_SRC_DIR}/helper_functions.cpp
+    ${VULKAN_SRC_DIR}/vulkan_context.cpp
+    ${VULKAN_SRC_DIR}/vulkan_physical_driver.cpp
+    ${VULKAN_SRC_DIR}/vulkan_driver.cpp
+    ${VULKAN_SRC_DIR}/vulkan_swapchain.cpp
+    ${VULKAN_SRC_DIR}/vulkan_renderer.cpp
+)
+
+add_library(${PROJECT_NAME} ${all_headers} ${all_src})
