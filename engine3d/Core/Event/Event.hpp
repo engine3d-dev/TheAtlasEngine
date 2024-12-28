@@ -1,5 +1,5 @@
 #pragma once
-#include <Core/Core.hpp>
+#include <core/core.hpp>
 #include <string>
 
 namespace engine3d{
