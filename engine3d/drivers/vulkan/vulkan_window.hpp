@@ -1,5 +1,5 @@
 #pragma once
-#include <drivers/Swapchain.hpp>
+#include <drivers/swapchain.hpp>
 #include <GLFW/glfw3.h>
 #include <core/window.hpp>
 #include <vulkan/vulkan_core.h>

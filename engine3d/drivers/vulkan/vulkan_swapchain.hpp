@@ -1,5 +1,5 @@
 #pragma once
-#include <drivers/Swapchain.hpp>
+#include <drivers/swapchain.hpp>
 #include <vulkan/vulkan.hpp>
 #include <drivers/vulkan/vulkan_driver.hpp>
 

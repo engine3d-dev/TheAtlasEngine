@@ -36,7 +36,7 @@ set(
     ${INCLUDE_DIR}/drivers/ui/imgui_backend.hpp
 
     ## graphic-agnostic drivers
-    ${INCLUDE_DIR}/drivers/Swapchain.hpp
+    ${INCLUDE_DIR}/drivers/swapchain.hpp
 
     ## Vulkan Driver stuff
     ${VULKAN_INCLUDE_DIR}/vulkan_window.hpp
@@ -74,7 +74,7 @@ set(
     ${SRC_DIR}/drivers/ui/imgui_backend.cpp
 
     ## graphic drivers backend-agnostic
-    ${SRC_DIR}/drivers/Swapchain.cpp
+    ${SRC_DIR}/drivers/swapchain.cpp
 
     ## Vulkan Driver stuff
     ${VULKAN_SRC_DIR}/vulkan_window.cpp

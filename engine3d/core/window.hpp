@@ -1,5 +1,5 @@
 #pragma once
-#include <drivers/Swapchain.hpp>
+#include <drivers/swapchain.hpp>
 #include <core/core.hpp>
 #include <string>
 #include <GLFW/glfw3.h>
