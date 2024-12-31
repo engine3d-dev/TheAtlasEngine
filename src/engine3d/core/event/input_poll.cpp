@@ -23,29 +23,29 @@ namespace engine3d{
         glfwWaitEvents();
     }
 
-    // glm::vec2 InputPoll::GetMousePosition(){
-    //     auto window = ApplicationInstance::GetWindow().GetNativeWindow();
-    //     double xPos, yPos;
-    //     glfwGetCursorPos(window, &xPos, &yPos);
+    glm::vec2 InputPoll::GetMousePosition(){
+        auto window = ApplicationInstance::GetWindow().GetNativeWindow();
+        double xPos, yPos;
+        glfwGetCursorPos(window, &xPos, &yPos);
 
-    //     return {xPos, yPos};
-    // }
+        return {xPos, yPos};
+    }
 
-    // float InputPoll::GetMouseX(){
-    //     return GetMousePosition().x;
-    // }
+    float InputPoll::GetMouseX(){
+        return GetMousePosition().x;
+    }
 
-    // float InputPoll::GetMouseY(){
-    //     return GetMousePosition().y;
-    // }
+    float InputPoll::GetMouseY(){
+        return GetMousePosition().y;
+    }
 
     bool InputPoll::IsControllerPresent(int p_ControllerID){
         return s_Controllers.contains(p_ControllerID);
     }
 
-    bool InputPoll::IsControllerButtonPressed(int p_ControllerID, int p_Button){
-        return false;
-    }
+    // bool InputPoll::IsControllerButtonPressed(int p_ControllerID, int p_Button){
+    //     return false;
+    // }
 
     bool InputPoll::IsControllerButtonReleased(int p_ControllerID, int p_Button){
         if(!IsControllerPresent(p_ControllerID)){
@@ -117,9 +117,5 @@ namespace engine3d{
 
             }
         }
-    }
-
-    bool InputPoll::IsControllerPresent(int p_ControllerID, int p_Btn){
-        return s_Controllers.contains(p_ControllerID);
     }
 };

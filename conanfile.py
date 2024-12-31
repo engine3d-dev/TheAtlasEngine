@@ -3,6 +3,9 @@ from conan.tools.cmake import CMakeToolchain, CMake, cmake_layout, CMakeDeps
 from conan.tools.scm import Git
 from conan.tools.files import copy
 import os
+from conan.tools.build import can_run
+# from conan.tools.os import rm, rmdir
+# from os import rmdir, rm
 
 class engine3dRecipe(ConanFile):
     name = "engine3d"
@@ -12,7 +15,7 @@ class engine3dRecipe(ConanFile):
     homepage = "https://github.com/engine3d-dev/engine3d"
     description = "Multipurpose 3D engine"
     topics = ("Engine", "Graphics", "Animations", "Simulations")
-
+    
     # Binary configuration
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [True, False], "fPIC": [True, False]}
@@ -39,7 +42,10 @@ class engine3dRecipe(ConanFile):
         # Vulkan-related headers and includes packages
         self.requires("vulkan-headers/1.3.290.0", transitive_headers=True)
         self.requires("entt/3.13.2")
+        self.requires("tinyobjloader/2.0.0-rc10")
         self.requires("joltphysics/1.0")
+
+        self.requires("boost-ext-ut/2.1.0")
 
     def config_options(self):
         if self.settings.os == "Windows":
@@ -63,6 +69,10 @@ class engine3dRecipe(ConanFile):
         # cmake.verbose = True
         cmake.configure()
         cmake.build()
+
+    def post_build(self):
+        print("Running Post Build!")
+
 
     def package(self):
         copy(self, "LICENSE", src=self.source_folder, dst=os.path.join(self.package_folder, "licenses"))

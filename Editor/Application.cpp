@@ -1,31 +1,39 @@
-#include "core/event/input_poll.hpp"
 #include <core/update_handlers/sync_update_manager.hpp>
 #include <core/engine_logger.hpp>
 #include <core/update_handlers/global_update_manager.hpp>
 #include <core/application_instance.hpp>
+#include "EditorWorld.hpp"
+#include <renderer/renderer.hpp>
 
 namespace engine3d{
     class Application : public engine3d::ApplicationInstance{
     public:
-        Application(const std::string& p_Tag) : engine3d::ApplicationInstance(p_Tag){
-            SyncUpdateManager::Subscribe(this, &Application::OnUpdate);
-
-            ConsoleLogInfoWithTag("Editor", "Application Initialized Completed!");
-            // GlobalUpdateManager::SubscribeApplicationUpdate(this, &Application::OnApplicationUpdate);
+        Application(const std::string& p_Tag) : engine3d::ApplicationInstance(p_Tag), m_World("Untitled"){
+            GlobalUpdateManager::SubscribeApplicationUpdate(this, &Application::OnApplicationUpdate);
+            ConsoleLogFatal("Applicatoin::Application(std::string) gets called!");
+            // m_World = CreateRef<EditorWorld>();
+            m_World.OnStart();
         }
-
-        void OnUpdate(){
-            // ConsoleLogInfoWithTag("Editor", "OnUpdate called from application!");
-            if(InputPoll::IsKeyPressed(ENGINE_KEY_ESCAPE)){
-                ApplicationInstance::ShutdownApplication();
-            }
-        }
-
 
         void OnApplicationUpdate(){
-            // ConsoleLogInfo("OnApplicationUpdate called from application!");
-            ConsoleLogInfoWithTag("Editor", "OnApplicationUpdate called from application!");
+            // ConsoleLogInfoWithTag("Editor", "OnUpdate called from application!");
+            
+            //! @note For now, I am going to use this for specifically rendering
+            //! @note Just to test that we can still render things.
+            m_World.OnUpdate();
+
+
+            //! @note Rendering happens here
+            // Renderer::RenderSceneObjects(m_World.GetAllWorldObjects());
         }
+
+
+        void OnUpdate(){
+            // ConsoleLogInfoWithTag("Editor", "OnApplicationUpdate called from application!");
+        }
+
+    private:
+        EditorWorld m_World;
     };
 
     Ref<ApplicationInstance> Initialize(){

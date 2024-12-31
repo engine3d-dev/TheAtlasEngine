@@ -4,6 +4,7 @@
 #include <core/engine_logger.hpp>
 #include <core/event/input_poll.hpp>
 #include <core/update_handlers/global_update_manager.hpp>
+#include <imgui.h>
 #include <string>
 
 namespace engine3d{
@@ -19,7 +20,7 @@ namespace engine3d{
         m_Window = Window::Create(900, 600, g_Tag);
         
         Renderer::Initialize();
-        // ImGuiBackend::Initialize();
+        ImGuiBackend::Initialize();
     }
 
     void ApplicationInstance::SetCurrentAPI(API api){
@@ -48,9 +49,15 @@ namespace engine3d{
             GlobalUpdateManager::GlobalOnTickUpdate();
             Renderer::End();
 
+            //! TODO: Fix the ImGui Begin and End() functions!
+            //! @note We dont get the error with imgui::initialize function, so we leave that uncomment for the time being
             // ImGuiBackend::Begin();
             // ImGuiBackend::End();
         }
         ConsoleLogWarn("Leaving executed mainloop!");
+    }
+
+    uint32_t ApplicationInstance::GetAspectRatio(){
+        return GetWindow().GetWidth() / GetWindow().GetHeight();
     }
 };

@@ -59,7 +59,6 @@ namespace engine3d::vk{
     VulkanPhysicalDriver::PhysicalQueueFamilyIndices VulkanPhysicalDriver::SelectQueueFamilyIndices(){
         VulkanPhysicalDriver::PhysicalQueueFamilyIndices indices;
         int i = 0;
-        VkBool32 compatible = VK_FALSE;
 
         for(const auto& queue_family : m_QueueFamilyProperties){
             if(queue_family.queueFlags & VK_QUEUE_GRAPHICS_BIT){

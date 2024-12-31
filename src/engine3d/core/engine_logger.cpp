@@ -29,6 +29,12 @@ namespace engine3d{
         s_Loggers["vulkan"]->set_pattern(pattern);
     }
 
+    void ConsoleEngineLogger::AddNewLogger(const std::string& p_Tag){
+        s_Loggers[p_Tag] = spdlog::stdout_color_mt(p_Tag);
+        s_Loggers[p_Tag]->set_level(spdlog::level::trace);
+        s_Loggers[p_Tag]->set_pattern(g_CurrentPatternForLogs);
+    }
+
     void ConsoleEngineLogger::SetCurrentApplicationTagLogger(const std::string& p_Tag){
         //! @note Setting up logs for different log stdout's
         //! @note Logs for p_Tag is logs specific to the game

@@ -20,7 +20,7 @@ namespace engine3d{
         static void InitializeConsoleLogger(const std::string& pattern="%^[%T] %n: %v%$");
 
         static void SetCurrentApplicationTagLogger(const std::string& p_Tag="Undefined g_Tag in console_logger");
-
+        static void AddNewLogger(const std::string& p_Tag="Undefined Tag");
         static Ref<spdlog::logger> GetLogger(const std::string& p_Tag);
     private:
         //! @note std::string is the tag of the log's location.

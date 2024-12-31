@@ -3,6 +3,7 @@
 #include <core/event/mouse_codes.hpp>
 #include <map>
 #include <string>
+#include <glm/glm.hpp>
 
 namespace engine3d{
     /**
@@ -47,7 +48,7 @@ namespace engine3d{
         //! TODO: IsMouseDown(MouseCode);
 
         //! @note Mouse Position
-        // static glm::vec2 GetMousePosition();
+        static glm::vec2 GetMousePosition();
 
         static float GetMouseX();
 
@@ -62,7 +63,7 @@ namespace engine3d{
 
         static float GetControllerAxis(int p_Controller, int p_Index);
 
-        static bool IsControllerButtonPressed(int p_ControllerID, int p_Button);
+        // static bool IsControllerButtonPressed(int p_ControllerID);
 
         static bool IsControllerButtonReleased(int p_ControllerID, int p_Button);
 

@@ -16,6 +16,9 @@ namespace engine3d{
         //! @note Initializes sync update manager to make sure our manager is able to dispatch our update functions.
         static void InitializeSyncUpdate();
 
+        //! @note Retrieves the local delta time
+        static float DeltaTime();
+
         // Called by threadManager
         static void RunUpdate(float deltaTime);
 

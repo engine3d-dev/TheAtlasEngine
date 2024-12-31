@@ -76,7 +76,7 @@ namespace engine3d{
         */
         s_SyncGlobalDeltaTime = deltaTime;
         // OnPhysicsUpdate();
-        const int collisionSteps = 1 + (60*(deltaTime));
+        // const int collisionSteps = 1 + (60*(deltaTime));
 
         // JoltHandler* p_joltHandler = JoltHandler::GetInstance();
         //Updating physics system based on jolt physics
@@ -153,5 +153,9 @@ namespace engine3d{
         {
             l_Subscriber();
         }
+    }
+
+    float SyncUpdateManager::DeltaTime(){
+        return s_SyncLocalDeltaTime;
     }
 };

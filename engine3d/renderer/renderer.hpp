@@ -1,5 +1,8 @@
 #pragma once
+#include <map>
 #include <vulkan/vulkan.hpp>
+#include <core/core.hpp>
+#include <scene/scene_node.hpp>
 
 namespace engine3d{
     /**
@@ -18,5 +21,7 @@ namespace engine3d{
         //! @note using begin/end semantics for specifying that when we've reached the end of the frame is when we flush and render our contexts that is proviedd.
         static void Begin();
         static void End();
+
+        static void RenderSceneObjects(std::map<std::string, Ref<SceneNode>>& p_AllSceneNoeds);
     };
 };

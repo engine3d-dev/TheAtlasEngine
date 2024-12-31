@@ -22,9 +22,9 @@ namespace engine3d{
     float g_DeltaTime = 0.0f;
 
     // this needs to be called every frame?
-    std::atomic<uint32_t> g_ThreadCounter;
-    std::mutex g_GlobalLock;
-    std::condition_variable g_GlobalConditional; 
+    // std::atomic<uint32_t> g_ThreadCounter;
+    // std::mutex g_GlobalLock;
+    // std::condition_variable g_GlobalConditional; 
 
     std::vector<std::function<void()>> GlobalUpdateManager::s_ApplicationUpdateSubscribers;
 
@@ -71,14 +71,14 @@ namespace engine3d{
     }
 
     void GlobalUpdateManager::IncrementCounter(){
-        g_ThreadCounter |= 1;
+        // g_ThreadCounter |= 1;
     }
 
 
     // Maintains a const fps if possible
     void GlobalUpdateManager::WaitForNextFrame(){
         
-        while(1.0f/s_MaxFrameratePerSecond > s_FrameratePerSecondMaintainTimer.ElapsedSec()){
+        while(s_FrameratePerSecondMaintainTimer.ElapsedSec() < 1.0f/s_MaxFrameratePerSecond){
             continue;
         }
 
@@ -87,9 +87,9 @@ namespace engine3d{
         // std::unique_lock<std::mutex> m(g_GlobalLock);
         // g_GlobalConditional.wait(m, [](){});
 
-        while(g_ThreadCounter < (GetThreadCount()/2) + 1){
-            continue;
-        }
+        // while(g_ThreadCounter < (GetThreadCount()/2) + 1){
+        //     continue;
+        // }
 
         // std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(1.0f/s_MaxFrameratePerSecond - s_FrameratePerSecondMaintainTimer.ElapsedSec()));
     }

@@ -1,3 +1,4 @@
+#include "engine_logger.hpp"
 #include <renderer/renderer.hpp>
 #include <drivers/renderer_backend.hpp>
 
@@ -16,5 +17,9 @@ namespace engine3d{
 
     void Renderer::End(){
         return g_RendererBackend->End();
+    }
+
+    void Renderer::RenderSceneObjects(std::map<std::string, Ref<SceneNode>>& p_SceneObjects){
+        return g_RendererBackend->RenderSceneObjects(p_SceneObjects);
     }
 };

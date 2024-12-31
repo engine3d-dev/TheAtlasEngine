@@ -5,7 +5,7 @@
 
 extern engine3d::Ref<engine3d::ApplicationInstance> engine3d::Initialize();
 
-int Main(int argc, char** argv){
+int Main(){
     //! @note DONT FORGET, GlobalUpdateManager should not be instantiated here.
     //! @note By doing this it would be reliant when windows initialized/
     //! @note I moved this to be part of the pre-init phase because every other code relies this to get it working.

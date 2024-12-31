@@ -30,14 +30,15 @@ namespace engine3d{
             ConsoleLogInfo("Thread Manager is running!");
         }
 
-        auto core_amount_half = GetThreadCount() / 2;
-        ConsoleLogTrace("Amount of Threads Specified: {}", core_amount_half);
+        // auto core_amount_half = GetThreadCount() / 2;
+        // ConsoleLogTrace("Amount of Threads Specified: {}", core_amount_half);
 
-        for(uint32_t i = 0; i < core_amount_half; i++){
-            Thread t = Thread(fmt::format("Thread {}", i));
-            t.Dispatch(&ThreadManager::UpdateParallelFunction, this);
-            m_ParallelThreads.push_back(&t);
-        }
+        // Commenting and will either git pull or implement this if zach hasn't done so, already
+        // for(uint32_t i = 0; i < core_amount_half; i++){
+        //     Thread t = Thread(fmt::format("Thread {}", i));
+        //     t.Dispatch(&ThreadManager::UpdateParallelFunction, this);
+        //     m_ParallelThreads.push_back(&t);
+        // }
 
     }
 
@@ -57,14 +58,15 @@ namespace engine3d{
         g_Ready = true;
         g_Ready2 = true;
         g_SyncFrame.notify_one();
-        g_ParallelFrame.notify_all();
+        // g_ParallelFrame.notify_all();
     }
 
     void ThreadManager::UpdateSyncFunction(){
         while(!m_ThreadStop){
             std::unique_lock<std::mutex> m(g_SyncLock);
             
-            GlobalUpdateManager::IncrementCounter();
+            // GlobalUpdateManager::IncrementCounter();
+            
 
             g_SyncFrame.wait(m, []{return g_Ready; });
 
@@ -126,6 +128,6 @@ namespace engine3d{
         g_Ready = true;
         g_Ready2 = true;
         g_SyncFrame.notify_all();
-        g_ParallelFrame.notify_all();
+        // g_ParallelFrame.notify_all();
     }
 };

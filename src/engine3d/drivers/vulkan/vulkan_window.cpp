@@ -63,6 +63,8 @@ namespace engine3d::vk{
 
     void VulkanWindow::OnWindowResize(GLFWwindow* Window, int Width, int Height){
         auto window = static_cast<GLFWwindow*>(glfwGetWindowUserPointer(Window));
+        if(!window){}
+        
         g_Width = Width;
         g_Height = Height;
         if(g_Width != ApplicationInstance::GetWindow().GetWidth() || g_Height != ApplicationInstance::GetWindow().GetHeight()){

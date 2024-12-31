@@ -2,6 +2,7 @@
 #include <core/engine_logger.hpp>
 #include <drivers/renderer_backend.hpp>
 #include <drivers/vulkan/vulkan_renderer.hpp>
+#include <map>
 
 namespace engine3d{
     Scope<RendererContext> RendererContext::Initialize(const std::string &p_Tag){
@@ -23,4 +24,13 @@ namespace engine3d{
     void RendererContext::End(){
         return EndFrame();
     }
+
+    void RendererContext::RenderSceneNode(Ref<SceneNode> p_SceneContext){
+        return DrawScene(p_SceneContext);
+    }
+    
+    void RendererContext::RenderSceneObjects(std::map<std::string, Ref<SceneNode>> p_SceneObjects){
+        return DrawSceneObjects(p_SceneObjects);
+    }
+
 };
