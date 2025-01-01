@@ -1,7 +1,8 @@
 #pragma once
-#include <scene/scene_node.hpp>
+#include <scene/scene_object.hpp>
 #include <scene/scene.hpp>
 #include <core/core.hpp>
+#include <map>
 
 /**
  * @name EditorScene
@@ -19,7 +20,7 @@ public:
     void OnUpdate();
 
     //! @note These are going to be all render targets
-    std::map<std::string, engine3d::Ref<engine3d::SceneNode>>& GetAllWorldObjects() { return m_SceneEntities; }
+    // std::map<std::string, engine3d::Ref<engine3d::SceneNode>>& GetAllWorldObjects() { return m_SceneEntities; }
 
     //! TODO: We can move this somewhere
     //! @note For now, this is going to be called from the renderer

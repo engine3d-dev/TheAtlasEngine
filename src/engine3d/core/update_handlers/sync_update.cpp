@@ -1,6 +1,6 @@
 #include <core/event/input_poll.hpp>
 #include <core/engine_logger.hpp>
-#include <core/update_handlers/sync_update_manager.hpp>
+#include <core/update_handlers/sync_update.hpp>
 
 
 namespace engine3d{
@@ -13,10 +13,10 @@ namespace engine3d{
     static int s_LocalUpdateCounter = 0;
     static int s_LocalFrameratePerSecond = 0;
     static int s_RandomFrame;
-    std::vector<std::function<void()>> SyncUpdateManager::s_SyncLateUpdateSubscribers;
-    std::vector<std::function<void()>> SyncUpdateManager::s_SyncUpdateSubscribers;
-    std::vector<std::function<void()>> SyncUpdateManager::s_SyncOnTickUpdateSubscribers;
-    std::vector<std::function<void()>> SyncUpdateManager::s_SyncRenderSubscribers;
+    std::vector<std::function<void()>> SyncUpdate::s_SyncLateUpdateSubscribers;
+    std::vector<std::function<void()>> SyncUpdate::s_SyncUpdateSubscribers;
+    std::vector<std::function<void()>> SyncUpdate::s_SyncOnTickUpdateSubscribers;
+    std::vector<std::function<void()>> SyncUpdate::s_SyncRenderSubscribers;
         // std::chrono::time_point<std::chrono::high_resolution_clock> m_LocalUpdateTime;
         
     // int m_MaxVariance;
@@ -33,9 +33,9 @@ namespace engine3d{
     // float m_SyncGlobalDeltaTime;
     // int m_LocalFPS;
 
-    void SyncUpdateManager::InitializeSyncUpdate()
+    void SyncUpdate::InitializeSyncUpdate()
     {
-        ConsoleLogInfo("SyncUpdateManager::InitializeSyncUpdate Initialized!!");
+        ConsoleLogInfo("SyncUpdate::InitializeSyncUpdate Initialized!!");
         s_SyncLateUpdateSubscribers = std::vector<std::function<void()>>();
         s_SyncUpdateSubscribers = std::vector<std::function<void()>>();
         s_SyncOnTickUpdateSubscribers = std::vector<std::function<void()>>();
@@ -54,7 +54,7 @@ namespace engine3d{
         s_RandomFrame = (rand() % s_MaxVariance) + s_MinFrames;
     }
 
-    SyncUpdateManager::~SyncUpdateManager()
+    SyncUpdate::~SyncUpdate()
     {
         // delete s_LocalTimer;
     }
@@ -62,7 +62,7 @@ namespace engine3d{
     //! @note this does not work per object this might need to change a little.
     //! Possibly pass gameObjects with the virtual functions.
     //! Possibly seperate active scripts to non active ones in scenes.
-    void SyncUpdateManager::RunUpdate(float deltaTime)
+    void SyncUpdate::RunUpdate(float deltaTime)
     {
         //! @note unsafe!!!!
         /** 
@@ -123,7 +123,7 @@ namespace engine3d{
         }
     }
 
-    void SyncUpdateManager::OnSceneRender()
+    void SyncUpdate::OnSceneRender()
     {
         for(auto& l_Subscriber : s_SyncRenderSubscribers)
         {
@@ -131,7 +131,7 @@ namespace engine3d{
         }
     }
 
-    void SyncUpdateManager::OnPhysicsUpdate()
+    void SyncUpdate::OnPhysicsUpdate()
     {
         for(auto& l_Subscriber : s_SyncOnTickUpdateSubscribers)
         {
@@ -139,7 +139,7 @@ namespace engine3d{
         }
     }
 
-    void SyncUpdateManager::OnUpdate()
+    void SyncUpdate::OnUpdate()
     {
         for(auto& l_Subscriber : s_SyncUpdateSubscribers)
         {
@@ -147,7 +147,7 @@ namespace engine3d{
         }
     }
 
-    void SyncUpdateManager::OnLateUpdate()
+    void SyncUpdate::OnLateUpdate()
     {
         for(auto& l_Subscriber : s_SyncLateUpdateSubscribers)
         {
@@ -155,7 +155,7 @@ namespace engine3d{
         }
     }
 
-    float SyncUpdateManager::DeltaTime(){
+    float SyncUpdate::DeltaTime(){
         return s_SyncLocalDeltaTime;
     }
 };

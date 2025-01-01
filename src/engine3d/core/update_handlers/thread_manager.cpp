@@ -1,6 +1,6 @@
 #include <core/engine_logger.hpp>
-#include <update_handlers/global_update_manager.hpp>
-#include <update_handlers/sync_update_manager.hpp>
+#include <update_handlers/global_update.hpp>
+#include <update_handlers/sync_update.hpp>
 #include <core/update_handlers/thread_manager.hpp>
 #include <condition_variable>
 #include <fmt/format.h>
@@ -65,7 +65,7 @@ namespace engine3d{
         while(!m_ThreadStop){
             std::unique_lock<std::mutex> m(g_SyncLock);
             
-            // GlobalUpdateManager::IncrementCounter();
+            // GlobalUpdate::IncrementCounter();
             
 
             g_SyncFrame.wait(m, []{return g_Ready; });
@@ -76,7 +76,7 @@ namespace engine3d{
             }
 
             g_Ready = false;
-            SyncUpdateManager::RunUpdate(m_DeltaTime);
+            SyncUpdate::RunUpdate(m_DeltaTime);
         }
     }
 
@@ -100,7 +100,7 @@ namespace engine3d{
                 ConsoleLogInfo("Inside Barrier");
             });
 
-            GlobalUpdateManager::IncrementCounter();
+            GlobalUpdate::IncrementCounter();
 
             g_ParallelCounter += 1;
             std::unique_lock<std::mutex> m(g_ParallelLock);
@@ -117,7 +117,7 @@ namespace engine3d{
             }
 
             g_Ready2 = false;
-            SyncUpdateManager::RunUpdate(m_DeltaTime);
+            SyncUpdate::RunUpdate(m_DeltaTime);
         }
 
         //! @note 2.)

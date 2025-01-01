@@ -95,4 +95,20 @@ Here are reasons why I think we should take a step back and re-evaluate what and
 
 ### Here are my Reasons
 
-we should treat every object as 
+We should treat specific objects within Sync and Global Update as non-owned objects reduce allocations.
+
+
+
+
+
+
+## Migrating from EnTT to Flecs
+
+These are my few reasons for utilizing flecs.
+
+- From reading their documentation they provide flexible API's not only for handling the entity and components
+- For knowing what is the difference between Flecs and EnTT go to this link.
+- There documentation also goes over the specifications of different trade-offs within their API.
+    - NOTE: We will have to benchmark the difference between entt and flecs.
+Link: https://www.flecs.dev/flecs/md_docs_2FAQ.html
+

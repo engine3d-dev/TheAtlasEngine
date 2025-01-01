@@ -1,6 +1,6 @@
-#include <core/update_handlers/sync_update_manager.hpp>
+#include <core/update_handlers/sync_update.hpp>
 #include <core/engine_logger.hpp>
-#include <core/update_handlers/global_update_manager.hpp>
+#include <core/update_handlers/global_update.hpp>
 #include <core/application_instance.hpp>
 #include "EditorWorld.hpp"
 #include <renderer/renderer.hpp>
@@ -9,8 +9,8 @@ namespace engine3d{
     class Application : public engine3d::ApplicationInstance{
     public:
         Application(const std::string& p_Tag) : engine3d::ApplicationInstance(p_Tag), m_World("Untitled"){
-            GlobalUpdateManager::SubscribeApplicationUpdate(this, &Application::OnApplicationUpdate);
-            ConsoleLogFatal("Applicatoin::Application(std::string) gets called!");
+            GlobalUpdate::SubscribeApplicationUpdate(this, &Application::OnApplicationUpdate);
+            // ConsoleLogFatal("Applicatoin::Application(std::string) gets called!");
             // m_World = CreateRef<EditorWorld>();
             m_World.OnStart();
         }

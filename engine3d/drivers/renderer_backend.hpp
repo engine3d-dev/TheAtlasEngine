@@ -1,7 +1,8 @@
 #pragma once
 #include <string>
 #include <core/core.hpp>
-#include <scene/scene_node.hpp>
+#include <scene/scene_object.hpp>
+#include <map>
 
 namespace engine3d{
     class RendererContext{

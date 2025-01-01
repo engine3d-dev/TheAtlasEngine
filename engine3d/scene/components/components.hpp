@@ -3,7 +3,7 @@
 #include <core/geometry/mesh.hpp>
 #include <glm/ext/quaternion_transform.hpp>
 #include <glm/fwd.hpp>
-#include <scene/scene_node.hpp>
+#include <scene/scene_object.hpp>
 // #include <glm/glm.hpp>
 
 #define GLM_ENABLE_EXPERIMENTAL

@@ -1,8 +1,6 @@
-#include <concepts>
 #include <functional>
 #include <glm/detail/qualifier.hpp>
 #include <glm/fwd.hpp>
-#include <type_traits>
 
 namespace engine3d{
 
@@ -30,14 +28,6 @@ namespace engine3d{
             float timeDif = 1.0f - l_AdjustedTime;
 
             return start * timeDif + end * l_AdjustedTime;
-        }
-
-        template<typename T>
-        constexpr bool IsMathTypeValid(){
-            if constexpr (std::same_as<T, glm::vec3>){
-                return true;
-            }
-
         }
 
     private:

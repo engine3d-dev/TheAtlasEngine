@@ -5,17 +5,17 @@
 #include <functional>
 
 namespace engine3d{
-    class GlobalUpdateManager{
+    class GlobalUpdate{
 
     public:
         /*
         * NEEDS FIX: Change to a more secure way to always have one
-        * GlobalUpdateManager per application instance
+        * GlobalUpdate per application instance
         */ 
-        GlobalUpdateManager() = delete;
-        ~GlobalUpdateManager() = delete;
-        GlobalUpdateManager(const GlobalUpdateManager&) = delete;
-        GlobalUpdateManager& operator=(const GlobalUpdateManager&) = delete;
+        GlobalUpdate() = delete;
+        ~GlobalUpdate() = delete;
+        GlobalUpdate(const GlobalUpdate&) = delete;
+        GlobalUpdate& operator=(const GlobalUpdate&) = delete;
         
         //! @note Initializes the global update manager and its cleanup function
         static void Initialize();

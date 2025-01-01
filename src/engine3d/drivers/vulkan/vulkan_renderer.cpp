@@ -1,5 +1,5 @@
 
-#include "update_handlers/sync_update_manager.hpp"
+#include "update_handlers/sync_update.hpp"
 #include <deque>
 #include <numeric>
 #include <drivers/vulkan/vulkan_renderer.hpp>
@@ -12,7 +12,7 @@
 #include <core/engine_logger.hpp>
 #include <drivers/vulkan/vulkan_swapchain.hpp>
 #include <drivers/vulkan/shaders/vulkan_shader.hpp>
-#include <scene/scene_node.hpp>
+#include <scene/scene_object.hpp>
 #include <scene/components/components.hpp>
 
 #define GLM_FORCE_RADIANS
@@ -207,71 +207,72 @@ namespace engine3d::vk{
     void VulkanRenderer::DrawSceneObjects(std::map<std::string, Ref<SceneNode>>& p_SceneObjects){
         // Draw Scene Objects (In the view of the frustrum)
         // ConsoleLogInfo("DrawSceneObjects() called!");
-        auto current_cmd_buffer = GetCurrentCommandBuffer();
+        if(!p_SceneObjects.contains("")){}
+        // auto current_cmd_buffer = GetCurrentCommandBuffer();
 
-        vkCmdBindPipeline(current_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, g_Shader->GetGraphicsPipeline());
-        // float delta_time = SyncUpdateManager::DeltaTime();
+        // vkCmdBindPipeline(current_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, g_Shader->GetGraphicsPipeline());
+        // // float delta_time = SyncUpdate::DeltaTime();
 
-        // ConsoleLogInfo("DrawSceneObjects() called! #2");
+        // // ConsoleLogInfo("DrawSceneObjects() called! #2");
         
-        // Setting up camera
-        auto& camera = p_SceneObjects["camera"];
-        auto& camera_pos = camera->GetComponent<Transform>().Position;
-        auto& camera_component = camera->GetComponent<Camera>();
-        auto camera_proj_view = camera_component.GetProjection() * camera_component.GetView();
-        // ConsoleLogInfo("DrawSceneObjects() called! #3");
+        // // Setting up camera
+        // auto& camera = p_SceneObjects["camera"];
+        // auto& camera_pos = camera->GetComponent<Transform>().Position;
+        // auto& camera_component = camera->GetComponent<Camera>();
+        // auto camera_proj_view = camera_component.GetProjection() * camera_component.GetView();
+        // // ConsoleLogInfo("DrawSceneObjects() called! #3");
 
-        // setting up one object
-        auto& object = p_SceneObjects["player"];
+        // // setting up one object
+        // auto& object = p_SceneObjects["player"];
         
-        PushConstantData push_data = {
-            .Transform = camera_proj_view * object->toMat4(),
-            .Model = object->toMat4(),
-            .LightTransform = camera_pos - object->GetComponent<Transform>().Position
-        };
+        // PushConstantData push_data = {
+        //     .Transform = camera_proj_view * object->toMat4(),
+        //     .Model = object->toMat4(),
+        //     .LightTransform = camera_pos - object->GetComponent<Transform>().Position
+        // };
 
-        vkCmdPushConstants(
-            current_cmd_buffer,
-         g_PipelineLayout,
-          VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
-           0,
-            sizeof(PushConstantData),
-            &push_data
-        );
+        // vkCmdPushConstants(
+        //     current_cmd_buffer,
+        //  g_PipelineLayout,
+        //   VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+        //    0,
+        //     sizeof(PushConstantData),
+        //     &push_data
+        // );
 
-        ConsoleLogInfo("DrawSceneObjects() called! #5");
+        // ConsoleLogInfo("DrawSceneObjects() called! #5");
 
-        auto& player_mesh = object->GetComponent<MeshComponent>();
-        // if(player_mesh.MeshMetadata){
-        //     ConsoleLogFatal("MeshComponent metadata is not valid!!");
+        // auto& player_mesh = object->GetComponent<MeshComponent>();
+        // // if(player_mesh.MeshMetadata){
+        // //     ConsoleLogFatal("MeshComponent metadata is not valid!!");
+        // // }
+        // // ConsoleLogInfo("DrawSceneObjects() called! #5.1");
+        // auto& vb = player_mesh.MeshMetadata.GetVertices();
+        // // ConsoleLogInfo("DrawSceneObjects() called! #5.2");
+        // auto ib = player_mesh.MeshMetadata.GetIndices();
+        // // ConsoleLogInfo("DrawSceneObjects() called! #6");
+
+        // vb->Bind(current_cmd_buffer);
+
+        // // ConsoleLogInfo("DrawSceneObjects() called! #7");
+
+        // if(ib != nullptr){
+        //     ib->Bind(current_cmd_buffer);
+        //     ConsoleLogInfo("Binding Index Buffer!");
+        //     // ConsoleLogInfo("DrawSceneObjects() called! #8");
+        //     if(ib->HasIndicesPresent()){
+        //         // ConsoleLogInfo("DrawSceneObjects() called! #9");
+        //         ib->Draw(GetCurrentCommandBuffer());
+        //     }
+        //     else{
+        //         ConsoleLogInfo("DrawSceneObjects() called! #9");
+        //         vb->Draw(GetCurrentCommandBuffer());
+        //     }
         // }
-        // ConsoleLogInfo("DrawSceneObjects() called! #5.1");
-        auto& vb = player_mesh.MeshMetadata.GetVertices();
-        // ConsoleLogInfo("DrawSceneObjects() called! #5.2");
-        auto ib = player_mesh.MeshMetadata.GetIndices();
-        // ConsoleLogInfo("DrawSceneObjects() called! #6");
-
-        vb->Bind(current_cmd_buffer);
-
-        // ConsoleLogInfo("DrawSceneObjects() called! #7");
-
-        if(ib != nullptr){
-            ib->Bind(current_cmd_buffer);
-            ConsoleLogInfo("Binding Index Buffer!");
-            // ConsoleLogInfo("DrawSceneObjects() called! #8");
-            if(ib->HasIndicesPresent()){
-                // ConsoleLogInfo("DrawSceneObjects() called! #9");
-                ib->Draw(GetCurrentCommandBuffer());
-            }
-            else{
-                ConsoleLogInfo("DrawSceneObjects() called! #9");
-                vb->Draw(GetCurrentCommandBuffer());
-            }
-        }
-        else{
-            ConsoleLogInfo("DrawSceneObjects() called! #8");
-            vb->Draw(GetCurrentCommandBuffer());
-        }
+        // else{
+        //     ConsoleLogInfo("DrawSceneObjects() called! #8");
+        //     vb->Draw(GetCurrentCommandBuffer());
+        // }
     }
 
     VkCommandBuffer VulkanRenderer::GetCurrentCommandBuffer(){

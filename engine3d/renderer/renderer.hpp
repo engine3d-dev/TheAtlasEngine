@@ -2,7 +2,7 @@
 #include <map>
 #include <vulkan/vulkan.hpp>
 #include <core/core.hpp>
-#include <scene/scene_node.hpp>
+#include <scene/scene_object.hpp>
 
 namespace engine3d{
     /**

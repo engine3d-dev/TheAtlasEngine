@@ -1,4 +1,4 @@
-#include <scene/scene_node.hpp>
+#include <scene/scene_object.hpp>
 #include <scene/components/components.hpp>
 
 namespace engine3d{

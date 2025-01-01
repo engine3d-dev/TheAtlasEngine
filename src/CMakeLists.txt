@@ -31,13 +31,18 @@ set(
     ${INCLUDE_DIR}/core/engine_logger.hpp
     ${INCLUDE_DIR}/core/window.hpp
     ${INCLUDE_DIR}/core/update_handlers/thread_manager.hpp
-    ${INCLUDE_DIR}/core/update_handlers/global_update_manager.hpp
-    ${INCLUDE_DIR}/core/update_handlers/sync_update_manager.hpp
+    ${INCLUDE_DIR}/core/update_handlers/global_update.hpp
+    ${INCLUDE_DIR}/core/update_handlers/sync_update.hpp
+
+    # Math stuff
+    ${INCLUDE_DIR}/core/math/math.hpp
+    ${INCLUDE_DIR}/core/math/types.hpp
 
     # Scene Stuff
-    ${INCLUDE_DIR}/scene/ecs/registry.hpp
+    # ${INCLUDE_DIR}/scene/ecs/registry.hpp
     ${INCLUDE_DIR}/scene/scene.hpp
-    ${INCLUDE_DIR}/scene/scene_node.hpp
+    ${INCLUDE_DIR}/scene/scene_object.hpp
+    ${INCLUDE_DIR}/scene/ecs/entity.hpp
     ${INCLUDE_DIR}/scene/components/components.hpp
 
 
@@ -79,16 +84,17 @@ set(
     ${SRC_DIR}/core/engine_logger.cpp
     ${SRC_DIR}/core/window.cpp
     ${SRC_DIR}/core/update_handlers/thread_manager.cpp
-    ${SRC_DIR}/core/update_handlers/global_update_manager.cpp
-    ${SRC_DIR}/core/update_handlers/sync_update_manager.cpp
+    ${SRC_DIR}/core/update_handlers/global_update.cpp
+    ${SRC_DIR}/core/update_handlers/sync_update.cpp
     ${SRC_DIR}/core/update_handlers/timer.cpp
 
     ${SRC_DIR}/core/platforms/main.cpp
     ${SRC_DIR}/core/platforms/win32.cpp
 
     # Scene stuff
-    # ${SRC_DIR}/scene/scene.cpp
-    ${SRC_DIR}/scene/scene_node.cpp
+    ${SRC_DIR}/scene/scene.cpp
+    ${SRC_DIR}/scene/ecs/entity.cpp
+    # ${SRC_DIR}/scene/scene_node.cpp
 
     # Geometry-stuff
     ${SRC_DIR}/core/geometry/mesh.cpp

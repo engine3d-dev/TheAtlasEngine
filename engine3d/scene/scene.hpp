@@ -1,6 +1,10 @@
 #pragma once
-#include <scene/ecs/registry.hpp>
+// #include <scene/ecs/registry.hpp>
+#include "scene/components/components.hpp"
+#define FLECS_CPP        // Build FLECS_SYSTEM
+#include <flecs.h>
 #include <string>
+#include <scene/ecs/entity.hpp>
 
 namespace engine3d{
     /**
@@ -19,52 +23,28 @@ namespace engine3d{
      * 
     */
     class Scene{
-        //! @note We provide properties for constructing a scene entity specifically with the entt::registry
-        /*
-        struct SceneEntity{
-            entt::entity EntityHandler{entt::null};
-            std::string Tag="Untitled";
-            // This UUID is also would be automatically generated everytime you create a new scene object for this scene
-            // uint32_t UUID; // this would replace with our generating for the UUID.
-        };
-        */
     public:
         Scene() = default;
-        Scene(const std::string& p_Tag) : m_Tag(p_Tag){}
-        ~Scene(){
-            m_SceneRegistry.Clear();
-        }
+        Scene(const std::string& p_Tag);
+        
+        ~Scene();
 
+        EntityObject CreateEntity(const std::string& p_Tag);
 
-        //! @note Creates a new entity for the specific scene with a tag
-        // SceneEntity CreateEntity(){
-        //     return {m_Registry.create(), "Untitled"};
-        // }
-
-        //! @note can be used to delete specific scene objects if need-be
-        // void DeleteEntity(entt::entity p_SourceEntity){
-        //     m_Registry.destroy(p_SourceEntity);
-        // }
+        void Test();
 
         /**
          * @note Function to provide a way to copy from one scene to another
          * @note This would utilize the function inside SceneNode called CopyComponent<UComponent>
          * @note Because if we want to copy scenes we want to copy all of our scene objects with those scenes
-         * @note TODO: Still needs to be decided on how this is going to work with SceneNode (in scene_node.hpp)
+         * @note TODO: Still needs to be decided on how this is going to work with SceneNode (in scene_object.hpp)
         */
         // static Scene Copy(const Scene& p_SourceSceneToCopy){
         //     return Scene();
         // }
 
-        //! @note Enables us to treat Scene as also an entt::registry
-        //! @note entt::registry is how this scene is going to register scene objects within this scene and it's components
-        operator Registry&(){
-            return m_SceneRegistry;
-        }
-
     private:
         std::string m_Tag = "Untitled";
-        // entt::registry m_Registry;
-        Registry m_SceneRegistry;
+        flecs::world m_SceneRegistry;
     };
 };

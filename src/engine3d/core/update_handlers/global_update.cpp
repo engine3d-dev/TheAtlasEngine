@@ -1,8 +1,8 @@
 #include "thread_utils/thread_utils.hpp"
-#include <core/update_handlers/global_update_manager.hpp>
+#include <core/update_handlers/global_update.hpp>
 #include <core/application_instance.hpp>
 #include <core/engine_logger.hpp>
-#include <core/update_handlers/sync_update_manager.hpp>
+#include <core/update_handlers/sync_update.hpp>
 #include <chrono>
 #include <print>
 #include <core/event/key_event.hpp>
@@ -26,9 +26,9 @@ namespace engine3d{
     // std::mutex g_GlobalLock;
     // std::condition_variable g_GlobalConditional; 
 
-    std::vector<std::function<void()>> GlobalUpdateManager::s_ApplicationUpdateSubscribers;
+    std::vector<std::function<void()>> GlobalUpdate::s_ApplicationUpdateSubscribers;
 
-    void GlobalUpdateManager::Initialize(){
+    void GlobalUpdate::Initialize(){
         s_GlobalTimer = Timer();
         s_FrameratePerSecondMaintainTimer = Timer();
         s_threadManager = CreateScope<ThreadManager>();
@@ -41,7 +41,7 @@ namespace engine3d{
         ConsoleLogInfo("F1 to see global time and F2 to see local time");
     }
 
-    void GlobalUpdateManager::GlobalOnTickUpdate(){
+    void GlobalUpdate::GlobalOnTickUpdate(){
         s_FrameratePerSecondMaintainTimer.Reset();
 
         for(const auto& app_update : s_ApplicationUpdateSubscribers){
@@ -66,17 +66,17 @@ namespace engine3d{
         g_DeltaTime = s_GlobalDeltaTime / SECONDS;
         
         s_threadManager->OnRun(g_DeltaTime);
-        // SyncUpdateManager::RunUpdate(g_DeltaTime);
+        // SyncUpdate::RunUpdate(g_DeltaTime);
         WaitForNextFrame();
     }
 
-    void GlobalUpdateManager::IncrementCounter(){
+    void GlobalUpdate::IncrementCounter(){
         // g_ThreadCounter |= 1;
     }
 
 
     // Maintains a const fps if possible
-    void GlobalUpdateManager::WaitForNextFrame(){
+    void GlobalUpdate::WaitForNextFrame(){
         
         while(s_FrameratePerSecondMaintainTimer.ElapsedSec() < 1.0f/s_MaxFrameratePerSecond){
             continue;
@@ -94,7 +94,7 @@ namespace engine3d{
         // std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(1.0f/s_MaxFrameratePerSecond - s_FrameratePerSecondMaintainTimer.ElapsedSec()));
     }
 
-    void GlobalUpdateManager::GlobalCleanup(){
+    void GlobalUpdate::GlobalCleanup(){
         ConsoleLogWarn("Global Update Manager is cleaning up!");
         s_threadManager->OnStop();
     }

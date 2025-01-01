@@ -6,12 +6,12 @@
 #include <stdexcept>
 
 namespace engine3d{
-    class SyncUpdateManager{
+    class SyncUpdate{
     public:
-        SyncUpdateManager() = delete;
-        SyncUpdateManager(const SyncUpdateManager&) = delete;
-        SyncUpdateManager& operator=(const SyncUpdateManager&) = delete;
-        ~SyncUpdateManager();
+        SyncUpdate() = delete;
+        SyncUpdate(const SyncUpdate&) = delete;
+        SyncUpdate& operator=(const SyncUpdate&) = delete;
+        ~SyncUpdate();
 
         //! @note Initializes sync update manager to make sure our manager is able to dispatch our update functions.
         static void InitializeSyncUpdate();

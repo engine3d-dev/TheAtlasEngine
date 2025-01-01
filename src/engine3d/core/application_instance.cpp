@@ -3,7 +3,7 @@
 #include <core/application_instance.hpp>
 #include <core/engine_logger.hpp>
 #include <core/event/input_poll.hpp>
-#include <core/update_handlers/global_update_manager.hpp>
+#include <core/update_handlers/global_update.hpp>
 #include <imgui.h>
 #include <string>
 
@@ -46,7 +46,7 @@ namespace engine3d{
             InputPoll::Update();
 
             Renderer::Begin();
-            GlobalUpdateManager::GlobalOnTickUpdate();
+            GlobalUpdate::GlobalOnTickUpdate();
             Renderer::End();
 
             //! TODO: Fix the ImGui Begin and End() functions!
