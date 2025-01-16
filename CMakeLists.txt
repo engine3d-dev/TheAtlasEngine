@@ -13,6 +13,9 @@ endif()
 build_library(
     DIRECTORIES src Editor
 
+    # This is to enable us to control if we want to run test cases or not
+    ENABLE_TESTS ON
+
     UNIT_TEST_SOURCES
 
     # Another issue that can occur with this

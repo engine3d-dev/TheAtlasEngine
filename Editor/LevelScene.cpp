@@ -107,7 +107,7 @@ namespace engine3d{
         m_Camera->SetComponent<engine3d::Transform>(transform);
 
 
-        ConsoleLogTrace("transform.Pos.x = {}, transform.Pos.y = {}, transform.Pos.z = {}", transform.Position.x, transform.Position.y, transform.Position.z);
+        // ConsoleLogTrace("transform.Pos.x = {}, transform.Pos.y = {}, transform.Pos.z = {}", transform.Position.x, transform.Position.y, transform.Position.z);
         // comp.SetViewXYZ(my_camera_transform.Position, my_camera_transform.Rotation);
         
         // comp.SetPerspectiveProjection(glm::radians(50.f), ApplicationInstance::GetAspectRatio(), 1.f, 1000.f);
