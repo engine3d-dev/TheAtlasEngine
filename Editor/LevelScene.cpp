@@ -9,7 +9,7 @@ namespace engine3d{
         m_Sphere = this->CreateNewObject("sphere");
         Transform sphere_transform;
         sphere_transform.Position = {0.f, 0.f, 0.f};
-        sphere_transform.Scale = {.1f,.1f, .1f};
+        sphere_transform.Scale = {.5f,.5f, .5f};
         m_Sphere->AddComponent<Transform>(sphere_transform);
         MeshComponent comp("3d_models/tutorial/sphere.obj");
         m_Sphere->AddComponent<MeshComponent>(comp);
@@ -43,6 +43,7 @@ namespace engine3d{
         if (InputPoll::IsKeyPressed(ENGINE_KEY_S)){
             // ConsoleLogWarn("S Pressed!");
             comp.ProcessKeyboard(BACKWARD, deltaTime);
+            ConsoleLogTrace("comp.Position (x, y, z) = ({}, {}, {})", comp.Position.x, comp.Position.y, comp.Position.z);
         }
         if (InputPoll::IsKeyPressed(ENGINE_KEY_A)){
             // ConsoleLogWarn("A Pressed!");
@@ -100,10 +101,13 @@ namespace engine3d{
 
         }
 
-        transform.Position.x = comp.Position.x;
-        transform.Position.y = comp.Position.y;
-        transform.Position.z = comp.Position.z;
+        // transform.Position.x = comp.Position.x;
+        // transform.Position.y = comp.Position.y;
+        // transform.Position.z = comp.Position.z;
+        // m_Sphere->SetComponent<engine3d::Transform>(transform);
+        comp.UpdateProjView();
 
+        m_Camera->SetComponent<engine3d::PerspectiveCamera>(comp);
         m_Camera->SetComponent<engine3d::Transform>(transform);
 
 

@@ -115,6 +115,17 @@ namespace engine3d::vk{
         return binding_descriptions;
     }
 
+    /*
+        Replace this with
+
+        VertexAttribute attributes = {
+            {FLOAT, offsetof(Vertex, Position)},
+            {FLOAT, offsetof(Vertex, Color)},
+            {FLOAT, offsetof(Vertex, Normals)},
+            {FLOAT, offsetof(Vertex, Uv)}
+        };
+    
+    */
     std::vector<VkVertexInputAttributeDescription> VulkanShader::GetVertexAttributeDescriptions(){
         std::vector<VkVertexInputAttributeDescription> attribute_description{};
 

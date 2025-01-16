@@ -310,8 +310,10 @@ namespace engine3d{
             Left = glm::normalize(glm::cross(-Front, WorldUp));
             Up    = glm::normalize(glm::cross(Right, Front));
             Down  = glm::normalize(glm::cross(-Right, WorldUp));
+        }
 
-
+    public:
+        void UpdateProjView(){
             Projection = glm::perspective(glm::radians(Zoom), AspectRatio, 0.1f, 100.f);
             View = GetViewMatrix();
         }
