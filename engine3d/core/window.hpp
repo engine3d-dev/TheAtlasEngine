@@ -8,6 +8,7 @@ namespace engine3d{
 
     class Window{
     public:
+        virtual ~Window() = default;
         static Ref<Window> Create(uint32_t Width, uint32_t Height, const std::string& Tag="Undefined Window Title");
         
         GLFWwindow* GetNativeWindow() const;

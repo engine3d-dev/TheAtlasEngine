@@ -8,6 +8,7 @@ namespace engine3d::vk{
     class VulkanWindow : public Window{
     public:
         VulkanWindow(uint32_t Width, uint32_t Height, const std::string& Tag);
+        virtual ~VulkanWindow(){}
     private:
         uint32_t Width() const override;
         uint32_t Height() const override;

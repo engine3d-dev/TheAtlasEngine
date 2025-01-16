@@ -1,6 +1,6 @@
 #include <core/engine_logger.hpp>
-#include <update_handlers/global_update_manager.hpp>
-#include <update_handlers/sync_update_manager.hpp>
+#include <update_handlers/global_update.hpp>
+#include <update_handlers/sync_update.hpp>
 #include <core/update_handlers/thread_manager.hpp>
 #include <condition_variable>
 #include <fmt/format.h>
@@ -30,14 +30,15 @@ namespace engine3d{
             ConsoleLogInfo("Thread Manager is running!");
         }
 
-        auto core_amount_half = GetThreadCount() / 2;
-        ConsoleLogTrace("Amount of Threads Specified: {}", core_amount_half);
+        // auto core_amount_half = GetThreadCount() / 2;
+        // ConsoleLogTrace("Amount of Threads Specified: {}", core_amount_half);
 
-        for(uint32_t i = 0; i < core_amount_half; i++){
-            Thread t = Thread(fmt::format("Thread {}", i));
-            t.Dispatch(&ThreadManager::UpdateParallelFunction, this);
-            m_ParallelThreads.push_back(&t);
-        }
+        // Commenting and will either git pull or implement this if zach hasn't done so, already
+        // for(uint32_t i = 0; i < core_amount_half; i++){
+        //     Thread t = Thread(fmt::format("Thread {}", i));
+        //     t.Dispatch(&ThreadManager::UpdateParallelFunction, this);
+        //     m_ParallelThreads.push_back(&t);
+        // }
 
     }
 
@@ -57,14 +58,15 @@ namespace engine3d{
         g_Ready = true;
         g_Ready2 = true;
         g_SyncFrame.notify_one();
-        g_ParallelFrame.notify_all();
+        // g_ParallelFrame.notify_all();
     }
 
     void ThreadManager::UpdateSyncFunction(){
         while(!m_ThreadStop){
             std::unique_lock<std::mutex> m(g_SyncLock);
             
-            GlobalUpdateManager::IncrementCounter();
+            // GlobalUpdate::IncrementCounter();
+            
 
             g_SyncFrame.wait(m, []{return g_Ready; });
 
@@ -74,7 +76,7 @@ namespace engine3d{
             }
 
             g_Ready = false;
-            SyncUpdateManager::RunUpdate(m_DeltaTime);
+            SyncUpdate::RunUpdate(m_DeltaTime);
         }
     }
 
@@ -98,7 +100,7 @@ namespace engine3d{
                 ConsoleLogInfo("Inside Barrier");
             });
 
-            GlobalUpdateManager::IncrementCounter();
+            GlobalUpdate::IncrementCounter();
 
             g_ParallelCounter += 1;
             std::unique_lock<std::mutex> m(g_ParallelLock);
@@ -115,7 +117,7 @@ namespace engine3d{
             }
 
             g_Ready2 = false;
-            SyncUpdateManager::RunUpdate(m_DeltaTime);
+            SyncUpdate::RunUpdate(m_DeltaTime);
         }
 
         //! @note 2.)
@@ -126,6 +128,6 @@ namespace engine3d{
         g_Ready = true;
         g_Ready2 = true;
         g_SyncFrame.notify_all();
-        g_ParallelFrame.notify_all();
+        // g_ParallelFrame.notify_all();
     }
 };

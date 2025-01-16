@@ -1,6 +1,7 @@
 #include <drivers/vulkan/vulkan_driver.hpp>
 #include <drivers/vulkan/helper_functions.hpp>
 #include <core/engine_logger.hpp>
+#include <drivers/vulkan/vulkan_context.hpp>
 
 namespace engine3d::vk{
     VulkanDriver::VulkanDriver(VulkanPhysicalDriver p_PhysicalDevice){
@@ -24,6 +25,7 @@ namespace engine3d::vk{
         VkDeviceCreateInfo create_info = {
             .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
             .pNext = nullptr,
+            .flags = 0,
             .queueCreateInfoCount = 1,
             .pQueueCreateInfos = &queue_create_info,
             .enabledLayerCount = 0,
@@ -54,5 +56,18 @@ namespace engine3d::vk{
         */
 
         vkGetDeviceQueue(m_CurrentDriver, p_PhysicalDevice.GetQueueIndices().Graphics, 0, &m_GraphicsQueue);
+    }
+
+    uint32_t VulkanDriver::SelectMemoryType(uint32_t p_TypeFilter, VkMemoryPropertyFlags p_PropertyFlag){
+        VkPhysicalDeviceMemoryProperties mem_props;
+        vkGetPhysicalDeviceMemoryProperties(VulkanContext::GetPhysicalDriver(), &mem_props);
+
+        for(uint32_t i = 0; i < mem_props.memoryTypeCount; i++){
+            if((p_TypeFilter & (1 << i)) and (mem_props.memoryTypes[i].propertyFlags & p_PropertyFlag) == p_PropertyFlag){
+                return i;
+            }
+        }
+
+        return -1;
     }
 };

@@ -1,8 +1,8 @@
 #include "thread_utils/thread_utils.hpp"
-#include <core/update_handlers/global_update_manager.hpp>
+#include <core/update_handlers/global_update.hpp>
 #include <core/application_instance.hpp>
 #include <core/engine_logger.hpp>
-#include <core/update_handlers/sync_update_manager.hpp>
+#include <core/update_handlers/sync_update.hpp>
 #include <chrono>
 #include <print>
 #include <core/event/key_event.hpp>
@@ -22,13 +22,13 @@ namespace engine3d{
     float g_DeltaTime = 0.0f;
 
     // this needs to be called every frame?
-    std::atomic<uint32_t> g_ThreadCounter;
-    std::mutex g_GlobalLock;
-    std::condition_variable g_GlobalConditional; 
+    // std::atomic<uint32_t> g_ThreadCounter;
+    // std::mutex g_GlobalLock;
+    // std::condition_variable g_GlobalConditional; 
 
-    std::vector<std::function<void()>> GlobalUpdateManager::s_ApplicationUpdateSubscribers;
+    std::deque<std::function<void()>> GlobalUpdate::s_ApplicationUpdates;
 
-    void GlobalUpdateManager::Initialize(){
+    void GlobalUpdate::Initialize(){
         s_GlobalTimer = Timer();
         s_FrameratePerSecondMaintainTimer = Timer();
         s_threadManager = CreateScope<ThreadManager>();
@@ -37,14 +37,14 @@ namespace engine3d{
         s_UpdateTimer = s_GlobalTimer.GetCurrentTime();
         s_MaxFrameratePerSecond = 100;
         s_FrameratePerSecondCounter = 1;
-        s_ApplicationUpdateSubscribers = std::vector<std::function<void()>>();
+        s_ApplicationUpdates = std::deque<std::function<void()>>();
         ConsoleLogInfo("F1 to see global time and F2 to see local time");
     }
 
-    void GlobalUpdateManager::GlobalOnTickUpdate(){
+    void GlobalUpdate::GlobalOnTickUpdate(){
         s_FrameratePerSecondMaintainTimer.Reset();
 
-        for(const auto& app_update : s_ApplicationUpdateSubscribers){
+        for(const auto& app_update : s_ApplicationUpdates){
             app_update();
         }
 
@@ -66,19 +66,19 @@ namespace engine3d{
         g_DeltaTime = s_GlobalDeltaTime / SECONDS;
         
         s_threadManager->OnRun(g_DeltaTime);
-        // SyncUpdateManager::RunUpdate(g_DeltaTime);
+        // SyncUpdate::RunUpdate(g_DeltaTime);
         WaitForNextFrame();
     }
 
-    void GlobalUpdateManager::IncrementCounter(){
-        g_ThreadCounter |= 1;
+    void GlobalUpdate::IncrementCounter(){
+        // g_ThreadCounter |= 1;
     }
 
 
     // Maintains a const fps if possible
-    void GlobalUpdateManager::WaitForNextFrame(){
+    void GlobalUpdate::WaitForNextFrame(){
         
-        while(1.0f/s_MaxFrameratePerSecond > s_FrameratePerSecondMaintainTimer.ElapsedSec()){
+        while(s_FrameratePerSecondMaintainTimer.ElapsedSec() < 1.0f/s_MaxFrameratePerSecond){
             continue;
         }
 
@@ -87,14 +87,14 @@ namespace engine3d{
         // std::unique_lock<std::mutex> m(g_GlobalLock);
         // g_GlobalConditional.wait(m, [](){});
 
-        while(g_ThreadCounter < (GetThreadCount()/2) + 1){
-            continue;
-        }
+        // while(g_ThreadCounter < (GetThreadCount()/2) + 1){
+        //     continue;
+        // }
 
         // std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(1.0f/s_MaxFrameratePerSecond - s_FrameratePerSecondMaintainTimer.ElapsedSec()));
     }
 
-    void GlobalUpdateManager::GlobalCleanup(){
+    void GlobalUpdate::GlobalCleanup(){
         ConsoleLogWarn("Global Update Manager is cleaning up!");
         s_threadManager->OnStop();
     }

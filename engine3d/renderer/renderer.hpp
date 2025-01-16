@@ -1,5 +1,9 @@
 #pragma once
+#include <map>
 #include <vulkan/vulkan.hpp>
+#include <core/core.hpp>
+// #include <scene/scene.hpp>
+#include <core/scene/scene.hpp>
 
 namespace engine3d{
     /**
@@ -11,6 +15,7 @@ namespace engine3d{
      *      The renderer context's public API's wont change but the operations behind it's implementation would be different by the API being used and set
      * @note TODO: Some thing I will consider because currently at runtime these graphic API's can be set, this is something that should be set at compile-time
     */
+    class SceneObject;
     class Renderer{
     public:
         static void Initialize();
@@ -18,5 +23,10 @@ namespace engine3d{
         //! @note using begin/end semantics for specifying that when we've reached the end of the frame is when we flush and render our contexts that is proviedd.
         static void Begin();
         static void End();
+
+        static void RenderSceneObjects(const Ref<SceneScope>& p_AllSceneNoeds);
+        static void RenderSceneObject(Ref<SceneObject>& p_ObjectToRender);
+
+        static void RenderWithCamera(Ref<SceneObject>& p_Object, Ref<SceneObject>& p_CameraObject);
     };
 };

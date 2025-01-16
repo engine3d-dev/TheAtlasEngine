@@ -1,7 +1,7 @@
 #pragma once
 
 namespace engine3d{
-    class EditorScene{
+    class VulkanImGui{
     public:
 
     private:

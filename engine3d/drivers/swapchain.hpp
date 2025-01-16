@@ -5,6 +5,7 @@
 namespace engine3d{
     class Swapchain{
     public:
+        virtual ~Swapchain() = default;
         //! @note Initialize our swapchain
         static Ref<Swapchain> InitializeSwapchain(VkSurfaceKHR p_Surface);
 

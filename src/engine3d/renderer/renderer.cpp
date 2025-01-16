@@ -17,4 +17,16 @@ namespace engine3d{
     void Renderer::End(){
         return g_RendererBackend->End();
     }
+
+    void Renderer::RenderSceneObjects(const Ref<SceneScope>& p_CurrentSceneContext){
+        return g_RendererBackend->RenderSceneObjects(p_CurrentSceneContext);
+    }
+
+    void Renderer::RenderSceneObject(Ref<SceneObject>& p_ObjectToRender){
+        g_RendererBackend->RenderSceneObject(p_ObjectToRender);
+    }
+
+    void Renderer::RenderWithCamera(Ref<SceneObject>& p_Object, Ref<SceneObject>& p_CameraObject){
+        g_RendererBackend->RenderWithCamera(p_Object, p_CameraObject);
+    }
 };

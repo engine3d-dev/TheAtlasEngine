@@ -1,3 +1,4 @@
+#include "drivers/vulkan/vulkan_context.hpp"
 #include <drivers/vulkan/vulkan_swapchain.hpp>
 #include <core/engine_logger.hpp>
 #include <core/application_instance.hpp>
@@ -6,7 +7,7 @@
 
 namespace engine3d::vk{
 
-    VulkanSwapchain::VulkanSwapchain(VulkanPhysicalDriver p_PhysicalDriver, VulkanDriver p_Driver, VkSurfaceKHR p_Surface) : m_PhysicalDriver(p_PhysicalDriver), m_Driver(p_Driver), m_CurrentSurface(p_Surface){
+    VulkanSwapchain::VulkanSwapchain(VulkanPhysicalDriver p_PhysicalDriver, VulkanDriver p_Driver, VkSurfaceKHR p_Surface) : m_CurrentSurface(p_Surface), m_PhysicalDriver(p_PhysicalDriver), m_Driver(p_Driver){
         //! @note This gives us the queue to present/render to display.
 
         //! @note We extract the current presentation index from our current selected physical index.
@@ -59,8 +60,9 @@ namespace engine3d::vk{
             .pNext = nullptr,
             .flags = 0,
             .surface = m_CurrentSurface,
+            .minImageCount = 2,
             .imageFormat = m_SurfaceFormat.format,
-            .preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR,
+            .preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR
         };
 
         if((surface_capabilities.supportedTransforms & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR) == 0){
@@ -102,9 +104,9 @@ namespace engine3d::vk{
         //     create_info.pQueueFamilyIndices = queue_fam_indices;
         // }
 
-        VkSwapchainKHR old_swapchain = VK_NULL_HANDLE;
+        // VkSwapchainKHR old_swapchain = VK_NULL_HANDLE;
         if(m_Swapchain != VK_NULL_HANDLE and m_IsSwapchainResized){
-            old_swapchain = m_Swapchain;
+            // old_swapchain = m_Swapchain;
             vkDestroySwapchainKHR(m_Driver, m_Swapchain, nullptr);
         }
 
@@ -335,18 +337,18 @@ namespace engine3d::vk{
         m_FramebuffersForSwapchain.resize(GetImagesSize());
 
         for(size_t i = 0; i < GetImagesSize(); i++){
-            std::array<VkImageView, 2> attachments = { m_ImagesForSwapchain[i].ImageView, m_DepthImagesForSwapchain[i].ImageView};
+            std::array<VkImageView, 2> image_attachment = { m_ImagesForSwapchain[i].ImageView, m_DepthImagesForSwapchain[i].ImageView};
 
-            VkExtent2D swapchain_extent = m_SwapchainExtent;
+            VkExtent2D swapchain_image_extent = m_SwapchainExtent;
             VkFramebufferCreateInfo fb_create_info = {
                 .sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
                 .pNext = nullptr,
                 .flags = 0,
                 .renderPass = m_RenderpassForSwapchain,
-                .attachmentCount = static_cast<uint32_t>(attachments.size()),
-                .pAttachments = attachments.data(),
-                .width = swapchain_extent.width,
-                .height = swapchain_extent.height,
+                .attachmentCount = static_cast<uint32_t>(image_attachment.size()),
+                .pAttachments = image_attachment.data(),
+                .width = swapchain_image_extent.width,
+                .height = swapchain_image_extent.height,
                 .layers = 1
             };
 

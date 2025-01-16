@@ -18,6 +18,12 @@ set(
     ${INCLUDE_DIR}/core/event/key_event.hpp
     ${INCLUDE_DIR}/core/event/mouse_event.hpp
 
+    # hash-stuff
+    ${INCLUDE_DIR}/core/utilities/hash.hpp
+
+    # Geometry-stuff
+    ${INCLUDE_DIR}/core/geometry/mesh.hpp
+
     ${INCLUDE_DIR}/thread_utils/thread_utils.hpp
     # ====================================================================================
     # ====================================================================================
@@ -25,8 +31,24 @@ set(
     ${INCLUDE_DIR}/core/engine_logger.hpp
     ${INCLUDE_DIR}/core/window.hpp
     ${INCLUDE_DIR}/core/update_handlers/thread_manager.hpp
-    ${INCLUDE_DIR}/core/update_handlers/global_update_manager.hpp
-    ${INCLUDE_DIR}/core/update_handlers/sync_update_manager.hpp
+    ${INCLUDE_DIR}/core/update_handlers/global_update.hpp
+    ${INCLUDE_DIR}/core/update_handlers/sync_update.hpp
+
+    # Math stuff
+    ${INCLUDE_DIR}/core/math/math.hpp
+    ${INCLUDE_DIR}/core/math/types.hpp
+
+    # System-related stuff
+    ${INCLUDE_DIR}/core/system_framework/system_registry.hpp
+
+    # Scene Stuff
+    ${INCLUDE_DIR}/scene/components/components.hpp
+    ${INCLUDE_DIR}/core/scene/scene.hpp
+    ${INCLUDE_DIR}/core/scene/world.hpp
+
+    ${INCLUDE_DIR}/scene/scene_object.hpp
+    ${INCLUDE_DIR}/scene/ecs/entity.hpp
+
 
     ## Renderer stuff
     ${INCLUDE_DIR}/renderer/renderer.hpp
@@ -36,6 +58,9 @@ set(
     ${INCLUDE_DIR}/drivers/ui/imgui_backend.hpp
 
     ## graphic-agnostic drivers
+    ${INCLUDE_DIR}/drivers/vertex_buffer.hpp
+    ${INCLUDE_DIR}/drivers/index_buffer.hpp
+    ${INCLUDE_DIR}/drivers/shader.hpp
     ${INCLUDE_DIR}/drivers/swapchain.hpp
 
     ## Vulkan Driver stuff
@@ -45,6 +70,10 @@ set(
     ${VULKAN_INCLUDE_DIR}/vulkan_physical_driver.hpp
     ${VULKAN_INCLUDE_DIR}/vulkan_driver.hpp
     ${VULKAN_INCLUDE_DIR}/vulkan_swapchain.hpp
+    ${VULKAN_INCLUDE_DIR}/vulkan_vertex_buffer.hpp
+    ${VULKAN_INCLUDE_DIR}/vulkan_index_buffer.hpp
+    ${VULKAN_INCLUDE_DIR}/vulkan_uniform_buffer.hpp
+    ${VULKAN_INCLUDE_DIR}/shaders/vulkan_shader.hpp
     ${VULKAN_INCLUDE_DIR}/vulkan_renderer.hpp
 
 )
@@ -59,12 +88,22 @@ set(
     ${SRC_DIR}/core/engine_logger.cpp
     ${SRC_DIR}/core/window.cpp
     ${SRC_DIR}/core/update_handlers/thread_manager.cpp
-    ${SRC_DIR}/core/update_handlers/global_update_manager.cpp
-    ${SRC_DIR}/core/update_handlers/sync_update_manager.cpp
+    ${SRC_DIR}/core/update_handlers/global_update.cpp
+    ${SRC_DIR}/core/update_handlers/sync_update.cpp
     ${SRC_DIR}/core/update_handlers/timer.cpp
 
     ${SRC_DIR}/core/platforms/main.cpp
     ${SRC_DIR}/core/platforms/win32.cpp
+
+    # System-related stuff
+    ${SRC_DIR}/core/system_framework/system_registry.cpp
+
+    # Scene stuff
+    ${SRC_DIR}/core/scene/world.cpp
+    ${SRC_DIR}/scene/ecs/entity.cpp
+
+    # Geometry-stuff
+    ${SRC_DIR}/core/geometry/mesh.cpp
 
     # Renderer-stuff
     ${SRC_DIR}/renderer/renderer.cpp
@@ -75,6 +114,9 @@ set(
 
     ## graphic drivers backend-agnostic
     ${SRC_DIR}/drivers/swapchain.cpp
+    ${SRC_DIR}/drivers/vertex_buffer.cpp
+    ${SRC_DIR}/drivers/index_buffer.cpp
+    ${SRC_DIR}/drivers/shader.cpp
 
     ## Vulkan Driver stuff
     ${VULKAN_SRC_DIR}/vulkan_window.cpp
@@ -83,6 +125,10 @@ set(
     ${VULKAN_SRC_DIR}/vulkan_physical_driver.cpp
     ${VULKAN_SRC_DIR}/vulkan_driver.cpp
     ${VULKAN_SRC_DIR}/vulkan_swapchain.cpp
+    ${VULKAN_SRC_DIR}/vulkan_vertex_buffer.cpp
+    ${VULKAN_SRC_DIR}/vulkan_index_buffer.cpp
+    ${VULKAN_SRC_DIR}/vulkan_uniform_buffer.cpp
+    ${VULKAN_SRC_DIR}/shaders/vulkan_shader.cpp
     ${VULKAN_SRC_DIR}/vulkan_renderer.cpp
 )
 

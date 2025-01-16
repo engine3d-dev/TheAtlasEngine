@@ -1,31 +1,35 @@
-#include "core/event/input_poll.hpp"
-#include <core/update_handlers/sync_update_manager.hpp>
+#include <core/update_handlers/sync_update.hpp>
 #include <core/engine_logger.hpp>
-#include <core/update_handlers/global_update_manager.hpp>
+#include <core/update_handlers/global_update.hpp>
 #include <core/application_instance.hpp>
+#include "EditorWorld.hpp"
+#include <renderer/renderer.hpp>
 
 namespace engine3d{
-    class Application : public engine3d::ApplicationInstance{
+    class Application : public ApplicationInstance{
     public:
-        Application(const std::string& p_Tag) : engine3d::ApplicationInstance(p_Tag){
-            SyncUpdateManager::Subscribe(this, &Application::OnUpdate);
+        Application(const std::string& p_Tag) : ApplicationInstance(p_Tag){
+            ConsoleLogFatal("Application::Application(std::string) gets called!");
+            m_World = CreateRef<EditorWorld>("Editor World");
 
-            ConsoleLogInfoWithTag("Editor", "Application Initialized Completed!");
-            // GlobalUpdateManager::SubscribeApplicationUpdate(this, &Application::OnApplicationUpdate);
+            GlobalUpdate::SubscribeApplicationUpdate(this, &Application::OnApplicationUpdate);
+
         }
-
-        void OnUpdate(){
-            // ConsoleLogInfoWithTag("Editor", "OnUpdate called from application!");
-            if(InputPoll::IsKeyPressed(ENGINE_KEY_ESCAPE)){
-                ApplicationInstance::ShutdownApplication();
-            }
-        }
-
 
         void OnApplicationUpdate(){
-            // ConsoleLogInfo("OnApplicationUpdate called from application!");
-            ConsoleLogInfoWithTag("Editor", "OnApplicationUpdate called from application!");
+            //! TODO: Currently renderer is being called per-level. This is not what we want.
+            //! @note What needs to happen is we provide a scene renderer.
+            /*
+            Scene Renderer
+            - Handles multiple-passes for us.
+            - Uses the draw call API's from the renderer to interface with the vulkan's API to do specific operations
+            - Whether this is drawing 2D line, 3D objects, telling which uniforms to update, etc
+            */
+            m_World->OnUpdate();
         }
+
+    private:
+        Ref<EditorWorld> m_World;
     };
 
     Ref<ApplicationInstance> Initialize(){

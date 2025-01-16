@@ -10,6 +10,7 @@ namespace engine3d::vk{
     */
     class VulkanSwapchain : public Swapchain{
     public:
+        virtual ~VulkanSwapchain() {}
         //! @note TODO: Change this into RendererConfig
         static constexpr uint32_t MaxFramesInFlight = 2;
 

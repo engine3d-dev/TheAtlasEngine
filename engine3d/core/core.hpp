@@ -20,10 +20,14 @@ namespace engine3d{
         return (1 << x);
     }
 
-    template<typename... T>
-    static void Render_Core_Assert(bool x, const T&&... args){
-        assert(x);
-    }
+    // template<typename... T>
+    // static void Render_Core_Assert(bool x, const T&&... args){
+    //     // assert(x);
+    //     if(x){
+    //         ConsoleLogFatal("")
+    //         assert(x);
+    //     }
+    // }
 
     template<typename, typename T>
     struct member_bound_function_check {
@@ -95,5 +99,18 @@ namespace engine3d{
     template<typename T, typename... Args>
     constexpr Scope<T> CreateScope(Args&&... args){
         return std::make_unique<T>(std::forward<Args>(args)...);
+    }
+
+    template<typename T>
+    using WeakPtr = std::weak_ptr<T>;
+
+    template<typename T, typename... Args>
+    constexpr WeakPtr<T> CreateWeakPtr(Args&&... args){
+        return std::weak_ptr<T>(std::forward<Args>(args)...);
+    }
+
+    template<typename T, typename U>
+    WeakPtr<T> ToWeakPtr(const U& p_Value){
+        return CreateWeakPtr<T>(p_Value);
     }
 };

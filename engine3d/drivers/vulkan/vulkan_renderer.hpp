@@ -14,15 +14,25 @@ namespace engine3d::vk{
     public:
         VulkanRenderer(const std::string& Tag);
         //! @note Implementation-details for sending draw calls.
-        // void DrawScene();
+
+        VkCommandBuffer GetCurrentCommandBuffer();
+        static VkCommandBuffer CurrentCommandBuffer();
+        static VkFramebuffer CurrentFramebuffer();
+        static uint32_t GetCurrentCommandBufferIndex();
+
     private:
         void BeginFrame() override;
         void EndFrame() override;
+        void DrawScene(Ref<SceneObject> p_SceneContext) override;
+        void DrawSceneObjects(const Ref<SceneScope>& p_CurrentScene) override;
+
+        void DrawSceneObject(Ref<SceneObject>& p_CurrentObject) override;
+
+        void DrawObjectWithCamera(Ref<SceneObject>& p_Object, Ref<SceneObject>& p_CameraObject) override;
 
     private:
         //! @note TODO: Moving VkPipeline/VkPipelineLayout out of the renderer and asbtracting this.
         void InitializeRendererPipeline();
-        VkCommandBuffer GetCurrentCommandBuffer();
     private:
     };
 };

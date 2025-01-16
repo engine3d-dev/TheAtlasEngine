@@ -20,6 +20,8 @@ namespace engine3d{
 
         static void ShutdownApplication();
 
+        static uint32_t GetAspectRatio();
+
     private:
         void SetCurrentAPI(API api);
     private:

@@ -35,7 +35,8 @@ namespace engine3d{
     bool Window::IsWindowActive() const { return !glfwWindowShouldClose(GetNativeWindow()); }
 
     void Window::Close(){
-        glfwDestroyWindow(GetNativeWindow());
+        // glfwDestroyWindow(GetNativeWindow());
+        glfwSetWindowShouldClose(GetNativeWindow(), true);
     }
 
     float Window::GetAspectRatio() const { return (float)GetWidth() / GetHeight(); }
