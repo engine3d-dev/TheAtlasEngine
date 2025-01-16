@@ -44,7 +44,7 @@ namespace engine3d{
 
         while(m_Window->IsWindowActive()){
             InputPoll::Update();
-
+            
             Renderer::Begin();
             GlobalUpdate::GlobalOnTickUpdate();
             Renderer::End();
@@ -52,6 +52,9 @@ namespace engine3d{
             //! TODO: Fix the ImGui Begin and End() functions!
             //! @note We dont get the error with imgui::initialize function, so we leave that uncomment for the time being
             // ImGuiBackend::Begin();
+            // ImGui::Begin("Settings");
+            // ImGui::Button("Press Me!");
+            // ImGui::End();
             // ImGuiBackend::End();
         }
         ConsoleLogWarn("Leaving executed mainloop!");

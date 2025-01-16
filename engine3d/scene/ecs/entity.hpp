@@ -1,8 +1,8 @@
 #pragma once
 #include <flecs.h>
-#include <flecs/addons/cpp/entity.hpp>
-#include <flecs/addons/cpp/mixins/pipeline/decl.hpp>
 #include <string>
+#include <core/scene/world.hpp>
+#include <core/system_framework/system_registry.hpp>
 
 namespace engine3d{
     /**
@@ -14,7 +14,9 @@ namespace engine3d{
     */
     class EntityObject{
     public:
+        EntityObject() = default;
         EntityObject(flecs::world* p_SceneRegistryToWorld, const std::string& p_Tag);
+        EntityObject(const flecs::entity& p_Entity) : m_EntityID(p_Entity){}
 
         ~EntityObject();
 
@@ -32,6 +34,11 @@ namespace engine3d{
             m_EntityID.add<UComponent>();
         }
 
+        template<typename UComponent>
+        void AddComponent(const UComponent& p_ComponentValue){
+            m_EntityID.set<UComponent>(p_ComponentValue);
+        }
+
         //! @note Returns the component from the entity
         //! @note Flecs has you return a pointer for checking if the component is found
         //! @note If not found will return nullptr
@@ -40,13 +47,24 @@ namespace engine3d{
             return m_EntityID.get<UComponent>();
         }
 
+        template<typename UComponent>
+        UComponent* GetMutableComponent(){
+            if(HasComponent<UComponent>()){
+                ConsoleLogTrace("IT DOES contain MeshComponent!");
+                // return nullptr;
+            }
+            ConsoleLogWarn("GetMutableComponent Called from entity.hpp with World Tag = {}", SystemRegistry::GetWorld().GetTag());
+            // return SystemRegistry::GetWorld()->GetRegistry().get_mut<UComponent>(m_EntityID);
+            return SystemRegistry::GetWorld().GetRegistry()->get_mut<UComponent>(m_EntityID);
+        }
+
         //! @note Checks if specific component of type UComponent is provided to this entity
         template<typename UComponent>
         bool HasComponent(){
             return m_EntityID.has<UComponent>();
         }
 
-        //! @note Setting singleton component
+        //! @note Setting a component
         template<typename UComponent>
         void SetComponent(const UComponent& p_Component){
             m_EntityID.set<UComponent>(p_Component);
@@ -60,11 +78,6 @@ namespace engine3d{
             //! @note flecs::entity::set returns a const entity& to set multiple components
             m_EntityID.set<T, U>(p_Component1).set(p_Component2);
         }
-
-        // template<typename... Types, typename... Args>
-        // void SetComponent(Args&&... args){
-        //     m_EntityID.set<Types...>(args...);
-        // }
 
         template<typename UComponent>
         void RemoveComponent(){

@@ -1,4 +1,3 @@
-#include "engine_logger.hpp"
 #include <renderer/renderer.hpp>
 #include <drivers/renderer_backend.hpp>
 
@@ -19,7 +18,15 @@ namespace engine3d{
         return g_RendererBackend->End();
     }
 
-    void Renderer::RenderSceneObjects(std::map<std::string, Ref<SceneNode>>& p_SceneObjects){
-        return g_RendererBackend->RenderSceneObjects(p_SceneObjects);
+    void Renderer::RenderSceneObjects(const Ref<SceneScope>& p_CurrentSceneContext){
+        return g_RendererBackend->RenderSceneObjects(p_CurrentSceneContext);
+    }
+
+    void Renderer::RenderSceneObject(Ref<SceneObject>& p_ObjectToRender){
+        g_RendererBackend->RenderSceneObject(p_ObjectToRender);
+    }
+
+    void Renderer::RenderWithCamera(Ref<SceneObject>& p_Object, Ref<SceneObject>& p_CameraObject){
+        g_RendererBackend->RenderWithCamera(p_Object, p_CameraObject);
     }
 };

@@ -44,6 +44,9 @@ namespace engine3d{
             ConsoleLogWarn("Could not load model from path {}", p_Filename);
             return Mesh();
         }
+        else{
+            ConsoleLogInfo("Model Loaded = {}", p_Filename);
+        }
 
         std::vector<Vertex> vertices;
         // std::vector<uint32_t> indices;

@@ -6,8 +6,10 @@ layout(location = 0) out vec4 outColor;
 
 
 layout(push_constant) uniform Push {
-    mat4 Transform; // proj * view * model
-    mat4 ModelMatrix;
+    // mat4 Transform; // proj * view * model
+    mat4 Projection;
+    mat4 View;
+    mat4 Model;
     vec3 LightTransform;
 } push;
 

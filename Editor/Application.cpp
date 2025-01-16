@@ -6,34 +6,30 @@
 #include <renderer/renderer.hpp>
 
 namespace engine3d{
-    class Application : public engine3d::ApplicationInstance{
+    class Application : public ApplicationInstance{
     public:
-        Application(const std::string& p_Tag) : engine3d::ApplicationInstance(p_Tag), m_World("Untitled"){
+        Application(const std::string& p_Tag) : ApplicationInstance(p_Tag){
+            ConsoleLogFatal("Application::Application(std::string) gets called!");
+            m_World = CreateRef<EditorWorld>("Editor World");
+
             GlobalUpdate::SubscribeApplicationUpdate(this, &Application::OnApplicationUpdate);
-            // ConsoleLogFatal("Applicatoin::Application(std::string) gets called!");
-            // m_World = CreateRef<EditorWorld>();
-            m_World.OnStart();
+
         }
 
         void OnApplicationUpdate(){
-            // ConsoleLogInfoWithTag("Editor", "OnUpdate called from application!");
-            
-            //! @note For now, I am going to use this for specifically rendering
-            //! @note Just to test that we can still render things.
-            m_World.OnUpdate();
-
-
-            //! @note Rendering happens here
-            // Renderer::RenderSceneObjects(m_World.GetAllWorldObjects());
-        }
-
-
-        void OnUpdate(){
-            // ConsoleLogInfoWithTag("Editor", "OnApplicationUpdate called from application!");
+            //! TODO: Currently renderer is being called per-level. This is not what we want.
+            //! @note What needs to happen is we provide a scene renderer.
+            /*
+            Scene Renderer
+            - Handles multiple-passes for us.
+            - Uses the draw call API's from the renderer to interface with the vulkan's API to do specific operations
+            - Whether this is drawing 2D line, 3D objects, telling which uniforms to update, etc
+            */
+            m_World->OnUpdate();
         }
 
     private:
-        EditorWorld m_World;
+        Ref<EditorWorld> m_World;
     };
 
     Ref<ApplicationInstance> Initialize(){

@@ -1,4 +1,5 @@
 
+#include "scene/scene.hpp"
 #include "update_handlers/sync_update.hpp"
 #include <deque>
 #include <numeric>
@@ -13,7 +14,6 @@
 #include <drivers/vulkan/vulkan_swapchain.hpp>
 #include <drivers/vulkan/shaders/vulkan_shader.hpp>
 #include <scene/scene_object.hpp>
-#include <scene/components/components.hpp>
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -39,7 +39,9 @@ namespace engine3d::vk{
     static Ref<Shader> g_Shader = nullptr;
 
     struct PushConstantData{
-        glm::mat4 Transform{1.f};
+        // glm::mat4 Transform{1.f};
+        glm::mat4 Projection{1.f};
+        glm::mat4 View{1.f};
         glm::mat4 Model{1.f};
         glm::vec3 LightTransform{1.0, -3.0, -1.0};
     };
@@ -200,14 +202,18 @@ namespace engine3d::vk{
     }
 
 
-    void VulkanRenderer::DrawScene(Ref<SceneNode> p_SceneContext) {
+    void VulkanRenderer::DrawScene(Ref<SceneObject> p_SceneContext) {
         if(!p_SceneContext){}
     }
 
-    void VulkanRenderer::DrawSceneObjects(std::map<std::string, Ref<SceneNode>>& p_SceneObjects){
+    void VulkanRenderer::DrawSceneObjects(const Ref<SceneScope>& p_Scene){
         // Draw Scene Objects (In the view of the frustrum)
         // ConsoleLogInfo("DrawSceneObjects() called!");
-        if(!p_SceneObjects.contains("")){}
+        // if(!p_SceneObjects.contains("")){}
+
+        if(!p_Scene){}
+        // auto& entites = p_Scene->Get
+
         // auto current_cmd_buffer = GetCurrentCommandBuffer();
 
         // vkCmdBindPipeline(current_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, g_Shader->GetGraphicsPipeline());
@@ -273,6 +279,87 @@ namespace engine3d::vk{
         //     ConsoleLogInfo("DrawSceneObjects() called! #8");
         //     vb->Draw(GetCurrentCommandBuffer());
         // }
+    }
+
+    void VulkanRenderer::DrawSceneObject(Ref<SceneObject>& p_CurrentObject){
+        if(p_CurrentObject == nullptr){}
+        // auto current_cmd_buffer = GetCurrentCommandBuffer();
+
+        // vkCmdBindPipeline(current_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, g_Shader->GetGraphicsPipeline());
+
+        // PushConstantData data = {
+        // };
+    }
+
+    void VulkanRenderer::DrawObjectWithCamera(Ref<SceneObject>& p_Object, Ref<SceneObject>& p_CameraObject){
+        auto current_cmd_buffer = GetCurrentCommandBuffer();
+        
+        vkCmdBindPipeline(current_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, g_Shader->GetGraphicsPipeline());
+        auto camera_transform = p_CameraObject->GetComponent<Transform>();
+        // auto camera_component = p_CameraObject->GetComponent<Camera>();
+        auto* camera_component = p_CameraObject->GetComponent<engine3d::PerspectiveCamera>();
+
+        auto camera_position = camera_transform->Position;
+        // auto camera_position = camera_component->Position;
+        // auto& projection = camera_component.GetProjection();
+        // auto proj_view = camera_component->GetProjection() * camera_component->GetView();
+        auto obj_model = p_Object->GetModelMatrix();
+
+
+        // float delta_time = SyncUpdate::DeltaTime();
+        PushConstantData push_const_data = {
+            // .Transform = proj_view,
+            .Projection = camera_component->GetProjection(),
+            .View = camera_component->GetView(),
+            .Model = obj_model,
+            // .LightTransform = camera_position * delta_time
+            .LightTransform = camera_position - p_Object->GetComponent<Transform>()->Position
+            // .LightTransform = camera_position - p_Object->GetComponent<Transform>()->Position
+        };
+
+        vkCmdPushConstants(
+            current_cmd_buffer,
+            g_PipelineLayout,
+            VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+            0,
+            sizeof(PushConstantData),
+            &push_const_data
+        );
+
+        // const MeshComponent* component = p_Object->GetComponent<MeshComponent>();
+        SceneObject& object = *p_Object;
+
+        auto* component = object.GetComponent<MeshComponent>();
+        if(component == nullptr){
+            ConsoleLogFatal("MeshComponent was invalid that was attempted to get in vulkan_renderer!!!");
+            return;
+        }
+        Mesh mesh_data = component->MeshMetadata;
+
+        // if(mesh_data.IsLoaded()){
+        //     ConsoleLogInfo("Mesh Data was indeed loaded!!!");
+        // }
+
+        auto& vb = mesh_data.GetVertices();
+        auto ib = mesh_data.GetIndices();
+
+
+        vb->Bind(current_cmd_buffer);
+
+        if(ib != nullptr){
+            ib->Bind(current_cmd_buffer);
+ 
+            if(ib->HasIndicesPresent()){
+                // ConsoleLogInfo("Ib->Draw being called!");
+                ib->Draw(current_cmd_buffer);
+            }
+            else{
+                vb->Draw(current_cmd_buffer);
+            }
+        }
+        else{
+            vb->Draw(current_cmd_buffer);
+        }
     }
 
     VkCommandBuffer VulkanRenderer::GetCurrentCommandBuffer(){

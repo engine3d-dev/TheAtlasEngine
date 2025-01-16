@@ -13,10 +13,23 @@ namespace engine3d{
         return state == GLFW_PRESS || state == GLFW_REPEAT;
     }
 
+    bool InputPoll::IsKeyReleased(KeyCode keyCode){
+        auto window = ApplicationInstance::GetWindow().GetNativeWindow();
+
+        auto state = glfwGetKey(window, static_cast<int32_t>(keyCode));
+        return state == GLFW_RELEASE;
+    }
+
     bool InputPoll::IsMousePressed(MouseCode mouseCode){
         auto window = ApplicationInstance::GetWindow().GetNativeWindow();
         auto state = glfwGetMouseButton(window, static_cast<int32_t>(mouseCode));
         return state == GLFW_PRESS;
+    }
+
+    bool InputPoll::IsMouseReleased(MouseCode mouseCode){
+        auto window = ApplicationInstance::GetWindow().GetNativeWindow();
+        auto state = glfwGetMouseButton(window, static_cast<int32_t>(mouseCode));
+        return state == GLFW_RELEASE;
     }
 
     void InputPoll::WaitForEvents(){
@@ -76,11 +89,24 @@ namespace engine3d{
         // return std::clamp(*s_Controllers[p_ControllerID].AxesOfController[p_LocationOfAxes], 0.01f, 1.0f);
     }
 
+
+    bool InputPoll::IsControllerButtonPressed(unsigned char button){
+        return (button == GLFW_PRESS);
+    }
+
+    bool InputPoll::IsControllerButtonReleased(unsigned char button){
+        return (button == GLFW_RELEASE);
+    }
+
     void InputPoll::Update(){
         glfwPollEvents();
 
-        //! @note Update Joysticks
-        //  1 is the first joystick.
+        //! @note Must be called per input updated events. In the case either game console disconnects or reconnects
+        //! @note This will continously check.
+        //! @note By default GLFW check's up to a total of 16 joystick ID's that are available
+        //! @note We iterate all 16 joysticks, only using the joystic ID's that are connected
+        //! @note Then checking for any events from the connected joystick has occurred
+        // 1 is the first joystick.
         // 16 is the last joystick
         for(int joystick_id = 0; joystick_id < 16; joystick_id++){
             if(glfwJoystickPresent(joystick_id) == GLFW_TRUE){
@@ -96,14 +122,17 @@ namespace engine3d{
 
                 for(int i = 0; i < amount_of_buttons; i++){
                     // ConsoleLogFatal("Button {} is ===> {}", i, buttons[i]);
-                    if(buttons[i] == GLFW_PRESS && !joystick.ButtonsDown[i]){
+                    // if(buttons[i] == GLFW_PRESS && !joystick.ButtonsDown[i]){
+                    if(IsControllerButtonPressed(buttons[i]) && !joystick.ButtonsDown[i]){
                         joystick.Buttons[i].ButtonState = InputState::PRESSED;
                     }
-                    else if(buttons[i] == GLFW_RELEASE and joystick.ButtonsDown[i]){
+                    // else if(buttons[i] == GLFW_RELEASE and joystick.ButtonsDown[i]){
+                    else if(IsControllerButtonReleased(buttons[i]) and joystick.ButtonsDown[i]){
                         joystick.Buttons[i].ButtonState = InputState::RELEASED;
                     }
 
-                    joystick.ButtonsDown[i] = (buttons[i] == GLFW_PRESS);
+                    // joystick.ButtonsDown[i] = (buttons[i] == GLFW_PRESS);
+                    joystick.ButtonsDown[i] = IsControllerButtonPressed(buttons[i]);
                 }
 
                 int amount_of_axes = -1;

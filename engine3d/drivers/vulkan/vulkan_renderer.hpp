@@ -23,8 +23,12 @@ namespace engine3d::vk{
     private:
         void BeginFrame() override;
         void EndFrame() override;
-        void DrawScene(Ref<SceneNode> p_SceneContext) override;
-        void DrawSceneObjects(std::map<std::string, Ref<SceneNode>>& p_SceneObjects) override;
+        void DrawScene(Ref<SceneObject> p_SceneContext) override;
+        void DrawSceneObjects(const Ref<SceneScope>& p_CurrentScene) override;
+
+        void DrawSceneObject(Ref<SceneObject>& p_CurrentObject) override;
+
+        void DrawObjectWithCamera(Ref<SceneObject>& p_Object, Ref<SceneObject>& p_CameraObject) override;
 
     private:
         //! @note TODO: Moving VkPipeline/VkPipelineLayout out of the renderer and asbtracting this.

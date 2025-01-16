@@ -1,12 +1,16 @@
 #include <boost/ut.hpp>
-#include <cmath>
 
-
-boost::ut::suite<"basic_add"> vec3_test = [](){
+boost::ut::suite<"basic_add"> add_test = [](){
     using namespace boost::ut;
-    int x = 10;
-    int y = 30;
-    int z = (x + y);
 
-    expect(z == 0);
+    "unit1"_test = [](){
+        int x = 10;
+        int y = 30;
+        int z = (x + y);
+
+        expect(z == 0);
+
+    };
 };
+
+

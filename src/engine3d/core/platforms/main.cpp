@@ -2,6 +2,7 @@
 #include <update_handlers/global_update.hpp>
 #include <core/engine_logger.hpp>
 #include <core/update_handlers/sync_update.hpp>
+
 extern int Main();
 
 

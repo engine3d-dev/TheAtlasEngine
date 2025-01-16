@@ -13,10 +13,10 @@ namespace engine3d{
     static int s_LocalUpdateCounter = 0;
     static int s_LocalFrameratePerSecond = 0;
     static int s_RandomFrame;
-    std::vector<std::function<void()>> SyncUpdate::s_SyncLateUpdateSubscribers;
-    std::vector<std::function<void()>> SyncUpdate::s_SyncUpdateSubscribers;
-    std::vector<std::function<void()>> SyncUpdate::s_SyncOnTickUpdateSubscribers;
-    std::vector<std::function<void()>> SyncUpdate::s_SyncRenderSubscribers;
+    std::deque<std::function<void()>> SyncUpdate::s_SyncLateUpdateSubscribers;
+    std::deque<std::function<void()>> SyncUpdate::s_SyncUpdateSubscribers;
+    std::deque<std::function<void()>> SyncUpdate::s_SyncOnTickUpdateSubscribers;
+    std::deque<std::function<void()>> SyncUpdate::s_SyncRenderSubscribers;
         // std::chrono::time_point<std::chrono::high_resolution_clock> m_LocalUpdateTime;
         
     // int m_MaxVariance;
@@ -36,10 +36,10 @@ namespace engine3d{
     void SyncUpdate::InitializeSyncUpdate()
     {
         ConsoleLogInfo("SyncUpdate::InitializeSyncUpdate Initialized!!");
-        s_SyncLateUpdateSubscribers = std::vector<std::function<void()>>();
-        s_SyncUpdateSubscribers = std::vector<std::function<void()>>();
-        s_SyncOnTickUpdateSubscribers = std::vector<std::function<void()>>();
-        s_SyncRenderSubscribers = std::vector<std::function<void()>>();
+        s_SyncLateUpdateSubscribers = std::deque<std::function<void()>>();
+        s_SyncUpdateSubscribers = std::deque<std::function<void()>>();
+        s_SyncOnTickUpdateSubscribers = std::deque<std::function<void()>>();
+        s_SyncRenderSubscribers = std::deque<std::function<void()>>();
 
         // s_LocalTimer = Timer();
         s_LocalTimer = Timer();

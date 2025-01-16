@@ -9,9 +9,9 @@ namespace engine3d::vk{
         static void Initialize();
         static VkInstance GetVkInstance() { return s_Instance; }
 
-        static VulkanPhysicalDriver GetPhysicalDriver() { return s_PhysicalDriver; }
+        static VulkanPhysicalDriver& GetPhysicalDriver() { return s_PhysicalDriver; }
 
-        static VulkanDriver GetDriver() { return s_Driver; }
+        static VulkanDriver& GetDriver() { return s_Driver; }
 
     private:
         static std::vector<const char*> InitializeValidationLayers();

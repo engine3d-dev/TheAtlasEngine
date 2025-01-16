@@ -1,35 +1,27 @@
 #pragma once
-#include <scene/scene_object.hpp>
-#include <scene/scene.hpp>
-#include <core/core.hpp>
-#include <map>
+#include "LevelScene.hpp"
 
 /**
- * @name EditorScene
+ * @name EditorWorld
+ * @note Dummy implementation of our world
+ * @note What does WorldScope mean?
+ *      - WorldScope means you are creating a container of multiple scenes
+ *      - Each container will contain a mixture of a octal-tree and BVH structure that helps to know when player enters specific scene areas
+ *      - Rather then having the octal-tree per scene, we have that be part of the world structure
 */
-class EditorWorld{
-public:
-    EditorWorld();
-    EditorWorld(const std::string& p_Tag);
 
-    void OnStart();
+namespace engine3d{
+    class EditorWorld{
+    public:
+        EditorWorld();
+        EditorWorld(const std::string& p_Tag);
 
-    void OnStop();
+        void OnUpdate();
 
-
-    void OnUpdate();
-
-    //! @note These are going to be all render targets
-    // std::map<std::string, engine3d::Ref<engine3d::SceneNode>>& GetAllWorldObjects() { return m_SceneEntities; }
-
-    //! TODO: We can move this somewhere
-    //! @note For now, this is going to be called from the renderer
-    //! @note Renderer::RenderScene(Scene) takes in a scene to render
-    //! @note Eventually this is what the scene render will utilize.
-    // engine3d::Ref<SceneNode> GetWorldScene() { return m_Scene1; }
-    // engine3d::Ref<engine3d::SceneNode> GetOneSceneNode() { return new_node1; }
-    // std::span<engine3d::SceneNode> GetAllSceneNodes() { return m_ChildrenSceneNodes; }
-private:
-    std::map<std::string, engine3d::Ref<engine3d::SceneNode>> m_SceneEntities;
-    engine3d::Scene m_Scene1;
-};
+    private:
+        engine3d::WorldScope m_MainWorld;
+        //! TODO: Would be handled by our system registry
+        engine3d::Ref<LevelScene> m_FirstLevelScene;
+        std::string m_Tag = "Undefined";
+    };
+}; // end of engine3d namespace

@@ -26,7 +26,7 @@ namespace engine3d{
     // std::mutex g_GlobalLock;
     // std::condition_variable g_GlobalConditional; 
 
-    std::vector<std::function<void()>> GlobalUpdate::s_ApplicationUpdateSubscribers;
+    std::deque<std::function<void()>> GlobalUpdate::s_ApplicationUpdates;
 
     void GlobalUpdate::Initialize(){
         s_GlobalTimer = Timer();
@@ -37,14 +37,14 @@ namespace engine3d{
         s_UpdateTimer = s_GlobalTimer.GetCurrentTime();
         s_MaxFrameratePerSecond = 100;
         s_FrameratePerSecondCounter = 1;
-        s_ApplicationUpdateSubscribers = std::vector<std::function<void()>>();
+        s_ApplicationUpdates = std::deque<std::function<void()>>();
         ConsoleLogInfo("F1 to see global time and F2 to see local time");
     }
 
     void GlobalUpdate::GlobalOnTickUpdate(){
         s_FrameratePerSecondMaintainTimer.Reset();
 
-        for(const auto& app_update : s_ApplicationUpdateSubscribers){
+        for(const auto& app_update : s_ApplicationUpdates){
             app_update();
         }
 

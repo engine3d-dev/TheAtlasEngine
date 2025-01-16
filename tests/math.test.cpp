@@ -1,10 +1,9 @@
-
-#include <boost/ut.hpp>
 #include <core/math/types.hpp>
 
 
 #include <Jolt/Jolt.h>
 #include <Jolt/Math/Vec4.h>
+#include <boost/ut.hpp>
 
 namespace engine3d{
     /**
@@ -69,14 +68,6 @@ private:
     JPH::Vec3 m_Position;
 };
 
-boost::ut::suite<"engine3d::glm_vec3"> plain_vec3_test = [](){
-    using namespace boost::ut;
-
-    engine3d::vec3 pl_vec3 = glm::vec3{2, 3, 4};
-    glm::vec3 expected = {2, 3, 4};
-    expect(expected == pl_vec3);
-};
-
 /**
  * @name engine3d::custom_vec3 test suite
  * @note Tests for customizable data types that can be defined by the user.
@@ -84,7 +75,23 @@ boost::ut::suite<"engine3d::glm_vec3"> plain_vec3_test = [](){
  *       the computation to be done with math library of their choice
  * @note All that is required is that they just need to convert to glm::vec2, vec3, or vec4 and other glm types
 */
-boost::ut::suite<"engine3d::custom_vec3"> vec3_test = [](){
+
+
+
+boost::ut::suite<"::basic_vec3"> original_vec3_test = [](){
+    using namespace boost::ut;
+
+    "basic_vec3_unit1_test"_test = [](){
+        glm::vec3 original_val = {1, 2, 3};
+        // engine3d::vec3 unit1_test = {1, 2, 3};
+        engine3d::vec3 unit1 = {{1.f, 2.f, 3.f}};
+
+
+        expect(original_val == unit1);
+    };
+};
+
+boost::ut::suite<"::custom_vec3"> vec3_test = [](){
     using namespace boost::ut;
 
     "custom_vec3"_test = [](){

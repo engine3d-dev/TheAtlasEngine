@@ -49,6 +49,7 @@ namespace engine3d{
 		vk::vk_check(vkCreateDescriptorPool(vk::VulkanContext::GetDriver(), &desc_pool_create_info, nullptr, &imgui_pool), "vkCreateDescriptorPool", __FILE__, __LINE__, __FUNCTION__);
 		ConsoleLogInfo("After creating descriptor sets for IMGUI");
 
+		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
@@ -101,7 +102,7 @@ namespace engine3d{
 		// ConsoleLogInfo("Begin() from imgui backend called!");
 		ImGui_ImplVulkan_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
-		ImGui::NewFrame();
+		ImGui::ShowDemoWindow();
 	}
 
     void ImGuiBackend::End(){

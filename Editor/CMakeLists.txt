@@ -5,8 +5,13 @@ project(Editor CXX)
 build_demos(
     SOURCES
     Application.cpp
+
     EditorWorld.hpp
     EditorWorld.cpp
+
+    LevelScene.hpp
+    LevelScene.cpp
     
-    LINK_PACKAGES engine3d
+    LINK_PACKAGES
+    engine3d
 )

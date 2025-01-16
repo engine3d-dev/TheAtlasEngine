@@ -10,8 +10,10 @@ layout(location = 3) in vec2 Uv;
 layout(location = 0) out vec3 fragColor;
 
 layout(push_constant) uniform Push {
-    mat4 Transform; // proj * view * model
-    mat4 ModelMatrix;
+    // mat4 Transform; // proj * view
+    mat4 Projection;
+    mat4 View;
+    mat4 Model;
     vec3 LightTransform;
 } push;
 
@@ -24,10 +26,11 @@ vec3 dir_to_light = normalize(push.LightTransform);
 
 void main(){
     // vec4 worldPositionSpace = push.ModelMatrix * vec3(Position, 1.0);
-    gl_Position = push.Transform * vec4(Position, 1.0);
+    mat4 transform = push.Projection * push.View;
+    gl_Position = transform * vec4(Position, 1.0);
 
     // mat3 normal_mat = transpose(inverse(mat3(push.ModelMatrix)));
-    vec3 normalize_world_space = normalize(mat3(push.ModelMatrix) * Normals);
+    vec3 normalize_world_space = normalize(mat3(push.Model) * Normals);
     float LightIntensity = max(dot(normalize_world_space, dir_to_light), 0) / 1.5f;
 
     // fragColor = Color;

@@ -38,12 +38,16 @@ set(
     ${INCLUDE_DIR}/core/math/math.hpp
     ${INCLUDE_DIR}/core/math/types.hpp
 
+    # System-related stuff
+    ${INCLUDE_DIR}/core/system_framework/system_registry.hpp
+
     # Scene Stuff
-    # ${INCLUDE_DIR}/scene/ecs/registry.hpp
-    ${INCLUDE_DIR}/scene/scene.hpp
+    ${INCLUDE_DIR}/scene/components/components.hpp
+    ${INCLUDE_DIR}/core/scene/scene.hpp
+    ${INCLUDE_DIR}/core/scene/world.hpp
+
     ${INCLUDE_DIR}/scene/scene_object.hpp
     ${INCLUDE_DIR}/scene/ecs/entity.hpp
-    ${INCLUDE_DIR}/scene/components/components.hpp
 
 
     ## Renderer stuff
@@ -91,10 +95,12 @@ set(
     ${SRC_DIR}/core/platforms/main.cpp
     ${SRC_DIR}/core/platforms/win32.cpp
 
+    # System-related stuff
+    ${SRC_DIR}/core/system_framework/system_registry.cpp
+
     # Scene stuff
-    ${SRC_DIR}/scene/scene.cpp
+    ${SRC_DIR}/core/scene/world.cpp
     ${SRC_DIR}/scene/ecs/entity.cpp
-    # ${SRC_DIR}/scene/scene_node.cpp
 
     # Geometry-stuff
     ${SRC_DIR}/core/geometry/mesh.cpp

@@ -1,4 +1,5 @@
 #include <boost/ut.hpp>
+#include <core/scene/scene.hpp>
 
 /**
  * @name Scene Test
@@ -10,6 +11,12 @@
  * @note Test: When we create quad/octal trees we can use them to see if we switch in between different scenes.
  * @note Test: Creating various scene structures and validate them
 */
-boost::ut::suite<"engine3d::scene"> scene_test = [](){
+boost::ut::suite<"::scene"> scene_test = [](){
     using namespace boost::ut;
+
+
+    "create_object"_test = [](){
+        
+    };
+
 };

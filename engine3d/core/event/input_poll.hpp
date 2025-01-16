@@ -25,7 +25,7 @@ namespace engine3d{
             InputState PreviousButtonState = InputState::NONE;
         };
 
-        //! @note Contains all our controller property information
+        //! @note Defines per Joystick Information
         struct ControllerProperties{
             int ID = -1;
             std::string JoystickName = "Default";
@@ -41,11 +41,11 @@ namespace engine3d{
         //! @note Key/Mouse event pressed!
         static bool IsKeyPressed(KeyCode keycode);
 
-        //! TODO: IsKeyDown(KeyCode)
+        static bool IsKeyReleased(KeyCode keyCode);
 
         static bool IsMousePressed(MouseCode mouseCode);
 
-        //! TODO: IsMouseDown(MouseCode);
+        static bool IsMouseReleased(MouseCode mouseCode);
 
         //! @note Mouse Position
         static glm::vec2 GetMousePosition();
@@ -63,8 +63,6 @@ namespace engine3d{
 
         static float GetControllerAxis(int p_Controller, int p_Index);
 
-        // static bool IsControllerButtonPressed(int p_ControllerID);
-
         static bool IsControllerButtonReleased(int p_ControllerID, int p_Button);
 
         //! @note Assuring that our events are correctly being updated
@@ -72,7 +70,9 @@ namespace engine3d{
 
         static void WaitForEvents();
 
-        static bool IsControllerPresent(int p_ControllerID, int p_Btn);
+        static bool IsControllerButtonPressed(unsigned char button);
+
+        static bool IsControllerButtonReleased(unsigned char button);
 
         static std::map<int, ControllerProperties> GetControllers() { return s_Controllers; }
     private:
