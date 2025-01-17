@@ -124,9 +124,7 @@ namespace engine3d::vk{
             {FLOAT, offsetof(Vertex, Normals)},
             {FLOAT, offsetof(Vertex, Uv)}
         };
-    
     */
-
     std::vector<VkVertexInputAttributeDescription> VulkanShader::GetVertexAttributeDescriptions(){
         std::vector<VkVertexInputAttributeDescription> attribute_description{};
 
