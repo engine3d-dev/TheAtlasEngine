@@ -295,25 +295,29 @@ namespace engine3d::vk{
         auto current_cmd_buffer = GetCurrentCommandBuffer();
         
         vkCmdBindPipeline(current_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, g_Shader->GetGraphicsPipeline());
-        auto camera_transform = p_CameraObject->GetComponent<Transform>();
+        // auto camera_transform = p_CameraObject->GetComponent<Transform>();
         // auto camera_component = p_CameraObject->GetComponent<Camera>();
         auto* camera_component = p_CameraObject->GetComponent<engine3d::PerspectiveCamera>();
 
-        auto camera_position = camera_transform->Position;
+        // auto camera_position = camera_transform->Position;
         // auto camera_position = camera_component->Position;
         // auto& projection = camera_component.GetProjection();
         // auto proj_view = camera_component->GetProjection() * camera_component->GetView();
         auto obj_model = p_Object->GetModelMatrix();
 
+        // auto front_position_of_camera = camera_component->Front;
+        // p_Object->GetComponent<engine3d::Transform>()
 
-        // float delta_time = SyncUpdate::DeltaTime();
+
+        float delta_time = SyncUpdate::DeltaTime();
         PushConstantData push_const_data = {
-            // .Transform = proj_view,
             .Projection = camera_component->GetProjection(),
             .View = camera_component->GetView(),
             .Model = obj_model,
-            // .LightTransform = camera_position * delta_time
-            .LightTransform = camera_position - p_Object->GetComponent<Transform>()->Position
+            // .LightTransform = front_position_of_camera * delta_time
+            .LightTransform = camera_component->Position * delta_time
+            // .LightTransform = (front_position_of_camera - p_Object->GetComponent<engine3d::Transform>()->Position) * delta_time
+            // .LightTransform = p_Object->GetComponent<Transform>()->Position
             // .LightTransform = camera_position - p_Object->GetComponent<Transform>()->Position
         };
 
