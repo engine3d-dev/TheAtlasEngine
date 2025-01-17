@@ -126,6 +126,7 @@ namespace engine3d::vk{
         };
     
     */
+
     std::vector<VkVertexInputAttributeDescription> VulkanShader::GetVertexAttributeDescriptions(){
         std::vector<VkVertexInputAttributeDescription> attribute_description{};
 

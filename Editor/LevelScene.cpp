@@ -9,7 +9,7 @@ namespace engine3d{
         m_Sphere = this->CreateNewObject("sphere");
         Transform sphere_transform;
         sphere_transform.Position = {0.f, 0.f, 0.f};
-        sphere_transform.Scale = {.5f,.5f, .5f};
+        sphere_transform.Scale = {.5f,.5f, .5f
         m_Sphere->AddComponent<Transform>(sphere_transform);
         MeshComponent comp("3d_models/tutorial/sphere.obj");
         m_Sphere->AddComponent<MeshComponent>(comp);
