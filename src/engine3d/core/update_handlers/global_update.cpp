@@ -1,14 +1,13 @@
-#include "thread_utils/thread_utils.hpp"
+// #include "thread_utils/thread_utils.hpp"
 #include <core/update_handlers/global_update.hpp>
 #include <core/application_instance.hpp>
 #include <core/engine_logger.hpp>
 #include <core/update_handlers/sync_update.hpp>
 #include <chrono>
-#include <print>
 #include <core/event/key_event.hpp>
 #include <core/event/input_poll.hpp>
 #include <core/engine_logger.hpp>
-#include <condition_variable>
+// #include <condition_variable>
 
 namespace engine3d{
     static float s_GlobalDeltaTime = 0.0f;
