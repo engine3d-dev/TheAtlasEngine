@@ -1,38 +1,29 @@
-#include <core/update_handlers/sync_update.hpp>
-#include <core/engine_logger.hpp>
-#include <core/update_handlers/global_update.hpp>
 #include <core/application_instance.hpp>
-#include "EditorWorld.hpp"
-#include <renderer/renderer.hpp>
+#include <core/engine_logger.hpp>
+#include "editor_world.hpp"
 
-namespace engine3d{
-    class Application : public ApplicationInstance{
-    public:
-        Application(const std::string& p_Tag) : ApplicationInstance(p_Tag){
-            ConsoleLogFatal("Application::Application(std::string) gets called!");
-            m_World = CreateRef<EditorWorld>("Editor World");
-
-            GlobalUpdate::SubscribeApplicationUpdate(this, &Application::OnApplicationUpdate);
-
-        }
-
-        void OnApplicationUpdate(){
-            //! TODO: Currently renderer is being called per-level. This is not what we want.
-            //! @note What needs to happen is we provide a scene renderer.
-            /*
-            Scene Renderer
-            - Handles multiple-passes for us.
-            - Uses the draw call API's from the renderer to interface with the vulkan's API to do specific operations
-            - Whether this is drawing 2D line, 3D objects, telling which uniforms to update, etc
-            */
-            m_World->OnUpdate();
-        }
-
-    private:
-        Ref<EditorWorld> m_World;
-    };
-
-    Ref<ApplicationInstance> Initialize(){
-        return CreateRef<Application>("Editor");
+class application : public atlas::application_instance{
+public:
+    application(const atlas::application_settings& p_settings) : application_instance(p_settings){
+        console_log_fatal("Application::Application(std::string) gets called!");
+        m_world = atlas::create_ref<editor_world>("Editor World");
     }
+
+private:
+    atlas::ref<editor_world> m_world;
 };
+
+namespace atlas{
+    ref<application_instance> initialize_application(){
+        //! @note Settings to initiate our application
+        //! @note Settings that can be used to set specific properties of the application
+        application_settings settings = {
+            .Name = "Editor",
+            .Width = 1200,
+            .Height = 800
+            // .Width = 1800,
+            // .Height = 1200
+        };
+        return create_ref<application>(settings);
+    }
+}

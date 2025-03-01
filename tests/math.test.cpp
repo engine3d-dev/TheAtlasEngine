@@ -5,7 +5,7 @@
 #include <Jolt/Math/Vec4.h>
 #include <boost/ut.hpp>
 
-namespace engine3d{
+namespace atlas{
     /**
      * @name Specialized template
      * @note What this does is customizing to utilize a different mathematical data type
@@ -17,20 +17,20 @@ namespace engine3d{
     struct vector3<JPH::Vec3>{
         vector3() = default;
         
-        vector3(const JPH::Vec3& p_Other){
-            value = {p_Other.GetX(), p_Other.GetY(), p_Other.GetZ()};
+        vector3(const JPH::Vec3& p_other){
+            value = {p_other.GetX(), p_other.GetY(), p_other.GetZ()};
         }
 
         operator glm::vec3() {
             return value;
         }
 
-        glm::vec3 operator=(const JPH::Vec3& p_Other) {
-            return {p_Other.GetX(), p_Other.GetY(), p_Other.GetZ()};
+        glm::vec3 operator=(const JPH::Vec3& p_other) {
+            return {p_other.GetX(), p_other.GetY(), p_other.GetZ()};
         }
 
-        bool operator==(const glm::vec3& p_Other){
-            return (value.x == p_Other.x and value.y == p_Other.y and value.z == p_Other.z);
+        bool operator==(const glm::vec3& p_other){
+            return (value.x == p_other.x and value.y == p_other.y and value.z == p_other.z);
         }
 
     private:
@@ -50,26 +50,26 @@ namespace engine3d{
  * @note Looking at the example below. I just test to see if we can actually do addition, and basic arithmetic as a minimal example
  * @note We just check if the conversion to glm is happening correctly, checking for type conversion validation
 */
-class MockTestProjectile{
+class mock_test_projectile{
 public:
-    MockTestProjectile() = default;
+    mock_test_projectile() = default;
 
-    glm::vec3 GetPosition() const {
-        return engine3d::vector3<JPH::Vec3>(m_Position);
+    glm::vec3 get_position() const {
+        return atlas::vector3<JPH::Vec3>(m_position);
     }
 
-    void OnUpdate(){
-        m_Position = {0, 1, 2};
+    void on_update(){
+        m_position = {0, 1, 2};
         JPH::Vec3 my_value2 = {1, 2, 3}; // simulating some data
-        m_Position += my_value2;
+        m_position += my_value2;
     }
 
 private:
-    JPH::Vec3 m_Position;
+    JPH::Vec3 m_position;
 };
 
 /**
- * @name engine3d::custom_vec3 test suite
+ * @name atlas::custom_vec3 test suite
  * @note Tests for customizable data types that can be defined by the user.
  * @note This considers that if users want to utilize a different math library then they can override
  *       the computation to be done with math library of their choice
@@ -83,8 +83,8 @@ boost::ut::suite<"::basic_vec3"> original_vec3_test = [](){
 
     "basic_vec3_unit1_test"_test = [](){
         glm::vec3 original_val = {1, 2, 3};
-        // engine3d::vec3 unit1_test = {1, 2, 3};
-        engine3d::vec3 unit1 = {{1.f, 2.f, 3.f}};
+        // atlas::vec3 unit1_test = {1, 2, 3};
+        atlas::vec3 unit1 = {{1.f, 2.f, 3.f}};
 
 
         expect(original_val == unit1);
@@ -97,7 +97,7 @@ boost::ut::suite<"::custom_vec3"> vec3_test = [](){
     "custom_vec3"_test = [](){
         JPH::Vec3 my_value = {0, 1, 2};
 
-        engine3d::vector3<JPH::Vec3> vec3_unit = my_value;
+        atlas::vector3<JPH::Vec3> vec3_unit = my_value;
         glm::vec3 expected = {0, 1, 2};
 
 
@@ -108,8 +108,8 @@ boost::ut::suite<"::custom_vec3"> vec3_test = [](){
         JPH::Vec3 my_value = {0, 1, 2};
         JPH::Vec3 my_value2 = {1, 2, 3};
 
-        engine3d::vector3<JPH::Vec3> vec3_unit = my_value;
-        engine3d::vector3<JPH::Vec3> vec3_unit2 = (my_value + my_value2);
+        atlas::vector3<JPH::Vec3> vec3_unit = my_value;
+        atlas::vector3<JPH::Vec3> vec3_unit2 = (my_value + my_value2);
 
         auto vec3_unit2_result = vec3_unit2;
         
@@ -122,11 +122,11 @@ boost::ut::suite<"::custom_vec3"> vec3_test = [](){
     };
 
     "custom_vec3_mock_class"_test = [](){
-        MockTestProjectile mock;
-        mock.OnUpdate();
+        mock_test_projectile mock;
+        mock.on_update();
 
         glm::vec3 expected_unit2 = {1, 3, 5};
 
-        expect(expected_unit2 == mock.GetPosition());
+        expect(expected_unit2 == mock.get_position());
     };
 };

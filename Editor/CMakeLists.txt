@@ -1,17 +1,16 @@
 cmake_minimum_required(VERSION 3.27)
-project(Editor CXX)
+project(editor CXX)
 
-
-build_demos(
+build_application(
     SOURCES
-    Application.cpp
+    application.cpp
 
-    EditorWorld.hpp
-    EditorWorld.cpp
+    editor_world.hpp
+    editor_world.cpp
 
-    LevelScene.hpp
-    LevelScene.cpp
+    level_scene.hpp
+    level_scene.cpp
     
     LINK_PACKAGES
-    engine3d
+    atlas
 )
