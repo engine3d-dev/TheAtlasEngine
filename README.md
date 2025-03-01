@@ -1,28 +1,36 @@
-# Engine3d
-Open-source game engine to be used for developing games and working on cool projects.
+# The Atlas Engine
+Open-source game engine for maing games, building cool projects, and to work on amazing features with the satisfaction of using them during game jams.
 
 ## Prerequisites
 
-First before cloning Engine3D and building the project.
+Before contributing, you must go through the [getting start](https://engine3d-dev.github.io/getting_started) before continuing.
 
-Go through the installation steps at engine3d's website [getting start](https://engine3d-dev.github.io/getting_started)
+## How to build the engine
 
-## Clone Repository
-These steps assume you've already done the prerequisites step before building engine3d.
+To get started in contributing here are the steps to do so. Follow these instructions.
+
+## Clone the repository
+
 ```
-git clone https://github.com/engine3d-dev/engine3d
-cd engine3d
+git clone https://github.com/engine3d-dev/TheAtlasEngine
+cd TheAtlasEngine
 ```
 
-## Building Engine3D using Conan
-`conan create . -b missing` will build engine3d and all of its dependencies into your conan cache. `-b missing` means build with any missing dependencies that may be missing in your conan cache.
+## Build using Conan
 
-`conan build .` - After you do `conan create`, you can just build using the `conan build <directory>` to build engine3d.
+To build the project, run the following command below.
 
-## Running Engine3D
+> [!TIP]
+> `-b missing` is used to get the dependency's the project uses before building the project itself. To load that into conan cache for reusability.
 
-Your executable will be in the directory `./build/Release/Editor/Editor.exe`.
+```
+conan build . -b missing
+```
 
-If you run in debug mode then change the directory name from `Release` to `Debug`.
+## Run the Engine
 
-Example of the changes would be executed, `./build/Debug/Editor/Editor.exe`
+When running the project. The engine will compile with the editor project within the repository.
+
+Conan the C++ package manager will compile your executable into the build directory it generates you.
+
+You should be able to find it in the `./build/editor/editor`.
