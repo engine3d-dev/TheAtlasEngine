@@ -2,8 +2,8 @@
 #include <core/core.hpp>
 #include <vulkan/vulkan_core.h>
 
-namespace atlas{
-    class swapchain{
+namespace atlas {
+    class swapchain {
     public:
         static bool is_rebuild();
         static void reset_build();
@@ -42,7 +42,8 @@ namespace atlas{
     private:
         virtual void resize_status(bool) = 0;
         virtual bool swapchain_resized() = 0;
-        virtual void recreate_swapchain(uint32_t p_width, uint32_t p_height) = 0;
+        virtual void recreate_swapchain(uint32_t p_width,
+                                        uint32_t p_height) = 0;
         virtual VkSwapchainKHR vk_swapchain_handler() = 0;
         virtual VkRenderPass read_swapchain_renderpass() = 0;
         virtual VkFormat& read_swapchain_format() = 0;
@@ -50,9 +51,9 @@ namespace atlas{
         virtual VkFramebuffer read_framebuffer(uint32_t idx) = 0;
         virtual VkImageView read_image_view(uint32_t index) = 0;
         virtual VkExtent2D read_swapchain_extent() = 0;
-        virtual void submit_and_write_command_buffer(VkCommandBuffer* p_command_buffers) = 0;
+        virtual void submit_and_write_command_buffer(
+          VkCommandBuffer* p_command_buffers) = 0;
         virtual uint32_t read_acquire_next_frame() = 0;
         virtual uint32_t current_frame_per_tick() = 0;
-
     };
 };

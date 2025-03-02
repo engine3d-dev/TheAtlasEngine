@@ -1,159 +1,173 @@
 #include <core/serialize/serializer.hpp>
 #include <flecs/addons/cpp/entity.hpp>
+#include <fstream>
 #include <glm/fwd.hpp>
 #include <yaml-cpp/emitter.h>
 #include <yaml-cpp/yaml.h>
-#include <fstream>
 
-
-namespace YAML{
+namespace YAML {
     template<>
     struct convert<glm::vec2> {
-        static Node encode(const glm::vec2& rhs){
-			Node node;
-			node.push_back(rhs.x);
-			node.push_back(rhs.y);
+        static Node encode(const glm::vec2& rhs) {
+            Node node;
+            node.push_back(rhs.x);
+            node.push_back(rhs.y);
 
-			return node;
-		}
+            return node;
+        }
 
-		static bool decode(const Node& node, glm::vec2& rhs){
-			if(!node.IsSequence() || node.size() != 2)
-				return false;
+        static bool decode(const Node& node, glm::vec2& rhs) {
+            if (!node.IsSequence() || node.size() != 2)
+                return false;
 
-			rhs.x = node[0].as<float>();
-			rhs.y = node[1].as<float>();
+            rhs.x = node[0].as<float>();
+            rhs.y = node[1].as<float>();
 
-			return true;
-		}
+            return true;
+        }
     };
 
     template<>
     struct convert<glm::vec3> {
-        static Node encode(const glm::vec3& rhs){
-			Node node;
-			node.push_back(rhs.x);
-			node.push_back(rhs.y);
+        static Node encode(const glm::vec3& rhs) {
+            Node node;
+            node.push_back(rhs.x);
+            node.push_back(rhs.y);
             node.push_back(rhs.z);
 
-			return node;
-		}
+            return node;
+        }
 
-		static bool decode(const Node& node, glm::vec3& rhs){
-			if(!node.IsSequence() || node.size() != 2)
-				return false;
+        static bool decode(const Node& node, glm::vec3& rhs) {
+            if (!node.IsSequence() || node.size() != 2)
+                return false;
 
-			rhs.x = node[0].as<float>();
-			rhs.y = node[1].as<float>();
+            rhs.x = node[0].as<float>();
+            rhs.y = node[1].as<float>();
             rhs.z = node[2].as<float>();
 
-			return true;
-		}
+            return true;
+        }
     };
 
     template<>
-	struct convert<glm::vec4>{
+    struct convert<glm::vec4> {
 
-		static Node encode(const glm::vec4& rhs){
-			Node node;
-			node.push_back(rhs.x);
-			node.push_back(rhs.y);
-			node.push_back(rhs.z);
-			node.push_back(rhs.w);
-			
-			return node;
-		}
+        static Node encode(const glm::vec4& rhs) {
+            Node node;
+            node.push_back(rhs.x);
+            node.push_back(rhs.y);
+            node.push_back(rhs.z);
+            node.push_back(rhs.w);
 
-		static bool decode(const Node& node, glm::vec4& rhs){
-			if(!node.IsSequence() || node.size() != 4)
-				return false;
+            return node;
+        }
 
-			rhs.x = node[0].as<float>();
-			rhs.y = node[1].as<float>();
-			rhs.z = node[2].as<float>();
-			rhs.w = node[3].as<float>();
-			return true;
-		}
-	};
+        static bool decode(const Node& node, glm::vec4& rhs) {
+            if (!node.IsSequence() || node.size() != 4)
+                return false;
+
+            rhs.x = node[0].as<float>();
+            rhs.y = node[1].as<float>();
+            rhs.z = node[2].as<float>();
+            rhs.w = node[3].as<float>();
+            return true;
+        }
+    };
 };
 
-
-namespace atlas{
+namespace atlas {
     // static YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec2& v){
-	// 	out << YAML::Flow;
-	// 	out << YAML::BeginSeq << v.x << v.y << YAML::EndSeq;
-	// 	return out;
-	// }
+    // 	out << YAML::Flow;
+    // 	out << YAML::BeginSeq << v.x << v.y << YAML::EndSeq;
+    // 	return out;
+    // }
 
     /**
      * NativeScriptComponent
      * - Allows to bind user-native scripts to be binded to this component
      * - Allows for entities to do:
      * PropellerController propeller_data = { // do stuff... };
-     * 
-     * m_SceneObject->add<NativeScriptComponent>(&propeller_data); 
-     * const PropellerComponent* static_cast<Data>(m_SceneObject->get<NativeScriptComponent>()->Data);
-     * 
-    */
+     *
+     * m_SceneObject->add<NativeScriptComponent>(&propeller_data);
+     * const PropellerComponent*
+     * static_cast<Data>(m_SceneObject->get<NativeScriptComponent>()->Data);
+     *
+     */
 
-	static YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec3& v){
-		
-        // m_SceneObject->add<NativeScriptComponent>(&propeller_data); 
-        // const PropellerComponent* = static_cast<PropellerController>(m_SceneObject->get<NativeScriptComponent>()->Data);
-        
+    static YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec3& v) {
+
+        // m_SceneObject->add<NativeScriptComponent>(&propeller_data);
+        // const PropellerComponent* =
+        // static_cast<PropellerController>(m_SceneObject->get<NativeScriptComponent>()->Data);
+
         out << YAML::Flow;
-		out << YAML::BeginSeq << v.x << v.y << v.z  << YAML::EndSeq;
-		return out;
-	}
+        out << YAML::BeginSeq << v.x << v.y << v.z << YAML::EndSeq;
+        return out;
+    }
 
-	static YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec4& v){
-		out << YAML::Flow;
-		out << YAML::BeginSeq << v.x << v.y << v.z << v.w << YAML::EndSeq;
-		return out;
-	}
+    static YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec4& v) {
+        out << YAML::Flow;
+        out << YAML::BeginSeq << v.x << v.y << v.z << v.w << YAML::EndSeq;
+        return out;
+    }
 
     // actual serialization with yaml-cpp
-    static void serialize_entity(YAML::Emitter& output, const flecs::entity& p_entity){
+    static void serialize_entity(YAML::Emitter& output,
+                                 const flecs::entity& p_entity) {
         output << YAML::BeginMap;
 
-        output << YAML::Key << "Entity" << YAML::Value << p_entity.get<Tag>()->TagMetadata;
-        
+        output << YAML::Key << "Entity" << YAML::Value
+               << p_entity.get<Tag>()->TagMetadata;
 
-        if(p_entity.has<Transform>()){
+        if (p_entity.has<Transform>()) {
             output << YAML::Key << "Transform";
 
             output << YAML::BeginMap;
             auto transform = p_entity.get<Transform>();
-            output << YAML::Key << "Position" << YAML::Value << transform->Position;
+            output << YAML::Key << "Position" << YAML::Value
+                   << transform->Position;
             output << YAML::Key << "Scale" << YAML::Value << transform->Scale;
-            output << YAML::Key << "Rotation" << YAML::Value << transform->Rotation;
+            output << YAML::Key << "Rotation" << YAML::Value
+                   << transform->Rotation;
             output << YAML::Key << "Color" << YAML::Value << transform->Color;
             output << YAML::EndMap;
         }
 
-        if(p_entity.has<PerspectiveCamera>()){
+        if (p_entity.has<PerspectiveCamera>()) {
             output << YAML::Key << "Perspective Camera";
             // output << YAML::Key << "Camera" << YAML::Value;
 
             auto perspective_camera = p_entity.get<PerspectiveCamera>();
-            
+
             output << YAML::BeginMap;
-            output << YAML::Key << "Position" << YAML::Value << perspective_camera->Position;
-            output << YAML::Key << "Front" << YAML::Value << perspective_camera->Front;
-            output << YAML::Key << "Up" << YAML::Value << perspective_camera->Up;
-            output << YAML::Key << "Down" << YAML::Value << perspective_camera->Down;
-            output << YAML::Key << "Right" << YAML::Value << perspective_camera->Right;
-            output << YAML::Key << "Left" << YAML::Value << perspective_camera->Left;
-            output << YAML::Key << "Yaw" << YAML::Value << perspective_camera->Yaw;
-            output << YAML::Key << "Pitch" << YAML::Value << perspective_camera->Pitch;
-            output << YAML::Key << "MovementSpeed" << YAML::Value << perspective_camera->MovementSpeed;
-            output << YAML::Key << "MouseSensitivity" << YAML::Value << perspective_camera->MouseSensitivity;
-            output << YAML::Key << "Zoom" << YAML::Value << perspective_camera->Zoom;
+            output << YAML::Key << "Position" << YAML::Value
+                   << perspective_camera->Position;
+            output << YAML::Key << "Front" << YAML::Value
+                   << perspective_camera->Front;
+            output << YAML::Key << "Up" << YAML::Value
+                   << perspective_camera->Up;
+            output << YAML::Key << "Down" << YAML::Value
+                   << perspective_camera->Down;
+            output << YAML::Key << "Right" << YAML::Value
+                   << perspective_camera->Right;
+            output << YAML::Key << "Left" << YAML::Value
+                   << perspective_camera->Left;
+            output << YAML::Key << "Yaw" << YAML::Value
+                   << perspective_camera->Yaw;
+            output << YAML::Key << "Pitch" << YAML::Value
+                   << perspective_camera->Pitch;
+            output << YAML::Key << "MovementSpeed" << YAML::Value
+                   << perspective_camera->MovementSpeed;
+            output << YAML::Key << "MouseSensitivity" << YAML::Value
+                   << perspective_camera->MouseSensitivity;
+            output << YAML::Key << "Zoom" << YAML::Value
+                   << perspective_camera->Zoom;
 
             output << YAML::EndMap;
         }
 
-        if(p_entity.has<MeshComponent>()){
+        if (p_entity.has<MeshComponent>()) {
             output << YAML::Key << "Mesh Component";
             // output << YAML::Key << "Mesh" << YAML::Value;
 
@@ -161,7 +175,8 @@ namespace atlas{
 
             output << YAML::BeginMap;
 
-            output << YAML::Key << "Filepath" << YAML::Value << mesh_component->Filepath;
+            output << YAML::Key << "Filepath" << YAML::Value
+                   << mesh_component->Filepath;
 
             output << YAML::EndMap;
         }
@@ -169,27 +184,29 @@ namespace atlas{
         output << YAML::EndMap; // Entity
     }
 
-    serializer::serializer([[maybe_unused]] const scene_scope* p_scene_ctx){
+    serializer::serializer([[maybe_unused]] const scene_scope* p_scene_ctx) {
         m_current_scene_ctx = create_ref<scene_scope>(*p_scene_ctx);
     }
 
-    void serializer::save_as(const std::string& p_filepath){
+    void serializer::save_as(const std::string& p_filepath) {
         YAML::Emitter output;
         output << YAML::BeginMap;
-        output << YAML::Key << "Scene" << YAML::Value << m_current_scene_ctx->get_tag();
+        output << YAML::Key << "Scene" << YAML::Value
+               << m_current_scene_ctx->get_tag();
         output << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
 
-        flecs::world* world_object = atlas::system_registry::get_world().get_registry();
+        flecs::world* world_object =
+          atlas::system_registry::get_world().get_registry();
 
-        //! @note Queries in flecs the ecs framework are how we can query all entities that the engine (user creates through our API)
-        flecs::query<> q = world_object->query_builder()
-        .with<atlas::Tag>()
-        .build();
+        //! @note Queries in flecs the ecs framework are how we can query all
+        //! entities that the engine (user creates through our API)
+        flecs::query<> q =
+          world_object->query_builder().with<atlas::Tag>().build();
 
-        q.each([&output](flecs::entity p_entity_id){
+        q.each([&output](flecs::entity p_entity_id) {
             serialize_entity(output, p_entity_id);
         });
-        
+
         std::ofstream output_file(p_filepath);
         output_file << output.c_str();
     }

@@ -1,9 +1,8 @@
 #pragma once
 
-namespace atlas{
-    class VulkanImGui{
+namespace atlas {
+    class VulkanImGui {
     public:
-
     private:
     };
 };

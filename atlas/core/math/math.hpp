@@ -2,26 +2,27 @@
 #include <glm/detail/qualifier.hpp>
 #include <glm/fwd.hpp>
 
-namespace atlas{
+namespace atlas {
 
-    class Interpolation{
+    class Interpolation {
     public:
         template<typename T>
-        static T LinearInterpolate(T start, T end, std::function<float(float)> function, float t){
+        static T LinearInterpolate(T start,
+                                   T end,
+                                   std::function<float(float)> function,
+                                   float t) {
             float l_AdjustedTime = 0.0f;
-            if(!function){
+            if (!function) {
                 l_AdjustedTime = t;
             }
             else {
                 const float f = function(t);
                 l_AdjustedTime = f;
             }
-            
-
-            if(l_AdjustedTime < 0){
+            if (l_AdjustedTime < 0) {
                 l_AdjustedTime = 0.0f;
             }
-            if(l_AdjustedTime > 1.0f){
+            if (l_AdjustedTime > 1.0f) {
                 l_AdjustedTime = 1.0f;
             }
 
@@ -33,4 +34,4 @@ namespace atlas{
     private:
         Interpolation() = default;
     };
-};
+}; // namespace atlas

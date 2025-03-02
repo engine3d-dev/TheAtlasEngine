@@ -1,22 +1,27 @@
 #pragma once
-#include <flecs.h>
-#include <string>
 #include <core/scene/world.hpp>
 #include <core/system_framework/system_registry.hpp>
+#include <flecs.h>
+#include <string>
 
-namespace atlas{
+namespace atlas {
     /**
      * @name Entity
-     * @note Wrapper around specifically creating a type of entity wrapper around the flecs API
-     * @note It provides the same mechanism for adding, removing, and checking if components are stored.
-     * @note Flecs API specified that querying components are how they find/iterate through entities
-     *       - Queries are also used throughout parts of the API such as their systems and observers
-    */
-    class entity_t{
+     * @note Wrapper around specifically creating a type of entity wrapper
+     * around the flecs API
+     * @note It provides the same mechanism for adding, removing, and checking
+     * if components are stored.
+     * @note Flecs API specified that querying components are how they
+     * find/iterate through entities
+     *       - Queries are also used throughout parts of the API such as their
+     * systems and observers
+     */
+    class entity_t {
     public:
         entity_t() = default;
         entity_t(flecs::world* p_registry, const std::string& p_tag);
-        entity_t(const flecs::entity& p_entity) : m_entity_id(p_entity){}
+        entity_t(const flecs::entity& p_entity)
+          : m_entity_id(p_entity) {}
 
         ~entity_t();
 
@@ -24,23 +29,23 @@ namespace atlas{
         //! @note Knowing when this entity lifecyle's ended
         bool is_alive() const { return m_entity_id.is_alive(); }
 
-        void on_destruction(){
-            m_entity_id.destruct();
-        }
+        void on_destruction() { m_entity_id.destruct(); }
 
-        //! @note Creates component in the ECS storage but does not assign it with a value.
+        //! @note Creates component in the ECS storage but does not assign it
+        //! with a value.
         template<typename UComponent>
-        void add(){
+        void add() {
             m_entity_id.add<UComponent>();
         }
 
         template<typename UComponent>
-        void add(const UComponent& p_component){
+        void add(const UComponent& p_component) {
             m_entity_id.set<UComponent>(p_component);
         }
 
         //! @note Returns the component from the entity
-        //! @note Flecs has you return a pointer for checking if the component is found
+        //! @note Flecs has you return a pointer for checking if the component
+        //! is found
         //! @note If not found will return nullptr
         template<typename UComponent>
         const UComponent* get() const {
@@ -48,11 +53,14 @@ namespace atlas{
         }
 
         template<typename UComponent>
-        UComponent* get_mut() const{
-            return system_registry::get_world().get_registry()->get_mut<UComponent>(m_entity_id);
+        UComponent* get_mut() const {
+            return system_registry::get_world()
+              .get_registry()
+              ->get_mut<UComponent>(m_entity_id);
         }
 
-        //! @note Checks if specific component of type UComponent is provided to this entity
+        //! @note Checks if specific component of type UComponent is provided to
+        //! this entity
         template<typename UComponent>
         bool has() const {
             return m_entity_id.has<UComponent>();
@@ -61,37 +69,37 @@ namespace atlas{
         //! @note Setting a component
         /**
             TODO: Try to allow the set component to be set to its initial value
-                Initial value should be set when the component that is set is empty
-        
+                Initial value should be set when the component that is set is
+           empty
+
         */
         template<typename UComponent>
-        void set(const UComponent& p_component){
+        void set(const UComponent& p_component) {
             m_entity_id.set<UComponent>(p_component);
         }
 
         //! @note Set value for position and velocity component
-        //! @note Flecs state component will be added if entity doesn't have any.
+        //! @note Flecs state component will be added if entity doesn't have
+        //! any.
         /*
         template<typename T, typename U>
         void set(const T& p_Component1, const U& p_Component2){
-            //! @note When setting multiple components this is how flecs does it typically
-            //! @note flecs::entity::set returns a const entity& to set multiple components
-            m_entity_id.set<T, U>(p_Component1).set(p_Component2);
+            //! @note When setting multiple components this is how flecs does it
+        typically
+            //! @note flecs::entity::set returns a const entity& to set multiple
+        components m_entity_id.set<T, U>(p_Component1).set(p_Component2);
         }
         */
 
         template<typename UComponent>
-        void remove(){
+        void remove() {
             m_entity_id.remove<UComponent>();
         }
 
-        operator flecs::entity(){
-            return m_entity_id;
-        }
-
+        operator flecs::entity() { return m_entity_id; }
 
     private:
         // Keep in mind that an entity just represent a 64-bit number
         flecs::entity m_entity_id;
     };
-};
+}; // namespace atlas

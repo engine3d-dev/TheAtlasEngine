@@ -101,7 +101,7 @@ set(
 
 set(
     all_src
-    ${SRC_DIR}/core/application_instance.cpp
+    ${SRC_DIR}/core/application.cpp
     ${SRC_DIR}/core/event/event.cpp
 
     ${SRC_DIR}/thread_utils/thread_utils.cpp

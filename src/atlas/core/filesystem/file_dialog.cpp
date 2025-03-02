@@ -1,14 +1,16 @@
+#include <core/engine_logger.hpp>
 #include <core/filesystem/file_dialog.hpp>
 #include <engine3d-nfd/nfd.h>
-#include <core/engine_logger.hpp>
 
-namespace atlas::filesystem{
-    std::string LoadFromFileDialog(const std::string& p_filter){
+
+namespace atlas::filesystem {
+    std::string LoadFromFileDialog(const std::string& p_filter) {
         char* output_path = nullptr;
 
-        nfdresult_t result = NFD_OpenDialog(p_filter.c_str(), nullptr, &output_path);
+        nfdresult_t result =
+          NFD_OpenDialog(p_filter.c_str(), nullptr, &output_path);
 
-        if(result == NFD_OKAY){
+        if (result == NFD_OKAY) {
             return std::string(output_path);
         }
 
@@ -16,12 +18,13 @@ namespace atlas::filesystem{
         return "";
     }
 
-    std::string SaveToFile([[maybe_unused]] const std::string& p_filter){
+    std::string SaveToFile([[maybe_unused]] const std::string& p_filter) {
         char* output_path = nullptr;
 
-        nfdresult_t result = NFD_SaveDialog(p_filter.c_str(), nullptr, &output_path);
+        nfdresult_t result =
+          NFD_SaveDialog(p_filter.c_str(), nullptr, &output_path);
 
-        if(result == NFD_OKAY){
+        if (result == NFD_OKAY) {
             return std::string(output_path);
         }
 

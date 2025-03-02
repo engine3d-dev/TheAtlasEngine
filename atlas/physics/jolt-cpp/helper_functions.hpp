@@ -3,25 +3,24 @@
 #include <core/math/types.hpp>
 #include <glm/fwd.hpp>
 
-namespace atlas{
+namespace atlas {
     template<>
-    struct vector3<JPH::Vec3>{
+    struct vector3<JPH::Vec3> {
         vector3() = default;
-        
-        vector3(const JPH::Vec3& p_other){
-            value = {p_other.GetX(), p_other.GetY(), p_other.GetZ()};
+
+        vector3(const JPH::Vec3& p_other) {
+            value = { p_other.GetX(), p_other.GetY(), p_other.GetZ() };
         }
 
-        operator glm::vec3() {
-            return value;
-        }
+        operator glm::vec3() { return value; }
 
         glm::vec3 operator=(const JPH::Vec3& p_other) {
-            return {p_other.GetX(), p_other.GetY(), p_other.GetZ()};
+            return { p_other.GetX(), p_other.GetY(), p_other.GetZ() };
         }
 
-        bool operator==(const glm::vec3& p_other){
-            return (value.x == p_other.x and value.y == p_other.y and value.z == p_other.z);
+        bool operator==(const glm::vec3& p_other) {
+            return (value.x == p_other.x and value.y == p_other.y and
+                    value.z == p_other.z);
         }
 
     private:
@@ -29,10 +28,11 @@ namespace atlas{
     };
 };
 
-namespace atlas::physics{
+namespace atlas::physics {
     /**
-     * @note So after dealing with this, we may need to figure out how we may want to handle these
-    */
+     * @note So after dealing with this, we may need to figure out how we may
+     * want to handle these
+     */
 
     /* Converting from glm::vec3 to a jolt's vec3 math data type */
     JPH::RVec3 to_rvec3(const glm::vec3& p_Value);

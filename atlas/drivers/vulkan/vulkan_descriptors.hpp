@@ -1,9 +1,8 @@
 #pragma once
 
-namespace atlas::vk{
+namespace atlas::vk {
 
-    class VulkanDescriptorSets{
+    class VulkanDescriptorSets {
     public:
-        
     };
 };

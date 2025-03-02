@@ -1,7 +1,7 @@
 #pragma once
 
-namespace atlas{
-    class ImGuiBackend{
+namespace atlas {
+    class ImGuiBackend {
     public:
         static void Initialize();
 

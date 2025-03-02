@@ -3,14 +3,20 @@
 #include <core/scene/scene.hpp>
 #include <string>
 
-namespace atlas{
-    class serializer{
+namespace atlas {
+    class serializer {
     public:
-        serializer(const scene_scope* p_scene_ctx);
+      serializer(const scene_scope* p_scene_ctx);
 
-        void save_as(const std::string& p_filepath);
+      void save_as(const std::string& p_filepath);
+
+      template<typename T>
+      void add() {
+          return T();
+      }
 
     private:
-        ref<scene_scope> m_current_scene_ctx;
+      ref<scene_scope> m_current_scene_ctx;
     };
-};
+
+}; // namespace atlas

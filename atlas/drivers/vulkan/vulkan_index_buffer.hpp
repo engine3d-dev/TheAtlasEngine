@@ -1,15 +1,17 @@
 #pragma once
 #include <drivers/index_buffer.hpp>
 
-namespace atlas::vk{
+namespace atlas::vk {
     class vk_index_buffer : public index_buffer {
     public:
         vk_index_buffer(const std::vector<uint32_t>& p_Indices);
         virtual ~vk_index_buffer();
 
     private:
-        void bind_to_index_buffer(const VkCommandBuffer& p_command_buffer) override;
-        void render_index_buffer(const VkCommandBuffer& p_command_buffer) override;
+        void bind_to_index_buffer(
+          const VkCommandBuffer& p_command_buffer) override;
+        void render_index_buffer(
+          const VkCommandBuffer& p_command_buffer) override;
         bool contains_indices() const override;
 
     private:

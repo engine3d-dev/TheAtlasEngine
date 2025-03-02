@@ -1,6 +1,4 @@
 
-namespace engine3d{
-};
+namespace engine3d {};
 
-int main(){
-}
+int main() {}

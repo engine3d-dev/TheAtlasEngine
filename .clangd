@@ -2,9 +2,12 @@ If:
   PathMatch: test_package/.*
   CompileFlags:
     CompilationDatabase: .
-    IncludeStyle: never
-Diagnostics:
-  UnusedIncludes: Strict
 Else:
   CompileFlags:
+    IncludeStyle: never
     CompilationDatabase: .
+
+Diagnostics:
+  UnusedIncludes: Strict
+CommandlineFlags: #This section DOES NOT exist.
+  HeaderInsertion: never #This is NOT a valid setting.

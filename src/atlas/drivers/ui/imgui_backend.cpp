@@ -3,7 +3,7 @@
 #include "drivers/vulkan/vulkan_renderer.hpp"
 #include "engine_logger.hpp"
 #include <drivers/ui/imgui_backend.hpp>
-#include <core/application_instance.hpp>
+#include <core/application.hpp>
 #include <drivers/vulkan/vulkan_context.hpp>
 #include <imgui.h>
 #include <imgui/backends/imgui_impl_glfw.h>
@@ -147,7 +147,7 @@ namespace atlas{
 
 		//! @note Creating separate render pass for imgui
 		VkAttachmentDescription attachment_description = {
-			.format = application_instance::get_window().get_current_swapchain()->get_swapchain_format(),
+			.format = application::get_window().get_current_swapchain()->get_swapchain_format(),
 			.samples = VK_SAMPLE_COUNT_1_BIT,
 			.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD,
 			.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
@@ -193,9 +193,9 @@ namespace atlas{
 
 		// static_assert(false, "Error from static_assert!");
 		// assert(true);
-		// auto swapchain_images_size = application_instance::get_window().get_current_swapchain()->get_images_size();
+		// auto swapchain_images_size = application::get_window().get_current_swapchain()->get_images_size();
 		
-		auto swapchain = application_instance::get_window().get_current_swapchain();
+		auto swapchain = application::get_window().get_current_swapchain();
 		auto swapchain_images_size = swapchain->get_images_size();
 
 		// Creating viewport framebuffers
@@ -211,8 +211,8 @@ namespace atlas{
 				.renderPass = s_ViewportRenderpass,
 				.attachmentCount = 1,
 				.pAttachments = attachment,
-				.width = application_instance::get_window().get_current_swapchain()->get_extent().width,
-				.height = application_instance::get_window().get_current_swapchain()->get_extent().height,
+				.width = application::get_window().get_current_swapchain()->get_extent().width,
+				.height = application::get_window().get_current_swapchain()->get_extent().height,
 				.layers = 1,
 			};
 
@@ -272,17 +272,17 @@ namespace atlas{
 		}
 
 		// this initializes imgui for Vulkan
-		ImGui_ImplGlfw_InitForVulkan(application_instance::get_window().get_native_window(), true);
+		ImGui_ImplGlfw_InitForVulkan(application::get_window().get_native_window(), true);
 		ImGui_ImplVulkan_InitInfo init_info = {};
 		init_info.Instance = vk::vk_context::get_vk_instance();
 		init_info.PhysicalDevice = vk::vk_context::get_current_selected_physical_driver();
 		init_info.Device = g_Driver;
 		init_info.Queue = g_Driver.get_graphics_queue();
-		init_info.RenderPass = application_instance::get_window().get_current_swapchain()->get_renderpass();
+		init_info.RenderPass = application::get_window().get_current_swapchain()->get_renderpass();
 		init_info.PipelineCache = VK_NULL_HANDLE;
 		init_info.DescriptorPool = s_DescriptorPool;
 		init_info.MinImageCount = 2;
-		init_info.ImageCount = application_instance::get_window().get_current_swapchain()->get_images_size();
+		init_info.ImageCount = application::get_window().get_current_swapchain()->get_images_size();
 		init_info.UseDynamicRendering = false;
 
 
@@ -291,7 +291,7 @@ namespace atlas{
 		//dynamic rendering parameters for imgui to use
 		// init_info.PipelineRenderingCreateInfo = { .sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO };
 		// init_info.PipelineRenderingCreateInfo.colorAttachmentCount = 1;
-		// init_info.PipelineRenderingCreateInfo.pColorAttachmentFormats = (const VkFormat*)application_instance::get_window().get_current_swapchain()->get_swapchain_format();
+		// init_info.PipelineRenderingCreateInfo.pColorAttachmentFormats = (const VkFormat*)application::get_window().get_current_swapchain()->get_swapchain_format();
 
 		init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
 		ImGui_ImplVulkan_Init(&init_info);
@@ -314,7 +314,7 @@ namespace atlas{
 		auto current_cmd_buffer = vk::vk_renderer::current_command_buffer();
 
 		int width, height;
-		glfwGetFramebufferSize(application_instance::get_window(), &width, &height); // Or use glfwget_windowSize
+		glfwGetFramebufferSize(application::get_window(), &width, &height); // Or use glfwget_windowSize
 		updateViewport(current_cmd_buffer, width, height); // Pass window width and height for initial viewport setup
 
 
