@@ -3,14 +3,16 @@
 #include <thread_utils/thread.hpp>
 #include <vector>
 
-namespace atlas{
+namespace atlas {
     /**
      * @name Thread Manager
-     * @note Might get replaced by task graph since this allows us to synchronously work with different tasks while still being in parallel
-     * @note Here are the purpose thread pools should be handling for the time being.API
+     * @note Might get replaced by task graph since this allows us to
+     * synchronously work with different tasks while still being in parallel
+     * @note Here are the purpose thread pools should be handling for the time
+     * being.API
      * @note 1.) Lifetime of threads (render, physics, audio)
-    */
-    class thread_manager{
+     */
+    class thread_manager {
     public:
         thread_manager();
         ~thread_manager();
@@ -22,6 +24,7 @@ namespace atlas{
     private:
         void update_sync_function();
         void update_parallel_function();
+
     private:
         bool m_thread_stop = false;
         thread m_sync_update_thread;

@@ -1,16 +1,14 @@
 #pragma once
 
-namespace atlas{
+namespace atlas {
     /**
      * @name Parallel Updates
-     * @note The workload handles 
-    */
-    class ParallelUpdateManager{
+     * @note The workload handles
+     */
+    class ParallelUpdateManager {
     public:
         ParallelUpdateManager() = delete;
 
         static void InitializeParallel();
-
-        
     };
 };

@@ -1,16 +1,18 @@
 #pragma once
+#include <drivers/renderer_backend.hpp>
 #include <string>
 #include <vulkan/vulkan_core.h>
-#include <drivers/renderer_backend.hpp>
 
-namespace atlas::vk{
+
+namespace atlas::vk {
     /**
      * @name vk_renderer
      * @note vulkan-backend specific renderer
      * @note renderer that is implemented with the vulkan's API
-     * @note Provide an API on directly submitting tasks to the vulkan API that gets send directly to the GPU
-    */
-    class vk_renderer : public render_context{
+     * @note Provide an API on directly submitting tasks to the vulkan API that
+     * gets send directly to the GPU
+     */
+    class vk_renderer : public render_context {
     public:
         vk_renderer(const std::string& Tag);
 
@@ -31,11 +33,14 @@ namespace atlas::vk{
 
         void draw_scene_object(ref<scene_object>& p_current_object) override;
 
-        void draw_object_with_camera(ref<scene_object>& p_object, ref<scene_object>& p_camera) override;
+        void draw_object_with_camera(ref<scene_object>& p_object,
+                                     ref<scene_object>& p_camera) override;
 
     private:
-        //! @note TODO: Moving VkPipeline/VkPipelineLayout out of the renderer and asbtracting this.
+        //! @note TODO: Moving VkPipeline/VkPipelineLayout out of the renderer
+        //! and asbtracting this.
         void initialize_pipeline();
+
     private:
     };
 };

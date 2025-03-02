@@ -1,29 +1,29 @@
 #pragma once
 #include <core/event/key_codes.hpp>
 #include <core/event/mouse_codes.hpp>
+#include <glm/glm.hpp>
 #include <map>
 #include <string>
-#include <glm/glm.hpp>
 
-namespace atlas::event{
+namespace atlas::event {
     /**
      * @name event.hpp
-     * @note Actual input polling system to poll in differeny sets of key/mouse actions
-     * @param UpdateEvents handles making sure that all of our events we handle have been successfully updated.
+     * @note Actual input polling system to poll in differeny sets of key/mouse
+     * actions
+     * @param UpdateEvents handles making sure that all of our events we handle
+     * have been successfully updated.
      * @param GetMousePos just returns the position of our mouse cursor
      */
-    enum input_state{
-        None, Idle, Pressed, Released
-    };
+    enum input_state { None, Idle, Pressed, Released };
 
-    struct joystick_button{
+    struct joystick_button {
         int ID = -1;
         std::string Name = "";
         input_state ButtonState = input_state::None;
         input_state PreviousButtonState = input_state::None;
     };
 
-    struct joystick_info{
+    struct joystick_info {
         int ID = -1;
         std::string JoystickName = "Default";
         std::map<int, joystick_button> Buttons;
@@ -39,7 +39,6 @@ namespace atlas::event{
     bool is_mouse_released(MouseCode p_mouse_code);
 
     glm::vec2 cursor_position();
-
 
     // joystic-specific functions
 
@@ -59,4 +58,4 @@ namespace atlas::event{
     void update_events();
 
     void wait_for_events();
-};
+}; // namespace atlas::event

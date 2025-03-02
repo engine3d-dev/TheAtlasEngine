@@ -1,0 +1,19 @@
+Language: Cpp
+BasedOnStyle: Mozilla
+IndentWidth: 4
+UseTab: Never
+NamespaceIndentation: All
+ColumnLimit: 80
+AlwaysBreakAfterReturnType: None
+AccessModifierOffset: -4 # Align access specifiers with class keyword
+PointerAlignment: Left
+BreakBeforeBraces: Custom
+SortIncludes: false
+BraceWrapping:
+  AfterFunction: false # Allman style for function definitions
+  AfterClass: false # Allman style for class definitions
+  AfterNamespace: false # Allman style for namespaces
+  BeforeElse: true # Allman style for else
+  BeforeCatch: true # Allman style for catch
+  BeforeWhile: true # Allman style for while in do-while
+  IndentBraces: false # Do not indent brace

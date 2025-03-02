@@ -1,7 +1,8 @@
-#include <core/scene/scene.hpp>
 #include <core/engine_logger.hpp>
+#include <core/scene/scene.hpp>
 
-namespace atlas{
+
+namespace atlas {
 
     // scene_scope::scene_scope(const std::string& p_tag) : m_tag(p_tag){
     //     console_log_error("scene_scope Instantiated!");
@@ -19,7 +20,6 @@ namespace atlas{
     //     // return scene_object(&m_EntityRegistry, p_tag);
     //     return scene_object(m_EntityRegistry, p_tag);
     // }
-
 
     // void scene_scope::Test(){}
 };

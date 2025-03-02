@@ -1,8 +1,8 @@
 #pragma once
 #include <chrono>
 
-namespace atlas{
-    class timer{
+namespace atlas {
+    class timer {
 
     public:
         timer();
@@ -13,10 +13,11 @@ namespace atlas{
 
         float seconds();
 
-        std::chrono::time_point<std::chrono::high_resolution_clock> current_time();
+        std::chrono::time_point<std::chrono::high_resolution_clock>
+        current_time();
 
     private:
-        std::chrono::time_point<std::chrono::high_resolution_clock> m_stop_watch;
-
+        std::chrono::time_point<std::chrono::high_resolution_clock>
+          m_stop_watch;
     };
 };

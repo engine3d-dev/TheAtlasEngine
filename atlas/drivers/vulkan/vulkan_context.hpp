@@ -1,14 +1,17 @@
 #pragma once
-#include <vulkan/vulkan.hpp>
 #include <drivers/vulkan/vulkan_driver.hpp>
+#include <vulkan/vulkan.hpp>
 
-namespace atlas::vk{
-    class vk_context{
+
+namespace atlas::vk {
+    class vk_context {
     public:
         static void initialize();
         static VkInstance get_vk_instance() { return s_instance; }
 
-        static vk_physical_driver& get_current_selected_physical_driver() { return s_physical_driver; }
+        static vk_physical_driver& get_current_selected_physical_driver() {
+            return s_physical_driver;
+        }
 
         static vk_driver& get_current_driver() { return s_driver; }
 

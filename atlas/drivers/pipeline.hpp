@@ -1,8 +1,7 @@
 #pragma once
 
-
-namespace atlas{
-    class Pipeline{
+namespace atlas {
+    class Pipeline {
     public:
         Pipeline() = default;
     };
