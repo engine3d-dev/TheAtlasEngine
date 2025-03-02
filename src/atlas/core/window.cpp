@@ -3,22 +3,20 @@
 #include <core/engine_logger.hpp>
 #include <core/window.hpp>
 #include <string>
-
-// #include <imgui/backends/imgui_impl_glfw.h>
 #include <drivers/vulkan/vulkan_window.hpp>
 
 namespace atlas {
-    static uint32_t g_WindowWidth = -1;
-    static uint32_t g_WindowHeight = -1;
+    static uint32_t g_width = -1;
+    static uint32_t g_height = -1;
 
-    ref<window> window::create(uint32_t Width,
-                               uint32_t Height,
-                               const std::string& Tag) {
-        g_WindowWidth = Width;
-        g_WindowHeight = Height;
+    ref<window> window::create(uint32_t p_width,
+                               uint32_t p_height,
+                               const std::string& p_tag) {
+        g_width = p_width;
+        g_height = p_height;
         switch (application::current_api()) {
             case VULKAN:
-                return create_ref<vk::vk_window>(Width, Height, Tag);
+                return create_ref<vk::vk_window>(p_width, p_height, p_tag);
             default:
                 console_log_error(
                   "API that was input was not specifiying valid backend!");
@@ -33,11 +31,11 @@ namespace atlas {
     }
 
     uint32_t window::get_width() const {
-        return g_WindowWidth;
+        return g_width;
     }
 
     uint32_t window::get_height() const {
-        return g_WindowHeight;
+        return g_height;
     }
 
     bool window::is_active() const {
@@ -45,7 +43,6 @@ namespace atlas {
     }
 
     void window::close() {
-        // glfwDestroyWindow(get_native_window());
         glfwSetWindowShouldClose(get_native_window(), true);
     }
 

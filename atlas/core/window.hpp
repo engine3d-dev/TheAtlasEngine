@@ -11,9 +11,9 @@ namespace atlas {
     public:
         virtual ~window() = default;
         static ref<window> create(
-          uint32_t Width,
-          uint32_t Height,
-          const std::string& Tag = "Undefined Window Title");
+          uint32_t p_width,
+          uint32_t p_height,
+          const std::string& p_tag = "Undefined Window Title");
 
         GLFWwindow* get_native_window() const;
 
