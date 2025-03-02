@@ -13,9 +13,6 @@ private:
 
 namespace atlas {
     ref<application> initialize_application() {
-        //! @note Settings to initiate our application
-        //! @note Settings that can be used to set specific properties of the
-        //! application
         application_settings settings = {
             .Name = "Editor",
             .Width = 1200,
@@ -25,4 +22,4 @@ namespace atlas {
         return create_ref<editor_application>(settings);
     }
 
-} // namespace atlas
+} // end of namespace atlas
