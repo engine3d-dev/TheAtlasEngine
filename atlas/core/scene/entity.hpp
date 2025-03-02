@@ -79,17 +79,19 @@ namespace atlas {
         }
 
         //! @note Set value for position and velocity component
-        //! @note Flecs state component will be added if entity doesn't have
-        //! any.
-        /*
-        template<typename T, typename U>
-        void set(const T& p_Component1, const U& p_Component2){
+        //! @note Flecs set component will be added if entity doesn't the
+        //! component
+        //! @note This is for setting multiple different components to be stored
+        //! into the entity
+        template<typename UComponent1, typename UComponent2>
+        void set(const UComponent1& p_component1,
+                 const UComponent2& p_component2) {
             //! @note When setting multiple components this is how flecs does it
-        typically
+            //! typically
             //! @note flecs::entity::set returns a const entity& to set multiple
-        components m_entity_id.set<T, U>(p_Component1).set(p_Component2);
+            m_entity_id.set<UComponent1, UComponent2>(p_component1)
+              .set(p_component2);
         }
-        */
 
         template<typename UComponent>
         void remove() {

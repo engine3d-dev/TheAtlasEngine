@@ -1,7 +1,7 @@
 #include <boost/ut.hpp>
 #include <core/math/types.hpp>
 #include <flecs.h>
-#include <scene/ecs/entity.hpp>
+#include <core/scene/entity.hpp>
 
 #include <Jolt/Jolt.h>
 #include <Jolt/Math/Vec4.h>
@@ -93,7 +93,7 @@ namespace atlas {
         "create_entity::add<T>"_test = [&scene_registry] {
             entity_t entity = entity_t(&scene_registry, "Mock Entity");
 
-            expect(entity.IsAlive());
+            expect(entity.is_alive());
 
             entity.add<TestTagComponent>();
             expect(entity.has<TestTagComponent>());
@@ -115,7 +115,7 @@ namespace atlas {
         "create_entity::set"_test = [&scene_registry]() {
             // entity_t entity = test_scene1.CreateEntity("New Entity1");
             entity_t entity = entity_t(&scene_registry, "New Entity");
-            MockProjectileMissle projectile;
+            mock_projectile projectile;
             projectile.on_update();
 
             TestTransform transform;
