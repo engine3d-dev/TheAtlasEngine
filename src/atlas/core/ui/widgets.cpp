@@ -85,7 +85,9 @@ namespace atlas::ui {
         ImGui::PopID();
     }
 
-    void draw_float(const std::string& p_tag, float& p_value, float reset_value) {
+    void draw_float(const std::string& p_tag,
+                    float& p_value,
+                    float reset_value) {
         ImGui::PushID(p_tag.c_str());
 
         float columnWidth = 100.0f;

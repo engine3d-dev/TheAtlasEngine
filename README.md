@@ -1,22 +1,21 @@
 # The Atlas Engine
-Open-source game engine for maing games, building cool projects, and to work on amazing features with the satisfaction of using them during game jams.
-
-## Prerequisites
-
-Before contributing, you must go through the [getting start](https://engine3d-dev.github.io/getting_started) before continuing.
+Open-source game engine for making games, building cool projects, and doing cool work in building features with the satisfaction of using them during game jams and other purposes.
 
 ## How to build the engine
 
+> [!TIP]
+> Before you build the project make sure to follow the setup instruction in the [getting start](https://engine3d-dev.github.io/getting_started) page.
+
 To get started in contributing here are the steps to do so. Follow these instructions.
 
-## Clone the repository
+### Clone the repository
 
 ```
 git clone https://github.com/engine3d-dev/TheAtlasEngine
 cd TheAtlasEngine
 ```
 
-## Build using Conan
+### Building using Conan
 
 To build the project, run the following command below.
 
@@ -27,7 +26,7 @@ To build the project, run the following command below.
 conan build . -b missing
 ```
 
-## Run the Engine
+## Running the engine
 
 When running the project. The engine will compile with the editor project within the repository.
 
