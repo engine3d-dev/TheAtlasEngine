@@ -4,7 +4,6 @@
 #include <drivers/swapchain.hpp>
 #include <string>
 
-
 namespace atlas {
 
     class window {

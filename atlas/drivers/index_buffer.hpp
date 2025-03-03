@@ -3,7 +3,6 @@
 #include <vector>
 #include <vulkan/vulkan.hpp>
 
-
 namespace atlas {
     class index_buffer {
     public:

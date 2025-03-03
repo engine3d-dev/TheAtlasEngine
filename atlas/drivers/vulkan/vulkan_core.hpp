@@ -56,35 +56,6 @@ namespace atlas::vk {
     void submit(VkQueue p_queue_to_use,
                 const std::span<VkCommandBuffer>& p_command_buffers);
 
-    /**
-     * @name Submit
-     * @note Handles direct operation to submit commands to directly to the gpu
-     * @note UCallableTask must return a valid structure that is valid to
-     * std::span<VkCommandBuffer>
-     * @param VkQueue passing the queue to submit the command buffer to
-     * @param UCallableTask defines a lambda function that is used to specify a
-     * large operation that requires more then just passing the command buffer
-     * itself
-     * @note Usage of this is when we need to handle specific tasks just before
-     * we directly submit those commands
-     */
-    template<typename UCallableTask>
-        requires ReturnInvoke<std::invoke_result_t<UCallableTask>>
-    void Submit(VkQueue p_queue_to_use, const UCallableTask& p_callable) {
-        auto commands = p_callable();
-
-        VkSubmitInfo submit_info = { .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
-                                     .commandBufferCount =
-                                       static_cast<uint32_t>(commands.size()),
-                                     .pCommandBuffers = commands.data() };
-
-        vkQueueSubmit(p_queue_to_use,
-                      static_cast<uint32_t>(commands.size()),
-                      &submit_info,
-                      VK_NULL_HANDLE);
-        vkQueueWaitIdle(p_queue_to_use);
-    }
-
     VkImage create_image(VkFormat p_format,
                          uint32_t p_width,
                          uint32_t p_height);

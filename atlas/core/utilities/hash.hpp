@@ -2,7 +2,6 @@
 #include <cstdint>
 #include <unordered_map>
 
-
 namespace atlas {
     template<typename T, typename... Rest>
     void hash_combine(size_t& seed, const T& v, const Rest&... rest) {
