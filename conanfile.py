@@ -47,10 +47,11 @@ class AtlasRecipe(ConanFile):
         self.requires("joltphysics/5.2.0")
 
         self.requires("boost-ext-ut/2.1.0")
-        self.requires("engine3d-nfd/1.0")
+        self.requires("nfd/1.0")
     
     def export_sources(self):
         copy(self,"CMakeLists.txt", self.recipe_folder, self.export_sources_folder)
+        copy(self,"src/CMakeLists.txt", self.recipe_folder, self.export_sources_folder)
         copy(self,"*.hpp", self.recipe_folder, self.export_sources_folder)
         copy(self,"*.h", self.recipe_folder, self.export_sources_folder)
         copy(self,"*.h", self.recipe_folder, self.export_sources_folder)
