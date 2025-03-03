@@ -1,6 +1,6 @@
 #include <core/engine_logger.hpp>
 #include <core/filesystem/file_dialog.hpp>
-#include <engine3d-nfd/nfd.h>
+#include <nfd/nfd.h>
 
 namespace atlas::filesystem {
     std::string LoadFromFileDialog(const std::string& p_filter) {
