@@ -2,7 +2,6 @@
 #include <core/application.hpp>
 #include <core/event/event.hpp>
 
-
 namespace atlas::event {
     static std::map<uint32_t, joystick_info> s_controllers;
 
