@@ -1,4 +1,3 @@
 #pragma once
 
-namespace atlas::physics{
-};
+namespace atlas::physics {};

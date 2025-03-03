@@ -3,7 +3,6 @@
 #include <string>
 #include <vulkan/vulkan_core.h>
 
-
 namespace atlas::vk {
     /**
      * @name vk_renderer
