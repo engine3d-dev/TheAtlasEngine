@@ -1,8 +1,7 @@
 #pragma once
 
-namespace atlas::physics{
-    class JoltPhysicBody{
+namespace atlas::physics {
+    class JoltPhysicBody {
     public:
-    
     };
 };
