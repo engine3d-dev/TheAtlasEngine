@@ -266,6 +266,11 @@ level_scene::level_scene(const std::string& p_tag)
                      atlas::system_registry::get_world().get_tag());
 }
 
+uint32_t addition(int x, int y)
+{
+    return x + y;
+}
+
 void
 level_scene::on_ui_update() {
 
