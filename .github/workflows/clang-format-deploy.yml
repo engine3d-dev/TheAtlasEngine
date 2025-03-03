@@ -1,0 +1,18 @@
+name: clang-format Check
+on: [push, pull_request]
+jobs:
+  formatting-check:
+    name: Formatting Check
+    runs-on: ubuntu-latest
+    steps:
+    
+    - name: 🌐 Downloading .clang-format from libhal
+      run: wget https://raw.githubusercontent.com/engine3d-dev/TheAtlasEngine/dev/.clang-format -O .clang-format
+    
+    - uses: actions/checkout@v4
+    - name: Run clang-format style check for C/C++/Protobuf programs.
+      uses: jidicula/clang-format-action@v4.14.0
+      with:
+        clang-format-version: 13
+        check-path: '.'
+        fallback-style: 'LLVM' # optional
