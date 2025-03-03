@@ -194,11 +194,6 @@ namespace ui {
     // }
 }; // namespace ui
 
-int add(int p_x, int p_y)
-{
-    return p_x + p_y;
-}
-
 level_scene::level_scene() {}
 
 level_scene::level_scene(const std::string& p_tag)
