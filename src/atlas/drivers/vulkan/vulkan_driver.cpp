@@ -4,7 +4,6 @@
 #include <drivers/vulkan/vulkan_driver.hpp>
 #include <vulkan/vulkan_core.h>
 
-
 namespace atlas::vk {
     vk_driver::vk_driver(const vk_physical_driver& p_physical) {
         // console_log_info("Vulkan2Showcase: Begin Vulkan Driver

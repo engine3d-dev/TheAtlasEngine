@@ -6,7 +6,6 @@
 #include <core/update_handlers/global_update.hpp>
 #include <core/update_handlers/sync_update.hpp>
 
-
 namespace atlas {
     static float s_current_delta_time = 0.0f;
     scope<thread_manager> s_thread_manager = nullptr;

@@ -313,7 +313,8 @@ level_scene::on_ui_update() {
             atlas::ui::draw_vec3("scale 1", sphere_data.Scale);
             atlas::ui::draw_vec3("rotate 1", sphere_data.Rotation);
             atlas::ui::draw_vec3("color 1", sphere_data.Color);
-            atlas::ui::button_open_file_dialog("Load Mesh 1", sphere_data.mesh_file);
+            atlas::ui::button_open_file_dialog("Load Mesh 1",
+                                               sphere_data.mesh_file);
 
             if (sphere_data.mesh_file != "") {
                 std::filesystem::path relative_path =
@@ -332,17 +333,19 @@ level_scene::on_ui_update() {
               atlas::ui::draw_vec3("Rotation 2", some_mesh_data.Rotation);
               atlas::ui::draw_vec3("Color 2", some_mesh_data.Color);
               atlas::ui::draw_float("Mouse Sensitivity", sensitivity);
-              atlas::ui::button_open_file_dialog("Load Mesh 2", some_mesh_data.mesh_file);
+              atlas::ui::button_open_file_dialog("Load Mesh 2",
+                                                 some_mesh_data.mesh_file);
 
-            //   if (some_mesh_data.mesh_file != "") {
-            //       std::filesystem::path relative_path =
-            //         std::filesystem::relative(some_mesh_data.mesh_file, "./");
-            //       console_log_trace("in branch 2 mesh_file = {}",
-            //                         relative_path.filename().string());
-            //       m_platform->set<atlas::MeshComponent>(
-            //         { some_mesh_data.mesh_file });
-            //       some_mesh_data.mesh_file = "";
-            //   }
+              //   if (some_mesh_data.mesh_file != "") {
+              //       std::filesystem::path relative_path =
+              //         std::filesystem::relative(some_mesh_data.mesh_file,
+              //         "./");
+              //       console_log_trace("in branch 2 mesh_file = {}",
+              //                         relative_path.filename().string());
+              //       m_platform->set<atlas::MeshComponent>(
+              //         { some_mesh_data.mesh_file });
+              //       some_mesh_data.mesh_file = "";
+              //   }
           });
 
         // atlas::ui::draw_panel_component<atlas::PerspectiveCamera>(

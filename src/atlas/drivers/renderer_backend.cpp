@@ -7,12 +7,12 @@
 namespace atlas {
     scope<render_context> render_context::initialize(const std::string& p_tag) {
         switch (application::current_api()) {
-        case API::VULKAN:
-            return create_scope<vk::vk_renderer>(p_tag);
+            case API::VULKAN:
+                return create_scope<vk::vk_renderer>(p_tag);
 
-        default:
-            console_log_fatal("API specified was not supported!");
-            return nullptr;
+            default:
+                console_log_fatal("API specified was not supported!");
+                return nullptr;
         }
         return nullptr;
     }
@@ -26,15 +26,20 @@ namespace atlas {
         return vk::vk_renderer::get_current_command_buffer_index();
     }
 
-    void render_context::begin() { return begin_frame(); }
+    void render_context::begin() {
+        return begin_frame();
+    }
 
-    void render_context::end() { return end_frame(); }
+    void render_context::end() {
+        return end_frame();
+    }
 
     void render_context::render_scene_objects(const ref<scene_scope>& p_scene) {
         return draw_scene_objects(p_scene);
     }
 
-    void render_context::render_scene_object(ref<scene_object>& p_scene_object) {
+    void render_context::render_scene_object(
+      ref<scene_object>& p_scene_object) {
         return draw_scene_object(p_scene_object);
     }
 

@@ -4,7 +4,6 @@
 #include <drivers/vulkan/helper_functions.hpp>
 #include <vulkan/vulkan_core.h>
 
-
 namespace atlas::vk {
     /*
     DescriptorLayout::builder DescriptorLayout::builder::AddBinding(

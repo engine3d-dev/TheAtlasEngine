@@ -3,7 +3,6 @@
 #include <drivers/vulkan/vulkan_context.hpp>
 #include <update_handlers/global_update.hpp>
 
-
 extern int Main();
 
 int

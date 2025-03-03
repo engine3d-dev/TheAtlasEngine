@@ -2,7 +2,6 @@
 #include <core/filesystem/file_dialog.hpp>
 #include <engine3d-nfd/nfd.h>
 
-
 namespace atlas::filesystem {
     std::string LoadFromFileDialog(const std::string& p_filter) {
         char* output_path = nullptr;

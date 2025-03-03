@@ -7,7 +7,6 @@
 #include <update_handlers/global_update.hpp>
 #include <update_handlers/sync_update.hpp>
 
-
 namespace atlas {
     std::mutex g_sync_lock;
     std::mutex g_parallel_lock;

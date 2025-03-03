@@ -3,7 +3,8 @@
 
 class editor_application : public atlas::application {
 public:
-    editor_application(const atlas::application_settings& p_settings) : application(p_settings) {
+    editor_application(const atlas::application_settings& p_settings)
+      : application(p_settings) {
         m_world = atlas::create_ref<editor_world>("Editor World");
     }
 

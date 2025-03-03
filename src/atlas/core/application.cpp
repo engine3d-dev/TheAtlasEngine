@@ -15,8 +15,7 @@ namespace atlas {
     application* application::s_instance = nullptr;
     static API g_graphics_backend_api = API::UNSPECIFIED;
 
-    application::application(
-      const application_settings& p_settings) {
+    application::application(const application_settings& p_settings) {
         s_instance = this;
         g_tag = p_settings.Name;
         console_log_manager::set_current_logger(g_tag);
@@ -29,7 +28,7 @@ namespace atlas {
         physics::JoltAPI::InitializeJoltAPI();
     }
 
-    application::~application(){
+    application::~application() {
         destroy();
     }
 

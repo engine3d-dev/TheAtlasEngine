@@ -3,7 +3,6 @@
 #include <drivers/vulkan/vulkan_vertex_buffer.hpp>
 #include <glm/glm.hpp>
 
-
 namespace atlas {
     ref<vertex_buffer> vertex_buffer::create(
       const std::vector<vertex>& p_vertices) {

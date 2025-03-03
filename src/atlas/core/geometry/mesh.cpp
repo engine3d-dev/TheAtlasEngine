@@ -3,7 +3,6 @@
 #include <drivers/vertex_buffer.hpp>
 #include <tiny_obj_loader.h>
 
-
 #include <core/utilities/hash.hpp>
 
 #define GLM_ENABLE_EXPERIMENTAL

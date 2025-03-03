@@ -1,7 +1,6 @@
 #include <core/engine_logger.hpp>
 #include <core/scene/scene.hpp>
 
-
 namespace atlas {
 
     // scene_scope::scene_scope(const std::string& p_tag) : m_tag(p_tag){

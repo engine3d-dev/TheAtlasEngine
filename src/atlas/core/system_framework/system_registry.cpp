@@ -2,7 +2,6 @@
 #include <core/scene/world.hpp>
 #include <core/system_framework/system_registry.hpp>
 
-
 namespace atlas {
     // static system_registry* s_GlobalSystemRegistry = nullptr;
     // world_scope* system_registry::s_CurrentWorld;

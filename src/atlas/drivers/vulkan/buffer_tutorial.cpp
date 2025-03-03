@@ -4,7 +4,6 @@
 #include <drivers/vulkan/buffer_tutorial.hpp>
 #include <vulkan/vulkan_core.h>
 
-
 namespace atlas::vk {
     static uint64_t get_alignment(uint64_t p_size,
                                   uint64_t p_min_offset_alignment) {

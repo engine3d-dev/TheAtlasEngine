@@ -12,8 +12,7 @@ Main() {
     //! code relies this to get it working.
     // atlas::global_updateManager* s_global_updateManager =
     // atlas::global_update::GetInstance();
-    atlas::ref<atlas::application> app =
-      atlas::initialize_application();
+    atlas::ref<atlas::application> app = atlas::initialize_application();
     atlas::system_registry::initialize();
     app->execute();
     atlas::global_update::cleanup();

@@ -3,7 +3,6 @@
 #include <drivers/vulkan/vulkan_context.hpp>
 #include <drivers/vulkan/vulkan_swapchain.hpp>
 
-
 namespace atlas {
     ref<swapchain> swapchain::initialize(VkSurfaceKHR p_Surface) {
         switch (application::current_api()) {

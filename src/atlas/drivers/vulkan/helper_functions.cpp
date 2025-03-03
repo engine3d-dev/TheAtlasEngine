@@ -2,7 +2,6 @@
 #include <drivers/vulkan/helper_functions.hpp>
 #include <vulkan/vulkan_core.h>
 
-
 namespace atlas::vk {
     void vk_check(VkResult result,
                   const char* p_tag,
