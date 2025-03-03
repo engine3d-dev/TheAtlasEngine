@@ -2,7 +2,6 @@
 #include <drivers/vulkan/vulkan_driver.hpp>
 #include <vulkan/vulkan.hpp>
 
-
 namespace atlas::vk {
     class vk_context {
     public:

@@ -4,7 +4,6 @@
 #include <vector>
 #include <vulkan/vulkan_core.h>
 
-
 namespace atlas::vk {
     /**
      * @name Vulkan Shader
