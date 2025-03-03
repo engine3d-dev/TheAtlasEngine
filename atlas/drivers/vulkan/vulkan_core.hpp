@@ -4,7 +4,6 @@
 #include <vulkan/vulkan.h>
 #include <vulkan/vulkan_core.h>
 
-
 namespace atlas::vk {
 
     //! @note This just checks the result type that is invoked by the passed

@@ -235,9 +235,8 @@ namespace atlas::vk {
         //! window's swapchain
         //! @note a TODO is to utilize different render passes utiization for
         //! shader pipelines, potentially.
-        pipeline_config.PipelineRenderPass = application::get_window()
-                                               .get_current_swapchain()
-                                               ->get_renderpass();
+        pipeline_config.PipelineRenderPass =
+          application::get_window().get_current_swapchain()->get_renderpass();
         pipeline_config.PipelineLayout = g_pipeline_layout;
 
         // m_Shader = shader::create("simple_shader/simple_shader.vert.spv",
@@ -254,9 +253,8 @@ namespace atlas::vk {
         console_log_error("NOT AN ERROR: Shader Loaded Successfully!");
 
         //! @note Initializing Command buffers.
-        g_command_buffers.resize(application::get_window()
-                                   .get_current_swapchain()
-                                   ->get_images_size());
+        g_command_buffers.resize(
+          application::get_window().get_current_swapchain()->get_images_size());
 
         VkCommandPoolCreateInfo pool_create_info = {
             .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
@@ -379,8 +377,7 @@ namespace atlas::vk {
                   g_current_frame_index), // Specifying which framebuffer to
                                           // render pass to.
             .renderArea = { .offset = { 0, 0 },
-                            .extent = { application::get_window()
-                                          .get_width(),
+                            .extent = { application::get_window().get_width(),
                                         application::get_window()
                                           .get_height() } }
         };
@@ -411,10 +408,11 @@ namespace atlas::vk {
             .maxDepth = 1.0f,
         };
 
-        VkRect2D scissor = { .offset = { 0, 0 },
-                             .extent = application::get_window()
-                                         .get_current_swapchain()
-                                         ->get_extent() };
+        VkRect2D scissor = {
+            .offset = { 0, 0 },
+            .extent =
+              application::get_window().get_current_swapchain()->get_extent()
+        };
 
         g_command_buffers[g_current_frame_index] = cmd_buffer;
 
@@ -525,8 +523,7 @@ namespace atlas::vk {
             .MousePosition = { event::cursor_position().x /
                                  application::get_window().get_width(),
                                event::cursor_position().y /
-                                 application::get_window()
-                                   .get_height() }
+                                 application::get_window().get_height() }
         };
 
         // auto frame_idx = g_current_frame_index.load();

@@ -4,7 +4,6 @@
 #include <deque>
 #include <functional>
 
-
 namespace atlas {
     /**
      * @name Sync Update Manager (SUM)

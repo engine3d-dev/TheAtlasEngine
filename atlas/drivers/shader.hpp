@@ -4,7 +4,6 @@
 #include <string>
 #include <vulkan/vulkan.h>
 
-
 namespace atlas {
     class shader {
     public:

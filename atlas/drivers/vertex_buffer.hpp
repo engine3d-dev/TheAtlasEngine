@@ -4,7 +4,6 @@
 #include <vector>
 #include <vulkan/vulkan.hpp>
 
-
 namespace atlas {
     /*
         @name vertex_buffer

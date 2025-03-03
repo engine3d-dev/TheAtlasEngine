@@ -6,7 +6,6 @@
 #include <spdlog/spdlog.h>
 #include <type_traits>
 
-
 namespace atlas {
 #ifdef ENGINE_PLATFORM_WINDOWS
 #ifdef ENGINE_BUILD_DLL

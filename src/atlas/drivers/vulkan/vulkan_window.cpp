@@ -19,7 +19,6 @@ namespace atlas::vk {
             return;
         }
 
-
         if (!glfwVulkanSupported()) {
             console_log_warn("GLFW: Vulkan is not supported!");
             return;

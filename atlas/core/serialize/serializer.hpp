@@ -6,17 +6,12 @@
 namespace atlas {
     class serializer {
     public:
-      serializer(const scene_scope* p_scene_ctx);
+        serializer(const scene_scope* p_scene_ctx);
 
-      void save_as(const std::string& p_filepath);
-
-      template<typename T>
-      void add() {
-          return T();
-      }
+        void save_as(const std::string& p_filepath);
 
     private:
-      ref<scene_scope> m_current_scene_ctx;
+        ref<scene_scope> m_current_scene_ctx;
     };
 
 }; // namespace atlas

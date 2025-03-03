@@ -3,7 +3,6 @@
 #include <core/scene/scene.hpp>
 #include <vulkan/vulkan.hpp>
 
-
 namespace atlas {
     /**
      * @name Renderer

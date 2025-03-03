@@ -7,7 +7,6 @@
 #include <spdlog/common.h>
 #include <spdlog/spdlog.h>
 
-
 namespace atlas {
     /**
      * @name console_log_manager

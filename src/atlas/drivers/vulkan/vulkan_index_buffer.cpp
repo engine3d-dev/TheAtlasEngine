@@ -3,7 +3,6 @@
 #include <drivers/vulkan/vulkan_context.hpp>
 #include <drivers/vulkan/vulkan_index_buffer.hpp>
 
-
 namespace atlas::vk {
     vk_index_buffer::vk_index_buffer(const std::vector<uint32_t>& p_Indices) {
         // console_log_info("Vulkan2Showcase: Begin Vulkan vertex_buffer

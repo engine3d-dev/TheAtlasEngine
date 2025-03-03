@@ -4,7 +4,6 @@
 #include <drivers/vulkan/vulkan_context.hpp>
 #include <vulkan/vulkan_core.h>
 
-
 namespace atlas::vk {
     const std::vector<std::string> InstanceLayers = {
         // #ifdef DEBUG

@@ -4,7 +4,6 @@
 #include <drivers/vulkan/vulkan_context.hpp>
 #include <drivers/vulkan/vulkan_vertex_buffer.hpp>
 
-
 namespace atlas::vk {
     vk_vertex_buffer::vk_vertex_buffer(const std::vector<vertex>& p_vertices) {
         console_log_warn_tagged("vulkan",

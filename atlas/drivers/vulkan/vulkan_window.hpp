@@ -4,7 +4,6 @@
 #include <drivers/swapchain.hpp>
 #include <vulkan/vulkan_core.h>
 
-
 namespace atlas::vk {
     class vk_window : public window {
     public:

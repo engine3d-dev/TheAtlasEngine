@@ -6,7 +6,6 @@
 #include <fstream>
 #include <vulkan/vulkan_core.h>
 
-
 namespace atlas::vk {
     vk_shader::vk_shader(const std::string& p_VertShader,
                          const std::string& p_FragShader,

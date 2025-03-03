@@ -3,7 +3,6 @@
 #include <drivers/vulkan/vulkan_core.hpp>
 #include <vulkan/vulkan_core.h>
 
-
 namespace atlas::vk {
     VkCommandBuffer create_command_buffer_and_record(
       const VkDevice& p_driver,
