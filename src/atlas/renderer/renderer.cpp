@@ -23,26 +23,4 @@ namespace atlas {
     uint32_t renderer::get_current_frame() {
         return render_context::get_current_frame();
     }
-
-    void renderer::set_camera(ref<scene_object>& object) {
-        g_RendererBackend->set_camera_object(object);
-    }
-
-    void renderer::submit_scene_object(ref<scene_object>& p_Object) {
-        g_RendererBackend->submit_render_scene_object(p_Object);
-    }
-
-    void renderer::render_scene_objects(
-      const ref<scene_scope>& p_CurrentSceneContext) {
-        return g_RendererBackend->render_scene_objects(p_CurrentSceneContext);
-    }
-
-    void renderer::render_scene_object(ref<scene_object>& p_ObjectToRender) {
-        g_RendererBackend->render_scene_object(p_ObjectToRender);
-    }
-
-    void renderer::render_with_camera(ref<scene_object>& p_Object,
-                                      ref<scene_object>& p_CameraObject) {
-        g_RendererBackend->render_with_camera(p_Object, p_CameraObject);
-    }
 };

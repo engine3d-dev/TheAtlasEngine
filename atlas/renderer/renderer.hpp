@@ -25,24 +25,16 @@ namespace atlas {
         //! @note Used to initialize
         static void initialize();
 
-        static void set_camera(ref<scene_object>& p_object);
-
-        static void submit_scene_object(ref<scene_object>& p_object);
-
         static uint32_t get_current_frame();
-
-        // static void SetCustomShaders(const std::string& p_VertexShader, const
-        // std::string& p_FragmentShader, bool p_IsOveridden); static bool
-        // IsCustomShaderEnabled(){
-        //     return false;
-        // }
 
         /**
         @note Begin()
-            - Indicates to the renderer the start of the frame
+            - Indicates to the renderer the preparation before the next frame's
+        called
 
         @note End()
-            - Tells renderer when a frame ends
+            - At the end of frame the renderer will offload the tasks onto the
+        GPU
 
         TODO: Implement Batch Rendering (Minimal Optimizaiton)
             - Batch Rendering is a technique on rendering in batches
@@ -56,13 +48,5 @@ namespace atlas {
         */
         static void begin();
         static void end();
-
-        // static void set_initial_camera(PerspectiveCamera& camera);
-
-        static void render_scene_objects(const ref<scene_scope>& p_scene);
-        static void render_scene_object(ref<scene_object>& p_scene_object);
-
-        static void render_with_camera(ref<scene_object>& p_scene_object,
-                                       ref<scene_object>& p_camera_object);
     };
 };

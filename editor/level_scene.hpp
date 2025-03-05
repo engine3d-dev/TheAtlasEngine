@@ -33,13 +33,6 @@ public:
 
     void on_ui_update();
 
-    //! TODO: Replacing this with batch rendering
-    //! @note Typically end_frame would handle this
-    //! TODDO: Remove this function. Remove the subscribe for the function.
-    //! TODO: Provide ways of submitting scene objects from a scene to the
-    //! rendderer. Rather having the scene renderer deal with that
-    void on_scene_render();
-
     //! TODO: Remove this and integrate a few functions into LevelScene such as
     //! on_runtime_start/on_runtime_stop
     void on_physics_update();
@@ -50,6 +43,7 @@ public:
 private:
     atlas::ref<atlas::scene_object> m_sphere;
     atlas::ref<atlas::scene_object> m_platform;
+    atlas::ref<atlas::scene_object> m_light_object;
     bool m_is_simulation_enabled = false;
     atlas::ref<atlas::scene_object> m_camera;
     atlas::physics::physics_scene m_physics_scene;

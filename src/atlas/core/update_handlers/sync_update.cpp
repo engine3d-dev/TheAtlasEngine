@@ -120,12 +120,6 @@ namespace atlas::sync_update {
         }
     }
 
-    void on_scene_render() {
-        for (auto& l_Subscriber : s_RenderQueue) {
-            l_Subscriber();
-        }
-    }
-
     void on_physics_update() {
         for (auto& l_Subscriber : s_PhysicsQueue) {
             l_Subscriber();

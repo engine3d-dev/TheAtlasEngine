@@ -69,7 +69,7 @@ namespace atlas {
     static std::vector<VkFramebuffer> s_ViewportFramebuffers;
     VkCommandPool s_ViewportCommandPool;
     VkRenderPass s_ViewportRenderpass;
-    static vk::vk_driver g_Driver;
+    static vk::vk_driver m_driver;
 
     struct ImGuiImage {
         VkImage Image;
@@ -115,7 +115,7 @@ namespace atlas {
 
     void ImGuiBackend::Initialize() {
         console_log_info("ImGui Vulkan Test: Begin Initialization!");
-        g_Driver = vk::vk_context::get_current_driver();
+        m_driver = vk::vk_context::get_current_driver();
 
         // 1: create descriptor pool for IMGUI
         //  the size of the pool is very oversize, but it's copied from imgui
@@ -147,7 +147,7 @@ namespace atlas {
         // VkDescriptorPool imgui_pool;
         vk::vk_check(
           vkCreateDescriptorPool(
-            g_Driver, &desc_pool_create_info, nullptr, &s_DescriptorPool),
+            m_driver, &desc_pool_create_info, nullptr, &s_DescriptorPool),
           "vkCreateDescriptorPool",
           __FILE__,
           __LINE__,
@@ -199,7 +199,7 @@ namespace atlas {
 
         vk::vk_check(
           vkCreateRenderPass(
-            g_Driver, &imgui_renderpass_ci, nullptr, &s_ViewportRenderpass),
+            m_driver, &imgui_renderpass_ci, nullptr, &s_ViewportRenderpass),
           "vkCreateRenderPass",
           __FILE__,
           __LINE__,
@@ -243,7 +243,7 @@ namespace atlas {
 
             vk::vk_check(
               vkCreateFramebuffer(
-                g_Driver, &fb_ci, nullptr, &s_ViewportFramebuffers[i]),
+                m_driver, &fb_ci, nullptr, &s_ViewportFramebuffers[i]),
               "vkCreateFramebuffer",
               __FILE__,
               __LINE__,
@@ -269,17 +269,17 @@ namespace atlas {
             // Create memory to backup image
             VkMemoryRequirements memory_requirements;
             vkGetImageMemoryRequirements(
-              g_Driver, s_ImGuiViewportImages[i].Image, &memory_requirements);
+              m_driver, s_ImGuiViewportImages[i].Image, &memory_requirements);
 
             // Allocate memory for these images
             VkMemoryAllocateInfo mem_alloc_info = {
                 .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO
             };
-            vkAllocateMemory(g_Driver,
+            vkAllocateMemory(m_driver,
                              &mem_alloc_info,
                              nullptr,
                              &s_ImGuiViewportImages[i].ImageDeviceMemory);
-            vkBindImageMemory(g_Driver,
+            vkBindImageMemory(m_driver,
                               s_ImGuiViewportImages[i].Image,
                               s_ImGuiViewportImages[i].ImageDeviceMemory,
                               0);
@@ -324,8 +324,8 @@ namespace atlas {
         init_info.Instance = vk::vk_context::get_vk_instance();
         init_info.PhysicalDevice =
           vk::vk_context::get_current_selected_physical_driver();
-        init_info.Device = g_Driver;
-        init_info.Queue = g_Driver.get_graphics_queue();
+        init_info.Device = m_driver;
+        init_info.Queue = m_driver.get_graphics_queue();
         init_info.RenderPass =
           application::get_window().get_current_swapchain()->get_renderpass();
         init_info.PipelineCache = VK_NULL_HANDLE;
@@ -360,7 +360,7 @@ namespace atlas {
     void ImGuiBackend::End() {
         ImGui::Render();
 
-        auto current_cmd_buffer = vk::vk_renderer::current_command_buffer();
+        auto current_cmd_buffer = vk::vk_renderer::get_current_command_buffer();
 
         int width, height;
         glfwGetFramebufferSize(application::get_window(),
