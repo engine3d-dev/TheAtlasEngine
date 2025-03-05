@@ -15,6 +15,7 @@ namespace atlas {
         void end();
 
         static uint32_t get_current_frame();
+
     private:
         virtual void begin_frame() = 0;
         virtual void end_frame() = 0;

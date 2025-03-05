@@ -61,7 +61,6 @@ namespace atlas::vk {
 
     std::array<VkCommandBuffer, 3> g_command_buffers;
 
-
     vk_renderer::vk_renderer(const std::string& p_tag) {
         g_current_frame_index = 0;
         m_is_frame_started = false;
@@ -78,186 +77,184 @@ namespace atlas::vk {
         initialize_pipeline();
     }
 
-    vk_renderer::~vk_renderer(){
-      vkDestroyPipelineLayout(m_driver, m_pipeline_layout, nullptr);
+    vk_renderer::~vk_renderer() {
+        vkDestroyPipelineLayout(m_driver, m_pipeline_layout, nullptr);
     }
 
-
     void vk_renderer::initialize_pipeline() {
-      auto max_frames_in_flight = vk_swapchain::MaxFramesInFlight;
-      m_driver = vk_context::get_current_driver();
+        auto max_frames_in_flight = vk_swapchain::MaxFramesInFlight;
+        m_driver = vk_context::get_current_driver();
 
-      m_global_pool = descriptor_pool::builder()
-                        .setMaxSets(max_frames_in_flight)
-                        .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                                     max_frames_in_flight)
-                        .addPoolSize(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-                                     max_frames_in_flight)
-                        .build();
+        m_global_pool = descriptor_pool::builder()
+                          .setMaxSets(max_frames_in_flight)
+                          .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                                       max_frames_in_flight)
+                          .addPoolSize(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+                                       max_frames_in_flight)
+                          .build();
 
-      m_global_set_layout = descriptor_set_layout::builder()
-                              .addBinding(0,
-                                          VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                                          VK_SHADER_STAGE_VERTEX_BIT)
-                              .build();
+        m_global_set_layout = descriptor_set_layout::builder()
+                                .addBinding(0,
+                                            VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                                            VK_SHADER_STAGE_VERTEX_BIT)
+                                .build();
 
-      m_global_descriptor_set =
-        std::vector<VkDescriptorSet>(max_frames_in_flight);
+        m_global_descriptor_set =
+          std::vector<VkDescriptorSet>(max_frames_in_flight);
 
-      m_global_ubo_list.resize(max_frames_in_flight);
+        m_global_ubo_list.resize(max_frames_in_flight);
 
-      for (size_t i = 0; i < m_global_ubo_list.size(); i++) {
-          m_global_ubo_list[i] =
-            BufferTutorial(sizeof(camera_ubo),
-                           1,
-                           VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-                           VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-          m_global_ubo_list[i].map();
-      }
+        for (size_t i = 0; i < m_global_ubo_list.size(); i++) {
+            m_global_ubo_list[i] =
+              BufferTutorial(sizeof(camera_ubo),
+                             1,
+                             VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+            m_global_ubo_list[i].map();
+        }
 
-      for (size_t i = 0; i < m_global_descriptor_set.size(); i++) {
-          auto buffer_info = m_global_ubo_list[i].descriptor_info();
+        for (size_t i = 0; i < m_global_descriptor_set.size(); i++) {
+            auto buffer_info = m_global_ubo_list[i].descriptor_info();
 
-          descriptor_writer(*m_global_set_layout, *m_global_pool)
-            .writeBuffer(0, &buffer_info)
-            .build(m_global_descriptor_set[i]);
-      }
+            descriptor_writer(*m_global_set_layout, *m_global_pool)
+              .writeBuffer(0, &buffer_info)
+              .build(m_global_descriptor_set[i]);
+        }
 
-      //! @note Setting up push constants
-      //! @note VkPipelineLayoutCreateInfo does not require a push constant to
-      //! be defined in it's configuration
-      //! @note It can just be set to its default vulkan has its configuration
-      g_current_frame_index = 0;
-      m_is_frame_started = false;
+        //! @note Setting up push constants
+        //! @note VkPipelineLayoutCreateInfo does not require a push constant to
+        //! be defined in it's configuration
+        //! @note It can just be set to its default vulkan has its configuration
+        g_current_frame_index = 0;
+        m_is_frame_started = false;
 
-      //! @note Setting up our pipeline.
-      auto pipeline_config = vk::vk_shader::shader_configuration(
-        application::get_window().get_width(),
-        application::get_window().get_height());
+        //! @note Setting up our pipeline.
+        auto pipeline_config = vk::vk_shader::shader_configuration(
+          application::get_window().get_width(),
+          application::get_window().get_height());
 
-      //! @note Initialize Push constant range
+        //! @note Initialize Push constant range
 
-      VkPushConstantRange push_const_range = { .stageFlags =
-                                                 VK_SHADER_STAGE_VERTEX_BIT |
-                                                 VK_SHADER_STAGE_FRAGMENT_BIT,
-                                               .offset = 0,
-                                               .size = sizeof(camera_ubo) };
+        VkPushConstantRange push_const_range = { .stageFlags =
+                                                   VK_SHADER_STAGE_VERTEX_BIT |
+                                                   VK_SHADER_STAGE_FRAGMENT_BIT,
+                                                 .offset = 0,
+                                                 .size = sizeof(camera_ubo) };
 
-      //! @note We are setting our descriptors to work with layout(set = 0,
-      //! binding = 0)
-      // std::vector<VkDescriptorSetLayout> setLayouts;
-      // setLayouts.push_back(m_global_set_layout->get_descriptor_set_layout());
+        //! @note We are setting our descriptors to work with layout(set = 0,
+        //! binding = 0)
+        // std::vector<VkDescriptorSetLayout> setLayouts;
+        // setLayouts.push_back(m_global_set_layout->get_descriptor_set_layout());
 
-      //! @note First initializing pipeline layout create info
-      //! @note TODO: Handle if a pipeline layout has descriptors or no
-      /*
+        //! @note First initializing pipeline layout create info
+        //! @note TODO: Handle if a pipeline layout has descriptors or no
+        /*
 
-          Pipeline API would look like the following
+            Pipeline API would look like the following
 
-          Pipeline pipeline_a = Pipeline(descriptors: false, descriptors_count
-         = 0, descriptors: std::span<DescriptorSet>);
+            Pipeline pipeline_a = Pipeline(descriptors: false, descriptors_count
+           = 0, descriptors: std::span<DescriptorSet>);
 
-      */
+        */
 
-      std::vector<VkDescriptorSetLayout> descriptor_set_layouts = {
-          m_global_set_layout->get_descriptor_set_layout()
-      };
+        std::vector<VkDescriptorSetLayout> descriptor_set_layouts = {
+            m_global_set_layout->get_descriptor_set_layout()
+        };
 
-      VkPipelineLayoutCreateInfo pipeline_layout_create_info = {
-          .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
-          .pNext = nullptr,
-          .flags = 0,
-          // .setLayoutCount = 0,
-          // .pSetLayouts = nullptr,
-          .setLayoutCount =
-            static_cast<uint32_t>(descriptor_set_layouts.size()),
-          .pSetLayouts = descriptor_set_layouts.data(),
-          // .setLayoutCount = 1,
-          // .pSetLayouts = &g_DescriptorSetLayout,
-          // .setLayoutCount = 1,
-          // .pSetLayouts = &info.Layout,
-          .pushConstantRangeCount = 1,
-          .pPushConstantRanges = &push_const_range
-      };
+        VkPipelineLayoutCreateInfo pipeline_layout_create_info = {
+            .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            // .setLayoutCount = 0,
+            // .pSetLayouts = nullptr,
+            .setLayoutCount =
+              static_cast<uint32_t>(descriptor_set_layouts.size()),
+            .pSetLayouts = descriptor_set_layouts.data(),
+            // .setLayoutCount = 1,
+            // .pSetLayouts = &g_DescriptorSetLayout,
+            // .setLayoutCount = 1,
+            // .pSetLayouts = &info.Layout,
+            .pushConstantRangeCount = 1,
+            .pPushConstantRanges = &push_const_range
+        };
 
-      vk::vk_check(vkCreatePipelineLayout(m_driver,
-                                          &pipeline_layout_create_info,
-                                          nullptr,
-                                          &m_pipeline_layout),
-                   "vkCreatePipelineLayout",
-                   __FILE__,
-                   __LINE__,
-                   __FUNCTION__);
+        vk::vk_check(vkCreatePipelineLayout(m_driver,
+                                            &pipeline_layout_create_info,
+                                            nullptr,
+                                            &m_pipeline_layout),
+                     "vkCreatePipelineLayout",
+                     __FILE__,
+                     __LINE__,
+                     __FUNCTION__);
 
-      //! @note We are setting our shader pipeline to utilize our current
-      //! window's swapchain
-      //! @note a TODO is to utilize different render passes utiization for
-      //! shader pipelines, potentially.
-      pipeline_config.PipelineRenderPass =
-        application::get_window().get_current_swapchain()->get_renderpass();
-      pipeline_config.PipelineLayout = m_pipeline_layout;
+        //! @note We are setting our shader pipeline to utilize our current
+        //! window's swapchain
+        //! @note a TODO is to utilize different render passes utiization for
+        //! shader pipelines, potentially.
+        pipeline_config.PipelineRenderPass =
+          application::get_window().get_current_swapchain()->get_renderpass();
+        pipeline_config.PipelineLayout = m_pipeline_layout;
 
-      // m_Shader = shader::create("simple_shader/simple_shader.vert.spv",
-      // "simple_shader/simple_shader.frag.spv", pipeline_config);
-      g_shader =
-        shader::create("shaders/mouse_picking_shaders/simple_shader.vert.spv",
-                       "shaders/mouse_picking_shaders/simple_shader.frag.spv",
-                       pipeline_config);
-      // g_ColorShader =
-      // shader::create("shader_ubo_tutorial/simple_shader.vert.spv",
-      // "shader_ubo_tutorial/simple_shader.frag.spv", pipeline_config);
+        // m_Shader = shader::create("simple_shader/simple_shader.vert.spv",
+        // "simple_shader/simple_shader.frag.spv", pipeline_config);
+        g_shader =
+          shader::create("shaders/mouse_picking_shaders/simple_shader.vert.spv",
+                         "shaders/mouse_picking_shaders/simple_shader.frag.spv",
+                         pipeline_config);
+        // g_ColorShader =
+        // shader::create("shader_ubo_tutorial/simple_shader.vert.spv",
+        // "shader_ubo_tutorial/simple_shader.frag.spv", pipeline_config);
 
-      // if()
-      console_log_error("NOT AN ERROR: Shader Loaded Successfully!");
+        // if()
+        console_log_error("NOT AN ERROR: Shader Loaded Successfully!");
 
-      //! @note Initializing Command buffers.
-      // g_command_buffers.resize(
-      //   application::get_window().get_current_swapchain()->get_images_size());
-      for(uint32_t i = 0; i < g_command_buffers.size(); i++){
-        g_command_buffers[i] = {};
-      }
+        //! @note Initializing Command buffers.
+        // g_command_buffers.resize(
+        //   application::get_window().get_current_swapchain()->get_images_size());
+        for (uint32_t i = 0; i < g_command_buffers.size(); i++) {
+            g_command_buffers[i] = {};
+        }
 
-      VkCommandPoolCreateInfo pool_create_info = {
-          .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
-          .pNext = nullptr,
-          .flags = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT |
-                   VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
-          .queueFamilyIndex =
-            vk::vk_context::get_current_selected_physical_driver()
-              .get_queue_indices()
-              .Graphics
-      };
+        VkCommandPoolCreateInfo pool_create_info = {
+            .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT |
+                     VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
+            .queueFamilyIndex =
+              vk::vk_context::get_current_selected_physical_driver()
+                .get_queue_indices()
+                .Graphics
+        };
 
-      vk::vk_check(vkCreateCommandPool(
-                     m_driver, &pool_create_info, nullptr, &m_command_pool),
-                   "vkCreateCommandPool",
-                   __FILE__,
-                   __LINE__,
-                   __FUNCTION__);
+        vk::vk_check(vkCreateCommandPool(
+                       m_driver, &pool_create_info, nullptr, &m_command_pool),
+                     "vkCreateCommandPool",
+                     __FILE__,
+                     __LINE__,
+                     __FUNCTION__);
 
-      console_log_info("RENDERER COMMAND BUFFERS SIZE === {}",
-                       g_command_buffers.size());
-      //! @note Allocating our command buffers.
-      VkCommandBufferAllocateInfo cmd_buffer_alloc_info = {
-          .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
-          .commandPool = m_command_pool,
-          .level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
-          .commandBufferCount =
-            static_cast<uint32_t>(g_command_buffers.size()),
-      };
+        console_log_info("RENDERER COMMAND BUFFERS SIZE === {}",
+                         g_command_buffers.size());
+        //! @note Allocating our command buffers.
+        VkCommandBufferAllocateInfo cmd_buffer_alloc_info = {
+            .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+            .commandPool = m_command_pool,
+            .level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
+            .commandBufferCount =
+              static_cast<uint32_t>(g_command_buffers.size()),
+        };
 
-      vk::vk_check(vkAllocateCommandBuffers(m_driver,
-                                            &cmd_buffer_alloc_info,
-                                            g_command_buffers.data()),
-                   "vkAllocateCommandBuffers",
-                   __FILE__,
-                   __LINE__,
-                   __FUNCTION__);
+        vk::vk_check(vkAllocateCommandBuffers(m_driver,
+                                              &cmd_buffer_alloc_info,
+                                              g_command_buffers.data()),
+                     "vkAllocateCommandBuffers",
+                     __FILE__,
+                     __LINE__,
+                     __FUNCTION__);
 
-      console_log_info("CommandBuffers Size === {}",
-                       g_command_buffers.size());
-  }
-
+        console_log_info("CommandBuffers Size === {}",
+                         g_command_buffers.size());
+    }
 
     void vk_renderer::begin_frame() {
 
@@ -360,21 +357,26 @@ namespace atlas::vk {
 
         ImGuiBackend::Begin();
 
+        //! @note Pre-computing our camera properties and applying it to our
+        //! scene objects
 
-		//! @note Pre-computing our camera properties and applying it to our scene objects
+        //! TODO: Fix: The bug is this only works when dealing with a single
+        //! scene
+        flecs::world* world_object =
+          system_registry::get_world().get_registry();
+        flecs::query<> queried_render_targets =
+          world_object->query_builder<Camera>().build();
 
-		//! TODO: Fix: The bug is this only works when dealing with a single scene
-        flecs::world* world_object = system_registry::get_world().get_registry();
-        flecs::query<> queried_render_targets = world_object->query_builder<Camera>().build();
-
-		//! @note The idea behind this is we pre-determine this at the beginning of the frame to getting our camera
-		//! @note Then once we get our camera properties that then gets applied to our object's that uses that camera
-        queried_render_targets.each([&](flecs::entity p_entity_id){
-			if(p_entity_id.has<Camera>()){
-				if(p_entity_id.get<Camera>()->IsMainCamera){
-					m_current_camera_component = *p_entity_id.get<Camera>();
-				}
-			}
+        //! @note The idea behind this is we pre-determine this at the beginning
+        //! of the frame to getting our camera
+        //! @note Then once we get our camera properties that then gets applied
+        //! to our object's that uses that camera
+        queried_render_targets.each([&](flecs::entity p_entity_id) {
+            if (p_entity_id.has<Camera>()) {
+                if (p_entity_id.get<Camera>()->IsMainCamera) {
+                    m_current_camera_component = *p_entity_id.get<Camera>();
+                }
+            }
         });
     }
 
@@ -383,87 +385,89 @@ namespace atlas::vk {
 
         //! @note Flushing out scene objects
 
+        // for()
 
-		// for()
+        //! TODO: Fix: The bug is this only works when dealing with a single
+        //! scene
+        flecs::world* world_object =
+          system_registry::get_world().get_registry();
+        flecs::query<> queried_render_targets =
+          world_object->query_builder<RenderTarget3D>().build();
 
-		//! TODO: Fix: The bug is this only works when dealing with a single scene
-        flecs::world* world_object = system_registry::get_world().get_registry();
-        flecs::query<> queried_render_targets = world_object->query_builder<RenderTarget3D>().build();
+        //! @note The idea behind this is we pre-determine this at the beginning
+        //! of the frame to getting our camera
+        //! @note Then once we get our camera properties that then gets applied
+        //! to our object's that uses that camera
+        queried_render_targets.each([&](flecs::entity p_entity_id) {
+            const Transform* transform_component = p_entity_id.get<Transform>();
+            vkCmdBindPipeline(current_cmd_buffer,
+                              VK_PIPELINE_BIND_POINT_GRAPHICS,
+                              g_shader->get_graphics_pipeline());
 
-		//! @note The idea behind this is we pre-determine this at the beginning of the frame to getting our camera
-		//! @note Then once we get our camera properties that then gets applied to our object's that uses that camera
-        queried_render_targets.each([&](flecs::entity p_entity_id){
-			const Transform* transform_component = p_entity_id.get<Transform>();
-			vkCmdBindPipeline(current_cmd_buffer,
-				VK_PIPELINE_BIND_POINT_GRAPHICS,
-				g_shader->get_graphics_pipeline());
-
-			glm::mat4 model = p_entity_id.get<RenderTarget3D>()->Model;
-			model = glm::translate(model, transform_component->Position);
+            glm::mat4 model = p_entity_id.get<RenderTarget3D>()->Model;
+            model = glm::translate(model, transform_component->Position);
             model = glm::scale(model, transform_component->Scale);
-			auto rotation_mat4 =
+            auto rotation_mat4 =
               glm::mat4(glm::quat(transform_component->Rotation));
             model *= rotation_mat4;
 
-			/*
-			
-			Camera
-			For the Projection and View matrices are going to be handled by the camera component
-			These get determined pre-frame. Within begin_frame
+            /*
 
-			RenderTarget
-			- Gets determined pre-frame and offloaded to GPU at the end of frame
+            Camera
+            For the Projection and View matrices are going to be handled by the
+            camera component These get determined pre-frame. Within begin_frame
 
-			*/
-			camera_ubo push_const_data = {
-			// .Projection = camera_component->get_projection(),
-			// .View = camera_component->get_view(),
-			.Projection = m_current_camera_component.get_projection(),
-			.View = m_current_camera_component.get_view(),
-			.Model = model,
-			// .LightPosition = -camera_component->Front,
-			.LightPosition = -m_current_camera_component.get_front(),
-			// .LightPosition = point_light.Position,
-			.Color = transform_component->Color,
-			// .MousePosition = event::cursor_position()
-			.MousePosition = { event::cursor_position().x /
-								application::get_window().get_width(),
-								event::cursor_position().y /
-								application::get_window().get_height() }
-			};
+            RenderTarget
+            - Gets determined pre-frame and offloaded to GPU at the end of frame
 
+            */
+            camera_ubo push_const_data = {
+                // .Projection = camera_component->get_projection(),
+                // .View = camera_component->get_view(),
+                .Projection = m_current_camera_component.get_projection(),
+                .View = m_current_camera_component.get_view(),
+                .Model = model,
+                // .LightPosition = -camera_component->Front,
+                .LightPosition = -m_current_camera_component.get_front(),
+                // .LightPosition = point_light.Position,
+                .Color = transform_component->Color,
+                // .MousePosition = event::cursor_position()
+                .MousePosition = { event::cursor_position().x /
+                                     application::get_window().get_width(),
+                                   event::cursor_position().y /
+                                     application::get_window().get_height() }
+            };
 
-			vkCmdPushConstants(current_cmd_buffer,
-							m_pipeline_layout,
-							VK_SHADER_STAGE_VERTEX_BIT |
-							VK_SHADER_STAGE_FRAGMENT_BIT,
-							0,
-							sizeof(camera_ubo),
-							&push_const_data);
+            vkCmdPushConstants(current_cmd_buffer,
+                               m_pipeline_layout,
+                               VK_SHADER_STAGE_VERTEX_BIT |
+                                 VK_SHADER_STAGE_FRAGMENT_BIT,
+                               0,
+                               sizeof(camera_ubo),
+                               &push_const_data);
 
-			if (!p_entity_id.has<RenderTarget3D>()) {
-				console_log_fatal("COULD NOT FIND MESH COMPONENT!!!");
-				return;
-			}
+            if (!p_entity_id.has<RenderTarget3D>()) {
+                console_log_fatal("COULD NOT FIND MESH COMPONENT!!!");
+                return;
+            }
 
-			auto* component = p_entity_id.get<RenderTarget3D>();
+            auto* component = p_entity_id.get<RenderTarget3D>();
 
-			Mesh mesh_data = component->MeshMetaData;
+            Mesh mesh_data = component->MeshMetaData;
 
-			auto& vb = mesh_data.get_vertex_buffer();
-			auto ib = mesh_data.get_index_buffer();
+            auto& vb = mesh_data.get_vertex_buffer();
+            auto ib = mesh_data.get_index_buffer();
 
-			vb->bind(current_cmd_buffer);
+            vb->bind(current_cmd_buffer);
 
-			if (ib != nullptr || ib->has_indices()) {
-				ib->bind(current_cmd_buffer);
-				ib->draw(current_cmd_buffer);
-			}
-			else {
-				vb->draw(current_cmd_buffer);
-			}
+            if (ib != nullptr || ib->has_indices()) {
+                ib->bind(current_cmd_buffer);
+                ib->draw(current_cmd_buffer);
+            }
+            else {
+                vb->draw(current_cmd_buffer);
+            }
         });
-
 
         ImGuiBackend::End();
         vkCmdEndRenderPass(current_cmd_buffer);

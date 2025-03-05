@@ -75,7 +75,7 @@ static MeshData sphere_data;
 static MeshData some_mesh_data;
 static CameraData camera_data;
 static std::string s_SceneFilepath = "";
-static glm::vec3 g_light_position=glm::vec3(0.0f, 0.0f, 1.0f);
+static glm::vec3 g_light_position = glm::vec3(0.0f, 0.0f, 1.0f);
 
 static void
 TraceImpl(const char* Message, ...) {
@@ -209,8 +209,10 @@ level_scene::level_scene(const std::string& p_tag)
 
     //! @note Creating our objects from our scene
     m_sphere = this->create_new_object("sphere");
-    // m_sphere->set<atlas::MeshComponent>({ "assets/models/colored_cube.obj" });
-    m_sphere->set<atlas::RenderTarget3D>(atlas::RenderTarget3D("assets/models/colored_cube.obj"));
+    // m_sphere->set<atlas::MeshComponent>({ "assets/models/colored_cube.obj"
+    // });
+    m_sphere->set<atlas::RenderTarget3D>(
+      atlas::RenderTarget3D("assets/models/colored_cube.obj"));
 
     m_sphere->set<atlas::Transform>({ .Position = { 0.f, 2.10f, -7.30f },
                                       .Scale = { .20f, .20f, .20f },
@@ -323,7 +325,8 @@ level_scene::on_ui_update() {
                 std::filesystem::path relative_path =
                   std::filesystem::relative(sphere_data.mesh_file, "./");
                 console_log_trace("Filepath = {}", sphere_data.mesh_file);
-                m_sphere->set<atlas::RenderTarget3D>({ relative_path.string() });
+                m_sphere->set<atlas::RenderTarget3D>(
+                  { relative_path.string() });
                 //! TODO: Empty String again to reset the filepath set
                 sphere_data.mesh_file = "";
             }

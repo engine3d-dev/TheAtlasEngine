@@ -29,10 +29,12 @@ namespace atlas {
 
         /**
         @note Begin()
-            - Indicates to the renderer the preparation before the next frame's called
+            - Indicates to the renderer the preparation before the next frame's
+        called
 
         @note End()
-            - At the end of frame the renderer will offload the tasks onto the GPU
+            - At the end of frame the renderer will offload the tasks onto the
+        GPU
 
         TODO: Implement Batch Rendering (Minimal Optimizaiton)
             - Batch Rendering is a technique on rendering in batches

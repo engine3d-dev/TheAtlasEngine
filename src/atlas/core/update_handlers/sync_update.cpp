@@ -119,7 +119,7 @@ namespace atlas::sync_update {
             l_Subscriber();
         }
     }
-    
+
     void on_physics_update() {
         for (auto& l_Subscriber : s_PhysicsQueue) {
             l_Subscriber();

@@ -153,9 +153,10 @@ namespace atlas {
                    << perspective_camera->Right;
             output << YAML::Key << "Left" << YAML::Value
                    << perspective_camera->Left;
-            output << YAML::Key << "Euler" << YAML::Value
-                //    << perspective_camera->EulerRotation;
-                << perspective_camera->EulerRotation;
+            output << YAML::Key << "Euler"
+                   << YAML::Value
+                   //    << perspective_camera->EulerRotation;
+                   << perspective_camera->EulerRotation;
             output << YAML::Key << "MovementSpeed" << YAML::Value
                    << perspective_camera->MovementSpeed;
             output << YAML::Key << "MouseSensitivity" << YAML::Value
