@@ -128,7 +128,7 @@ namespace atlas::vk {
 
         //! @note Current frame that we are at in the application from the start
         //! of the app.
-        size_t m_current_frame_index = 0;
+        size_t g_current_frame_index = 0;
 
         //! @note Acts as our image index.
         uint32_t m_current_image_index =

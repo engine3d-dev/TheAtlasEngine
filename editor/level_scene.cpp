@@ -75,6 +75,7 @@ static MeshData sphere_data;
 static MeshData some_mesh_data;
 static CameraData camera_data;
 static std::string s_SceneFilepath = "";
+static glm::vec3 g_light_position=glm::vec3(0.0f, 0.0f, 1.0f);
 
 static void
 TraceImpl(const char* Message, ...) {
@@ -208,13 +209,15 @@ level_scene::level_scene(const std::string& p_tag)
 
     //! @note Creating our objects from our scene
     m_sphere = this->create_new_object("sphere");
-    m_sphere->set<atlas::MeshComponent>({ "assets/models/colored_cube.obj" });
+    // m_sphere->set<atlas::MeshComponent>({ "assets/models/colored_cube.obj" });
+    m_sphere->set<atlas::RenderTarget3D>(atlas::RenderTarget3D("assets/models/colored_cube.obj"));
 
     m_sphere->set<atlas::Transform>({ .Position = { 0.f, 2.10f, -7.30f },
                                       .Scale = { .20f, .20f, .20f },
                                       .Color = { 1.0f, 1.f, 1.f, 1.f } });
 
     m_sphere->add<atlas::RigidBody3D>();
+    m_sphere->add<atlas::Light>();
     // First we get body interface from this scene's physics system
     // BodyInterface is how  jolt's bodies interact with the physics system'
     // main way to interact with the physics systems through body interfaces
@@ -235,7 +238,7 @@ level_scene::level_scene(const std::string& p_tag)
     some_mesh_data.Position = some_mesh_transform->Position;
     some_mesh_data.Scale = some_mesh_transform->Scale;
     some_mesh_data.Rotation = some_mesh_transform->Rotation;
-    m_platform->set<atlas::MeshComponent>({ "assets/models/cube.obj" });
+    m_platform->set<atlas::RenderTarget3D>({ "assets/models/cube.obj" });
 
     /**
     @note Jolt's Body Interface
@@ -253,13 +256,12 @@ level_scene::level_scene(const std::string& p_tag)
     camera_data.Position = { 0.0f, 1.50f, 0.0f };
     camera_data.Front = glm::vec3(-0.0f, 0.0f, -1.0f);
 
-    m_camera->add<atlas::PerspectiveCamera>();
+    m_camera->add<atlas::Camera>();
 
-    sensitivity = m_camera->get<atlas::PerspectiveCamera>()->MovementSpeed;
+    sensitivity = m_camera->get<atlas::Camera>()->MovementSpeed;
 
     sync(this, &level_scene::on_update);
     sync_physics(this, &level_scene::on_physics_update);
-    submit(this, &level_scene::on_scene_render);
     attach(this, &level_scene::on_ui_update);
 
     console_log_warn("World Tag After Initialization ======>>>>> {}",
@@ -308,11 +310,12 @@ level_scene::on_ui_update() {
         //! outside of the window
         //! @note Imgui will just have a window that appears until when you exit
         //! the application and the UI is not docked outside the window
-        atlas::ui::draw_panel_component<atlas::MeshComponent>("Sphere", [&]() {
+        atlas::ui::draw_panel_component<atlas::RenderTarget3D>("Sphere", [&]() {
             atlas::ui::draw_vec3("pos 1", sphere_data.Position);
             atlas::ui::draw_vec3("scale 1", sphere_data.Scale);
             atlas::ui::draw_vec3("rotate 1", sphere_data.Rotation);
             atlas::ui::draw_vec3("color 1", sphere_data.Color);
+            atlas::ui::draw_vec3("Light Pos", g_light_position);
             atlas::ui::button_open_file_dialog("Load Mesh 1",
                                                sphere_data.mesh_file);
 
@@ -320,13 +323,13 @@ level_scene::on_ui_update() {
                 std::filesystem::path relative_path =
                   std::filesystem::relative(sphere_data.mesh_file, "./");
                 console_log_trace("Filepath = {}", sphere_data.mesh_file);
-                m_sphere->set<atlas::MeshComponent>({ relative_path.string() });
+                m_sphere->set<atlas::RenderTarget3D>({ relative_path.string() });
                 //! TODO: Empty String again to reset the filepath set
                 sphere_data.mesh_file = "";
             }
         });
 
-        atlas::ui::draw_panel_component<atlas::MeshComponent>(
+        atlas::ui::draw_panel_component<atlas::RenderTarget3D>(
           "Some Mesh", [&]() {
               atlas::ui::draw_vec3("Position 2", some_mesh_data.Position);
               atlas::ui::draw_vec3("Scale 2", some_mesh_data.Scale);
@@ -348,7 +351,7 @@ level_scene::on_ui_update() {
               //   }
           });
 
-        // atlas::ui::draw_panel_component<atlas::PerspectiveCamera>(
+        // atlas::ui::draw_panel_component<atlas::Camera>(
         //   "Camera", [&]() {
         //       camera_data.Position = atlas::ui::draw_vec3("Position");
         //       camera_data.Front = atlas::ui::draw_vec3("Front");
@@ -371,7 +374,7 @@ level_scene::on_update() {
 
     auto camera_transform = *m_camera->get<atlas::Transform>();
 
-    auto camera_comp = *m_camera->get<atlas::PerspectiveCamera>();
+    auto camera_comp = *m_camera->get<atlas::Camera>();
 
     //! TODO: Move DeltaTime out of global update
     //! TODO: global_update just uses delta timer for frame-rate stuff, and we
@@ -445,8 +448,9 @@ level_scene::on_update() {
     //! @note
     camera_comp.MovementSpeed = sensitivity;
     camera_comp.UpdateProjView();
+    camera_comp.IsMainCamera = true;
 
-    m_camera->set<atlas::PerspectiveCamera>(camera_comp);
+    m_camera->set<atlas::Camera>(camera_comp);
     m_camera->set<atlas::Transform>(camera_transform);
 
     atlas::Transform sphere_transform = {
@@ -509,12 +513,6 @@ level_scene::on_physics_update() {
     if (m_is_simulation_enabled) {
         m_physics_scene.on_runtime_update(steps);
     }
-}
-
-void
-level_scene::on_scene_render() {
-    atlas::renderer::render_with_camera(m_sphere, m_camera);
-    atlas::renderer::render_with_camera(m_platform, m_camera);
 }
 
 void

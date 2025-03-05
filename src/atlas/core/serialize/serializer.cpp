@@ -134,17 +134,17 @@ namespace atlas {
             output << YAML::EndMap;
         }
 
-        if (p_entity.has<PerspectiveCamera>()) {
+        if (p_entity.has<Camera>()) {
             output << YAML::Key << "Perspective Camera";
             // output << YAML::Key << "Camera" << YAML::Value;
 
-            auto perspective_camera = p_entity.get<PerspectiveCamera>();
+            auto perspective_camera = p_entity.get<Camera>();
 
             output << YAML::BeginMap;
             output << YAML::Key << "Position" << YAML::Value
                    << perspective_camera->Position;
-            output << YAML::Key << "Front" << YAML::Value
-                   << perspective_camera->Front;
+            // output << YAML::Key << "Front" << YAML::Value
+            //        << perspective_camera->Front;
             output << YAML::Key << "Up" << YAML::Value
                    << perspective_camera->Up;
             output << YAML::Key << "Down" << YAML::Value
@@ -153,10 +153,9 @@ namespace atlas {
                    << perspective_camera->Right;
             output << YAML::Key << "Left" << YAML::Value
                    << perspective_camera->Left;
-            output << YAML::Key << "Yaw" << YAML::Value
-                   << perspective_camera->Yaw;
-            output << YAML::Key << "Pitch" << YAML::Value
-                   << perspective_camera->Pitch;
+            output << YAML::Key << "Euler" << YAML::Value
+                //    << perspective_camera->EulerRotation;
+                << perspective_camera->EulerRotation;
             output << YAML::Key << "MovementSpeed" << YAML::Value
                    << perspective_camera->MovementSpeed;
             output << YAML::Key << "MouseSensitivity" << YAML::Value
@@ -167,11 +166,11 @@ namespace atlas {
             output << YAML::EndMap;
         }
 
-        if (p_entity.has<MeshComponent>()) {
+        if (p_entity.has<RenderTarget3D>()) {
             output << YAML::Key << "Mesh Component";
             // output << YAML::Key << "Mesh" << YAML::Value;
 
-            auto mesh_component = p_entity.get<MeshComponent>();
+            auto mesh_component = p_entity.get<RenderTarget3D>();
 
             output << YAML::BeginMap;
 

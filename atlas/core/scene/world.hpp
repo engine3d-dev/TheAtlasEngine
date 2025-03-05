@@ -74,6 +74,7 @@ namespace atlas {
         void add_scene(ref<scene_scope> p_scene_context);
 
         flecs::world* get_registry() { return &m_scene_registry; }
+        // flecs::world& get_registry() { return m_scene_registry; }
 
         operator flecs::world&() { return m_scene_registry; }
 

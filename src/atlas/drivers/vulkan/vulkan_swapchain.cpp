@@ -610,7 +610,7 @@ namespace atlas::vk {
         }
 
         m_swapchain_fences[m_current_image_index] =
-          m_swapchain_in_flight_fences[m_current_frame_index];
+          m_swapchain_in_flight_fences[g_current_frame_index];
 
         VkSubmitInfo submit_info = {
             .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
@@ -618,7 +618,7 @@ namespace atlas::vk {
         };
 
         VkSemaphore wait_semaphore[] = {
-            m_semaphores_images_available[m_current_frame_index]
+            m_semaphores_images_available[g_current_frame_index]
         };
 
         VkPipelineStageFlags wait_stages[] = {
@@ -633,20 +633,20 @@ namespace atlas::vk {
         submit_info.pCommandBuffers = p_CommandBuffers;
 
         VkSemaphore signal_sems[] = {
-            m_semaphores_render_completed[m_current_frame_index]
+            m_semaphores_render_completed[g_current_frame_index]
         };
 
         submit_info.signalSemaphoreCount = 1;
         submit_info.pSignalSemaphores = signal_sems;
 
         vkResetFences(
-          m_driver, 1, &m_swapchain_in_flight_fences[m_current_frame_index]);
+          m_driver, 1, &m_swapchain_in_flight_fences[g_current_frame_index]);
 
         vk_check(
           vkQueueSubmit(m_driver.get_graphics_queue(),
                         1,
                         &submit_info,
-                        m_swapchain_in_flight_fences[m_current_frame_index]),
+                        m_swapchain_in_flight_fences[g_current_frame_index]),
           "vkQueueSubmit",
           __FILE__,
           __LINE__,
@@ -681,8 +681,8 @@ namespace atlas::vk {
 
         vk_check(res, "vkQueuePresentKHR", __FILE__, __LINE__, __FUNCTION__);
 
-        m_current_frame_index =
-          (m_current_frame_index + 1) % vk_swapchain::MaxFramesInFlight;
+        g_current_frame_index =
+          (g_current_frame_index + 1) % vk_swapchain::MaxFramesInFlight;
     }
 
     uint32_t vk_swapchain::read_acquire_next_frame() {
@@ -690,7 +690,7 @@ namespace atlas::vk {
         vk_check(
           vkWaitForFences(m_driver,
                           1,
-                          &m_swapchain_in_flight_fences[m_current_frame_index],
+                          &m_swapchain_in_flight_fences[g_current_frame_index],
                           true,
                           std::numeric_limits<uint32_t>::max()),
           "vkWaitForFences",
@@ -702,7 +702,7 @@ namespace atlas::vk {
           m_driver,
           m_swapchain,
           std::numeric_limits<uint64_t>::max(),
-          m_semaphores_images_available[m_current_frame_index],
+          m_semaphores_images_available[g_current_frame_index],
           VK_NULL_HANDLE,
           &image_index);
         if (res == VK_ERROR_OUT_OF_DATE_KHR || res == VK_SUBOPTIMAL_KHR) {
@@ -727,7 +727,7 @@ namespace atlas::vk {
     }
 
     uint32_t vk_swapchain::current_frame_per_tick() {
-        return m_current_frame_index;
+        return g_current_frame_index;
     }
 
     uint32_t vk_swapchain::select_memory_type(

@@ -18,9 +18,9 @@ namespace atlas {
         static Mesh load(const std::string& p_filepath);
         // bool load_from_file(const std::string& p_filepath);
 
-        ref<vertex_buffer>& get_vertices() { return m_vertex_buffer; }
+        ref<vertex_buffer>& get_vertex_buffer() { return m_vertex_buffer; }
 
-        ref<index_buffer>& get_indices() { return m_index_buffer; }
+        ref<index_buffer>& get_index_buffer() { return m_index_buffer; }
 
     private:
         ref<vertex_buffer> m_vertex_buffer;

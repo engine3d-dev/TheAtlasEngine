@@ -114,11 +114,6 @@ namespace atlas {
     }
 
     template<typename UObject, typename UCallable>
-    void submit(UObject* p_instance, const UCallable& p_callable) {
-        sync_update::submit(p_instance, p_callable);
-    }
-
-    template<typename UObject, typename UCallable>
     void attach(UObject* p_instance, const UCallable& p_callable) {
         sync_update::attach(p_instance, p_callable);
     }
