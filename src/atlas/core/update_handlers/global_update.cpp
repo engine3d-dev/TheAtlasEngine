@@ -78,7 +78,7 @@ namespace atlas {
         sync_update::on_ui_update();
 
         // sync_update::on_update();
-        sync_update::on_scene_render();
+        // sync_update::on_scene_render();
         // std::thread render_thread();
         // s_render_thread =
         // create_scope<std::thread>(sync_update::on_scene_render);

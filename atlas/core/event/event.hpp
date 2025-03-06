@@ -31,12 +31,12 @@ namespace atlas::event {
         std::map<int, const float*> AxesOfController;
     };
 
-    bool is_key_pressed(KeyCode p_key);
+    bool is_key_pressed(int p_key);
 
-    bool is_key_released(KeyCode p_key);
+    bool is_key_released(int p_key);
 
-    bool is_mouse_pressed(MouseCode p_mouse_code);
-    bool is_mouse_released(MouseCode p_mouse_code);
+    bool is_mouse_pressed(int p_mouse_code);
+    bool is_mouse_released(int p_mouse_code);
 
     glm::vec2 cursor_position();
 
@@ -50,9 +50,9 @@ namespace atlas::event {
 
     bool is_joystick_button_released(int p_controller_id);
 
-    bool is_joystick_button_pressed(unsigned char p_button);
+    bool is_joystick_button_pressed(int p_button);
 
-    bool is_joystick_button_released(unsigned char p_button);
+    bool is_joystick_button_released(int p_button);
 
     // specific for listening events
     void update_events();

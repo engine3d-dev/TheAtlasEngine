@@ -2,7 +2,7 @@
 #include <cstdint>
 
 namespace atlas {
-    enum class KeyCode : uint16_t {
+    enum KeyCode : int {
         // From glfw3.h
         Space = 32,
         Apostrophe = 39, /* ' */
@@ -138,128 +138,129 @@ namespace atlas {
 }
 
 // From glfw3.h
-#define KEY_SPACE ::atlas::KeyCode::Space
-#define KEY_APOSTROPHE ::atlas::KeyCode::Apostrophe /* ' */
-#define KEY_COMMA ::atlas::KeyCode::Comma           /* , */
-#define KEY_MINUS ::atlas::KeyCode::Minus           /* - */
-#define KEY_PERIOD ::atlas::KeyCode::Period         /* . */
-#define KEY_SLASH ::atlas::KeyCode::Slash           /* / */
-#define KEY_0 ::atlas::KeyCode::D0
-#define KEY_1 ::atlas::KeyCode::D1
-#define KEY_2 ::atlas::KeyCode::D2
-#define KEY_3 ::atlas::KeyCode::D3
-#define KEY_4 ::atlas::KeyCode::D4
-#define KEY_5 ::atlas::KeyCode::D5
-#define KEY_6 ::atlas::KeyCode::D6
-#define KEY_7 ::atlas::KeyCode::D7
-#define KEY_8 ::atlas::KeyCode::D8
-#define KEY_9 ::atlas::KeyCode::D9
-#define KEY_SEMICOLON ::atlas::KeyCode::Semicolon /* ; */
-#define KEY_EQUAL ::atlas::KeyCode::Equal         /* = */
-#define KEY_A ::atlas::KeyCode::A
-#define KEY_B ::atlas::KeyCode::B
-#define KEY_C ::atlas::KeyCode::C
-#define KEY_D ::atlas::KeyCode::D
-#define KEY_E ::atlas::KeyCode::E
-#define KEY_F ::atlas::KeyCode::F
-#define KEY_G ::atlas::KeyCode::G
-#define KEY_H ::atlas::KeyCode::H
-#define KEY_I ::atlas::KeyCode::I
-#define KEY_J ::atlas::KeyCode::J
-#define KEY_K ::atlas::KeyCode::K
-#define KEY_L ::atlas::KeyCode::L
-#define KEY_M ::atlas::KeyCode::M
-#define KEY_N ::atlas::KeyCode::N
-#define KEY_O ::atlas::KeyCode::O
-#define KEY_P ::atlas::KeyCode::P
-#define KEY_Q ::atlas::KeyCode::Q
-#define KEY_R ::atlas::KeyCode::R
-#define KEY_S ::atlas::KeyCode::S
-#define KEY_T ::atlas::KeyCode::T
-#define KEY_U ::atlas::KeyCode::U
-#define KEY_V ::atlas::KeyCode::V
-#define KEY_W ::atlas::KeyCode::W
-#define KEY_X ::atlas::KeyCode::X
-#define KEY_Y ::atlas::KeyCode::Y
-#define KEY_Z ::atlas::KeyCode::Z
-#define KEY_LEFT_BRACKET ::atlas::KeyCode::LeftBracket   /* [ */
-#define KEY_BACKSLASH ::atlas::KeyCode::Backslash        /* \ */
-#define KEY_RIGHT_BRACKET ::atlas::KeyCode::RightBracket /* ] */
-#define KEY_GRAVE_ACCENT ::atlas::KeyCode::GraveAccent   /* ` */
-#define KEY_WORLD_1 ::atlas::KeyCode::World1             /* non-US #1 */
-#define KEY_WORLD_2 ::atlas::KeyCode::World2             /* non-US #2 */
+
+inline constexpr int KEY_SPACE = ::atlas::KeyCode::Space;
+inline constexpr int KEY_APOSTROPHE = ::atlas::KeyCode::Apostrophe; /* ' */
+inline constexpr int KEY_COMMA = ::atlas::KeyCode::Comma;           /* , */
+inline constexpr int KEY_MINUS = ::atlas::KeyCode::Minus;           /* - */
+inline constexpr int KEY_PERIOD = ::atlas::KeyCode::Period;         /* . */
+inline constexpr int KEY_SLASH = ::atlas::KeyCode::Slash;           /* / */
+inline constexpr int KEY_0 = ::atlas::KeyCode::D0;
+inline constexpr int KEY_1 = ::atlas::KeyCode::D1;
+inline constexpr int KEY_2 = ::atlas::KeyCode::D2;
+inline constexpr int KEY_3 = ::atlas::KeyCode::D3;
+inline constexpr int KEY_4 = ::atlas::KeyCode::D4;
+inline constexpr int KEY_5 = ::atlas::KeyCode::D5;
+inline constexpr int KEY_6 = ::atlas::KeyCode::D6;
+inline constexpr int KEY_7 = ::atlas::KeyCode::D7;
+inline constexpr int KEY_8 = ::atlas::KeyCode::D8;
+inline constexpr int KEY_9 = ::atlas::KeyCode::D9;
+inline constexpr int KEY_SEMICOLON = ::atlas::KeyCode::Semicolon; /* ; */
+inline constexpr int KEY_EQUAL = ::atlas::KeyCode::Equal;         /* = */
+inline constexpr int KEY_A = ::atlas::KeyCode::A;
+inline constexpr int KEY_B = ::atlas::KeyCode::B;
+inline constexpr int KEY_C = ::atlas::KeyCode::C;
+inline constexpr int KEY_D = ::atlas::KeyCode::D;
+inline constexpr int KEY_E = ::atlas::KeyCode::E;
+inline constexpr int KEY_F = ::atlas::KeyCode::F;
+inline constexpr int KEY_G = ::atlas::KeyCode::G;
+inline constexpr int KEY_H = ::atlas::KeyCode::H;
+inline constexpr int KEY_I = ::atlas::KeyCode::I;
+inline constexpr int KEY_J = ::atlas::KeyCode::J;
+inline constexpr int KEY_K = ::atlas::KeyCode::K;
+inline constexpr int KEY_L = ::atlas::KeyCode::L;
+inline constexpr int KEY_M = ::atlas::KeyCode::M;
+inline constexpr int KEY_N = ::atlas::KeyCode::N;
+inline constexpr int KEY_O = ::atlas::KeyCode::O;
+inline constexpr int KEY_P = ::atlas::KeyCode::P;
+inline constexpr int KEY_Q = ::atlas::KeyCode::Q;
+inline constexpr int KEY_R = ::atlas::KeyCode::R;
+inline constexpr int KEY_S = ::atlas::KeyCode::S;
+inline constexpr int KEY_T = ::atlas::KeyCode::T;
+inline constexpr int KEY_U = ::atlas::KeyCode::U;
+inline constexpr int KEY_V = ::atlas::KeyCode::V;
+inline constexpr int KEY_W = ::atlas::KeyCode::W;
+inline constexpr int KEY_X = ::atlas::KeyCode::X;
+inline constexpr int KEY_Y = ::atlas::KeyCode::Y;
+inline constexpr int KEY_Z = ::atlas::KeyCode::Z;
+inline constexpr int KEY_LEFT_BRACKET = ::atlas::KeyCode::LeftBracket;   /* [ */
+inline constexpr int KEY_BACKSLASH = ::atlas::KeyCode::Backslash;        /* \ */
+inline constexpr int KEY_RIGHT_BRACKET = ::atlas::KeyCode::RightBracket; /* ] */
+inline constexpr int KEY_GRAVE_ACCENT = ::atlas::KeyCode::GraveAccent;   /* ` */
+inline constexpr int KEY_WORLD_1 = ::atlas::KeyCode::World1;             /* non-US #1 */
+inline constexpr int KEY_WORLD_2 = ::atlas::KeyCode::World2;             /* non-US #2 */
 
 /* Function keys */
-#define KEY_ESCAPE ::atlas::KeyCode::Escape
-#define KEY_ENTER ::atlas::KeyCode::Enter
-#define KEY_TAB ::atlas::KeyCode::Tab
-#define KEY_BACKSPACE ::atlas::KeyCode::Backspace
-#define KEY_INSERT ::atlas::KeyCode::Insert
-#define KEY_DELETE ::atlas::KeyCode::Delete
-#define KEY_RIGHT ::atlas::KeyCode::Right
-#define KEY_LEFT ::atlas::KeyCode::Left
-#define KEY_DOWN ::atlas::KeyCode::Down
-#define KEY_UP ::atlas::KeyCode::Up
-#define KEY_PAGE_UP ::atlas::KeyCode::PageUp
-#define KEY_PAGE_DOWN ::atlas::KeyCode::PageDown
-#define KEY_HOME ::atlas::KeyCode::Home
-#define KEY_END ::atlas::KeyCode::End
-#define KEY_CAPS_LOCK ::atlas::KeyCode::CapsLock
-#define KEY_SCROLL_LOCK ::atlas::KeyCode::ScrollLock
-#define KEY_NUM_LOCK ::atlas::KeyCode::NumLock
-#define KEY_PRINT_SCREEN ::atlas::KeyCode::PrintScreen
-#define KEY_PAUSE ::atlas::KeyCode::Pause
-#define KEY_F1 ::atlas::KeyCode::F1
-#define KEY_F2 ::atlas::KeyCode::F2
-#define KEY_F3 ::atlas::KeyCode::F3
-#define KEY_F4 ::atlas::KeyCode::F4
-#define KEY_F5 ::atlas::KeyCode::F5
-#define KEY_F6 ::atlas::KeyCode::F6
-#define KEY_F7 ::atlas::KeyCode::F7
-#define KEY_F8 ::atlas::KeyCode::F8
-#define KEY_F9 ::atlas::KeyCode::F9
-#define KEY_F10 ::atlas::KeyCode::F10
-#define KEY_F11 ::atlas::KeyCode::F11
-#define KEY_F12 ::atlas::KeyCode::F12
-#define KEY_F13 ::atlas::KeyCode::F13
-#define KEY_F14 ::atlas::KeyCode::F14
-#define KEY_F15 ::atlas::KeyCode::F15
-#define KEY_F16 ::atlas::KeyCode::F16
-#define KEY_F17 ::atlas::KeyCode::F17
-#define KEY_F18 ::atlas::KeyCode::F18
-#define KEY_F19 ::atlas::KeyCode::F19
-#define KEY_F20 ::atlas::KeyCode::F20
-#define KEY_F21 ::atlas::KeyCode::F21
-#define KEY_F22 ::atlas::KeyCode::F22
-#define KEY_F23 ::atlas::KeyCode::F23
-#define KEY_F24 ::atlas::KeyCode::F24
-#define KEY_F25 ::atlas::KeyCode::F25
+inline constexpr int KEY_ESCAPE = ::atlas::KeyCode::Escape;
+inline constexpr int KEY_ENTER = ::atlas::KeyCode::Enter;
+inline constexpr int KEY_TAB = ::atlas::KeyCode::Tab;
+inline constexpr int KEY_BACKSPACE = ::atlas::KeyCode::Backspace;
+inline constexpr int KEY_INSERT = ::atlas::KeyCode::Insert;
+inline constexpr int KEY_DELETE = ::atlas::KeyCode::Delete;
+inline constexpr int KEY_RIGHT = ::atlas::KeyCode::Right;
+inline constexpr int KEY_LEFT = ::atlas::KeyCode::Left;
+inline constexpr int KEY_DOWN = ::atlas::KeyCode::Down;
+inline constexpr int KEY_UP = ::atlas::KeyCode::Up;
+inline constexpr int KEY_PAGE_UP = ::atlas::KeyCode::PageUp;
+inline constexpr int KEY_PAGE_DOWN = ::atlas::KeyCode::PageDown;
+inline constexpr int KEY_HOME = ::atlas::KeyCode::Home;
+inline constexpr int KEY_END = ::atlas::KeyCode::End;
+inline constexpr int KEY_CAPS_LOCK = ::atlas::KeyCode::CapsLock;
+inline constexpr int KEY_SCROLL_LOCK = ::atlas::KeyCode::ScrollLock;
+inline constexpr int KEY_NUM_LOCK = ::atlas::KeyCode::NumLock;
+inline constexpr int KEY_PRINT_SCREEN = ::atlas::KeyCode::PrintScreen;
+inline constexpr int KEY_PAUSE = ::atlas::KeyCode::Pause;
+inline constexpr int KEY_F1 = ::atlas::KeyCode::F1;
+inline constexpr int KEY_F2 = ::atlas::KeyCode::F2;
+inline constexpr int KEY_F3 = ::atlas::KeyCode::F3;
+inline constexpr int KEY_F4 = ::atlas::KeyCode::F4;
+inline constexpr int KEY_F5 = ::atlas::KeyCode::F5;
+inline constexpr int KEY_F6 = ::atlas::KeyCode::F6;
+inline constexpr int KEY_F7 = ::atlas::KeyCode::F7;
+inline constexpr int KEY_F8 = ::atlas::KeyCode::F8;
+inline constexpr int KEY_F9 = ::atlas::KeyCode::F9;
+inline constexpr int KEY_F10 = ::atlas::KeyCode::F10;
+inline constexpr int KEY_F11 = ::atlas::KeyCode::F11;
+inline constexpr int KEY_F12 = ::atlas::KeyCode::F12;
+inline constexpr int KEY_F13 = ::atlas::KeyCode::F13;
+inline constexpr int KEY_F14 = ::atlas::KeyCode::F14;
+inline constexpr int KEY_F15 = ::atlas::KeyCode::F15;
+inline constexpr int KEY_F16 = ::atlas::KeyCode::F16;
+inline constexpr int KEY_F17 = ::atlas::KeyCode::F17;
+inline constexpr int KEY_F18 = ::atlas::KeyCode::F18;
+inline constexpr int KEY_F19 = ::atlas::KeyCode::F19;
+inline constexpr int KEY_F20 = ::atlas::KeyCode::F20;
+inline constexpr int KEY_F21 = ::atlas::KeyCode::F21;
+inline constexpr int KEY_F22 = ::atlas::KeyCode::F22;
+inline constexpr int KEY_F23 = ::atlas::KeyCode::F23;
+inline constexpr int KEY_F24 = ::atlas::KeyCode::F24;
+inline constexpr int KEY_F25 = ::atlas::KeyCode::F25;
 
 /* Keypad */
-#define KEY_KP_0 ::atlas::KeyCode::KP0
-#define KEY_KP_1 ::atlas::KeyCode::KP1
-#define KEY_KP_2 ::atlas::KeyCode::KP2
-#define KEY_KP_3 ::atlas::KeyCode::KP3
-#define KEY_KP_4 ::atlas::KeyCode::KP4
-#define KEY_KP_5 ::atlas::KeyCode::KP5
-#define KEY_KP_6 ::atlas::KeyCode::KP6
-#define KEY_KP_7 ::atlas::KeyCode::KP7
-#define KEY_KP_8 ::atlas::KeyCode::KP8
-#define KEY_KP_9 ::atlas::KeyCode::KP9
-#define KEY_KP_DECIMAL ::atlas::KeyCode::KPDecimal
-#define KEY_KP_DIVIDE ::atlas::KeyCode::KPDivide
-#define KEY_KP_MULTIPLY ::atlas::KeyCode::KPMultiply
-#define KEY_KP_SUBTRACT ::atlas::KeyCode::KPSubtract
-#define KEY_KP_ADD ::atlas::KeyCode::KPAdd
-#define KEY_KP_ENTER ::atlas::KeyCode::KPEnter
-#define KEY_KP_EQUAL ::atlas::KeyCode::KPEqual
+inline constexpr int KEY_KP_0 = ::atlas::KeyCode::KP0;
+inline constexpr int KEY_KP_1 = ::atlas::KeyCode::KP1;
+inline constexpr int KEY_KP_2 = ::atlas::KeyCode::KP2;
+inline constexpr int KEY_KP_3 = ::atlas::KeyCode::KP3;
+inline constexpr int KEY_KP_4 = ::atlas::KeyCode::KP4;
+inline constexpr int KEY_KP_5 = ::atlas::KeyCode::KP5;
+inline constexpr int KEY_KP_6 = ::atlas::KeyCode::KP6;
+inline constexpr int KEY_KP_7 = ::atlas::KeyCode::KP7;
+inline constexpr int KEY_KP_8 = ::atlas::KeyCode::KP8;
+inline constexpr int KEY_KP_9 = ::atlas::KeyCode::KP9;
+inline constexpr int KEY_KP_DECIMAL = ::atlas::KeyCode::KPDecimal;
+inline constexpr int KEY_KP_DIVIDE = ::atlas::KeyCode::KPDivide;
+inline constexpr int KEY_KP_MULTIPLY = ::atlas::KeyCode::KPMultiply;
+inline constexpr int KEY_KP_SUBTRACT = ::atlas::KeyCode::KPSubtract;
+inline constexpr int KEY_KP_ADD = ::atlas::KeyCode::KPAdd;
+inline constexpr int KEY_KP_ENTER = ::atlas::KeyCode::KPEnter;
+inline constexpr int KEY_KP_EQUAL = ::atlas::KeyCode::KPEqual;
 
-#define KEY_LEFT_SHIFT ::atlas::KeyCode::LeftShift
-#define KEY_LEFT_CONTROL ::atlas::KeyCode::LeftControl
-#define KEY_LEFT_ALT ::atlas::KeyCode::LeftAlt
-#define KEY_LEFT_SUPER ::atlas::KeyCode::Leftsuper
-#define KEY_RIGHT_SHIFT ::atlas::KeyCode::RightShift
-#define KEY_RIGHT_CONTROL ::atlas::KeyCode::RightControl
-#define KEY_RIGHT_ALT ::atlas::KeyCode::RightAlt
-#define KEY_RIGHT_SUPER ::atlas::KeyCode::Rightsuper
-#define KEY_MENU ::atlas::KeyCode::Menu
+inline constexpr int KEY_LEFT_SHIFT = ::atlas::KeyCode::LeftShift;
+inline constexpr int KEY_LEFT_CONTROL = ::atlas::KeyCode::LeftControl;
+inline constexpr int KEY_LEFT_ALT = ::atlas::KeyCode::LeftAlt;
+inline constexpr int KEY_LEFT_SUPER = ::atlas::KeyCode::Leftsuper;
+inline constexpr int KEY_RIGHT_SHIFT = ::atlas::KeyCode::RightShift;
+inline constexpr int KEY_RIGHT_CONTROL = ::atlas::KeyCode::RightControl;
+inline constexpr int KEY_RIGHT_ALT = ::atlas::KeyCode::RightAlt;
+inline constexpr int KEY_RIGHT_SUPER = ::atlas::KeyCode::Rightsuper;
+inline constexpr int KEY_MENU = ::atlas::KeyCode::Menu;
