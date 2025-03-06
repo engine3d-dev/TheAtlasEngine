@@ -5,21 +5,21 @@
 namespace atlas::event {
     static std::map<uint32_t, joystick_info> s_controllers;
 
-    bool is_key_pressed(KeyCode p_key) {
+    bool is_key_pressed(int p_key) {
         GLFWwindow* window = application::get_window();
 
         auto state = glfwGetKey(window, static_cast<int32_t>(p_key));
         return (state == GLFW_PRESS);
     }
 
-    bool is_key_released(KeyCode p_key) {
+    bool is_key_released(int p_key) {
         GLFWwindow* window = application::get_window();
 
         auto state = glfwGetKey(window, static_cast<int32_t>(p_key));
         return (state == GLFW_RELEASE);
     }
 
-    bool is_mouse_pressed(MouseCode p_mouse_code) {
+    bool is_mouse_pressed(int p_mouse_code) {
         GLFWwindow* window = application::get_window();
 
         auto state =
@@ -27,7 +27,7 @@ namespace atlas::event {
         return (state == GLFW_PRESS);
     }
 
-    bool is_mouse_released(MouseCode p_mouse_code) {
+    bool is_mouse_released(int p_mouse_code) {
         GLFWwindow* window = application::get_window();
 
         auto state =
@@ -67,11 +67,11 @@ namespace atlas::event {
         }
     }
 
-    bool is_joystick_button_released(unsigned char p_button) {
+    bool is_joystick_button_released(int p_button) {
         return (p_button == GLFW_PRESS);
     }
 
-    bool is_joystick_button_pressed(unsigned char p_button) {
+    bool is_joystick_button_pressed(int p_button) {
         return (p_button == GLFW_RELEASE);
     }
 
