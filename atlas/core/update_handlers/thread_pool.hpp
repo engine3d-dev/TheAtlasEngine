@@ -2,13 +2,14 @@
 #include <core/core.hpp>
 #include <thread>
 
-namespace atlas{
+namespace atlas {
 
     /**
-     * @note There are a few things to note when considering implementing the thread pool
-     * 
-     * 
-    */
+     * @note There are a few things to note when considering implementing the
+     * thread pool
+     *
+     *
+     */
 
     class thread_pool {
     public:
