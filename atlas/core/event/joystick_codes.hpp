@@ -50,11 +50,19 @@ inline constexpr int JOY_STICK_6 = ::atlas::Joystick::JoystickCodes::JOYSTICK_6;
 inline constexpr int JOY_STICK_7 = ::atlas::Joystick::JoystickCodes::JOYSTICK_7;
 inline constexpr int JOY_STICK_8 = ::atlas::Joystick::JoystickCodes::JOYSTICK_8;
 inline constexpr int JOY_STICK_9 = ::atlas::Joystick::JoystickCodes::JOYSTICK_9;
-inline constexpr int JOY_STICK_10 = ::atlas::Joystick::JoystickCodes::JOYSTICK_10;
-inline constexpr int JOY_STICK_11 = ::atlas::Joystick::JoystickCodes::JOYSTICK_11;
-inline constexpr int JOY_STICK_12 = ::atlas::Joystick::JoystickCodes::JOYSTICK_12;
-inline constexpr int JOY_STICK_13 = ::atlas::Joystick::JoystickCodes::JOYSTICK_13;
-inline constexpr int JOY_STICK_14 = ::atlas::Joystick::JoystickCodes::JOYSTICK_14;
-inline constexpr int JOY_STICK_15 = ::atlas::Joystick::JoystickCodes::JOYSTICK_15;
-inline constexpr int JOY_STICK_16 = ::atlas::Joystick::JoystickCodes::JOYSTICK_16;
-inline constexpr int JOY_STICK_LAST = ::atlas::Joystick::JoystickCodes::JOYSTICK_LAST;
+inline constexpr int JOY_STICK_10 =
+  ::atlas::Joystick::JoystickCodes::JOYSTICK_10;
+inline constexpr int JOY_STICK_11 =
+  ::atlas::Joystick::JoystickCodes::JOYSTICK_11;
+inline constexpr int JOY_STICK_12 =
+  ::atlas::Joystick::JoystickCodes::JOYSTICK_12;
+inline constexpr int JOY_STICK_13 =
+  ::atlas::Joystick::JoystickCodes::JOYSTICK_13;
+inline constexpr int JOY_STICK_14 =
+  ::atlas::Joystick::JoystickCodes::JOYSTICK_14;
+inline constexpr int JOY_STICK_15 =
+  ::atlas::Joystick::JoystickCodes::JOYSTICK_15;
+inline constexpr int JOY_STICK_16 =
+  ::atlas::Joystick::JoystickCodes::JOYSTICK_16;
+inline constexpr int JOY_STICK_LAST =
+  ::atlas::Joystick::JoystickCodes::JOYSTICK_LAST;

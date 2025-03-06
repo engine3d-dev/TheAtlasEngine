@@ -187,8 +187,8 @@ inline constexpr int KEY_LEFT_BRACKET = ::atlas::KeyCode::LeftBracket;   /* [ */
 inline constexpr int KEY_BACKSLASH = ::atlas::KeyCode::Backslash;        /* \ */
 inline constexpr int KEY_RIGHT_BRACKET = ::atlas::KeyCode::RightBracket; /* ] */
 inline constexpr int KEY_GRAVE_ACCENT = ::atlas::KeyCode::GraveAccent;   /* ` */
-inline constexpr int KEY_WORLD_1 = ::atlas::KeyCode::World1;             /* non-US #1 */
-inline constexpr int KEY_WORLD_2 = ::atlas::KeyCode::World2;             /* non-US #2 */
+inline constexpr int KEY_WORLD_1 = ::atlas::KeyCode::World1; /* non-US #1 */
+inline constexpr int KEY_WORLD_2 = ::atlas::KeyCode::World2; /* non-US #2 */
 
 /* Function keys */
 inline constexpr int KEY_ESCAPE = ::atlas::KeyCode::Escape;
