@@ -16,7 +16,7 @@ jobs:
       id: review
 
     # Uploads an artefact containing clang_fixes.json
-    - uses: ZedThree/clang-tidy-review/upload@v0.14.0
+    - uses: ZedThree/clang-tidy-review/upload@v0.20.0
       id: upload-review
 
     # If there are any comments, fail the check
