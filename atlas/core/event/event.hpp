@@ -48,8 +48,11 @@ namespace atlas::event {
 
     float get_joystic_axis(int p_controller_id, int p_button);
 
-    bool is_joystick_button_released(int p_controller_id);
+    bool is_button_pressed(int p_button_id, int p_controller_id);
 
+    bool is_button_released(int p_button_id, int p_controller_id);
+
+    //! @note FIXME: Make button later
     bool is_joystick_button_pressed(int p_button);
 
     bool is_joystick_button_released(int p_button);

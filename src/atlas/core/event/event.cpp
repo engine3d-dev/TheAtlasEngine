@@ -67,12 +67,23 @@ namespace atlas::event {
         }
     }
 
-    bool is_joystick_button_released(int p_button) {
-        return (p_button == GLFW_PRESS);
+    bool is_button_released(int p_button_id, int p_controller_id) {
+        auto controller = s_controllers[p_controller_id];
+        return (controller.Buttons[p_button_id].ButtonState ==
+                input_state::Pressed);
+    }
+
+    bool is_button_pressed(int p_button_id, int p_controller_id) {
+        auto controller = s_controllers[p_controller_id];
+        return (controller.Buttons[p_button_id].ButtonState == GLFW_RELEASE);
     }
 
     bool is_joystick_button_pressed(int p_button) {
-        return (p_button == GLFW_RELEASE);
+        return p_button == GLFW_PRESS;
+    }
+
+    bool is_joystick_button_released(int p_button) {
+        return p_button == GLFW_RELEASE;
     }
 
     // specific for listening events
@@ -136,6 +147,11 @@ namespace atlas::event {
                 //     ConsoleLogFatal("Axes at for-loop i = {} and Axes value =
                 //     {:.3f}", i, axes[i]);
                 // }
+            }
+            else {
+                if (is_joystic_present(joystick_id)) {
+                    s_controllers.erase(joystick_id);
+                }
             }
         }
     }
