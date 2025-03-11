@@ -10,8 +10,8 @@ jobs:
             - uses: actions/checkout@v4
             
             - name: Ensuring winget is installed
-              run: Invoke-WebRequest -Uri https://aka.ms/getwinget -OutFile winget.msixbundle \
-                    Add-AppxPackage winget.msixbundle   \
+              run: Invoke-WebRequest -Uri https://aka.ms/getwinget -OutFile winget.msixbundle
+                    Add-AppxPackage winget.msixbundle
                     del winget.msixbundle
 
             - name: Setting up C++ on Windows
