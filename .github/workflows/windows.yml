@@ -9,9 +9,9 @@ jobs:
         steps:
             - uses: actions/checkout@v4
 
-            - name: Setting up C++ on Windows
-              shell: pwsh
-              run: winget install Microsoft.VisualStudio.2022.BuildTools --override "--add Microsoft.VisualStudio.Workload.VCTools --includeRecommended -p --installWhileDownloading"
+            # - name: Setting up C++ on Windows
+            #   shell: pwsh
+            #   run: winget install Microsoft.VisualStudio.2022.BuildTools --override "--add Microsoft.VisualStudio.Workload.VCTools --includeRecommended -p --installWhileDownloading"
             
             - name: Installing Choco
               shell: pwsh
@@ -25,9 +25,9 @@ jobs:
               shell: pwsh
               run: pip install conan
 
-            - name: Installing vulkan
-              shell: pwsh
-              run: winget install --id=KhronosGroup.VulkanSDK -e
+            # - name: Installing vulkan
+            #   shell: pwsh
+            #   run: winget install --id=KhronosGroup.VulkanSDK -e
             
             - name: Setting up conan profiles
               shell: pwsh
