@@ -2,28 +2,21 @@ cmake_minimum_required(VERSION 3.27)
 project(atlas C CXX)
 set(ENGINE_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/atlas)
 
-# set(CMAKE_BUILD_TYPE Debug CACHE STRING "CMake Build Type")
-# Define the build type based on Conan settings (optional)
-if(NOT DEFINED CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE ${CONAN_BUILD_TYPE} CACHE STRING "CMAKE build type")
+if(${TESTS_ONLY})
+  message("===================> TESTS ONLY ENABLED <=====================")
+  set(DIRECTORIES src)
+else()
+  set(DIRECTORIES src Editor)
 endif()
 
-
-# set(CMAKE_CONAN_CREATE_ENABLED "")
-# options(CMAKE_CONAN_CREATE_ENABLED ON)
-
-message("WHAT IS THE VALUE =======>>>>>>>> ${CMAKE_BUILD_TYPE}")
-
-# TODO: Add BUILD_TYPE parameter to specify different build types for engine3d to handle
-# Usage: build_library(BUILD_TYPE Release)
+# TODO: Enable toggling custom conan arguments for specifying which build to use
 
 
 build_core_library(
-    DIRECTORIES src editor
-    # DIRECTORIES src
+    DIRECTORIES ${DIRECTORIES}
 
     # This is to enable us to control if we want to run test cases or not
-    ENABLE_TESTS OFF
+    ENABLE_TESTS ${TESTS_ONLY}
 
     UNIT_TEST_SOURCES
 

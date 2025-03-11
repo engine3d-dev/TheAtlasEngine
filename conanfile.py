@@ -80,7 +80,7 @@ class AtlasRecipe(ConanFile):
         deps = CMakeDeps(self)
         deps.generate()
         tc = CMakeToolchain(self)
-        # tc.variables["CMAKE_BUILD_TYPE"] = "Debug"
+        tc.variables["TESTS_ONLY"] = "true"
         tc.generate()
 
     def build(self):
