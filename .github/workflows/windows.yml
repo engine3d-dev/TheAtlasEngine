@@ -1,0 +1,40 @@
+name: Windows Build Tests
+
+on: [push, pull_request]
+
+jobs:
+    windows-build:
+        name: "Windows-Build"
+        runs-on: windows-latest
+        steps:
+            - uses: actions/checkout@v4
+        
+            - name: Setting up C++ on Windows
+              run: winget install Microsoft.VisualStudio.2022.BuildTools --override "--add Microsoft.VisualStudio.Workload.VCTools --includeRecommended -p --installWhileDownloading"
+            
+            - name: Installing Choco
+              run: Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
+            - name: Install tooling with Choco
+              run: choco install git python llvm make cmake mingw
+            
+            - name: Pip installing conan
+              run: pip install conan
+
+            - name: Installing vulkan
+              uses: humbletim/setup-vulkan-sdk@v1.2.0
+              with:
+                vulkan-query-version: 1.3.204.0
+                vulkan-components: Vulkan-Headers, Vulkan-Loader
+                vulkan-use-cache: true
+            
+            - name: Setting up conan profiles
+              run: conan config install -sf profiles/x86_64/Windows/ -tf profiles https://github.com/engine3d-dev/conan-config.git
+            
+            - name: Setting up packages
+              run: conan remote add engine3d-conan https://libhal.jfrog.io/artifactory/api/conan/engine3d-conan
+            
+            - name: Running Test Cases
+              run: conan build . -b missing
+            
+            
