@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     
-    - name: 🌐 Downloading .clang-format from libhal
+    - name: 🌐 Downloading .clang-format from TheAtlasEngine
       run: wget https://raw.githubusercontent.com/engine3d-dev/TheAtlasEngine/dev/.clang-format -O .clang-format
     
     - uses: actions/checkout@v4
