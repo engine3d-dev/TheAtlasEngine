@@ -32,10 +32,9 @@ To build the project, run the following command below.
 conan build . -b missing
 ```
 
-## Running the engine
 
-When running the project. The engine will compile with the editor project within the repository.
+The compiled executable to run the editor to run is
 
-Conan the C++ package manager will compile your executable into the build directory it generates you.
-
-You should be able to find it in the `./build/editor/editor`.
+```
+./build/editor/editor
+```
