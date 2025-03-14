@@ -1,7 +1,7 @@
 name: clang-tidy-review
 
 # You can be more specific, but it currently only works on pull requests
-on: [pull_request]
+on: [pull_request, push]
 
 jobs:
   build:
