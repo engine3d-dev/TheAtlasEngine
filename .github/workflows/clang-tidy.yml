@@ -1,24 +1,24 @@
-# Run clang-tidy
-name: clang-tidy check
+name: clang-tidy-review
 
-on:
-  push:
-    branches: [ dev ]
-  pull_request:
-    branches: [ dev ]
+# You can be more specific, but it currently only works on pull requests
+on: [pull_request]
 
 jobs:
-  checkout-and-check-formatting:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Run clang-tidy
-      uses: HorstBaerbel/action-clang-tidy@1.2
-      # These are optional (defaults displayed)
-      with:
-        scandir: '.'
-        builddir: 'build'
-        excludedirs: ''
-        extensions: 'c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx'
-        cmakeoptions: ''
+    - uses: actions/checkout@v4
+
+    # Optionally generate compile_commands.json
+
+    - uses: ZedThree/clang-tidy-review@v0.14.0
+      id: review
+
+    # Uploads an artefact containing clang_fixes.json
+    - uses: ZedThree/clang-tidy-review/upload@v0.14.0
+      id: upload-review
+
+    # If there are any comments, fail the check
+    - if: steps.review.outputs.total_comments > 0
+      run: exit 1
