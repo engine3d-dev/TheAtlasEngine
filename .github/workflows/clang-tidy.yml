@@ -5,7 +5,7 @@ on: [pull_request]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v4
@@ -15,7 +15,43 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y build-essential
-    # Optionally generate compile_commands.json
+        
+      # Optionally generate compile_commands.json
+
+        # - name: Setting up C++ on Windows
+        #   shell: pwsh
+        #   run: winget install Microsoft.VisualStudio.2022.BuildTools --override "--add Microsoft.VisualStudio.Workload.VCTools --includeRecommended -p --installWhileDownloading"
+        
+    - name: Installing Choco
+      shell: pwsh
+      run: Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+
+    - name: Install tooling with Choco
+      shell: pwsh
+      run: choco install git llvm make cmake mingw
+    
+    # - name: Installing python
+    #   run: choco install python --version=3.12.2
+    
+    - name: Pip installing conan
+      shell: pwsh
+      run: pip install conan
+
+    # - name: Installing vulkan
+    #   shell: pwsh
+    #   run: winget install --id=KhronosGroup.VulkanSDK -e
+    
+    - name: Setting up conan profiles
+      shell: pwsh
+      run: conan config install -sf profiles/x86_64/Windows/ -tf profiles https://github.com/engine3d-dev/conan-config.git
+    
+    - name: Setting up packages
+      shell: pwsh
+      run: conan remote add engine3d-conan https://libhal.jfrog.io/artifactory/api/conan/engine3d-conan
+    
+    - name: Running Test Cases
+      shell: pwsh
+      run: conan build . -b missing
 
     - uses: ZedThree/clang-tidy-review@v0.20.1
       id: review
