@@ -82,15 +82,21 @@ class AtlasRecipe(ConanFile):
     def build(self):
         # Removing the .gcda files for specifically tests
         # Due to some arc-tag
-        gcda_tests_dir = os.path.join(self.build_folder, "CMakeFiles/unit_test.dir/tests")
-        tests_dir = os.path.join(self.source_folder, "tests");
-        tests_files = os.path.join(tests_dir, "*.test.cpp")
+        # gcda_tests_dir = os.path.join(self.build_folder, "CMakeFiles/unit_test.dir/tests")
+        # tests_dir = os.path.join(self.source_folder, "tests");
+        # tests_files = os.path.join(tests_dir, "*.test.cpp")
 
-        gcda_files = os.path.join(gcda_tests_dir, "*.gcda")
+        # gcda_files = os.path.join(gcda_tests_dir, "*.gcda")
 
-        if os.path.exists(gcda_tests_dir):
-            for file in glob.glob(gcda_files):
-                os.remove(file)
+        # if os.path.exists(gcda_tests_dir):
+        #     for file in glob.glob(gcda_files):
+        #         os.remove(file)
+        unit_test_dir = os.path.join(self.build_folder, "CMakeFiles\engine3d_unit_test.dir")
+        print(f"unit test dir === {unit_test_dir}")
+
+        if os.path.exists(unit_test_dir):
+            print("Cleaning up unit_test directory cache")
+            shutil.rmtree(unit_test_dir)
 
         cmake = CMake(self)
         cmake.configure()
