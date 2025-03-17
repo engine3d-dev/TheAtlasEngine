@@ -10,7 +10,7 @@ Open-source game engine for making games, building cool projects, and doing cool
 ## How to build the engine
 
 > [!TIP]
-> Before you build the project make sure to follow the setup instruction in the [getting start](https://engine3d-dev.github.io/getting_started) page.
+> Before you build the project make sure to follow the setup instruction in the [getting start](https://engine3d-dev.github.io/0.1/getting_started/) page.
 
 To get started in contributing here are the steps to do so. Follow these instructions.
 
