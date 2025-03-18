@@ -5,7 +5,7 @@ on: [pull_request, push]
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -22,39 +22,21 @@ jobs:
           #   shell: pwsh
           #   run: winget install Microsoft.VisualStudio.2022.BuildTools --override "--add Microsoft.VisualStudio.Workload.VCTools --includeRecommended -p --installWhileDownloading"
           
-      - name: Installing Choco
-        shell: pwsh
-        run: Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-  
-      - name: Install tooling with Choco
-        shell: pwsh
-        run: choco install git llvm make cmake mingw
-      
-      # - name: Installing python
-      #   run: choco install python --version=3.12.2
-      
-      - name: Pip installing conan
-        shell: pwsh
-        run: pip install conan
-  
-      # - name: Installing vulkan
-      #   shell: pwsh
-      #   run: winget install --id=KhronosGroup.VulkanSDK -e
-      
-      - name: Setting up conan profiles
-        shell: pwsh
-        run: conan config install -sf profiles/x86_64/Windows/ -tf profiles https://github.com/engine3d-dev/conan-config.git
-      
-      - name: Setting up packages
-        shell: pwsh
-        run: conan remote add engine3d-conan https://libhal.jfrog.io/artifactory/api/conan/engine3d-conan
-      
-      - name: Running Test Cases
-        shell: pwsh
-        run: conan build . -b missing
+      - name: Install LLVM
+        shell: bash
+        run: wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh
 
-      - uses: ZedThree/clang-tidy-review@v0.20.1
-        id: review
+      - name: Install Pip and Python
+        shell: bash
+        run: sudo apt install pipx && pipx install "conan>=2.10.1"
+
+      - name: Install conan profiles
+        shell: bash
+        run: conan config install -sf profiles/x86_64/linux/ -tf profiles https://github.com/engine3d-dev/conan-config.git
+
+      - name: Atlas Conan Packages
+        shell: bash
+        run: conan remote add engine3d-conan https://libhal.jfrog.io/artifactory/api/conan/engine3d-conan
   
       # Uploads an artefact containing clang_fixes.json
       - uses: ZedThree/clang-tidy-review/upload@v0.20.1
