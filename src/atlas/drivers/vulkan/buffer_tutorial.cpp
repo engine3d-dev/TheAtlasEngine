@@ -63,7 +63,7 @@ namespace atlas::vk {
             .memoryTypeIndex =
               vk_context::get_current_selected_physical_driver()
                 .search_memory_type(memory_requirements.memoryTypeBits,
-                                    p_memory_property_flags)
+                    m_memory_property_flags)
         };
 
         vk_check(vkAllocateMemory(vk_context::get_current_driver(),

@@ -8,6 +8,6 @@ boost::ut::suite<"basic_add"> add_test = []() {
         int y = 30;
         int z = (x + y);
 
-        expect(z == 0);
+        expect(z == 40);
     };
 };
