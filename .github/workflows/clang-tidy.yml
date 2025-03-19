@@ -1,42 +1,42 @@
-name: clang-tidy-review
+# name: clang-tidy-review
 
-# You can be more specific, but it currently only works on pull requests
-on: [pull_request, push]
+# # You can be more specific, but it currently only works on pull requests
+# on: [pull_request, push]
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v4
+#     steps:
+#       - uses: actions/checkout@v4
       
-      - name: Install LLVM
-        run: wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh
+#       - name: Install LLVM
+#         run: wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh
 
-      - name: Install Pip and Python
-        run: sudo apt install pipx && pipx install "conan>=2.10.1"
+#       - name: Install Pip and Python
+#         run: sudo apt install pipx && pipx install "conan>=2.10.1"
 
-      - name: Install conan profiles
-        run: conan config install -sf profiles/x86_64/linux/ -tf profiles https://github.com/engine3d-dev/conan-config.git
+#       - name: Install conan profiles
+#         run: conan config install -sf profiles/x86_64/linux/ -tf profiles https://github.com/engine3d-dev/conan-config.git
 
-      - name: Atlas Conan Packages
-        run: conan remote add engine3d-conan https://libhal.jfrog.io/artifactory/api/conan/engine3d-conan
+#       - name: Atlas Conan Packages
+#         run: conan remote add engine3d-conan https://libhal.jfrog.io/artifactory/api/conan/engine3d-conan
 
-      - name: Cloning Atlas Engine Repository
-        run: git clone https://github.com/engine3d-dev/TheAtlasEngine
+#       - name: Cloning Atlas Engine Repository
+#         run: git clone https://github.com/engine3d-dev/TheAtlasEngine
       
-      - name: Building Atlas Engine
-        run: cd TheAtlasEngine && conan build . -b missing -c tools.system.package_manager:mode=install
+#       - name: Building Atlas Engine
+#         run: cd TheAtlasEngine && conan build . -b missing -c tools.system.package_manager:mode=install
 
-      - name: Run clang-tidy
-        uses: HorstBaerbel/action-clang-tidy@1.2
-        # These are optional (defaults displayed)
-        with:
-          scandir: '.'
-          builddir: 'build'
-          excludedirs: ''
-          extensions: 'c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx'
-          cmakeoptions: ''
+#       - name: Run clang-tidy
+#         uses: HorstBaerbel/action-clang-tidy@1.2
+#         # These are optional (defaults displayed)
+#         with:
+#           scandir: '.'
+#           builddir: 'build'
+#           excludedirs: ''
+#           extensions: 'c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx'
+#           cmakeoptions: ''
   
       # Uploads an artefact containing clang_fixes.json
       # - uses: ZedThree/clang-tidy-review/upload@v0.20.1
@@ -45,3 +45,30 @@ jobs:
       # # If there are any comments, fail the check
       # - if: steps.review.outputs.total_comments > 0
       #   run: exit 1
+
+name: Clang Tidy Review
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # Using another container changes the
+    # working directory from GITHUB_WORKSPACE
+    container:
+      image: my-container
+
+    steps:
+    - uses: actions/checkout@v4
+
+    # Get the current working directory and set it
+    # as an environment variable
+    - name: Set base_dir
+      run: echo "base_dir=$(pwd)" >> $GITHUB_ENV
+
+    - uses: ZedThree/clang-tidy-review@v0.14.0
+      id: review
+      with:
+        # Tell clang-tidy-review the base directory.
+        # This will get replaced by the new working
+        # directory inside the action
+        base_dir: ${{ env.base_dir }}
