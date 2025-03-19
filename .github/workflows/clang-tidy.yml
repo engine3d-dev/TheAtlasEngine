@@ -37,11 +37,25 @@ jobs:
       - name: Atlas Conan Packages
         shell: bash
         run: conan remote add engine3d-conan https://libhal.jfrog.io/artifactory/api/conan/engine3d-conan
+
+      - name: Building Atlas Engine
+        shell: bash
+        run: conan build . -b missing
+
+      - name: Run clang-tidy
+        uses: HorstBaerbel/action-clang-tidy@1.2
+        # These are optional (defaults displayed)
+        with:
+          scandir: '.'
+          builddir: 'build'
+          excludedirs: ''
+          extensions: 'c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx'
+          cmakeoptions: ''
   
       # Uploads an artefact containing clang_fixes.json
-      - uses: ZedThree/clang-tidy-review/upload@v0.20.1
-        id: upload-review
+      # - uses: ZedThree/clang-tidy-review/upload@v0.20.1
+      #   id: upload-review
   
-      # If there are any comments, fail the check
-      - if: steps.review.outputs.total_comments > 0
-        run: exit 1
+      # # If there are any comments, fail the check
+      # - if: steps.review.outputs.total_comments > 0
+      #   run: exit 1
