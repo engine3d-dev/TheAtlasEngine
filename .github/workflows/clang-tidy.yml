@@ -40,7 +40,7 @@ jobs:
 
       - name: Building Atlas Engine
         shell: bash
-        run: conan build . -b missing
+        run: conan build . -b missing -c tools.system.package_manager:mode=install
 
       - name: Run clang-tidy
         uses: HorstBaerbel/action-clang-tidy@1.2
