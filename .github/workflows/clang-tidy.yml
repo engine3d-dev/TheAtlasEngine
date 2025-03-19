@@ -10,40 +10,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      # # Install CMake 3.20
-      # - name: Install CMake 3.20
-      #   run: |
-      #     sudo apt-get update
-      #     sudo apt-get install -y build-essential
-          
-        # Optionally generate compile_commands.json
-  
-          # - name: Setting up C++ on Windows
-          #   shell: pwsh
-          #   run: winget install Microsoft.VisualStudio.2022.BuildTools --override "--add Microsoft.VisualStudio.Workload.VCTools --includeRecommended -p --installWhileDownloading"
-          
       - name: Install LLVM
-        shell: bash
         run: wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh
 
       - name: Install Pip and Python
-        shell: bash
         run: sudo apt install pipx && pipx install "conan>=2.10.1"
 
       - name: Install conan profiles
-        shell: bash
         run: conan config install -sf profiles/x86_64/linux/ -tf profiles https://github.com/engine3d-dev/conan-config.git
 
       - name: Atlas Conan Packages
-        shell: bash
         run: conan remote add engine3d-conan https://libhal.jfrog.io/artifactory/api/conan/engine3d-conan
 
       - name: Cloning Atlas Engine Repository
-        shell: bash
         run: git clone https://github.com/engine3d-dev/TheAtlasEngine
       
       - name: Building Atlas Engine
-        shell: bash
         run: cd TheAtlasEngine && conan build . -b missing -c tools.system.package_manager:mode=install
 
       - name: Run clang-tidy
