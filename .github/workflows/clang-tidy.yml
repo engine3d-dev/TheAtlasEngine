@@ -47,7 +47,7 @@
       #   run: exit 1
 
 name: Clang Tidy Review
-on: [pull_request]
+on: [pull_request, push]
 
 jobs:
   build:
