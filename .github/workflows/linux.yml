@@ -19,7 +19,7 @@ jobs:
               run: sudo apt install pipx
 
             - name: Installing Prerequisites for Linux
-              run: sudo apt install lsb-release wget software-properties-common gnupg
+              run: sudo apt install lsb-release wget software-properties-common gnupg libgtk2.0-dev
 
             - name: Installing Conan
               run: pipx install "conan>=2.10.1"
