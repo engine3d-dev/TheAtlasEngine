@@ -40,5 +40,5 @@ jobs:
               run: git clone https://github.com/engine3d-dev/TheAtlasEngine
 
             - name: Building Atlas
-              run: conan build . -b missing -c tools.system.package_manager:mode=install
+              run: conan build . -b missing -c tools.system.package_manager:sudo=True tools.system.package_manager:mode=install
               
