@@ -21,6 +21,7 @@ jobs:
             - name: Installing Prerequisites for Linux
               run: |
                   sudo apt install lsb-release wget software-properties-common gnupg libgtk2.0-dev libgl1-mesa-dev -y
+                  sudo apt install libx11-dev libx11-xcb-dev libfontenc-dev libice-dev libsm-dev libxau-dev libxaw7-dev libxt-dev libxtst-dev libxrender-dev libxrandr-dev libxi-dev -y
                   sudo apt install software-properties-common -y
                   sudo add-apt-repository ppa:deadsnakes/ppa
 
