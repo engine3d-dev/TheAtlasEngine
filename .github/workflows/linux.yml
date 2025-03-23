@@ -1,0 +1,38 @@
+name: Linux Build Tests
+
+on: [push, pull_request]
+
+jobs:
+    linux-build:
+        name: "Linux-Build"
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Install LLVM
+              run: wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh
+
+            - name: Install LLVM's C++ Standard Library
+              run: sudo apt install libc++-17-dev libc++abi-17-dev
+
+            - name: Installing pipx
+              run: sudo apt install pipx
+
+            - name: Installing Prerequisites for Linux
+              run: sudo apt install lsb-release wget software-properties-common gnupg
+
+            - name: Installing Conan
+              run: pipx install "conan>=2.10.1"
+
+            - name: Setting up Conan Profiles
+              run: conan config install -sf profiles/x86_64/linux/ -tf profiles https://github.com/engine3d-dev/conan-config.git
+
+            - name: Installing project dependencies
+              run: conan remote add engine3d-conan https://libhal.jfrog.io/artifactory/api/conan/engine3d-conan
+
+            - name: Cloning Atlas repository
+              run: git clone https://github.com/engine3d-dev/TheAtlasEngine
+
+            - name: Building Atlas
+              run: conan build . -b missing -c tools.system.package_manager:mode=install
+              
