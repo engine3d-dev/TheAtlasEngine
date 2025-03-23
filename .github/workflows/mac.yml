@@ -1,9 +1,9 @@
-name: Linux Build Tests
+name: Macos Build Tests
 
 on: [push, pull_request]
 
 jobs:
-    linux-build:
+    macos-build:
         name: "M1 Mac Build"
         runs-on: macos-latest
         steps:
@@ -14,10 +14,10 @@ jobs:
 
             - name: Install LLVM
               run: |
-                brew install python llvm@17
+                brew install python pipx llvm@17
 
             - name: Installing conan
-              run: python3 -m pip install "conan>=2.10.2"
+              run: pipx install "conan>=2.10.2"
 
             - name: Installing clang-tidy
               run: sudo ln -s $(brew --prefix llvm)/bin/clang-tidy /usr/local/bin/
