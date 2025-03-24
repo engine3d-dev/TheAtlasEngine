@@ -46,29 +46,29 @@
       # - if: steps.review.outputs.total_comments > 0
       #   run: exit 1
 
-name: Clang Tidy Review
-on: [pull_request, push]
+# name: Clang Tidy Review
+# on: [pull_request, push]
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    # Using another container changes the
-    # working directory from GITHUB_WORKSPACE
-    container:
-      image: my-container
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+#     # Using another container changes the
+#     # working directory from GITHUB_WORKSPACE
+#     container:
+#       image: my-container
 
-    steps:
-    - uses: actions/checkout@v4
+#     steps:
+#     - uses: actions/checkout@v4
 
-    # Get the current working directory and set it
-    # as an environment variable
-    - name: Set base_dir
-      run: echo "base_dir=$(pwd)" >> $GITHUB_ENV
+#     # Get the current working directory and set it
+#     # as an environment variable
+#     - name: Set base_dir
+#       run: echo "base_dir=$(pwd)" >> $GITHUB_ENV
 
-    - uses: ZedThree/clang-tidy-review@v0.20.1
-      id: review
-      with:
-        # Tell clang-tidy-review the base directory.
-        # This will get replaced by the new working
-        # directory inside the action
-        base_dir: ${{ env.base_dir }}
+#     - uses: ZedThree/clang-tidy-review@v0.20.1
+#       id: review
+#       with:
+#         # Tell clang-tidy-review the base directory.
+#         # This will get replaced by the new working
+#         # directory inside the action
+#         base_dir: ${{ env.base_dir }}
