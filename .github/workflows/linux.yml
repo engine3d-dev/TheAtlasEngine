@@ -9,6 +9,20 @@ jobs:
         steps:
             - uses: actions/checkout@v4
 
+            - uses: cpp-linter/cpp-linter-action@v2
+              id: linter
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  style: 'file'  # Use .clang-format config file
+                  tidy-checks: '' # Use .clang-tidy config file
+                  # only 'update' a single comment in a pull request thread.
+                  thread-comments: ${{ github.event_name == 'pull_request' && 'update' }}
+                  
+            - name: Fail fast?!
+              if: steps.linter.outputs.checks-failed > 0
+              run: exit 1
+
             - name: Install LLVM
               run: wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh
 
