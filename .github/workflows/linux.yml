@@ -31,7 +31,9 @@ jobs:
               run: pipx install "conan>=2.10.1"
 
             - name: Setting up Conan Profiles
-              run: conan config install -sf profiles/x86_64/linux/ -tf profiles https://github.com/engine3d-dev/conan-config.git
+              run: |
+                  conan remote add conancenter https://center2.conan.io --force
+                  conan config install -sf profiles/x86_64/linux/ -tf profiles https://github.com/engine3d-dev/conan-config.git
 
             - name: Installing project dependencies
               run: conan remote add engine3d-conan https://libhal.jfrog.io/artifactory/api/conan/engine3d-conan
