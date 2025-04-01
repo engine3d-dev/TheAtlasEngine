@@ -38,7 +38,9 @@ jobs:
             
             - name: Setting up packages
               shell: pwsh
-              run: conan remote add engine3d-conan https://libhal.jfrog.io/artifactory/api/conan/engine3d-conan
+              run: |
+                  conan remote update conancenter --url="https://center2.conan.io"
+                  conan remote add engine3d-conan https://libhal.jfrog.io/artifactory/api/conan/engine3d-conan
             
             - name: Running Test Cases
               shell: pwsh

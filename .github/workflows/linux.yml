@@ -1,0 +1,60 @@
+name: Linux Build Tests
+
+on: [push, pull_request]
+
+jobs:
+    linux-build:
+        name: "Linux-Build"
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Install LLVM
+              run: wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh
+
+            - name: Install LLVM's C++ Standard Library
+              run: sudo apt install libc++-17-dev libc++abi-17-dev
+
+            - name: Installing pipx
+              run: sudo apt install pipx
+
+            - name: Installing Prerequisites for Linux
+              run: |
+                  sudo apt-get update
+                  sudo apt install lsb-release wget software-properties-common gnupg libgtk2.0-dev libgl1-mesa-dev -y
+                  # sudo apt install libx11-dev libx11-xcb-dev libfontenc-dev libice-dev libsm-dev libxau-dev libxaw7-dev libxt-dev libxtst-dev libxrender-dev libxrandr-dev libxi-dev -y
+                  sudo apt-get install -y libx11-dev libx11-xcb-dev libfontenc-dev libice-dev libsm-dev libxau-dev libxaw7-dev libxt-dev libxtst-dev libxrender-dev libxrandr-dev libxi-dev
+                  sudo apt install software-properties-common -y
+                  sudo add-apt-repository ppa:deadsnakes/ppa
+
+            - name: Installing Conan
+              run: pipx install "conan>=2.10.1"
+
+            - name: Setting up Conan Profiles
+              run: conan config install -sf profiles/x86_64/linux/ -tf profiles https://github.com/engine3d-dev/conan-config.git
+
+            - name: Installing project dependencies
+              run: |
+                  conan remote update conancenter --url="https://center2.conan.io"
+                  conan remote add engine3d-conan https://libhal.jfrog.io/artifactory/api/conan/engine3d-conan
+
+            - name: Cloning Atlas repository
+              run: git clone https://github.com/engine3d-dev/TheAtlasEngine
+
+            - name: Building Atlas
+              run: conan build . -b missing -c tools.system.package_manager:sudo=True -c tools.system.package_manager:mode=install
+
+            - uses: cpp-linter/cpp-linter-action@v2
+              id: linter
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  style: '.clang-format'  # Use .clang-format config file
+                  tidy-checks: '.clang-tidy' # Use .clang-tidy config file
+                  # only 'update' a single comment in a pull request thread.
+                  thread-comments: ${{ github.event_name == 'pull_request' && 'update' }}
+                  
+            - name: Fail fast?!
+              if: steps.linter.outputs.checks-failed > 0
+              run: exit 1
+              

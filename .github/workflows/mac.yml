@@ -1,0 +1,38 @@
+name: Macos Build Tests
+
+on: [push, pull_request]
+
+jobs:
+    macos-build:
+        name: "M1 Mac Build"
+        runs-on: macos-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Install Homebrew
+              run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+            - name: Install LLVM
+              run: |
+                brew install python pipx llvm@17
+
+            - name: Installing conan
+              run: pipx install "conan>=2.10.2"
+
+            - name: Installing clang-tidy
+              run: sudo ln -s $(brew --prefix llvm)/bin/clang-tidy /usr/local/bin/
+
+            - name: Install Rosetta
+              run: /usr/sbin/softwareupdate --install-rosetta --agree-to-license
+
+            - name: Setting up Conan profile
+              run: conan config install -sf profiles/armv8/mac/ -tf profiles https://github.com/engine3d-dev/conan-config.git
+
+            - name: Installing Atlas repositories
+              run: conan remote add engine3d-conan https://libhal.jfrog.io/artifactory/api/conan/engine3d-conan
+
+            - name: Cloning Atlas repository
+              run: git clone https://github.com/engine3d-dev/TheAtlasEngine
+
+            - name: Building the project
+              run: conan build . -b missing
