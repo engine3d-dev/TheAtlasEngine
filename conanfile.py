@@ -31,8 +31,7 @@ class AtlasRecipe(ConanFile):
 
     def requirements(self):
         self.requires("glfw/3.4", transitive_headers=True)
-        self.requires("fmt/10.2.1", transitive_headers=True)
-        self.requires("spdlog/1.14.1", transitive_headers=True)
+        self.requires("spdlog/1.15.1", transitive_headers=True)
         self.requires("glm/1.0.1", transitive_headers=True)
         self.requires("yaml-cpp/0.8.0", transitive_headers=True)
         self.requires("box2d/2.4.1", transitive_headers=True)
@@ -41,7 +40,7 @@ class AtlasRecipe(ConanFile):
 
         # Vulkan-related headers and includes packages
         self.requires("vulkan-headers/1.3.290.0", transitive_headers=True)
-        self.requires("flecs/4.0.0")
+        self.requires("flecs/4.0.4")
         self.requires("tinyobjloader/2.0.0-rc10")
         self.requires("stb/cci.20230920")
         self.requires("joltphysics/5.2.0")
