@@ -12,7 +12,7 @@
 #include <glm/ext/quaternion_common.hpp>
 #include <physics/jolt-cpp/helper_functions.hpp>
 #include <physics/jolt-cpp/jolt_api.hpp>
-#include <physics/physics_engine.hpp>
+// #include <physics/physics_engine.hpp>
 #include <renderer/renderer.hpp>
 
 #include <core/timer.hpp>
@@ -511,10 +511,10 @@ level_scene::on_physics_update() {
     }
 
     // retreives us the timer frequency specifically for physics
-    float steps = atlas::time::physcs_step();
+    // float steps = atlas::time::physcs_step();
 
     if (m_is_simulation_enabled) {
-        m_physics_scene.on_runtime_update(steps);
+        // m_physics_scene.on_runtime_update(steps);
     }
 }
 
@@ -531,12 +531,12 @@ level_scene::on_runtime_start() {
        modified as well m_physics_scene.add_entity(m_sphere);
         m_physics_scene.add_entity(m_Floor);
     */
-    m_physics_scene = atlas::physics::physics_scene(this);
+    // m_physics_scene = atlas::physics::physics_scene(this);
 
-    m_physics_scene.on_runtime_start();
+    // m_physics_scene.on_runtime_start();
 }
 
 void
 level_scene::on_runtime_stop() {
-    m_physics_scene.on_runtime_stop();
+    // m_physics_scene.on_runtime_stop();
 }

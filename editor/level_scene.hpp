@@ -2,7 +2,7 @@
 #include <core/scene/scene.hpp>
 #include <core/scene/scene_object.hpp>
 #include <map>
-#include <physics/physics_scene.hpp>
+// #include <physics/physics_scene.hpp>
 
 /**
  * @name LevelScene
@@ -46,5 +46,5 @@ private:
     atlas::ref<atlas::scene_object> m_light_object;
     bool m_is_simulation_enabled = false;
     atlas::ref<atlas::scene_object> m_camera;
-    atlas::physics::physics_scene m_physics_scene;
+    // atlas::physics::physics_scene m_physics_scene;
 };

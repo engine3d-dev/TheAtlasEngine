@@ -54,7 +54,6 @@ set(
     # physics stuff
     ${INCLUDE_DIR}/physics/physics_engine.hpp
     ${INCLUDE_DIR}/physics/jolt-cpp/jolt_api.hpp
-    ${INCLUDE_DIR}/physics/physics_scene.hpp
     ${INCLUDE_DIR}/physics/jolt-cpp/helper_functions.hpp
 
     # Scene Stuff
@@ -129,7 +128,6 @@ set(
 
     # physics stuff
     ${SRC_DIR}/physics/physics_engine.cpp
-    ${SRC_DIR}/physics/physics_scene.cpp
     ${SRC_DIR}/physics/jolt-cpp/jolt_api.cpp
     ${SRC_DIR}/physics/jolt-cpp/jolt-imports.cpp
     ${SRC_DIR}/physics/jolt-cpp/helper_functions.cpp
