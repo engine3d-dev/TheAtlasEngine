@@ -117,4 +117,8 @@ namespace atlas::physics {
     //     static void OptimizeBroadPhase();
     //     // void Init();
     // };
+
+    class physics_engine {
+        
+    };
 };
