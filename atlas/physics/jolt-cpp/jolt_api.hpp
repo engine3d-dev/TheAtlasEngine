@@ -40,7 +40,8 @@
 //     public:
 //         BPLayerInterfaceHandler() {
 //             m_ToBroadPhase[BodyTypeTest::STATIC] = BroadPhaseLayers::STATIC;
-//             m_ToBroadPhase[BodyTypeTest::DYNAMIC] = BroadPhaseLayers::DYNAMIC;
+//             m_ToBroadPhase[BodyTypeTest::DYNAMIC] =
+//             BroadPhaseLayers::DYNAMIC;
 //             m_ToBroadPhase[BodyTypeTest::KINEMATIC] =
 //               BroadPhaseLayers::KINEMATIC;
 //         }
@@ -65,8 +66,8 @@
 //         // JPH::BroadPhaseLayer m_ToBroadPhase[3];
 //     };
 
-//     class ObjectLayerPairFilterInterface : public JPH::ObjectLayerPairFilter {
-//     public:
+//     class ObjectLayerPairFilterInterface : public JPH::ObjectLayerPairFilter
+//     { public:
 //         bool ShouldCollide(JPH::ObjectLayer inObject1,
 //                            JPH::ObjectLayer inObject2) const override {
 //             switch (inObject1) {
@@ -110,7 +111,8 @@
 //           [[maybe_unused]] const JPH::BodyID& inBodyID,
 //           [[maybe_unused]] JPH::uint64 inBodyUserData) override {
 //             // console_log_trace("");
-//             printf("FROM ActivationListener Class --- Body was activated!\n");
+//             printf("FROM ActivationListener Class --- Body was
+//             activated!\n");
 //         }
 
 //         void OnBodyDeactivated(
@@ -131,7 +133,8 @@
 //           override {
 //             printf("FROM ContactListener Class --- Validating...\n");
 
-//             // Allows you to ignore a contact before it is created (using layers
+//             // Allows you to ignore a contact before it is created (using
+//             layers
 //             // to not make objects collide is cheaper!)
 //             return JPH::ValidateResult::AcceptAllContactsForThisBodyPair;
 //         }
@@ -149,16 +152,19 @@
 //           [[maybe_unused]] const JPH::Body& inBody2,
 //           [[maybe_unused]] const JPH::ContactManifold& inManifold,
 //           [[maybe_unused]] JPH::ContactSettings& ioSettings) override {
-//             printf("FROM ContactListener Class --- Contact was persisted!\n");
+//             printf("FROM ContactListener Class --- Contact was
+//             persisted!\n");
 //         }
 
 //         void OnContactRemoved(
-//           [[maybe_unused]] const JPH::SubShapeIDPair& inSubShapePair) override {
+//           [[maybe_unused]] const JPH::SubShapeIDPair& inSubShapePair)
+//           override {
 //             printf("FROM ContactListener Class --- Contact was removed!\n");
 //         }
 //     };
 
-//     //! @note Screw it, I dont have enough time. Just gonna implement physics as
+//     //! @note Screw it, I dont have enough time. Just gonna implement physics
+//     as
 //     //! I see it currently.
 //     /**/
 //     class JoltAPI {
