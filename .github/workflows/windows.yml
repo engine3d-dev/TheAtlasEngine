@@ -19,7 +19,10 @@ jobs:
 
             - name: Install tooling with Choco
               shell: pwsh
-              run: choco install git llvm make cmake mingw
+              run: |
+                  choco install cmake.install --version=3.31.6
+                  cmake --version
+                  choco install git llvm make mingw
             
             # - name: Installing python
             #   run: choco install python --version=3.12.2

@@ -34,9 +34,7 @@ jobs:
               run: conan config install -sf profiles/x86_64/linux/ -tf profiles https://github.com/engine3d-dev/conan-config.git
 
             - name: Installing project dependencies
-              run: |
-                  conan remote update conancenter --url="https://center2.conan.io"
-                  conan remote add engine3d-conan https://libhal.jfrog.io/artifactory/api/conan/engine3d-conan
+              run: conan remote add engine3d-conan https://libhal.jfrog.io/artifactory/api/conan/engine3d-conan
 
             - name: Cloning Atlas repository
               run: git clone https://github.com/engine3d-dev/TheAtlasEngine
@@ -57,4 +55,3 @@ jobs:
             - name: Fail fast?!
               if: steps.linter.outputs.checks-failed > 0
               run: exit 1
-              

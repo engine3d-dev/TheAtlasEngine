@@ -1,3 +1,1 @@
-namespace atlas::physics {
-    
-};
+namespace atlas::physics {};

@@ -24,8 +24,6 @@ namespace atlas {
 
         renderer::initialize();
         ImGuiBackend::Initialize();
-
-        physics::JoltAPI::InitializeJoltAPI();
     }
 
     application::~application() {

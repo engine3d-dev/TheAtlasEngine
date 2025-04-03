@@ -118,7 +118,5 @@ namespace atlas::physics {
     //     // void Init();
     // };
 
-    class physics_engine {
-        
-    };
+    class physics_engine {};
 };
