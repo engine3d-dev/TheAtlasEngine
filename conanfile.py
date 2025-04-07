@@ -40,7 +40,7 @@ class AtlasRecipe(ConanFile):
 
         # Vulkan-related headers and includes packages
         self.requires("vulkan-headers/1.3.290.0", transitive_headers=True)
-        self.requires("flecs/4.0.4")
+        self.requires("flecs/4.0.0")
         self.requires("tinyobjloader/2.0.0-rc10")
         self.requires("stb/cci.20230920")
         self.requires("joltphysics/5.2.0")
