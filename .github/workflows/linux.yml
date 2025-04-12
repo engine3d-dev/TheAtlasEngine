@@ -41,3 +41,17 @@ jobs:
 
             - name: Building Atlas
               run: conan build . -b missing -c tools.system.package_manager:sudo=True -c tools.system.package_manager:mode=install
+
+            - uses: cpp-linter/cpp-linter-action@main
+              id: linter
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  style: '.clang-format'  # Use .clang-format config file
+                  tidy-checks: '.clang-tidy' # Use .clang-tidy config file
+                  # only 'update' a single comment in a pull request thread.
+                  thread-comments: ${{ github.event_name == 'pull_request' && 'update' }}
+                  
+            - name: Fail fast?!
+              if: steps.linter.outputs.checks-failed > 0
+              run: exit 1
