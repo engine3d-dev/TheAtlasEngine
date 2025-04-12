@@ -6,6 +6,12 @@
 
 namespace atlas {
 
+
+    class test_object {
+    public:
+        test_object([[maybe_unused]] std::string& p_title){}
+    };
+
     struct application_settings {
         std::string Name = "Undefined";
         uint32_t Width = 0;
