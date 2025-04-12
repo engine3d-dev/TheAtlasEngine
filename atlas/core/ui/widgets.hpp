@@ -17,9 +17,21 @@ namespace ImGui {
 
 namespace atlas::ui {
 
+    bool begin_popup_context_window(const char* str_id,
+                                 ImGuiMouseButton mb,
+                                 bool over_items);
+
     /* Rendering glm::vec3's as a UI widget */
     void draw_vec3(const std::string& p_tag,
                    glm::vec3& p_value,
+                   float p_reset_value = 0.f);
+
+    /**
+     * @name draw_vec4
+     * @brief Render values of glm::vec4 as a GUI section
+     */
+    void draw_vec4(const std::string& p_tag,
+                   glm::vec4& p_value,
                    float p_reset_value = 0.f);
 
     /* Rendering float as a UI widget with default reset values */
@@ -39,8 +51,8 @@ namespace atlas::ui {
 
         USAGE:
 
-        DrawPanelCompoent<Component>("Transform", [](){
-            DrawVec3("Position", SomePosition);
+        draw_panel_component<UComponent>("Transform", [](){
+            DrawVec3("Position", position_value);
             // etc....
         });
     */

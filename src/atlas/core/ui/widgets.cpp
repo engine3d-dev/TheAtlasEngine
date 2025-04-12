@@ -1,6 +1,12 @@
 #include <core/ui/widgets.hpp>
 
 namespace atlas::ui {
+    bool begin_popup_context_window(const char* str_id,
+                                 ImGuiMouseButton mb,
+                                 bool over_items) {
+        return ImGui::BeginPopupContextWindow(
+          str_id, mb | (over_items ? 0 : ImGuiPopupFlags_NoOpenOverItems));
+    }
     void draw_vec3(const std::string& p_tag,
                    glm::vec3& Position,
                    float p_reset_value) {
@@ -76,6 +82,90 @@ namespace atlas::ui {
         ImGui::PopStyleColor(3);
         ImGui::SameLine();
         ImGui::DragFloat("##Z", &Position.z, 0.1f, 0.0f, 0.0f, "%.2f");
+        ImGui::PopItemWidth();
+
+        ImGui::PopStyleVar();
+
+        ImGui::Columns(1);
+
+        ImGui::PopID();
+    }
+
+    void draw_vec4(const std::string& p_tag,
+                   glm::vec4& p_value,
+                   float p_reset_value) {
+        // ImGuiIO& io = ImGui::GetIO();
+        ImGui::PushID(p_tag.c_str());
+
+        float columnWidth = 100.0f;
+
+        ImGui::Columns(2);
+        ImGui::SetColumnWidth(0, columnWidth);
+        ImGui::Text("%s", p_tag.c_str());
+        ImGui::NextColumn();
+
+        ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
+
+        float lineHeight =
+          ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y * 2.0f;
+        ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
+
+        ImGui::PushStyleColor(ImGuiCol_Button,
+                              ImVec4{ 0.8, 0.1f, 0.15f, 1.0f });
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+                              ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive,
+                              ImVec4{ 0.2, 0.1f, 0.2f, 1.0f });
+
+        if (ImGui::Button("X", buttonSize)) {
+            p_value.x = p_reset_value;
+            // ImGui::End();
+        }
+
+        // ImGui::PopFont();
+        ImGui::PopStyleColor(3);
+
+        ImGui::SameLine();
+        ImGui::DragFloat("##X", &p_value.x, 0.1f, 0.0f, 0.0f, "%.2f");
+        ImGui::PopItemWidth();
+        ImGui::SameLine();
+
+        // Setting up for the Y button
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2, 0.7f, 0.2f, 1.0f });
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+                              ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive,
+                              ImVec4{ 0.2, 0.1f, 0.2f, 1.0f });
+
+        if (ImGui::Button("Y", buttonSize)) {
+            p_value.y = p_reset_value;
+            // ImGui::End();
+        }
+
+        // ImGui::PopFont();
+        ImGui::PopStyleColor(3);
+        ImGui::SameLine();
+        ImGui::DragFloat("##Y", &p_value.y, 0.1f, 0.0f, 0.0f, "%.2f");
+        ImGui::PopItemWidth();
+        ImGui::SameLine();
+
+        // Setting up for the Z button
+        ImGui::PushStyleColor(ImGuiCol_Button,
+                              ImVec4{ 0.1, 0.25f, 0.8f, 1.0f });
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered,
+                              ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive,
+                              ImVec4{ 0.8, 0.1f, 0.15f, 1.0f });
+        if (ImGui::Button("Z", buttonSize)) {
+            p_value.z = p_reset_value;
+            // ImGui::End();
+        }
+
+        // ImGui::PopFont();
+        ImGui::PopStyleColor(3);
+        ImGui::SameLine();
+        ImGui::DragFloat("##Z", &p_value.z, 0.1f, 0.0f, 0.0f, "%.2f");
         ImGui::PopItemWidth();
 
         ImGui::PopStyleVar();
