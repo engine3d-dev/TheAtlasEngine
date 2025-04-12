@@ -31,7 +31,7 @@ namespace atlas::vk {
      * @note TODO: Should probably be its own class that also enables to
      * read/write to it to the shaders
      */
-    struct uniform_buffer {
+    struct UniformBuffer {
         VkBuffer BufferHanlder;
         VkDeviceMemory BufferMemory;
         void* uniform_bufferMappedData;
@@ -44,7 +44,7 @@ namespace atlas::vk {
     //! @note Since descriptor sets aren't working, we are creating another
     //! shader just to set the colors lol
 
-    struct camera_ubo {
+    struct CameraUbo {
         glm::mat4 Projection{ 1.f };
         glm::mat4 View{ 1.f };
         glm::mat4 Model{ 1.f };
@@ -106,7 +106,7 @@ namespace atlas::vk {
 
         for (size_t i = 0; i < m_global_ubo_list.size(); i++) {
             m_global_ubo_list[i] =
-              BufferTutorial(sizeof(camera_ubo),
+              BufferTutorial(sizeof(CameraUbo),
                              1,
                              VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
                              VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
@@ -139,7 +139,7 @@ namespace atlas::vk {
                                                    VK_SHADER_STAGE_VERTEX_BIT |
                                                    VK_SHADER_STAGE_FRAGMENT_BIT,
                                                  .offset = 0,
-                                                 .size = sizeof(camera_ubo) };
+                                                 .size = sizeof(CameraUbo) };
 
         //! @note We are setting our descriptors to work with layout(set = 0,
         //! binding = 0)
@@ -316,13 +316,13 @@ namespace atlas::vk {
                                           .get_height() } }
         };
 
-        std::array<VkClearValue, 2> clearValues;
-        clearValues[0].color = { { 0.1f, 0.1f, 0.1f, 1.0f } };
-        clearValues[1].depthStencil = { 1.0f, 0 };
+        std::array<VkClearValue, 2> clear_values;
+        clear_values[0].color = { { 0.1f, 0.1f, 0.1f, 1.0f } };
+        clear_values[1].depthStencil = { 1.0f, 0 };
 
         rp_begin_info.clearValueCount =
-          static_cast<uint32_t>(clearValues.size());
-        rp_begin_info.pClearValues = clearValues.data();
+          static_cast<uint32_t>(clear_values.size());
+        rp_begin_info.pClearValues = clear_values.data();
 
         vkCmdBeginRenderPass(
           cmd_buffer, &rp_begin_info, VK_SUBPASS_CONTENTS_INLINE);
@@ -365,16 +365,16 @@ namespace atlas::vk {
         flecs::world* world_object =
           system_registry::get_world().get_registry();
         flecs::query<> queried_render_targets =
-          world_object->query_builder<Camera>().build();
+          world_object->query_builder<camera>().build();
 
         //! @note The idea behind this is we pre-determine this at the beginning
         //! of the frame to getting our camera
         //! @note Then once we get our camera properties that then gets applied
         //! to our object's that uses that camera
         queried_render_targets.each([&](flecs::entity p_entity_id) {
-            if (p_entity_id.has<Camera>()) {
-                if (p_entity_id.get<Camera>()->IsMainCamera) {
-                    m_current_camera_component = *p_entity_id.get<Camera>();
+            if (p_entity_id.has<camera>()) {
+                if (p_entity_id.get<camera>()->IsMainCamera) {
+                    m_current_camera_component = *p_entity_id.get<camera>();
                 }
             }
         });
@@ -421,7 +421,7 @@ namespace atlas::vk {
             - Gets determined pre-frame and offloaded to GPU at the end of frame
 
             */
-            camera_ubo push_const_data = {
+            CameraUbo push_const_data = {
                 // .Projection = camera_component->get_projection(),
                 // .View = camera_component->get_view(),
                 .Projection = m_current_camera_component.get_projection(),
@@ -433,9 +433,9 @@ namespace atlas::vk {
                 .Color = transform_component->Color,
                 // .MousePosition = event::cursor_position()
                 .MousePosition = { event::cursor_position().x /
-                                     application::get_window().get_width(),
+                                     (float)application::get_window().get_width(),
                                    event::cursor_position().y /
-                                     application::get_window().get_height() }
+                                     (float)application::get_window().get_height() }
             };
 
             vkCmdPushConstants(current_cmd_buffer,
@@ -443,7 +443,7 @@ namespace atlas::vk {
                                VK_SHADER_STAGE_VERTEX_BIT |
                                  VK_SHADER_STAGE_FRAGMENT_BIT,
                                0,
-                               sizeof(camera_ubo),
+                               sizeof(CameraUbo),
                                &push_const_data);
 
             if (!p_entity_id.has<RenderTarget3D>()) {

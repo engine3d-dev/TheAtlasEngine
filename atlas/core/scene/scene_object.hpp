@@ -24,8 +24,8 @@ namespace atlas {
             m_model = glm::mat4(1.0f);
         }
 
-        scene_object(const flecs::entity& p_Entity)
-          : m_entity(p_Entity) {}
+        scene_object(const flecs::entity& p_entity)
+          : m_entity(p_entity) {}
 
         ~scene_object() {
             console_log_fatal("Scene Object Tag = {} HAS DESTRUCTED!!!",
@@ -41,8 +41,8 @@ namespace atlas {
         }
 
         template<typename UComponent>
-        void add(UComponent& p_ComponentValue) {
-            m_entity.add<UComponent>(p_ComponentValue);
+        void add(UComponent& p_component_value) {
+            m_entity.add<UComponent>(p_component_value);
         }
 
         /**
@@ -68,7 +68,7 @@ namespace atlas {
         }
 
         template<typename UComponent>
-        const UComponent* get() const {
+        [[nodiscard]] const UComponent* get() const {
             return m_entity.get<UComponent>();
         }
 
@@ -83,14 +83,14 @@ namespace atlas {
         }
 
         template<typename UComponent>
-        void set(const UComponent& p_Component) {
-            m_entity.set<UComponent>(p_Component);
+        void set(const UComponent& p_component) {
+            m_entity.set<UComponent>(p_component);
         }
 
         template<typename UComponent, typename UComponent2>
-        void set(const UComponent& p_Component,
-                 const UComponent2& p_Component2) {
-            m_entity.set<UComponent>(p_Component, p_Component2);
+        void set(const UComponent& p_component,
+                 const UComponent2& p_component2) {
+            m_entity.set<UComponent>(p_component, p_component2);
         }
 
         template<typename UComponent>

@@ -1,4 +1,5 @@
 #include <core/ui/widgets.hpp>
+#include <imgui_internal.h> // Used to include "PushMultiItemsWidths"
 
 namespace atlas::ui {
     bool begin_popup_context_window(const char* str_id,
@@ -7,25 +8,26 @@ namespace atlas::ui {
         return ImGui::BeginPopupContextWindow(
           str_id, mb | (over_items ? 0 : ImGuiPopupFlags_NoOpenOverItems));
     }
+
     void draw_vec3(const std::string& p_tag,
-                   glm::vec3& Position,
+                   glm::vec3& p_position,
                    float p_reset_value) {
         // ImGuiIO& io = ImGui::GetIO();
         ImGui::PushID(p_tag.c_str());
 
-        float columnWidth = 100.0f;
+        float column_width = 100.0f;
 
         ImGui::Columns(2);
-        ImGui::SetColumnWidth(0, columnWidth);
+        ImGui::SetColumnWidth(0, column_width);
         ImGui::Text("%s", p_tag.c_str());
         ImGui::NextColumn();
 
         ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
 
-        float lineHeight =
+        float line_height =
           ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y * 2.0f;
-        ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
+        ImVec2 button_size = { line_height + 3.0f, line_height };
 
         ImGui::PushStyleColor(ImGuiCol_Button,
                               ImVec4{ 0.8, 0.1f, 0.15f, 1.0f });
@@ -34,8 +36,8 @@ namespace atlas::ui {
         ImGui::PushStyleColor(ImGuiCol_ButtonActive,
                               ImVec4{ 0.2, 0.1f, 0.2f, 1.0f });
 
-        if (ImGui::Button("X", buttonSize)) {
-            Position.x = p_reset_value;
+        if (ImGui::Button("X", button_size)) {
+            p_position.x = p_reset_value;
             // ImGui::End();
         }
 
@@ -43,7 +45,7 @@ namespace atlas::ui {
         ImGui::PopStyleColor(3);
 
         ImGui::SameLine();
-        ImGui::DragFloat("##X", &Position.x, 0.1f, 0.0f, 0.0f, "%.2f");
+        ImGui::DragFloat("##X", &p_position.x, 0.1f, 0.0f, 0.0f, "%.2f");
         ImGui::PopItemWidth();
         ImGui::SameLine();
 
@@ -54,15 +56,15 @@ namespace atlas::ui {
         ImGui::PushStyleColor(ImGuiCol_ButtonActive,
                               ImVec4{ 0.2, 0.1f, 0.2f, 1.0f });
 
-        if (ImGui::Button("Y", buttonSize)) {
-            Position.y = p_reset_value;
+        if (ImGui::Button("Y", button_size)) {
+            p_position.y = p_reset_value;
             // ImGui::End();
         }
 
         // ImGui::PopFont();
         ImGui::PopStyleColor(3);
         ImGui::SameLine();
-        ImGui::DragFloat("##Y", &Position.y, 0.1f, 0.0f, 0.0f, "%.2f");
+        ImGui::DragFloat("##Y", &p_position.y, 0.1f, 0.0f, 0.0f, "%.2f");
         ImGui::PopItemWidth();
         ImGui::SameLine();
 
@@ -73,15 +75,15 @@ namespace atlas::ui {
                               ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
         ImGui::PushStyleColor(ImGuiCol_ButtonActive,
                               ImVec4{ 0.8, 0.1f, 0.15f, 1.0f });
-        if (ImGui::Button("Z", buttonSize)) {
-            Position.z = p_reset_value;
+        if (ImGui::Button("Z", button_size)) {
+            p_position.z = p_reset_value;
             // ImGui::End();
         }
 
         // ImGui::PopFont();
         ImGui::PopStyleColor(3);
         ImGui::SameLine();
-        ImGui::DragFloat("##Z", &Position.z, 0.1f, 0.0f, 0.0f, "%.2f");
+        ImGui::DragFloat("##Z", &p_position.z, 0.1f, 0.0f, 0.0f, "%.2f");
         ImGui::PopItemWidth();
 
         ImGui::PopStyleVar();
@@ -97,19 +99,19 @@ namespace atlas::ui {
         // ImGuiIO& io = ImGui::GetIO();
         ImGui::PushID(p_tag.c_str());
 
-        float columnWidth = 100.0f;
+        float column_width = 100.0f;
 
         ImGui::Columns(2);
-        ImGui::SetColumnWidth(0, columnWidth);
+        ImGui::SetColumnWidth(0, column_width);
         ImGui::Text("%s", p_tag.c_str());
         ImGui::NextColumn();
 
         ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
 
-        float lineHeight =
+        float line_height =
           ImGui::GetFontSize() + ImGui::GetStyle().FramePadding.y * 2.0f;
-        ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
+        ImVec2 button_size = { line_height + 3.0f, line_height };
 
         ImGui::PushStyleColor(ImGuiCol_Button,
                               ImVec4{ 0.8, 0.1f, 0.15f, 1.0f });
@@ -118,7 +120,7 @@ namespace atlas::ui {
         ImGui::PushStyleColor(ImGuiCol_ButtonActive,
                               ImVec4{ 0.2, 0.1f, 0.2f, 1.0f });
 
-        if (ImGui::Button("X", buttonSize)) {
+        if (ImGui::Button("X", button_size)) {
             p_value.x = p_reset_value;
             // ImGui::End();
         }
@@ -138,7 +140,7 @@ namespace atlas::ui {
         ImGui::PushStyleColor(ImGuiCol_ButtonActive,
                               ImVec4{ 0.2, 0.1f, 0.2f, 1.0f });
 
-        if (ImGui::Button("Y", buttonSize)) {
+        if (ImGui::Button("Y", button_size)) {
             p_value.y = p_reset_value;
             // ImGui::End();
         }
@@ -157,7 +159,7 @@ namespace atlas::ui {
                               ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
         ImGui::PushStyleColor(ImGuiCol_ButtonActive,
                               ImVec4{ 0.8, 0.1f, 0.15f, 1.0f });
-        if (ImGui::Button("Z", buttonSize)) {
+        if (ImGui::Button("Z", button_size)) {
             p_value.z = p_reset_value;
             // ImGui::End();
         }
@@ -180,11 +182,11 @@ namespace atlas::ui {
                     float reset_value) {
         ImGui::PushID(p_tag.c_str());
 
-        float columnWidth = 100.0f;
+        float column_width = 100.0f;
 
         ImGui::Columns(2);
 
-        ImGui::SetColumnWidth(0, columnWidth);
+        ImGui::SetColumnWidth(0, column_width);
         ImGui::Text("%s", p_tag.c_str());
         ImGui::NextColumn();
 
@@ -268,7 +270,7 @@ namespace atlas::ui {
         }
     }
 
-    void button_open_file_dialog(const std::string p_tag,
+    void button_open_file_dialog(const std::string& p_tag,
                                  std::string& p_filename,
                                  const std::string& p_filter) {
         if (ImGui::Button(p_tag.c_str())) {
