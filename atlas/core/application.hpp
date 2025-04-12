@@ -3,7 +3,6 @@
 #include <core/window.hpp>
 #include <drivers/swapchain.hpp>
 #include <string>
-#include <thread_utils/thread.hpp>
 
 namespace atlas {
     struct application_settings {
@@ -11,6 +10,7 @@ namespace atlas {
         uint32_t Width = 0;
         uint32_t Height = 0;
     };
+
     class application {
     public:
         application(const application_settings& p_settings);
@@ -40,7 +40,6 @@ namespace atlas {
 
     private:
         ref<window> m_window;
-        thread m_sync_update_thread;
         static application* s_instance;
     };
 

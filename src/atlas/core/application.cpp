@@ -19,7 +19,7 @@ namespace atlas {
     application* application::s_instance = nullptr;
     static API g_graphics_backend_api = API::UNSPECIFIED;
 
-    application::application(const application_settings& p_settings) : m_sync_update_thread("sync update") {
+    application::application(const application_settings& p_settings) {
         s_instance = this;
         g_tag = p_settings.Name;
         console_log_manager::set_current_logger(g_tag);
@@ -59,7 +59,6 @@ namespace atlas {
     static float s_fps_counter = 0.0f;
     // static constexpr int seconds = 1000000;
     float g_delta_time = 0.0f;
-
 
     // sync update variables
     static timer s_localtimer = timer();
@@ -124,7 +123,7 @@ namespace atlas {
             sync_update::on_ui_update();
 
             renderer::end();
-            
+
             // sync_update::run_update(g_delta_time);
             /*
             s_sync_global_delta_time = s_current_delta_time;
@@ -151,7 +150,7 @@ namespace atlas {
             else {
                 s_local_update_counter++;
             }
-            
+
             //! @note I don't understand why this works but localtime doesn't.
             //! @note My guess is that it needs to be called every frame/ double
             //! buffering might be an issue.
@@ -159,8 +158,8 @@ namespace atlas {
             if (s_localtimer.seconds() >= 1.0) {
                 s_localtimer.reset();
 
-                //! @note Key event added to allow switch between global and local.
-                if (event::is_key_pressed(KeyCode::K)) {
+                //! @note Key event added to allow switch between global and
+            local. if (event::is_key_pressed(KeyCode::K)) {
                     console_log_info("Local FPS: {0}, Local Delta Time: {1}",
                                     s_local_framerate_per_second,
                                     s_sync_local_delta_time);

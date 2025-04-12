@@ -57,7 +57,7 @@ namespace atlas::sync_update {
         else {
             s_local_update_counter++;
         }
-        
+
         //! @note I don't understand why this works but localtime doesn't.
         //! @note My guess is that it needs to be called every frame/ double
         //! buffering might be an issue.
@@ -74,7 +74,7 @@ namespace atlas::sync_update {
             s_local_framerate_per_second = 0;
         }
     }
-    
+
     float delta_time() {
         return s_sync_local_delta_time;
     }
