@@ -35,7 +35,6 @@ namespace atlas {
             }
         }
 
-
         template<typename UComponent>
         void add() {
             m_entity.add<UComponent>();

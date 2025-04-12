@@ -25,8 +25,7 @@ static float sensitivity = 0.f;
 static std::string s_SceneFilepath = "";
 static glm::vec3 g_light_position = glm::vec3(0.0f, 0.0f, 1.0f);
 
-namespace ui {
-}; // namespace ui
+namespace ui {}; // namespace ui
 
 //! @brief These structs were just for testing add_query<UComponent...>()
 struct component1 {};
@@ -62,7 +61,6 @@ level_scene::level_scene(const std::string& p_tag)
     m_sphere->add<atlas::RigidBody3D>();
     m_sphere->add<atlas::Light>();
 
-
     m_platform = this->create_new_object("mesh1");
     m_platform->set<atlas::Transform>({
       .Position = { 0.f, 1.40f, -7.4f },
@@ -71,12 +69,11 @@ level_scene::level_scene(const std::string& p_tag)
 
     m_platform->set<atlas::RenderTarget3D>({ "assets/models/cube.obj" });
 
-    m_test_object = create_new_object("test object");
-
     //! @note This is just for testing if we can query multiple components to
     //! the entities
-    // m_test_object->add_query<component1, component2, component3, component4>();
-
+    // m_test_object = create_new_object("test object");
+    // m_test_object->add_query<component1, component2, component3,
+    // component4>();
 
     /**
     @note Jolt's Body Interface
@@ -158,7 +155,8 @@ level_scene::on_ui_update() {
         //! outside of the window
         //! @note Imgui will just have a window that appears until when you exit
         //! the application and the UI is not docked outside the window
-        //! TODO: Assign widgets in this lambda to correspond to panel's as groups
+        //! TODO: Assign widgets in this lambda to correspond to panel's as
+        //! groups
         //! @note Or else there will be conflict in naming ID's
         atlas::ui::draw_panel_component<atlas::RenderTarget3D>("Sphere", [&]() {
             std::string sphere_filepath = "";
@@ -192,14 +190,16 @@ level_scene::on_ui_update() {
               if (platform_filepath != "") {
                   std::filesystem::path relative_path =
                     std::filesystem::relative(platform_filepath, "./");
-                  console_log_trace("Platform Filepath = {}", platform_filepath);
-                  platform_render_target->MeshMetaData = {relative_path.string() };
+                  console_log_trace("Platform Filepath = {}",
+                                    platform_filepath);
+                  platform_render_target->MeshMetaData = {
+                      relative_path.string()
+                  };
                   //! TODO: Empty String again to reset the filepath set
                   platform_filepath = "";
               }
           });
 
-        
         if (ImGui::Button("Save As")) {
             std::string output_path = atlas::filesystem::SaveToFile("");
             atlas::serializer serializer(this);

@@ -2,8 +2,8 @@
 
 namespace atlas::ui {
     bool begin_popup_context_window(const char* str_id,
-                                 ImGuiMouseButton mb,
-                                 bool over_items) {
+                                    ImGuiMouseButton mb,
+                                    bool over_items) {
         return ImGui::BeginPopupContextWindow(
           str_id, mb | (over_items ? 0 : ImGuiPopupFlags_NoOpenOverItems));
     }

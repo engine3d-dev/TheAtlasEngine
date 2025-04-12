@@ -18,8 +18,8 @@ namespace ImGui {
 namespace atlas::ui {
 
     bool begin_popup_context_window(const char* str_id,
-                                 ImGuiMouseButton mb,
-                                 bool over_items);
+                                    ImGuiMouseButton mb,
+                                    bool over_items);
 
     /* Rendering glm::vec3's as a UI widget */
     void draw_vec3(const std::string& p_tag,
