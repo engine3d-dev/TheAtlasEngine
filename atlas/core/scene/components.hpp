@@ -73,7 +73,7 @@ namespace atlas {
           , MeshMetaData(p_filepath) {}
 
         std::string Filepath;
-        Mesh MeshMetaData{};
+        mesh MeshMetaData{};
         glm::mat4 Model{ 1.f };
     };
 

@@ -225,7 +225,7 @@ level_scene::on_update() {
     //! @note And timer::reset with no params resets our timer automatically
     //! (though would effect the entire timing variables though unless we
     //! separate them some way)
-    float delta_time = atlas::sync_update::delta_time();
+    float delta_time = atlas::application::delta_time();
     // float physics_step = atlas::timer::physcs_step();
 
     if (atlas::event::is_key_pressed(KEY_ESCAPE)) {
@@ -233,6 +233,7 @@ level_scene::on_update() {
     }
 
     if (atlas::event::is_key_pressed(KEY_W)) {
+        // console_log_trace(""
         camera->process_keyboard(atlas::FORWARD, delta_time);
     }
     if (atlas::event::is_key_pressed(KEY_S)) {

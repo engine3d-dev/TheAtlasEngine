@@ -3,6 +3,7 @@
 #include <core/window.hpp>
 #include <drivers/swapchain.hpp>
 #include <string>
+#include <thread_utils/thread.hpp>
 
 namespace atlas {
     struct application_settings {
@@ -14,6 +15,8 @@ namespace atlas {
     public:
         application(const application_settings& p_settings);
         ~application();
+
+        static float delta_time();
 
         /* executes the application's mainloop */
         void execute();
@@ -37,6 +40,7 @@ namespace atlas {
 
     private:
         ref<window> m_window;
+        thread m_sync_update_thread;
         static application* s_instance;
     };
 

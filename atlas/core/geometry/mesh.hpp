@@ -8,14 +8,14 @@
 
 namespace atlas {
 
-    class Mesh {
+    class mesh {
     public:
-        Mesh() = default;
-        Mesh(const std::string& p_filepath);
-        Mesh(const ref<vertex_buffer>& p_vertex_buffer,
+        mesh() = default;
+        mesh(const std::string& p_filepath);
+        mesh(const ref<vertex_buffer>& p_vertex_buffer,
              const ref<index_buffer>& p_index_buffer);
-        bool is_loaded() const;
-        static Mesh load(const std::string& p_filepath);
+        [[nodiscard]] bool is_loaded() const;
+        static mesh load(const std::string& p_filepath);
         // bool load_from_file(const std::string& p_filepath);
 
         ref<vertex_buffer>& get_vertex_buffer() { return m_vertex_buffer; }

@@ -15,6 +15,6 @@ Main() {
     atlas::ref<atlas::application> app = atlas::initialize_application();
     atlas::system_registry::initialize();
     app->execute();
-    atlas::global_update::cleanup();
+    // atlas::global_update::cleanup();
     return 0;
 }

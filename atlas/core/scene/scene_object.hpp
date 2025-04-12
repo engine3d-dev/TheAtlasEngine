@@ -73,7 +73,7 @@ namespace atlas {
         }
 
         template<typename UComponent>
-        UComponent* get_mut() {
+        [[nodiscard]] UComponent* get_mut() {
             return m_entity.get_mut<UComponent>();
         }
 
@@ -98,7 +98,7 @@ namespace atlas {
             return m_entity.remove<UComponent>();
         }
 
-        glm::mat4 get_model() {
+        [[nodiscard]] glm::mat4 get_model() {
             const Transform* transform_component = get<Transform>();
             m_model = glm::mat4(1.f);
 

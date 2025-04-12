@@ -454,7 +454,7 @@ namespace atlas::vk {
 
             auto* component = p_entity_id.get<RenderTarget3D>();
 
-            Mesh mesh_data = component->MeshMetaData;
+            mesh mesh_data = component->MeshMetaData;
 
             auto& vb = mesh_data.get_vertex_buffer();
             auto ib = mesh_data.get_index_buffer();

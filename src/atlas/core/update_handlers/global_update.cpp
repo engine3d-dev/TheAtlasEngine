@@ -7,6 +7,7 @@
 #include <core/update_handlers/sync_update.hpp>
 
 namespace atlas {
+    /*
     static float s_current_delta_time = 0.0f;
     scope<thread_manager> s_thread_manager = nullptr;
     static std::chrono::time_point<std::chrono::high_resolution_clock>
@@ -45,6 +46,7 @@ namespace atlas {
     }
 
     void global_update::tick_update_frequency() {
+
         s_fps_timer.reset();
 
         //! @note Physics, since calculations must be fast before we render.
@@ -124,4 +126,5 @@ namespace atlas {
         console_log_warn("Global Update Manager is cleaning up!");
         s_thread_manager->on_stop();
     }
+    */
 };

@@ -3,131 +3,106 @@
 #include <core/update_handlers/sync_update.hpp>
 
 namespace atlas::sync_update {
-    static timer s_Localtimer = timer();
+    /*
+    static timer s_localtimer = timer();
     static std::chrono::time_point<std::chrono::high_resolution_clock>
-      s_LocalUpdateTime;
-    static float s_SyncLocalDeltaTime = 0.0f;
-    static float s_SyncGlobalDeltaTime = 0.0f;
-    static int s_MaxVariance = 0;
-    static int s_MinFrames = 0;
-    static int s_LocalUpdateCounter = 0;
-    static int s_LocalFrameratePerSecond = 0;
-    static int s_RandomFrame;
+      s_local_update_time;
+    static float s_sync_local_delta_time = 0.0f;
+    static float s_sync_global_delta_time = 0.0f;
+    static int s_max_variance = 0;
+    static int s_min_frames = 0;
+    static int s_local_update_counter = 0;
+    static int s_local_framerate_per_second = 0;
+    static int s_random_frame;
 
     void initialize() {
         console_log_info("InitializeSyncUpdate Initialized!!");
-        s_Localtimer = timer();
-        s_LocalUpdateTime = s_Localtimer.current_time();
-        s_SyncLocalDeltaTime = 0.0;
-        s_MaxVariance = 2;
-        s_MinFrames = 0;
-        s_LocalUpdateCounter = 0;
-        s_LocalFrameratePerSecond = 0;
-        srand(std::time(NULL));
-        s_RandomFrame = (rand() % s_MaxVariance) + s_MinFrames;
+        s_localtimer = timer();
+        s_local_update_time = s_localtimer.current_time();
+        s_sync_local_delta_time = 0.0;
+        s_max_variance = 2;
+        s_min_frames = 0;
+        s_local_update_counter = 0;
+        s_local_framerate_per_second = 0;
+        srand(std::time(nullptr));
+        s_random_frame = (rand() % s_max_variance) + s_min_frames;
     }
 
     //! @note this does not work per object this might need to change a little.
     //! Possibly pass gameObjects with the virtual functions.
     //! Possibly seperate active scripts to non active ones in scenes.
-    void run_update(float deltaTime) {
-        //! @note unsafe!!!!
-        /**
-         * @note Render is not quite placed in the right position here
-         * @param randomFrame Used both to determine update and
-         * used to allow render to optimise gpu sending if needed
-         *
-         * @note I used random in this case becuase it is hard for a
-         * human to catch wether the render is correct or not.
-         * Benchmark later.
-         */
-        s_SyncGlobalDeltaTime = deltaTime;
+    void run_update(float delta_time) {
+
+        s_sync_global_delta_time = delta_time;
         // on_physics_update();
         // const int collisionSteps = 1 + (60*(deltaTime));
 
-        // JoltHandler* p_joltHandler = JoltHandler::GetInstance();
-        // Updating physics system based on jolt physics
-        // p_joltHandler->physics_system.Update(
-        //     deltaTime,
-        //     collisionSteps,
-        //     p_joltHandler->physics_allocator,
-        //     p_joltHandler->job_system);
 
-        if (s_RandomFrame <= s_LocalUpdateCounter) {
-            s_RandomFrame = (rand() % s_MaxVariance) + s_MinFrames;
-            s_LocalUpdateCounter = 0;
+        if (s_random_frame <= s_local_update_counter) {
+            s_random_frame = (rand() % s_max_variance) + s_min_frames;
+            s_local_update_counter = 0;
 
             // on_update();
-            // on_updateSub2();
             // on_late_update();
 
-            s_SyncLocalDeltaTime =
+            s_sync_local_delta_time =
               duration_cast<std::chrono::microseconds>(
-                s_Localtimer.current_time() - s_LocalUpdateTime)
+                s_localtimer.current_time() - s_local_update_time)
                 .count();
-            s_SyncLocalDeltaTime = s_SyncLocalDeltaTime / 1000000;
+            s_sync_local_delta_time = s_sync_local_delta_time / 1000000;
 
-            s_LocalUpdateTime = s_Localtimer.current_time();
-            s_LocalFrameratePerSecond++;
+            s_local_update_time = s_localtimer.current_time();
+            s_local_framerate_per_second++;
         }
         else {
-            s_LocalUpdateCounter++;
+            s_local_update_counter++;
         }
+        
         //! @note I don't understand why this works but localtime doesn't.
         //! @note My guess is that it needs to be called every frame/ double
         //! buffering might be an issue.
         // on_scene_render();
-        if (s_Localtimer.seconds() >= 1.0) {
-            s_Localtimer.reset();
+        if (s_localtimer.seconds() >= 1.0) {
+            s_localtimer.reset();
 
             //! @note Key event added to allow switch between global and local.
             if (event::is_key_pressed(KeyCode::K)) {
                 console_log_info("Local FPS: {0}, Local Delta Time: {1}",
-                                 s_LocalFrameratePerSecond,
-                                 s_SyncLocalDeltaTime);
+                                 s_local_framerate_per_second,
+                                 s_sync_local_delta_time);
             }
-            s_LocalFrameratePerSecond = 0;
+            s_local_framerate_per_second = 0;
         }
     }
-
-    // void on_physics_update()
-    // {
-    //     // for(auto& l_Subscriber : s_SyncOnTickUpdateSubscribers)
-    //     // {
-    //     //     l_Subscriber();
-    //     // }
-    // }
+    
+    float delta_time() {
+        return s_sync_local_delta_time;
+    }
+    */
 
     void on_update() {
-
-        // console_log_trace("on_update Called for
-        // std::deque<std::function<void()>>!!!");
-        for (auto& l_Subscriber : s_Update) {
-            l_Subscriber();
+        for (auto& l_subscriber : s_Update) {
+            l_subscriber();
         }
     }
 
     void on_ui_update() {
 
-        for (auto& uiUpdate : s_UIUpdate) {
-            uiUpdate();
+        for (auto& ui_update : s_UIUpdate) {
+            ui_update();
         }
     }
 
     void on_late_update() {
-        for (auto& l_Subscriber : s_LateUpdate) {
-            l_Subscriber();
+        for (auto& l_subscriber : s_LateUpdate) {
+            l_subscriber();
         }
     }
 
     void on_physics_update() {
-        for (auto& l_Subscriber : s_PhysicsQueue) {
-            l_Subscriber();
+        for (auto& l_subscriber : s_PhysicsQueue) {
+            l_subscriber();
         }
-    }
-
-    float delta_time() {
-        return s_SyncLocalDeltaTime;
     }
 
 };
