@@ -1,8 +1,6 @@
 #pragma once
 #include <core/scene/scene.hpp>
 #include <core/scene/scene_object.hpp>
-#include <map>
-// #include <physics/physics_scene.hpp>
 
 /**
  * @name LevelScene
@@ -18,13 +16,15 @@
 
 class level_scene : public atlas::scene_scope {
 public:
-    level_scene();
+    level_scene() = default;
 
     level_scene(const std::string& p_tag);
 
-    virtual ~level_scene() {
+    ~level_scene() override {
         console_log_error("LevelScene::~LevelScene Destructed!!!");
     }
+
+    [[nodiscard]] float read_float() const { return 4.f; }
 
     //! @note Remove these from being overridden
     //! TODO: We should have an indication on what functions are update phased
@@ -44,7 +44,8 @@ private:
     atlas::ref<atlas::scene_object> m_sphere;
     atlas::ref<atlas::scene_object> m_platform;
     atlas::ref<atlas::scene_object> m_light_object;
+    // atlas::ref<atlas::scene_object> m_test_object = nullptr;
+
     bool m_is_simulation_enabled = false;
     atlas::ref<atlas::scene_object> m_camera;
-    // atlas::physics::physics_scene m_physics_scene;
 };

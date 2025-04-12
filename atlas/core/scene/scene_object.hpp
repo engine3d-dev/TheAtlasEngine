@@ -2,6 +2,7 @@
 #include <core/engine_logger.hpp>
 #include <core/scene/components.hpp>
 #include <core/scene/entity.hpp>
+#include <variant>
 
 namespace atlas {
     /**
@@ -12,22 +13,19 @@ namespace atlas {
      * @note Provides same API as the entity_t
      * @note While also providing additional API's on how engine3d may define
      * scene objects
+     * @note These are just user-defined entities that will be the
+     * game-high-level specifics to interact with the ecs framework
      */
     class scene_object {
     public:
         scene_object() = default;
         scene_object(flecs::world* p_registry, const std::string& p_tag)
           : m_entity(p_registry, p_tag) {
-            //! @note Because flecs the ecs framework uses components to
-            //! indicate which entities you want to query from.
-            //! @note Each entity the engine creates will by default contain the
-            // m_entity.set<Tag>({p_tag});
-            // m_entity.add<Transform>();
             m_model = glm::mat4(1.0f);
         }
 
-        scene_object(const flecs::entity& p_Entity)
-          : m_entity(p_Entity) {}
+        scene_object(const flecs::entity& p_entity)
+          : m_entity(p_entity) {}
 
         ~scene_object() {
             console_log_fatal("Scene Object Tag = {} HAS DESTRUCTED!!!",
@@ -37,23 +35,40 @@ namespace atlas {
             }
         }
 
-        std::string get_tag() const { return m_entity.get<Tag>()->TagMetadata; }
-
-        glm::mat4 GetModelMatrix() const { return m_model; }
-        void SetModel(const glm::mat4& p_other) { m_model = p_other; }
-
         template<typename UComponent>
         void add() {
             m_entity.add<UComponent>();
         }
 
         template<typename UComponent>
-        void add(UComponent& p_ComponentValue) {
-            m_entity.add<UComponent>(p_ComponentValue);
+        void add(UComponent& p_component_value) {
+            m_entity.add<UComponent>(p_component_value);
+        }
+
+        /**
+         * @brief Specify groups of entity signatures to add to the entity
+         * @brief signatures being the components
+         * EXPERIEMENTAL: Function to add multiple components but still in its
+         * experiemental stages.
+         */
+        template<typename... Args>
+        void add_query() {
+            using tuple_variadic = std::tuple<Args...>;
+            std::variant<tuple_variadic> conditions;
+            std::visit(
+              [&]([[maybe_unused]] const auto& p_component) {
+                  std::apply(
+                    [&](auto&... p_placeholder) {
+                        (m_entity.add<std::decay_t<decltype(p_placeholder)>>(),
+                         ...);
+                    },
+                    p_component);
+              },
+              conditions);
         }
 
         template<typename UComponent>
-        const UComponent* get() const {
+        [[nodiscard]] const UComponent* get() const {
             return m_entity.get<UComponent>();
         }
 
@@ -68,22 +83,20 @@ namespace atlas {
         }
 
         template<typename UComponent>
-        void set(const UComponent& p_Component) {
-            m_entity.set<UComponent>(p_Component);
+        void set(const UComponent& p_component) {
+            m_entity.set<UComponent>(p_component);
         }
 
         template<typename UComponent, typename UComponent2>
-        void set(const UComponent& p_Component,
-                 const UComponent2& p_Component2) {
-            m_entity.set<UComponent>(p_Component, p_Component2);
+        void set(const UComponent& p_component,
+                 const UComponent2& p_component2) {
+            m_entity.set<UComponent>(p_component, p_component2);
         }
 
         template<typename UComponent>
         void remove() {
             return m_entity.remove<UComponent>();
         }
-
-        void SetRotation(float p_Angle) { m_angle = glm::radians(p_Angle); }
 
         glm::mat4 get_model() {
             const Transform* transform_component = get<Transform>();
@@ -93,6 +106,8 @@ namespace atlas {
             m_model = glm::translate(m_model, transform_component->Position);
             m_model = glm::scale(m_model, transform_component->Scale);
 
+            //! @note These are just notes from discussions about mathematical
+            //! conversion
             //! TODO: The caveaut of this implicit conversion is, mathematically
             //! un-optimized
             //! @note Unoptimized meaning we are squaring quaternions from mat3

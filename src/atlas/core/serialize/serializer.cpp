@@ -134,11 +134,11 @@ namespace atlas {
             output << YAML::EndMap;
         }
 
-        if (p_entity.has<Camera>()) {
+        if (p_entity.has<camera>()) {
             output << YAML::Key << "Perspective Camera";
             // output << YAML::Key << "Camera" << YAML::Value;
 
-            auto perspective_camera = p_entity.get<Camera>();
+            auto perspective_camera = p_entity.get<camera>();
 
             output << YAML::BeginMap;
             output << YAML::Key << "Position" << YAML::Value
