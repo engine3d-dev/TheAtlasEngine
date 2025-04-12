@@ -9,7 +9,10 @@ namespace atlas {
 
     class test_object {
     public:
-        test_object([[maybe_unused]] std::string& p_title){}
+        test_object(const std::string p_title) : m_title(p_title) {}
+
+    private:
+        std::string m_title="";
     };
 
     struct application_settings {
