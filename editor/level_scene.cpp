@@ -22,21 +22,19 @@
 static float sensitivity = 0.f;
 
 // static CameraData camera_data;
-static std::string s_SceneFilepath = "";
+static std::string s_scene_filepath = "";
 static glm::vec3 g_light_position = glm::vec3(0.0f, 0.0f, 1.0f);
 
 namespace ui {}; // namespace ui
 
 //! @brief These structs were just for testing add_query<UComponent...>()
-struct component1 {};
+struct Component1 {};
 
-struct component2 {};
+struct Component2 {};
 
-struct component3 {};
+struct Component3 {};
 
-struct component4 {};
-
-level_scene::level_scene() {}
+struct Component4 {};
 
 level_scene::level_scene(const std::string& p_tag)
   : atlas::scene_scope(p_tag) {
@@ -91,9 +89,9 @@ level_scene::level_scene(const std::string& p_tag)
     // camera_data.Position = { 0.0f, 1.50f, 0.0f };
     // camera_data.Front = glm::vec3(-0.0f, 0.0f, -1.0f);
 
-    m_camera->add<atlas::Camera>();
+    m_camera->add<atlas::camera>();
 
-    sensitivity = m_camera->get<atlas::Camera>()->MovementSpeed;
+    sensitivity = m_camera->get<atlas::camera>()->MovementSpeed;
 
     sync(this, &level_scene::on_update);
     sync_physics(this, &level_scene::on_physics_update);
@@ -117,7 +115,7 @@ level_scene::on_ui_update() {
       m_platform->get_mut<atlas::Transform>();
 
     if (ImGui::Begin("Viewport")) {
-        glm::vec2 viewportPanelSize =
+        glm::vec2 viewport_panel_size =
           glm::vec2{ atlas::application::get_window().get_width(),
                      atlas::application::get_window().get_height() };
 
@@ -214,7 +212,7 @@ level_scene::on_ui_update() {
 void
 level_scene::on_update() {
     // auto camera_comp = *m_camera->get<atlas::Camera>();
-    atlas::Camera* camera = m_camera->get_mut<atlas::Camera>();
+    atlas::camera* camera = m_camera->get_mut<atlas::camera>();
 
     //! TODO: Move DeltaTime out of global update
     //! TODO: global_update just uses delta timer for frame-rate stuff, and we
@@ -227,7 +225,7 @@ level_scene::on_update() {
     //! @note And timer::reset with no params resets our timer automatically
     //! (though would effect the entire timing variables though unless we
     //! separate them some way)
-    float deltaTime = atlas::sync_update::delta_time();
+    float delta_time = atlas::sync_update::delta_time();
     // float physics_step = atlas::timer::physcs_step();
 
     if (atlas::event::is_key_pressed(KEY_ESCAPE)) {
@@ -235,22 +233,22 @@ level_scene::on_update() {
     }
 
     if (atlas::event::is_key_pressed(KEY_W)) {
-        camera->ProcessKeyboard(atlas::FORWARD, deltaTime);
+        camera->process_keyboard(atlas::FORWARD, delta_time);
     }
     if (atlas::event::is_key_pressed(KEY_S)) {
-        camera->ProcessKeyboard(atlas::BACKWARD, deltaTime);
+        camera->process_keyboard(atlas::BACKWARD, delta_time);
     }
     if (atlas::event::is_key_pressed(KEY_A)) {
-        camera->ProcessKeyboard(atlas::LEFT, deltaTime);
+        camera->process_keyboard(atlas::LEFT, delta_time);
     }
     if (atlas::event::is_key_pressed(KEY_D)) {
-        camera->ProcessKeyboard(atlas::RIGHT, deltaTime);
+        camera->process_keyboard(atlas::RIGHT, delta_time);
     }
     if (atlas::event::is_key_pressed(KEY_Q)) {
-        camera->ProcessKeyboard(atlas::UP, deltaTime);
+        camera->process_keyboard(atlas::UP, delta_time);
     }
     if (atlas::event::is_key_pressed(KEY_E)) {
-        camera->ProcessKeyboard(atlas::DOWN, deltaTime);
+        camera->process_keyboard(atlas::DOWN, delta_time);
     }
 
     //! @note Press shift key to move using the mouse to rotate around
@@ -259,34 +257,34 @@ level_scene::on_update() {
             glm::vec2 cursor_pos = atlas::event::cursor_position();
 
             float x_offset = cursor_pos.x;
-            float velocity = x_offset * deltaTime;
-            camera->ProcessMouseMovement(-velocity, 0.f);
+            float velocity = x_offset * delta_time;
+            camera->process_mouse_movement(-velocity, 0.f);
         }
 
         if (atlas::event::is_mouse_pressed(MOUSE_BUTTON_LEFT)) {
             glm::vec2 cursor_pos = atlas::event::cursor_position();
 
             float x_offset = cursor_pos.x;
-            float velocity = x_offset * deltaTime;
-            camera->ProcessMouseMovement(velocity, 0.f);
+            float velocity = x_offset * delta_time;
+            camera->process_mouse_movement(velocity, 0.f);
         }
 
         if (atlas::event::is_mouse_pressed(MOUSE_BUTTON_MIDDLE)) {
             glm::vec2 cursor_pos = atlas::event::cursor_position();
 
-            float velocity = cursor_pos.y * deltaTime;
-            camera->ProcessMouseMovement(0.f, velocity);
+            float velocity = cursor_pos.y * delta_time;
+            camera->process_mouse_movement(0.f, velocity);
         }
 
         if (atlas::event::is_key_pressed(KEY_SPACE)) {
             glm::vec2 cursor_pos = atlas::event::cursor_position();
-            float velocity = cursor_pos.y * deltaTime;
-            camera->ProcessMouseMovement(0.f, -velocity);
+            float velocity = cursor_pos.y * delta_time;
+            camera->process_mouse_movement(0.f, -velocity);
         }
     }
 
     camera->MovementSpeed = sensitivity;
-    camera->UpdateProjView();
+    camera->update_proj_view();
     camera->IsMainCamera = true;
 }
 

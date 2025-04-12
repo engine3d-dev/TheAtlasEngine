@@ -16,13 +16,15 @@
 
 class level_scene : public atlas::scene_scope {
 public:
-    level_scene();
+    level_scene() = default;
 
     level_scene(const std::string& p_tag);
 
-    virtual ~level_scene() {
+     ~level_scene() override {
         console_log_error("LevelScene::~LevelScene Destructed!!!");
     }
+
+    [[nodiscard]] float read_float() const { return 4.f; }
 
     //! @note Remove these from being overridden
     //! TODO: We should have an indication on what functions are update phased

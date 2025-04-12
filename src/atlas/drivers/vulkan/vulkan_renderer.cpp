@@ -3,7 +3,6 @@
 #include <core/engine_logger.hpp>
 #include <core/update_handlers/sync_update.hpp>
 #include <cstring>
-#include <deque>
 #include <drivers/vulkan/helper_functions.hpp>
 #include <drivers/vulkan/shaders/vulkan_shader.hpp>
 #include <drivers/vulkan/vulkan_context.hpp>
@@ -433,9 +432,11 @@ namespace atlas::vk {
                 .Color = transform_component->Color,
                 // .MousePosition = event::cursor_position()
                 .MousePosition = { event::cursor_position().x /
-                                     (float)application::get_window().get_width(),
+                                     (float)application::get_window()
+                                       .get_width(),
                                    event::cursor_position().y /
-                                     (float)application::get_window().get_height() }
+                                     (float)application::get_window()
+                                       .get_height() }
             };
 
             vkCmdPushConstants(current_cmd_buffer,

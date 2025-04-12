@@ -11,7 +11,8 @@ static const std::filesystem::path g_asset_path = "3d_models";
 
 // namespace ImGui {
 //     //! @note We need to see if this works
-//     //! @note Because imgui implements this but the header file for some reason
+//     //! @note Because imgui implements this but the header file for some
+//     reason
 //     //! does not contain this implementation...
 //     void PushMultiItemsWidths(int components, float w_full);
 // };
