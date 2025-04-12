@@ -1,10 +1,6 @@
-#include <chrono>
 #include <core/application.hpp>
 #include <core/engine_logger.hpp>
 #include <core/event/event.hpp>
-#include <core/timer.hpp>
-#include <core/update_handlers/global_update.hpp>
-#include <core/update_handlers/sync_update.hpp>
 
 namespace atlas {
     /*

@@ -18,6 +18,8 @@ namespace atlas {
 
         static float delta_time();
 
+        static float physics_step();
+
         /* executes the application's mainloop */
         void execute();
 

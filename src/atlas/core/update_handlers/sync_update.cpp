@@ -81,27 +81,27 @@ namespace atlas::sync_update {
     */
 
     void on_update() {
-        for (auto& l_subscriber : s_Update) {
-            l_subscriber();
+        for (auto& on_update : s_update) {
+            on_update();
         }
     }
 
     void on_ui_update() {
 
-        for (auto& ui_update : s_UIUpdate) {
+        for (auto& ui_update : s_ui_update) {
             ui_update();
         }
     }
 
     void on_late_update() {
-        for (auto& l_subscriber : s_LateUpdate) {
-            l_subscriber();
+        for (auto& late_update : s_late_update) {
+            late_update();
         }
     }
 
     void on_physics_update() {
-        for (auto& l_subscriber : s_PhysicsQueue) {
-            l_subscriber();
+        for (auto& physics_update : s_physica_update) {
+            physics_update();
         }
     }
 

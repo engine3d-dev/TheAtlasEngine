@@ -14,8 +14,6 @@
 #include <physics/jolt-cpp/jolt_api.hpp>
 #include <renderer/renderer.hpp>
 
-#include <core/timer.hpp>
-
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/compatibility.hpp>
 
@@ -133,7 +131,7 @@ level_scene::on_ui_update() {
         // @note right click on blank space
         // @param string_id
         // @param popup_flags - will be the mouse flag (0=right, 1=left)
-        if (atlas::ui::begin_popup_context_window(0, 1, false)) {
+        if (atlas::ui::begin_popup_context_window(nullptr, 1, false)) {
             if (ImGui::MenuItem("Create Empty Entity")) {
                 // m_scene_objects.insert({"Empty Entity",
                 // this->create_new_object("Empty Object")});

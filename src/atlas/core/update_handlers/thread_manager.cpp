@@ -1,10 +1,4 @@
-#include <barrier>
-#include <condition_variable>
 #include <core/engine_logger.hpp>
-#include <core/update_handlers/thread_manager.hpp>
-#include <fmt/format.h>
-#include <thread_utils/thread_utils.hpp>
-#include <update_handlers/global_update.hpp>
 #include <update_handlers/sync_update.hpp>
 
 namespace atlas {

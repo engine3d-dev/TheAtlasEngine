@@ -1,7 +1,6 @@
 #include <atomic>
 #include <core/application.hpp>
 #include <core/engine_logger.hpp>
-#include <core/update_handlers/sync_update.hpp>
 #include <cstring>
 #include <drivers/vulkan/helper_functions.hpp>
 #include <drivers/vulkan/shaders/vulkan_shader.hpp>

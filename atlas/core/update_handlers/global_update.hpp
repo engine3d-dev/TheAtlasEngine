@@ -1,6 +1,6 @@
 #pragma once
-#include <core/update_handlers/thread_manager.hpp>
-#include <core/update_handlers/timer.hpp>
+// #include <core/update_handlers/thread_manager.hpp>
+// #include <core/update_handlers/timer.hpp>
 
 namespace atlas {
     //! TODO: global_update should be a namespace
