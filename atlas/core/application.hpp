@@ -5,7 +5,7 @@
 #include <string>
 
 namespace atlas {
-    
+
     struct application_settings {
         std::string Name = "Undefined";
         uint32_t Width = 0;
