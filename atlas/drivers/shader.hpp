@@ -8,9 +8,9 @@ namespace atlas {
     class shader {
     public:
         virtual ~shader() = default;
-        static ref<shader> create(const std::string p_VertShader,
-                                  const std::string& p_FragShader,
-                                  const vk::shader_pipeline_config& p_Config);
+        static ref<shader> create(const std::string& p_vert_shader,
+                                  const std::string& p_frag_shader,
+                                  const vk::shader_pipeline_config& p_config);
 
         VkPipeline get_graphics_pipeline();
 

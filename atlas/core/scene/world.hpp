@@ -71,7 +71,7 @@ namespace atlas {
 
         std::string get_tag() { return m_tag; }
 
-        void add_scene(ref<scene_scope> p_scene_context);
+        void add_scene(const ref<scene_scope>& p_scene_context);
 
         flecs::world* get_registry() { return &m_scene_registry; }
         // flecs::world& get_registry() { return m_scene_registry; }

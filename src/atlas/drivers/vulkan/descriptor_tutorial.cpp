@@ -174,18 +174,20 @@ namespace atlas::vk {
     */
     // *************** Descriptor Set Layout builder *********************
 
+    
+    /*
     descriptor_set_layout::builder& descriptor_set_layout::builder::addBinding(
       uint32_t binding,
-      VkDescriptorType descriptorType,
-      VkShaderStageFlags stageFlags,
+      VkDescriptorType descriptor_type,
+      VkShaderStageFlags stage_flags,
       uint32_t count) {
         assert(bindings.count(binding) == 0 && "Binding already in use");
-        VkDescriptorSetLayoutBinding layoutBinding{};
-        layoutBinding.binding = binding;
-        layoutBinding.descriptorType = descriptorType;
-        layoutBinding.descriptorCount = count;
-        layoutBinding.stageFlags = stageFlags;
-        bindings[binding] = layoutBinding;
+        VkDescriptorSetLayoutBinding layout_binding{};
+        layout_binding.binding = binding;
+        layout_binding.descriptorType = descriptor_type;
+        layout_binding.descriptorCount = count;
+        layout_binding.stageFlags = stage_flags;
+        bindings[binding] = layout_binding;
         return *this;
     }
 
@@ -199,20 +201,20 @@ namespace atlas::vk {
     descriptor_set_layout::descriptor_set_layout(
       std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings)
       : bindings{ bindings } {
-        std::vector<VkDescriptorSetLayoutBinding> setLayoutBindings{};
+        std::vector<VkDescriptorSetLayoutBinding> set_layout_bindings{};
         for (auto kv : bindings) {
-            setLayoutBindings.push_back(kv.second);
+            set_layout_bindings.push_back(kv.second);
         }
 
-        VkDescriptorSetLayoutCreateInfo descriptorSetLayoutInfo{};
-        descriptorSetLayoutInfo.sType =
+        VkDescriptorSetLayoutCreateInfo descriptor_set_layout_info{};
+        descriptor_set_layout_info.sType =
           VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-        descriptorSetLayoutInfo.bindingCount =
-          static_cast<uint32_t>(setLayoutBindings.size());
-        descriptorSetLayoutInfo.pBindings = setLayoutBindings.data();
+        descriptor_set_layout_info.bindingCount =
+          static_cast<uint32_t>(set_layout_bindings.size());
+        descriptor_set_layout_info.pBindings = set_layout_bindings.data();
 
         if (vkCreateDescriptorSetLayout(vk_context::get_current_driver(),
-                                        &descriptorSetLayoutInfo,
+                                        &descriptor_set_layout_info,
                                         nullptr,
                                         &m_descriptor_set_layout) !=
             VK_SUCCESS) {
@@ -228,9 +230,9 @@ namespace atlas::vk {
     // *************** Descriptor Pool builder *********************
 
     descriptor_pool::builder& descriptor_pool::builder::addPoolSize(
-      VkDescriptorType descriptorType,
+      VkDescriptorType descriptor_type,
       uint32_t count) {
-        poolSizes.push_back({ descriptorType, count });
+        poolSizes.push_back({ descriptor_type, count });
         return *this;
     }
 
@@ -381,4 +383,6 @@ namespace atlas::vk {
                                0,
                                nullptr);
     }
+    */
+    
 };

@@ -10,20 +10,22 @@ namespace atlas::vk {
      */
     class vk_swapchain : public swapchain {
     public:
-        virtual ~vk_swapchain() {}
+        ~vk_swapchain() override = default;
         //! @note TODO: Change this into RendererConfig
-        static constexpr uint32_t MaxFramesInFlight = 2;
+        static constexpr uint32_t max_frames_in_flight = 2;
 
         vk_swapchain() = default;
-        vk_swapchain(vk_physical_driver p_physical,
-                     vk_driver p_driver,
-                     VkSurfaceKHR p_surface);
+        vk_swapchain(const vk_physical_driver& p_physical,
+                     const vk_driver& p_driver,
+                     const VkSurfaceKHR& p_surface);
 
         static void resize_reset();
         static bool is_resized();
 
     private:
-        void on_create(uint32_t p_width, uint32_t p_height);
+        //! @note I made p_height const because of clang-tidy
+        //! @note vulkan abstractions getting a rewrite anyways, so doing this to silence it for the time being
+        void on_create(uint32_t p_width, const uint32_t p_height);
 
     private:
         //! @note Graphic swapchain virtual implementation functions
@@ -35,7 +37,7 @@ namespace atlas::vk {
         VkRenderPass read_swapchain_renderpass() override;
         VkFormat& read_swapchain_format() override;
 
-        uint32_t images_size() const override;
+        [[nodiscard]] uint32_t images_size() const override;
         VkFramebuffer read_framebuffer(uint32_t idx) override;
         VkImageView read_image_view(uint32_t index) override;
         VkExtent2D read_swapchain_extent() override;
@@ -72,26 +74,26 @@ namespace atlas::vk {
                                          VkFormatFeatureFlags p_feature_flags);
 
     private:
-        int m_width = -1;
-        int m_height = -1;
+        uint32_t m_width = -1;
+        uint32_t m_height = -1;
         bool m_is_resized_requested = false;
         VkQueue m_presentation_queue = nullptr;
         VkSurfaceKHR m_current_surface = nullptr;
 
-        struct SwapchainImage {
+        struct swapchain_image {
             VkImage Image;
             VkImageView ImageView;
         };
 
-        struct SwapchainDepthImage {
+        struct swapchain_depth_image {
             VkImage Image;
             VkImageView ImageView;
             VkDeviceMemory DeviceMemory;
         };
 
         //! @note Images that are either in-use for images or depth images.
-        std::vector<SwapchainImage> m_swapchain_images;
-        std::vector<SwapchainDepthImage> m_swapchain_depth_images;
+        std::vector<swapchain_image> m_swapchain_images;
+        std::vector<swapchain_depth_image> m_swapchain_depth_images;
         std::vector<VkFramebuffer> m_swapchain_framebuffers;
 
         VkSwapchainKHR m_swapchain = nullptr;
@@ -128,7 +130,7 @@ namespace atlas::vk {
 
         //! @note Current frame that we are at in the application from the start
         //! of the app.
-        size_t g_current_frame_index = 0;
+        size_t m_current_frame_index = 0;
 
         //! @note Acts as our image index.
         uint32_t m_current_image_index =

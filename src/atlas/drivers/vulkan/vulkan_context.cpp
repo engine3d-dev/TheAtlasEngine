@@ -5,7 +5,7 @@
 #include <vulkan/vulkan_core.h>
 
 namespace atlas::vk {
-    const std::vector<std::string> InstanceLayers = {
+    const std::vector<std::string> instance_layers = {
         // #ifdef DEBUG
         // Khronos Validation is a layer which encompasses all of the
         // functionality that used to be contained in VK_LAYER_GOOGLE_threading,
@@ -111,7 +111,8 @@ namespace atlas::vk {
         for (const auto& layer : layer_properties) {
             for (uint32_t j = 0; j < layer_count; j++) {
                 // if(layer_properties[j].layerName == layer.layerName)
-                if (strcmp(layer_properties[j].layerName, layer.layerName)) {
+                if (strcmp(layer_properties[j].layerName, layer.layerName) !=
+                    0) {
                     layer_names.emplace_back(layer_properties[j].layerName);
                 }
             }
@@ -120,16 +121,16 @@ namespace atlas::vk {
     }
 
     std::vector<const char*> vk_context::initialize_instance_extensions() {
-        std::vector<const char*> extensionNames;
+        std::vector<const char*> extension_names;
 
-        extensionNames.emplace_back(VK_KHR_SURFACE_EXTENSION_NAME);
+        extension_names.emplace_back(VK_KHR_SURFACE_EXTENSION_NAME);
 
         // An additional surface extension needs to be loaded. This extension is
         // platform-specific so needs to be selected based on the platform the
         // example is going to be deployed to. Preprocessor directives are used
         // here to select the correct platform.
 #ifdef VK_USE_PLATFORM_WIN32_KHR
-        extensionNames.emplace_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
+        extension_names.emplace_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
 #endif
 #ifdef VK_USE_PLATFORM_XLIB_KHR
         extensionNames.emplace_back(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
@@ -150,6 +151,6 @@ namespace atlas::vk {
         extensionNames.emplace_back(VK_KHR_DISPLAY_EXTENSION_NAME);
 #endif
 
-        return extensionNames;
+        return extension_names;
     }
 };

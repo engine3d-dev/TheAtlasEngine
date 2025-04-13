@@ -11,11 +11,11 @@
 #include <glm/gtx/matrix_decompose.hpp>
 
 namespace atlas {
-    struct Tag {
+    struct tag {
         std::string TagMetadata = "";
     };
 
-    struct Transform {
+    struct transform {
         glm::highp_vec3 Position{ 0.f };
         glm::highp_vec3 QuaternionRotation{ 0.f };
         glm::highp_vec3 Rotation{ 0.f };
@@ -24,8 +24,8 @@ namespace atlas {
     };
 
     //! @note Our interpretation of the RigidBody3D
-    struct RigidBody3D {
-        RigidBody3D() = default;
+    struct rigidbody3d {
+        rigidbody3d() = default;
 
         enum class BodyType { STATIC = 0, DYNAMIC = 1, KINEMATIC = 2 };
 
@@ -37,9 +37,9 @@ namespace atlas {
 
     //! @note Our interpretation of the BoxCollider that will get interpreted
     //! based on physics API's enabled
-    struct BoxCollider3D {
-        BoxCollider3D() = default;
-        BoxCollider3D(const BoxCollider3D&) = default;
+    struct box_collider3d {
+        box_collider3d() = default;
+        box_collider3d(const box_collider3d&) = default;
 
         float density = 1.0f;
         float friction = 0.5f;
@@ -52,13 +52,13 @@ namespace atlas {
 
     // Defines several possible options for camera movement. Used as abstraction
     // to stay away from window-system specific input methods
-    enum CameraMovement { FORWARD, BACKWARD, LEFT, RIGHT, UP, DOWN };
+    enum CameraMovement { Forward, Backward, Left, Right, Up, Down };
 
     // An abstract camera class that processes input and calculates the
     // corresponding Euler Angles, Vectors and Matrices for use in OpenGL
 
     //! TODO: Make this better (when we do lighting)
-    struct Light {
+    struct light {
         glm::vec3 Position{ 1.f };
     };
 
@@ -66,9 +66,9 @@ namespace atlas {
     //! TODO: IMPORTANT: NEED TO CHANGE HOW THIS WORKSS!!
     //! IMPORTANT: flecs gives you a lifetime issue if it doesnt have a default
     //! constructor implictly added to a struct/class
-    struct RenderTarget3D {
-        RenderTarget3D() = default;
-        RenderTarget3D(const std::string& p_filepath)
+    struct rendertarget3d {
+        rendertarget3d() = default;
+        rendertarget3d(const std::string& p_filepath)
           : Filepath(p_filepath)
           , MeshMetaData(p_filepath) {}
 
@@ -124,20 +124,20 @@ namespace atlas {
         void process_keyboard(CameraMovement p_direction, float p_delta_time) {
             float velocity = MovementSpeed * p_delta_time;
 
-            if (p_direction == FORWARD)
+            if (p_direction == CameraMovement::Forward)
                 Position += get_front() * velocity;
-            if (p_direction == BACKWARD)
+            if (p_direction == CameraMovement::Backward)
                 Position -= get_front() * velocity;
-            if (p_direction == LEFT)
+            if (p_direction == CameraMovement::Left)
                 Position -= Right * velocity;
-            if (p_direction == RIGHT)
+            if (p_direction == CameraMovement::Right)
                 Position += Right * velocity;
 
-            if (p_direction == UP) {
+            if (p_direction == CameraMovement::Up) {
                 Position += Up * velocity;
             }
 
-            if (p_direction == DOWN) {
+            if (p_direction == CameraMovement::Down) {
                 Position -= Up * velocity;
             }
         }

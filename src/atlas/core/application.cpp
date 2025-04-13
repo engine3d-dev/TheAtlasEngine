@@ -26,7 +26,7 @@ namespace atlas {
         m_window = window::create(p_settings.Width, p_settings.Height, g_tag);
 
         renderer::initialize();
-        ImGuiBackend::Initialize();
+        imgui_backend::initialize();
     }
 
     application::~application() {

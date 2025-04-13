@@ -117,7 +117,7 @@ namespace atlas::vk {
 
     uint32_t vk_physical_driver::get_presentation_index(
       VkSurfaceKHR p_surface) const {
-        uint32_t PresentationIndex = -1;
+        uint32_t presentation_index = -1;
         VkBool32 compatible = VK_FALSE;
         uint32_t i = 0;
         for (const auto& queue_family : m_queue_family_properties) {
@@ -130,13 +130,13 @@ namespace atlas::vk {
                          __FUNCTION__);
 
                 if (compatible) {
-                    PresentationIndex = i;
+                    presentation_index = i;
                 }
             }
             i++;
         }
 
-        console_log_warn("Presentation Index === {}", PresentationIndex);
-        return PresentationIndex;
+        console_log_warn("Presentation Index === {}", presentation_index);
+        return presentation_index;
     }
 };

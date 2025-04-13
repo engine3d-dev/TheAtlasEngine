@@ -2,7 +2,7 @@
 #include <drivers/vulkan/vulkan_context.hpp>
 #include <core/system_framework/system_registry.hpp>
 
-extern int Main();
+extern int win_main();
 
 int
 main() {
@@ -14,5 +14,5 @@ main() {
     atlas::vk::vk_context::initialize();
     atlas::system_registry::initialize();
 
-    return Main();
+    return win_main();
 }

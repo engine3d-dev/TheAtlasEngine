@@ -47,7 +47,7 @@ namespace atlas {
     }
 
     float window::get_aspect_ratio() const {
-        return (float)get_width() / get_height();
+        return (float)get_width() / (float)get_height();
     }
 
     GLFWwindow* window::get_native_window() const {

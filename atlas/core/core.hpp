@@ -15,6 +15,10 @@ namespace atlas {
 #define ENGINE_API __attribute__((visibility("default")))
 #endif
 
+#ifdef ATLAS_DEBUG_BUILD
+#define ATLAS_DEBUG_BUILD
+#endif
+
     template<typename... T>
     static void core_assert(bool x, T&&... args) {
         // const char* filename = __FILE__;

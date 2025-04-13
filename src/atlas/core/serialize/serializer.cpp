@@ -118,19 +118,19 @@ namespace atlas {
         output << YAML::BeginMap;
 
         output << YAML::Key << "Entity" << YAML::Value
-               << p_entity.get<Tag>()->TagMetadata;
+               << p_entity.get<tag>()->TagMetadata;
 
-        if (p_entity.has<Transform>()) {
+        if (p_entity.has<transform>()) {
             output << YAML::Key << "Transform";
 
             output << YAML::BeginMap;
-            auto transform = p_entity.get<Transform>();
+            auto entity_transform = p_entity.get<transform>();
             output << YAML::Key << "Position" << YAML::Value
-                   << transform->Position;
-            output << YAML::Key << "Scale" << YAML::Value << transform->Scale;
+                   << entity_transform->Position;
+            output << YAML::Key << "Scale" << YAML::Value << entity_transform->Scale;
             output << YAML::Key << "Rotation" << YAML::Value
-                   << transform->Rotation;
-            output << YAML::Key << "Color" << YAML::Value << transform->Color;
+                   << entity_transform->Rotation;
+            output << YAML::Key << "Color" << YAML::Value << entity_transform->Color;
             output << YAML::EndMap;
         }
 
@@ -167,11 +167,11 @@ namespace atlas {
             output << YAML::EndMap;
         }
 
-        if (p_entity.has<RenderTarget3D>()) {
+        if (p_entity.has<rendertarget3d>()) {
             output << YAML::Key << "Mesh Component";
             // output << YAML::Key << "Mesh" << YAML::Value;
 
-            auto mesh_component = p_entity.get<RenderTarget3D>();
+            auto mesh_component = p_entity.get<rendertarget3d>();
 
             output << YAML::BeginMap;
 
@@ -201,7 +201,7 @@ namespace atlas {
         //! @note Queries in flecs the ecs framework are how we can query all
         //! entities that the engine (user creates through our API)
         flecs::query<> q =
-          world_object->query_builder().with<atlas::Tag>().build();
+          world_object->query_builder().with<atlas::tag>().build();
 
         q.each([&output](flecs::entity p_entity_id) {
             serialize_entity(output, p_entity_id);

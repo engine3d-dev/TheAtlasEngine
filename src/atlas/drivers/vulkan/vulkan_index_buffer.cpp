@@ -4,12 +4,12 @@
 #include <drivers/vulkan/vulkan_index_buffer.hpp>
 
 namespace atlas::vk {
-    vk_index_buffer::vk_index_buffer(const std::vector<uint32_t>& p_Indices) {
+    vk_index_buffer::vk_index_buffer(const std::vector<uint32_t>& p_indices) {
         // console_log_info("Vulkan2Showcase: Begin Vulkan vertex_buffer
         // Initialization!!");
         console_log_warn_tagged("vulkan",
                                 "Begin Vulkan vertex_buffer Initialization!!");
-        m_indices_count = static_cast<uint32_t>(p_Indices.size());
+        m_indices_count = static_cast<uint32_t>(p_indices.size());
 
         m_has_indices = (m_indices_count > 0);
 
@@ -19,7 +19,7 @@ namespace atlas::vk {
             return;
         }
 
-        VkDeviceSize buffer_size = sizeof(p_Indices[0]) * m_indices_count;
+        VkDeviceSize buffer_size = sizeof(p_indices[0]) * m_indices_count;
         VkBufferUsageFlags usage_flags = VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
         VkMemoryPropertyFlags property_flags =
           VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
@@ -93,7 +93,7 @@ namespace atlas::vk {
                     buffer_size,
                     0,
                     &data);
-        memcpy(data, p_Indices.data(), static_cast<size_t>(buffer_size));
+        memcpy(data, p_indices.data(), static_cast<size_t>(buffer_size));
         vkUnmapMemory(vk_context::get_current_driver(),
                       m_index_device_buffer_memory);
 
@@ -103,21 +103,23 @@ namespace atlas::vk {
           "vulkan", "Vulkan vertex_buffer Initialized Completed!!!");
     }
 
-    vk_index_buffer::~vk_index_buffer() {}
+    // vk_index_buffer::~vk_index_buffer() = default;
 
     void vk_index_buffer::bind_to_index_buffer(
-      const VkCommandBuffer& p_CommandBuffer) {
+      const VkCommandBuffer& p_command_buffer) {
         // VkBuffer buffers[] = {m_index_buffer_handler};
         // VkDeviceSize offsets[] = {0};
 
         if (m_has_indices) {
-            vkCmdBindIndexBuffer(
-              p_CommandBuffer, m_index_buffer_handler, 0, VK_INDEX_TYPE_UINT32);
+            vkCmdBindIndexBuffer(p_command_buffer,
+                                 m_index_buffer_handler,
+                                 0,
+                                 VK_INDEX_TYPE_UINT32);
         }
     }
 
     void vk_index_buffer::render_index_buffer(
-      const VkCommandBuffer& p_CommandBuffer) {
+      const VkCommandBuffer& p_command_buffer) {
         /**
         //! @note This will happen within Renderer itself, but not here nor
         vertex_buffer class. if(m_has_indices){
@@ -128,7 +130,7 @@ namespace atlas::vk {
         }
         */
 
-        vkCmdDrawIndexed(p_CommandBuffer, m_indices_count, 1, 0, 0, 0);
+        vkCmdDrawIndexed(p_command_buffer, m_indices_count, 1, 0, 0, 0);
     }
 
     bool vk_index_buffer::contains_indices() const {

@@ -4,13 +4,13 @@
 #include <drivers/vulkan/vulkan_swapchain.hpp>
 
 namespace atlas {
-    ref<swapchain> swapchain::initialize(VkSurfaceKHR p_Surface) {
+    ref<swapchain> swapchain::initialize(VkSurfaceKHR p_surface) {
         switch (application::current_api()) {
             case API::VULKAN:
                 return create_ref<vk::vk_swapchain>(
                   vk::vk_context::get_current_selected_physical_driver(),
                   vk::vk_context::get_current_driver(),
-                  p_Surface);
+                  p_surface);
             default:
                 break;
         }

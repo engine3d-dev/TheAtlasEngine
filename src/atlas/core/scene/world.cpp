@@ -25,8 +25,8 @@ namespace atlas {
         @note Really, this would be providing a way of handling scenes in some
        spatial data structure
     */
-    void world_scope::add_scene(ref<scene_scope> p_SceneContext) {
-        m_current_scene = p_SceneContext;
+    void world_scope::add_scene(const ref<scene_scope>& p_scene_context) {
+        m_current_scene = p_scene_context;
         m_scene_manager_queue.push_back(m_current_scene);
     }
 };

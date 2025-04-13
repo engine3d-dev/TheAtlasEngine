@@ -8,7 +8,7 @@ namespace atlas::filesystem {
      * @example passing "obj;jpg" will only allow to select these files with
      * those extensions
      */
-    std::string LoadFromFileDialog(const std::string& p_filter);
+    std::string load_from_file_dialog(const std::string& p_filter);
 
-    std::string SaveToFile(const std::string& p_filter);
+    std::string save_to_file(const std::string& p_filter);
 }; // namespace atlas::filesystem
