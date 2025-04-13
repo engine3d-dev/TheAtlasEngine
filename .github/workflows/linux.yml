@@ -1,6 +1,6 @@
 name: Linux Build Tests
 
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
     linux-build:
@@ -42,7 +42,7 @@ jobs:
             - name: Building Atlas
               run: conan build . -b missing -c tools.system.package_manager:sudo=True -c tools.system.package_manager:mode=install
 
-            - uses: cpp-linter/cpp-linter-action@v2
+            - uses: cpp-linter/cpp-linter-action@main
               id: linter
               env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -52,15 +52,7 @@ namespace atlas {
 
     // Defines several possible options for camera movement. Used as abstraction
     // to stay away from window-system specific input methods
-    enum Camera_Movement { FORWARD, BACKWARD, LEFT, RIGHT, UP, DOWN };
-
-    // Default camera values
-    const float YAW = -90.0f;
-    // const float YAW = 45.0f;
-    const float PITCH = 0.0f;
-    // const float SPEED       =  2.5f;
-    // const float SENSITIVITY =  0.1f;
-    const float ZOOM = 45.0f;
+    enum CameraMovement { FORWARD, BACKWARD, LEFT, RIGHT, UP, DOWN };
 
     // An abstract camera class that processes input and calculates the
     // corresponding Euler Angles, Vectors and Matrices for use in OpenGL
@@ -99,68 +91,72 @@ namespace atlas {
 
 
     */
-    class Camera {
+    class camera {
+        // Default camera values
+        // const float yaw = -90.0f;
+        // const float PITCH = 0.0f;
+        // const float ZOOM = 45.0f;
     public:
         // constructor with vectors
-        Camera(glm::vec3 position = glm::vec3(0.0f, 1.50f, 0.0f),
+        camera(glm::vec3 position = glm::vec3(0.0f, 1.50f, 0.0f),
                glm::vec3 up = glm::vec3(0.0f, -1.0f, 0.0f),
-               float yaw = YAW,
-               float pitch = PITCH)
+               float yaw = -90.0f,
+               float pitch = 0.0f)
           : MovementSpeed(5.f)
           , MouseSensitivity(0.1f)
-          , Zoom(ZOOM)
+          , Zoom(45.0f)
           , camera_mouse_sensitivity(0.1f) {
             Position = position;
             WorldUp = up;
             EulerRotation = { yaw, pitch, 1.f };
-            AspectRatio = application::get_aspect_ratio();
-            updateCameraVectors();
+            AspectRatio = (float)application::get_aspect_ratio();
+            update_camera();
         }
 
         // returns the view matrix calculated using Euler Angles and the LookAt
         // Matrix
-        glm::mat4 get_view() const { return View; }
-        glm::mat4 get_projection() const { return Projection; }
+        [[nodiscard]] glm::mat4 get_view() const { return View; }
+        [[nodiscard]] glm::mat4 get_projection() const { return Projection; }
 
         // processes input received from any keyboard-like input system. Accepts
         // input parameter in the form of camera defined ENUM (to abstract it
         // from windowing systems)
-        void ProcessKeyboard(Camera_Movement direction, float deltaTime) {
-            float velocity = MovementSpeed * deltaTime;
+        void process_keyboard(CameraMovement p_direction, float p_delta_time) {
+            float velocity = MovementSpeed * p_delta_time;
 
-            if (direction == FORWARD)
+            if (p_direction == FORWARD)
                 Position += get_front() * velocity;
-            if (direction == BACKWARD)
+            if (p_direction == BACKWARD)
                 Position -= get_front() * velocity;
-            if (direction == LEFT)
+            if (p_direction == LEFT)
                 Position -= Right * velocity;
-            if (direction == RIGHT)
+            if (p_direction == RIGHT)
                 Position += Right * velocity;
 
-            if (direction == UP) {
+            if (p_direction == UP) {
                 Position += Up * velocity;
             }
 
-            if (direction == DOWN) {
+            if (p_direction == DOWN) {
                 Position -= Up * velocity;
             }
         }
 
         // processes input received from a mouse input system. Expects the
         // offset value in both the x and y direction.
-        void ProcessMouseMovement(float xoffset,
-                                  float yoffset,
-                                  bool constrainPitch = true) {
+        void process_mouse_movement(float p_x,
+                                    float p_y,
+                                    bool p_constraint_pitch = true) {
 
-            xoffset *= MouseSensitivity;
-            yoffset *= MouseSensitivity;
+            p_x *= MouseSensitivity;
+            p_y *= MouseSensitivity;
 
-            EulerRotation.x += xoffset;
-            EulerRotation.y += yoffset;
+            EulerRotation.x += p_x;
+            EulerRotation.y += p_y;
 
             // make sure that when pitch is out of bounds, screen doesn't get
             // flipped
-            if (constrainPitch) {
+            if (p_constraint_pitch) {
                 if (EulerRotation.y > 89.0f) {
                     EulerRotation.y = 89.0f;
                 }
@@ -170,12 +166,12 @@ namespace atlas {
             }
 
             // update Front, Right and Up Vectors using the updated Euler angles
-            updateCameraVectors();
+            update_camera();
         }
 
         // processes input received from a mouse scroll-wheel event. Only
         // requires input on the vertical wheel-axis
-        void ProcessMouseScroll(float yoffset) {
+        void process_mouse_scroll(float yoffset) {
             Zoom -= (float)yoffset;
 
             if (Zoom < 1.0f) {
@@ -188,20 +184,22 @@ namespace atlas {
         }
 
         //! TODO: REMOVE THESE -- these should be user-defined
-        void SetCameraMovementSpeed(float Sensitivity) {
-            camera_movement_sensitivity = Sensitivity;
+        void set_movement_speed(float p_sensitivity) {
+            camera_movement_sensitivity = p_sensitivity;
             MovementSpeed = camera_movement_sensitivity;
         }
 
-        void SetCameraMouseSpeed(float Sensitivity) {
-            camera_mouse_sensitivity = Sensitivity;
+        void set_mouse_speed(float p_sensitivity) {
+            camera_mouse_sensitivity = p_sensitivity;
         }
 
-        float GetCameraSensitivity() const { return camera_mouse_sensitivity; }
+        [[nodiscard]] float camera_sensitivity() const {
+            return camera_mouse_sensitivity;
+        }
 
     private:
         // calculates the front vector from the Camera's (updated) Euler Angles
-        void updateCameraVectors() {
+        void update_camera() {
             // calculate the new Front vector
             // glm::vec3 front;
             // front.x = cos(glm::radians(EulerRotation.x)) *
@@ -221,7 +219,7 @@ namespace atlas {
         }
 
     public:
-        void UpdateProjView() {
+        void update_proj_view() {
             //! TODO: Eventually we will have camera configurations that will
             //! utilize this.
             Projection =
@@ -229,7 +227,7 @@ namespace atlas {
             View = glm::lookAt(Position, Position + get_front(), Up);
         }
 
-        glm::vec3 get_front() const {
+        [[nodiscard]] glm::vec3 get_front() const {
             glm::vec3 front_values;
             front_values.x = cos(glm::radians(EulerRotation.x)) *
                              cos(glm::radians(EulerRotation.y));
@@ -258,9 +256,9 @@ namespace atlas {
         // {x: Yaw, y: Pitch, z: Roll}
         glm::vec3 EulerRotation;
         // camera options
-        float MovementSpeed;
-        float MouseSensitivity;
-        float Zoom;
+        float MovementSpeed{};
+        float MouseSensitivity{};
+        float Zoom{};
 
         // float camera_mouse_sensitivity = 0.1f;
         float camera_mouse_sensitivity = 2.5f;

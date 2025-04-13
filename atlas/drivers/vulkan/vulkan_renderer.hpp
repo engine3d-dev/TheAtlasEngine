@@ -16,7 +16,7 @@ namespace atlas::vk {
      */
     class vk_renderer : public render_context {
     public:
-        vk_renderer(const std::string& Tag);
+        vk_renderer(const std::string& tag);
         ~vk_renderer();
 
         //! @note Implementation-details for sending draw calls.
@@ -50,6 +50,6 @@ namespace atlas::vk {
         std::vector<VkDescriptorSet> m_global_descriptor_set;
 
         //! @note This is just going to be the current camera component set
-        Camera m_current_camera_component;
+        camera m_current_camera_component;
     };
 };

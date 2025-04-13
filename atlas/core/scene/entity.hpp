@@ -1,8 +1,7 @@
 #pragma once
-#include <core/scene/world.hpp>
-#include <core/system_framework/system_registry.hpp>
-#include <flecs.h>
 #include <string>
+#include <core/scene/world.hpp>
+#include <flecs.h>
 
 namespace atlas {
     /**
@@ -38,11 +37,6 @@ namespace atlas {
             m_entity_id.add<UComponent>();
         }
 
-        template<typename UComponent>
-        void add(const UComponent& p_component) {
-            m_entity_id.set<UComponent>(p_component);
-        }
-
         //! @note Returns the component from the entity
         //! @note Flecs has you return a pointer for checking if the component
         //! is found
@@ -54,9 +48,7 @@ namespace atlas {
 
         template<typename UComponent>
         UComponent* get_mut() const {
-            return system_registry::get_world()
-              .get_registry()
-              ->get_mut<UComponent>(m_entity_id);
+            return m_entity_id.get_mut<UComponent>();
         }
 
         //! @note Checks if specific component of type UComponent is provided to
