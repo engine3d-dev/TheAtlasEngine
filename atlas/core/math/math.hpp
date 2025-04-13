@@ -8,9 +8,9 @@ namespace atlas {
     public:
         template<typename T>
         static T linear_interpolate(T start,
-                                   T end,
-                                   const std::function<float(float)>& function,
-                                   float t) {
+                                    T end,
+                                    const std::function<float(float)>& function,
+                                    float t) {
             float l_adjusted_time = 0.0f;
             if (!function) {
                 l_adjusted_time = t;

@@ -127,10 +127,12 @@ namespace atlas {
             auto entity_transform = p_entity.get<transform>();
             output << YAML::Key << "Position" << YAML::Value
                    << entity_transform->Position;
-            output << YAML::Key << "Scale" << YAML::Value << entity_transform->Scale;
+            output << YAML::Key << "Scale" << YAML::Value
+                   << entity_transform->Scale;
             output << YAML::Key << "Rotation" << YAML::Value
                    << entity_transform->Rotation;
-            output << YAML::Key << "Color" << YAML::Value << entity_transform->Color;
+            output << YAML::Key << "Color" << YAML::Value
+                   << entity_transform->Color;
             output << YAML::EndMap;
         }
 

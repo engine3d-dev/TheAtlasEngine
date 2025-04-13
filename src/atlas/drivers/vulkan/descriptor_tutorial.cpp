@@ -174,7 +174,6 @@ namespace atlas::vk {
     */
     // *************** Descriptor Set Layout builder *********************
 
-    
     /*
     descriptor_set_layout::builder& descriptor_set_layout::builder::addBinding(
       uint32_t binding,
@@ -384,5 +383,5 @@ namespace atlas::vk {
                                nullptr);
     }
     */
-    
+
 };

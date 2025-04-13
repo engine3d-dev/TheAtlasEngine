@@ -24,7 +24,8 @@ namespace atlas::vk {
 
     private:
         //! @note I made p_height const because of clang-tidy
-        //! @note vulkan abstractions getting a rewrite anyways, so doing this to silence it for the time being
+        //! @note vulkan abstractions getting a rewrite anyways, so doing this
+        //! to silence it for the time being
         void on_create(uint32_t p_width, const uint32_t p_height);
 
     private:

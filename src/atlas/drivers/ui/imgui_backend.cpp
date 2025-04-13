@@ -83,8 +83,8 @@ namespace atlas {
     // static VkCommandPool cmd_pool;
 
     static void update_viewport(const VkCommandBuffer& p_command_buffer,
-                               int p_width,
-                               int p_height) {
+                                int p_width,
+                                int p_height) {
         // 1. Get the ImGui viewport's position and size
         ImGuiViewport* viewport =
           ImGui::GetMainViewport(); // Or a specific viewport if you're using
@@ -104,9 +104,9 @@ namespace atlas {
         // 3. Create a scissor rectangle (optional, but recommended)
         VkRect2D scissor_rect = {};
         scissor_rect.offset = { .x = static_cast<int32_t>(pos.x),
-                               .y = static_cast<int32_t>(pos.y) };
-        scissor_rect.extent = { .width =  static_cast<uint32_t>(p_width),
-                               .height = static_cast<uint32_t>(p_height) };
+                                .y = static_cast<int32_t>(pos.y) };
+        scissor_rect.extent = { .width = static_cast<uint32_t>(p_width),
+                                .height = static_cast<uint32_t>(p_height) };
 
         // 4. Set the viewport and scissor in your Vulkan command buffer
         vkCmdSetViewport(p_command_buffer, 0, 1, &vk_viewport);
@@ -268,8 +268,9 @@ namespace atlas {
 
             // Create memory to backup image
             VkMemoryRequirements memory_requirements;
-            vkGetImageMemoryRequirements(
-              m_driver, s_im_gui_viewport_images[i].Image, &memory_requirements);
+            vkGetImageMemoryRequirements(m_driver,
+                                         s_im_gui_viewport_images[i].Image,
+                                         &memory_requirements);
 
             // Allocate memory for these images
             VkMemoryAllocateInfo mem_alloc_info = {

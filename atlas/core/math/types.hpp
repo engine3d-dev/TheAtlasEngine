@@ -56,7 +56,8 @@ namespace atlas {
         vector3(float x, float y, float z)
           : m_value(x, y, z) {}
         vector3(const std::initializer_list<float>& values)
-          : m_value(*values.begin(), *values.begin() + 1, *values.begin() + 2) {}
+          : m_value(*values.begin(), *values.begin() + 1, *values.begin() + 2) {
+        }
 
         operator glm::vec3() { return m_value; }
 
