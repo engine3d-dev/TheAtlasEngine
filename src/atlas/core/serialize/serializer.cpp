@@ -113,7 +113,7 @@ namespace atlas {
     }
 
     // actual serialization with yaml-cpp
-    static void serialize_entity(YAML::Emitter& output,
+    [[maybe_unused]] static void serialize_entity(YAML::Emitter& output,
                                  const flecs::entity& p_entity) {
         output << YAML::BeginMap;
 
@@ -197,17 +197,20 @@ namespace atlas {
                << m_current_scene_ctx->get_tag();
         output << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
 
-        flecs::world* world_object =
-          atlas::system_registry::get_world().get_registry();
+        // flecs::world* world_object = atlas::system_registry::get_world().get_registry();
+        // ref<world_scope> world_object = system_registry::get_world("Editor World");
+        // ref<scene_scope> current_scene = world_object->get_scene("LevelScene");
+        // flecs::query<> q = current_scene->query_builder<atlas::tag>().build();
+        // flecs::world world_registry = world_object->
 
         //! @note Queries in flecs the ecs framework are how we can query all
         //! entities that the engine (user creates through our API)
-        flecs::query<> q =
-          world_object->query_builder().with<atlas::tag>().build();
+        // flecs::query<> q =
+        //   world_object->query_builder().with<atlas::tag>().build();
 
-        q.each([&output](flecs::entity p_entity_id) {
-            serialize_entity(output, p_entity_id);
-        });
+        // q.each([&output](flecs::entity p_entity_id) {
+        //     serialize_entity(output, p_entity_id);
+        // });
 
         std::ofstream output_file(p_filepath);
         output_file << output.c_str();

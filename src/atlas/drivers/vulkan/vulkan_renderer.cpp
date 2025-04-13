@@ -356,30 +356,56 @@ namespace atlas::vk {
 
         //! TODO: Fix: The bug is this only works when dealing with a single
         //! scene
-        flecs::world* world_object =
-          system_registry::get_world().get_registry();
-        flecs::query<> query_camera_objects =
-          world_object->query_builder<camera>().build();
-        // if(!world_object) {
-        // 	console_log_fatal("world_object != nullptr!!!");
-        // 	flecs::query<> queried_render_targets =
-        // world_object->query_builder<camera>().build();
-        // }
-        // else {
-        // 	console_log_fatal("world_object == nullptr");
-        // }
+		// flecs::world* world_object = system_registry::get_world().get_registry();
+		ref<world_scope> world_object = system_registry::get_world("Editor World");
+        ref<scene_scope> current_scene = world_object->get_scene("LevelScene");
+		// console_log_trace("current_scene address = {}", (void*)current_scene.get());
+		if(current_scene == nullptr) {
+			console_log_error("current_scene == nullptr!!!");
+		}
+		flecs::query<> query_camera_objects = current_scene->query_builder<camera>().build();
+		query_camera_objects.each([&](flecs::entity p_entity_id) {
+			if (p_entity_id.has<camera>()) {
+				if (p_entity_id.get<camera>()->IsMainCamera) {
+					m_current_camera_component = *p_entity_id.get<camera>();
+				}
+			}
+		});
+		// q.each([](flecs::entity p_entity_id){
+		// 	console_log_error("Entity Tag = {}", p_entity_id.get<tag>()->TagMetadata);
+		// });
+        // flecs::query<> q = current_scene->query_builder<atlas::tag>().build();
 
-        //! @note The idea behind this is we pre-determine this at the beginning
-        //! of the frame to getting our camera
-        //! @note Then once we get our camera properties that then gets applied
-        //! to our object's that uses that camera
-        query_camera_objects.each([&](flecs::entity p_entity_id) {
-            if (p_entity_id.has<camera>()) {
-                if (p_entity_id.get<camera>()->IsMainCamera) {
-                    m_current_camera_component = *p_entity_id.get<camera>();
-                }
-            }
-        });
+		// if(query_camera_objects.is_true()) {}
+		// 	console_log_trace("world_object = nullptr!!");
+		// }
+		// else {
+		// 	console_log_trace("world_object != nullptr!");
+		// }
+
+#if 0
+        flecs::world* world_object = system_registry::get_world().get_registry();
+		
+		if(world_object != nullptr) {
+
+			flecs::query<> query_camera_objects = world_object->query_builder<camera>().build();
+
+			//! @note The idea behind this is we pre-determine this at the beginning
+			//! of the frame to getting our camera
+			//! @note Then once we get our camera properties that then gets applied
+			//! to our object's that uses that camera
+			query_camera_objects.each([&](flecs::entity p_entity_id) {
+				if (p_entity_id.has<camera>()) {
+					if (p_entity_id.get<camera>()->IsMainCamera) {
+						m_current_camera_component = *p_entity_id.get<camera>();
+					}
+				}
+			});
+		}
+		else {
+			console_log_fatal("world_object = nullptr!!!");
+		}
+#endif
     }
 
     void vk_renderer::end_frame() {
@@ -391,85 +417,171 @@ namespace atlas::vk {
 
         //! TODO: Fix: The bug is this only works when dealing with a single
         //! scene
+		ref<world_scope> world_object = system_registry::get_world("Editor World");
+        ref<scene_scope> current_scene = world_object->get_scene("LevelScene");
+		// console_log_trace("current_scene address = {}", (void*)current_scene.get());
+		if(current_scene == nullptr) {
+			console_log_error("current_scene == nullptr!!!");
+		}
 
-        flecs::world* world_object =
-          system_registry::get_world().get_registry();
-        flecs::query<> queried_render_targets =
-          world_object->query_builder<rendertarget3d>().build();
+		flecs::query<> queried_render_targets = current_scene->query_builder<rendertarget3d>().build();
 
-        //! @note The idea behind this is we pre-determine this at the beginning
-        //! of the frame to getting our camera
-        //! @note Then once we get our camera properties that then gets applied
-        //! to our object's that uses that camera
-        queried_render_targets.each([&](flecs::entity p_entity_id) {
-            const transform* transform_component = p_entity_id.get<transform>();
-            vkCmdBindPipeline(current_cmd_buffer,
-                              VK_PIPELINE_BIND_POINT_GRAPHICS,
-                              g_shader->get_graphics_pipeline());
+		//! @note The idea behind this is we pre-determine this at the beginning
+		//! of the frame to getting our camera
+		//! @note Then once we get our camera properties that then gets applied
+		//! to our object's that uses that camera
+		queried_render_targets.each([&](flecs::entity p_entity_id) {
+			const transform* transform_component = p_entity_id.get<transform>();
+			vkCmdBindPipeline(current_cmd_buffer,
+							VK_PIPELINE_BIND_POINT_GRAPHICS,
+							g_shader->get_graphics_pipeline());
 
-            glm::mat4 model = p_entity_id.get<rendertarget3d>()->Model;
-            model = glm::translate(model, transform_component->Position);
-            model = glm::scale(model, transform_component->Scale);
-            auto rotation_mat4 =
-              glm::mat4(glm::quat(transform_component->Rotation));
-            model *= rotation_mat4;
+			glm::mat4 model = p_entity_id.get<rendertarget3d>()->Model;
+			model = glm::translate(model, transform_component->Position);
+			model = glm::scale(model, transform_component->Scale);
+			auto rotation_mat4 =
+			glm::mat4(glm::quat(transform_component->Rotation));
+			model *= rotation_mat4;
 
-            // Camera
-            // For the Projection and View matrices are going to be handled by
-            // the camera component These get determined pre-frame. Within
-            // begin_frame
+			// Camera
+			// For the Projection and View matrices are going to be handled by
+			// the camera component These get determined pre-frame. Within
+			// begin_frame
 
-            // RenderTarget
-            // - Gets determined pre-frame and offloaded to GPU at the end of
-            // frame
+			// RenderTarget
+			// - Gets determined pre-frame and offloaded to GPU at the end of
+			// frame
 
-            camera_ubo push_const_data = {
-                .Projection = m_current_camera_component.get_projection(),
-                .View = m_current_camera_component.get_view(),
-                .Model = model,
-                // .LightPosition = -camera_component->Front,
-                .LightPosition = -m_current_camera_component.get_front(),
-                // .LightPosition = point_light.Position,
-                .Color = transform_component->Color,
-                // .MousePosition = event::cursor_position()
-                .MousePosition = { event::cursor_position().x /
-                                     (float)application::get_window()
-                                       .get_width(),
-                                   event::cursor_position().y /
-                                     (float)application::get_window()
-                                       .get_height() }
-            };
+			camera_ubo push_const_data = {
+				.Projection = m_current_camera_component.get_projection(),
+				.View = m_current_camera_component.get_view(),
+				.Model = model,
+				// .LightPosition = -camera_component->Front,
+				.LightPosition = -m_current_camera_component.get_front(),
+				// .LightPosition = point_light.Position,
+				.Color = transform_component->Color,
+				// .MousePosition = event::cursor_position()
+				.MousePosition = { event::cursor_position().x /
+									(float)application::get_window()
+									.get_width(),
+								event::cursor_position().y /
+									(float)application::get_window()
+									.get_height() }
+			};
 
-            vkCmdPushConstants(current_cmd_buffer,
-                               m_pipeline_layout,
-                               VK_SHADER_STAGE_VERTEX_BIT |
-                                 VK_SHADER_STAGE_FRAGMENT_BIT,
-                               0,
-                               sizeof(camera_ubo),
-                               &push_const_data);
+			vkCmdPushConstants(current_cmd_buffer,
+							m_pipeline_layout,
+							VK_SHADER_STAGE_VERTEX_BIT |
+								VK_SHADER_STAGE_FRAGMENT_BIT,
+							0,
+							sizeof(camera_ubo),
+							&push_const_data);
 
-            if (!p_entity_id.has<rendertarget3d>()) {
-                console_log_fatal("COULD NOT FIND MESH COMPONENT!!!");
-                return;
-            }
+			if (!p_entity_id.has<rendertarget3d>()) {
+				console_log_fatal("COULD NOT FIND MESH COMPONENT!!!");
+				return;
+			}
 
-            auto* component = p_entity_id.get<rendertarget3d>();
+			auto* component = p_entity_id.get<rendertarget3d>();
 
-            mesh mesh_data = component->MeshMetaData;
+			mesh mesh_data = component->MeshMetaData;
 
-            auto& vb = mesh_data.get_vertex_buffer();
-            auto ib = mesh_data.get_index_buffer();
+			auto& vb = mesh_data.get_vertex_buffer();
+			auto ib = mesh_data.get_index_buffer();
 
-            vb->bind(current_cmd_buffer);
+			vb->bind(current_cmd_buffer);
 
-            if (ib != nullptr || ib->has_indices()) {
-                ib->bind(current_cmd_buffer);
-                ib->draw(current_cmd_buffer);
-            }
-            else {
-                vb->draw(current_cmd_buffer);
-            }
-        });
+			if (ib != nullptr || ib->has_indices()) {
+				ib->bind(current_cmd_buffer);
+				ib->draw(current_cmd_buffer);
+			}
+			else {
+				vb->draw(current_cmd_buffer);
+			}
+		});
+		
+#if 0
+        flecs::world* world_object = system_registry::get_world().get_registry();
+        
+		if(world_object != nullptr) {
+			flecs::query<> queried_render_targets = world_object->query_builder<rendertarget3d>().build();
+
+			//! @note The idea behind this is we pre-determine this at the beginning
+			//! of the frame to getting our camera
+			//! @note Then once we get our camera properties that then gets applied
+			//! to our object's that uses that camera
+			queried_render_targets.each([&](flecs::entity p_entity_id) {
+				const transform* transform_component = p_entity_id.get<transform>();
+				vkCmdBindPipeline(current_cmd_buffer,
+								VK_PIPELINE_BIND_POINT_GRAPHICS,
+								g_shader->get_graphics_pipeline());
+
+				glm::mat4 model = p_entity_id.get<rendertarget3d>()->Model;
+				model = glm::translate(model, transform_component->Position);
+				model = glm::scale(model, transform_component->Scale);
+				auto rotation_mat4 =
+				glm::mat4(glm::quat(transform_component->Rotation));
+				model *= rotation_mat4;
+
+				// Camera
+				// For the Projection and View matrices are going to be handled by
+				// the camera component These get determined pre-frame. Within
+				// begin_frame
+
+				// RenderTarget
+				// - Gets determined pre-frame and offloaded to GPU at the end of
+				// frame
+
+				camera_ubo push_const_data = {
+					.Projection = m_current_camera_component.get_projection(),
+					.View = m_current_camera_component.get_view(),
+					.Model = model,
+					// .LightPosition = -camera_component->Front,
+					.LightPosition = -m_current_camera_component.get_front(),
+					// .LightPosition = point_light.Position,
+					.Color = transform_component->Color,
+					// .MousePosition = event::cursor_position()
+					.MousePosition = { event::cursor_position().x /
+										(float)application::get_window()
+										.get_width(),
+									event::cursor_position().y /
+										(float)application::get_window()
+										.get_height() }
+				};
+
+				vkCmdPushConstants(current_cmd_buffer,
+								m_pipeline_layout,
+								VK_SHADER_STAGE_VERTEX_BIT |
+									VK_SHADER_STAGE_FRAGMENT_BIT,
+								0,
+								sizeof(camera_ubo),
+								&push_const_data);
+
+				if (!p_entity_id.has<rendertarget3d>()) {
+					console_log_fatal("COULD NOT FIND MESH COMPONENT!!!");
+					return;
+				}
+
+				auto* component = p_entity_id.get<rendertarget3d>();
+
+				mesh mesh_data = component->MeshMetaData;
+
+				auto& vb = mesh_data.get_vertex_buffer();
+				auto ib = mesh_data.get_index_buffer();
+
+				vb->bind(current_cmd_buffer);
+
+				if (ib != nullptr || ib->has_indices()) {
+					ib->bind(current_cmd_buffer);
+					ib->draw(current_cmd_buffer);
+				}
+				else {
+					vb->draw(current_cmd_buffer);
+				}
+			});
+			console_log_fatal("world_object = nullptr!!!");
+		}
+#endif
 
         imgui_backend::end();
         vkCmdEndRenderPass(current_cmd_buffer);

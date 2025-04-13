@@ -36,12 +36,7 @@ struct component4 {};
 
 level_scene::level_scene(const std::string& p_tag)
   : atlas::scene_scope(p_tag) {
-
     console_log_info("scene_scope::scene_scope with Tag = {} called!", p_tag);
-    atlas::world_scope world = atlas::system_registry::get_world();
-    std::string world_tag = world.get_tag();
-    console_log_trace("From level_scene::level_scene() ==> World Tag = {}",
-                      world_tag);
 
     //! @note Creating our objects from our scene
     m_sphere = this->create_new_object("sphere");
@@ -86,17 +81,12 @@ level_scene::level_scene(const std::string& p_tag)
 
     // camera_data.Position = { 0.0f, 1.50f, 0.0f };
     // camera_data.Front = glm::vec3(-0.0f, 0.0f, -1.0f);
-
     m_camera->add<atlas::camera>();
-
     sensitivity = m_camera->get<atlas::camera>()->MovementSpeed;
 
     sync(this, &level_scene::on_update);
     sync_physics(this, &level_scene::on_physics_update);
     attach(this, &level_scene::on_ui_update);
-
-    console_log_warn("World Tag After Initialization ======>>>>> {}",
-                     atlas::system_registry::get_world().get_tag());
 }
 
 void

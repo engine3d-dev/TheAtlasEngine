@@ -3,32 +3,48 @@
 #include <core/system_framework/system_registry.hpp>
 
 namespace atlas {
-    // static system_registry* s_GlobalSystemRegistry = nullptr;
-    // world_scope* system_registry::s_CurrentWorld;
-    // static world_scope g_CurrentWorld;
-    static std::string g_tag = "Undefined Tag";
-    // static world_scope g_CurrentWorld;
+    system_registry* system_registry::s_instance = nullptr;
     static std::deque<world_scope> g_initial_worlds;
 
     //! @note At initialization what should system registry know?
     //! @note How do we assign a hash as part of the tag?
 
-    void system_registry::initialize() {
-        console_log_manager::create_new_logger("registry");
+    system_registry::system_registry(const std::string& p_tag) : m_tag(p_tag){
+        console_log_manager::create_new_logger(p_tag);
+        s_instance = this;
+    }
+
+    ref<world_scope> system_registry::create_world(const std::string& p_tag) {
+        // return create_ref<world_scope>(p_tag);
+        // m_world_registered[p_tag] = create_ref<world_scope>(p_tag);
+        // m_world_registered.insert({p_tag, world_scope(p_tag)});
+        return s_instance->append_world_scope(create_ref<world_scope>(p_tag));
     }
 
     //! @note TODO: Probably want to have g_CurrentWorld in a deque of some sort
     //! @note We need to ensure that a world scope is in synced if there are
     //! multiple worlds
-    void system_registry::register_to(world_scope* p_world) {
-        g_initial_worlds.push_back(*p_world);
+    void system_registry::register_to(const ref<world_scope>& p_world) {
+        // g_initial_worlds.push_back(*p_world);
 
-        auto current_world = *g_initial_worlds.begin();
+        s_instance->append_world(p_world);
 
-        console_log_info("register_to::p_World->get_tag() = {}",
-                         p_world->get_tag());
-        console_log_info("register_to::g_CurrentWorld->get_tag() = {}",
-                         current_world.get_tag());
+        // auto current_world = *g_initial_worlds.begin();
+        
+
+        console_log_info("register_to::p_World->get_tag() = {}", p_world->get_tag());
+    }
+
+    ref<world_scope> system_registry::get_world(const std::string& p_tag) {
+        return s_instance->search_world(p_tag);
+    }
+
+    ref<world_scope> system_registry::search_world(const std::string& p_tag) {
+        if(m_world_registered.contains(p_tag)) {
+            return m_world_registered[p_tag];
+        }
+
+        return nullptr;
     }
 
     /*

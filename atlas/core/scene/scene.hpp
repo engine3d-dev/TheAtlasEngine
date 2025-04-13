@@ -27,59 +27,13 @@ namespace atlas {
      * and what scene this object at creation is associating with itself to auto
      * new_object_sphere = create_new_object(system_registry::Get(this),
      * Tag.c_str()); new_object_sphere.add<PhysicsBody>();
-     *
-     * @brief We need to also figure
-     *
-     *
-     *
-     *
-     *
-     *
-     * TODO: Create something called SceneData (or SceneProperties)
-     * @note This struct would contain properties of the tag, and the UUID
-     * attached with this scene object
-     * @note Here are properties ot he scene_scope.
-     * @note This was the solution so that scenes know who they are associated
-     * with. Which would be a look up table.
-     * @note I do not like the idea of having a scene_object that contains a
-     * pointer to the scene that it's apart of (Purely a design decision)
-     *
-     * @note scene_object may have similar properties
-     * @note Where we need each scene object to be instantiated with an UUID
-     *
-     * SceneObjectProperties{
-     *  UUID: Hash ID to itself
-     *  ParentUUID: Hash ID to the scene the object's associated with (use of
-     * getting objects to interact with each other)
-     * };
-     *
-     *
-     * SceneProperties{
-     *  GetUUID: Hash ID of the scene itself
-     *  GetParentUUID: World UUID that helps to associate
-     * }
-     *
-     *
-     * @note New Idea for get_world(this);
-     *
-     * New API Would be the following
-     *
-     * // Setting the scene
-     * m_physics_system = physics::physics_system(this);
-     *
-     * // Inside physics system
-     *
-     * physics_system(const scene_scope* p_scene_ctx){
-     *      m_scene_registry = system_registry::get_world(string Tag:
-     * p_scene_ctx);
-     * }
-     *
+     * 
+     * @brief scene_scope is defining a scope of a scene
+     * @brief Scenes are part of the world; where the world contains sets of scenes per world
      */
     class scene_scope {
     public:
-        scene_scope()
-          : m_entity(nullptr, "Undefined")
-          , m_tag("Undefined") {}
+        scene_scope() : m_tag("Undefined") {}
         scene_scope(const std::string& p_tag)
           : m_tag(p_tag) {}
 
@@ -90,8 +44,13 @@ namespace atlas {
 
         */
         ref<scene_object> create_new_object(const std::string& p_tag) {
-            return create_ref<scene_object>(
-              system_registry::get_world().get_registry(), p_tag);
+            // return create_ref<scene_object>(system_registry::get_world().get_registry(), p_tag);
+            return create_ref<scene_object>(&m_registry, p_tag);
+        }
+
+        template <typename... Comps, typename... Args>
+        flecs::query_builder<Comps...> query_builder(Args &&... args) const {
+            return flecs::query_builder<Comps...>(m_registry, std::forward(args)...);
         }
 
         virtual ~scene_scope() = default;
@@ -99,7 +58,8 @@ namespace atlas {
         std::string get_tag() { return m_tag; }
 
     private:
-        entity_t m_entity;
+        // entity_t m_entity;
+        flecs::world m_registry;
         std::string m_tag = "Undefined Tag";
     };
 }; // namespace atlas
