@@ -1,11 +1,11 @@
 #pragma once
 
 namespace atlas {
-    class ImGuiBackend {
+    class imgui_backend {
     public:
-        static void Initialize();
+        static void initialize();
 
-        static void Begin();
-        static void End();
+        static void begin();
+        static void end();
     };
 };

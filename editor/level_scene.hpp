@@ -1,4 +1,6 @@
 #pragma once
+// #define ATLAS_DEBUG_BUILD
+#include <core/core.hpp>
 #include <core/scene/scene.hpp>
 #include <core/scene/scene_object.hpp>
 
@@ -23,8 +25,6 @@ public:
     ~level_scene() override {
         console_log_error("LevelScene::~LevelScene Destructed!!!");
     }
-
-    [[nodiscard]] float read_float() const { return 4.f; }
 
     //! @note Remove these from being overridden
     //! TODO: We should have an indication on what functions are update phased

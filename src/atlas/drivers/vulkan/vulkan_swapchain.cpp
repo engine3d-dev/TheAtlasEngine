@@ -7,27 +7,27 @@
 namespace atlas::vk {
     static bool g_is_swapchain_resized = false;
 
-    vk_swapchain::vk_swapchain(vk_physical_driver p_PhysicalDriver,
-                               vk_driver p_Driver,
-                               VkSurfaceKHR p_Surface)
-      : m_current_surface(p_Surface)
-      , m_physical(p_PhysicalDriver)
-      , m_driver(p_Driver) {
+    vk_swapchain::vk_swapchain(const vk_physical_driver& p_physical_driver,
+                               const vk_driver& p_driver,
+                               const VkSurfaceKHR& p_surface)
+      : m_current_surface(p_surface)
+      , m_physical(p_physical_driver)
+      , m_driver(p_driver) {
         //! @note This gives us the queue to present/render to display.
 
         //! @note We extract the current presentation index from our current
         //! selected physical index.
         m_presentation_index =
-          p_PhysicalDriver.get_presentation_index(p_Surface);
+          p_physical_driver.get_presentation_index(p_surface);
         vkGetDeviceQueue(
           m_driver, m_presentation_index, 0, &m_presentation_queue);
         on_create(application::get_window().get_width(),
                   application::get_window().get_height());
     }
 
-    void vk_swapchain::on_create(uint32_t p_Width, uint32_t p_Height) {
-        m_width = p_Width;
-        m_height = p_Height;
+    void vk_swapchain::on_create(uint32_t p_width, const uint32_t p_height) {
+        m_width = p_width;
+        m_height = p_height;
 
         uint32_t format_count;
         std::vector<VkSurfaceFormatKHR> formats;
@@ -507,11 +507,11 @@ namespace atlas::vk {
 
         //! @note Setting up our arrays
         // m_semaphores_images_available.resize(MaxFramesInFlight);
-        m_semaphores_images_available.resize(MaxFramesInFlight);
-        // m_semaphores_render_completed.resize(MaxFramesInFlight);
-        m_semaphores_render_completed.resize(MaxFramesInFlight);
-        // m_swapchain_in_flight_fences.resize(MaxFramesInFlight);
-        m_swapchain_in_flight_fences.resize(MaxFramesInFlight);
+        m_semaphores_images_available.resize(max_frames_in_flight);
+        // m_semaphores_render_completed.resize(max_frames_in_flight);
+        m_semaphores_render_completed.resize(max_frames_in_flight);
+        // m_swapchain_in_flight_fences.resize(max_frames_in_flight);
+        m_swapchain_in_flight_fences.resize(max_frames_in_flight);
         // m_swapchain_fences.resize(get_images_size(), VK_NULL_HANDLE);
         m_swapchain_fences.resize(get_images_size(), VK_NULL_HANDLE);
 
@@ -524,7 +524,7 @@ namespace atlas::vk {
             .flags = VK_FENCE_CREATE_SIGNALED_BIT
         };
 
-        for (size_t i = 0; i < MaxFramesInFlight; i++) {
+        for (size_t i = 0; i < max_frames_in_flight; i++) {
             vk_check(vkCreateSemaphore(m_driver,
                                        &semaphore_create_info,
                                        nullptr,
@@ -563,8 +563,8 @@ namespace atlas::vk {
         m_is_resized_requested = false;
     }
 
-    void vk_swapchain::recreate_swapchain(uint32_t Width, uint32_t Height) {
-        on_create(Width, Height);
+    void vk_swapchain::recreate_swapchain(uint32_t p_width, uint32_t p_height) {
+        on_create(p_width, p_height);
     }
 
     VkSwapchainKHR vk_swapchain::vk_swapchain_handler() {
@@ -596,7 +596,7 @@ namespace atlas::vk {
     }
 
     void vk_swapchain::submit_and_write_command_buffer(
-      VkCommandBuffer* p_CommandBuffers) {
+      VkCommandBuffer* p_command_buffers) {
         // if(m_IsSwapchainResized){
         //     return;
         // }
@@ -610,7 +610,7 @@ namespace atlas::vk {
         }
 
         m_swapchain_fences[m_current_image_index] =
-          m_swapchain_in_flight_fences[g_current_frame_index];
+          m_swapchain_in_flight_fences[m_current_frame_index];
 
         VkSubmitInfo submit_info = {
             .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
@@ -618,7 +618,7 @@ namespace atlas::vk {
         };
 
         VkSemaphore wait_semaphore[] = {
-            m_semaphores_images_available[g_current_frame_index]
+            m_semaphores_images_available[m_current_frame_index]
         };
 
         VkPipelineStageFlags wait_stages[] = {
@@ -630,23 +630,23 @@ namespace atlas::vk {
         submit_info.pWaitDstStageMask = wait_stages;
 
         submit_info.commandBufferCount = 1;
-        submit_info.pCommandBuffers = p_CommandBuffers;
+        submit_info.pCommandBuffers = p_command_buffers;
 
         VkSemaphore signal_sems[] = {
-            m_semaphores_render_completed[g_current_frame_index]
+            m_semaphores_render_completed[m_current_frame_index]
         };
 
         submit_info.signalSemaphoreCount = 1;
         submit_info.pSignalSemaphores = signal_sems;
 
         vkResetFences(
-          m_driver, 1, &m_swapchain_in_flight_fences[g_current_frame_index]);
+          m_driver, 1, &m_swapchain_in_flight_fences[m_current_frame_index]);
 
         vk_check(
           vkQueueSubmit(m_driver.get_graphics_queue(),
                         1,
                         &submit_info,
-                        m_swapchain_in_flight_fences[g_current_frame_index]),
+                        m_swapchain_in_flight_fences[m_current_frame_index]),
           "vkQueueSubmit",
           __FILE__,
           __LINE__,
@@ -681,8 +681,8 @@ namespace atlas::vk {
 
         vk_check(res, "vkQueuePresentKHR", __FILE__, __LINE__, __FUNCTION__);
 
-        g_current_frame_index =
-          (g_current_frame_index + 1) % vk_swapchain::MaxFramesInFlight;
+        m_current_frame_index =
+          (m_current_frame_index + 1) % vk_swapchain::max_frames_in_flight;
     }
 
     uint32_t vk_swapchain::read_acquire_next_frame() {
@@ -690,7 +690,7 @@ namespace atlas::vk {
         vk_check(
           vkWaitForFences(m_driver,
                           1,
-                          &m_swapchain_in_flight_fences[g_current_frame_index],
+                          &m_swapchain_in_flight_fences[m_current_frame_index],
                           true,
                           std::numeric_limits<uint32_t>::max()),
           "vkWaitForFences",
@@ -702,7 +702,7 @@ namespace atlas::vk {
           m_driver,
           m_swapchain,
           std::numeric_limits<uint64_t>::max(),
-          m_semaphores_images_available[g_current_frame_index],
+          m_semaphores_images_available[m_current_frame_index],
           VK_NULL_HANDLE,
           &image_index);
         if (res == VK_ERROR_OUT_OF_DATE_KHR || res == VK_SUBOPTIMAL_KHR) {
@@ -722,21 +722,21 @@ namespace atlas::vk {
         return m_is_resized_requested;
     }
 
-    void vk_swapchain::resize_status(bool IsResizeSignaled) {
-        m_is_resized_requested = IsResizeSignaled;
+    void vk_swapchain::resize_status(bool is_resize_signaled) {
+        m_is_resized_requested = is_resize_signaled;
     }
 
     uint32_t vk_swapchain::current_frame_per_tick() {
-        return g_current_frame_index;
+        return m_current_frame_index;
     }
 
     uint32_t vk_swapchain::select_memory_type(
-      VkPhysicalDeviceMemoryProperties p_MemoryProperties,
-      uint32_t p_TypeFilter,
+      VkPhysicalDeviceMemoryProperties p_memory_properties,
+      uint32_t p_type_filter,
       VkMemoryPropertyFlags property_flag) {
-        for (uint32_t i = 0; i < p_MemoryProperties.memoryTypeCount; i++) {
-            if ((p_TypeFilter & (1 << i)) &&
-                (p_MemoryProperties.memoryTypes[i].propertyFlags &
+        for (uint32_t i = 0; i < p_memory_properties.memoryTypeCount; i++) {
+            if ((p_type_filter & (1 << i)) &&
+                (p_memory_properties.memoryTypes[i].propertyFlags &
                  property_flag) == property_flag) {
                 return i;
             }
@@ -747,10 +747,10 @@ namespace atlas::vk {
     }
 
     VkPresentModeKHR vk_swapchain::select_compatible_present_mode(
-      const VkPresentModeKHR& p_RequestMode,
-      const std::vector<VkPresentModeKHR>& p_Modes) {
-        for (const auto& mode : p_Modes) {
-            if (mode == p_RequestMode) {
+      const VkPresentModeKHR& p_request_mode,
+      const std::vector<VkPresentModeKHR>& p_modes) {
+        for (const auto& mode : p_modes) {
+            if (mode == p_request_mode) {
                 return mode;
             }
         }
@@ -758,28 +758,28 @@ namespace atlas::vk {
     }
 
     VkExtent2D vk_swapchain::select_valid_extent(
-      const VkSurfaceCapabilitiesKHR& p_SurfaceCapabilities) {
+      const VkSurfaceCapabilitiesKHR& p_surface_capabilities) {
         //! @note Width/Height of our current swapchain
 
         //! @note All this checks is the width/height are not set, then whatever
         //! the swapchain is set to will set the extent by default
-        if (p_SurfaceCapabilities.currentExtent.width == (uint32_t)-1) {
+        if (p_surface_capabilities.currentExtent.width == (uint32_t)-1) {
             m_swapchain_extent.width = m_width;
             m_swapchain_extent.height = m_height;
         }
         else {
-            m_swapchain_extent = p_SurfaceCapabilities.currentExtent;
-            m_width = p_SurfaceCapabilities.currentExtent.width;
-            m_height = p_SurfaceCapabilities.currentExtent.height;
+            m_swapchain_extent = p_surface_capabilities.currentExtent;
+            m_width = p_surface_capabilities.currentExtent.width;
+            m_height = p_surface_capabilities.currentExtent.height;
         }
 
-        return p_SurfaceCapabilities.currentExtent;
+        return p_surface_capabilities.currentExtent;
     }
 
     VkFormat vk_swapchain::select_depth_format(
-      const VkPhysicalDevice& p_PhysicalDevice) {
+      const VkPhysicalDevice& p_physical_device) {
         return select_supported_format(
-          p_PhysicalDevice,
+          p_physical_device,
           { VK_FORMAT_D32_SFLOAT,
             VK_FORMAT_D32_SFLOAT_S8_UINT,
             VK_FORMAT_D24_UNORM_S8_UINT },
@@ -790,7 +790,7 @@ namespace atlas::vk {
     VkFormat vk_swapchain::select_supported_format(
       VkPhysicalDevice p_physical,
       const std::vector<VkFormat>& p_formats,
-      VkImageTiling p_Tiling,
+      VkImageTiling p_tiling,
       VkFormatFeatureFlags p_feature_flags) {
         VkFormat valid_format = VK_FORMAT_UNDEFINED;
 
@@ -799,16 +799,39 @@ namespace atlas::vk {
             vkGetPhysicalDeviceFormatProperties(
               p_physical, format, &properties);
 
-            if (p_Tiling == VK_IMAGE_TILING_LINEAR &&
+            // if ((p_tiling == VK_IMAGE_TILING_LINEAR ||
+            //      p_tiling == VK_IMAGE_TILING_OPTIMAL) &&
+            //     (properties.linearTilingFeatures & p_feature_flags) ==
+            //       p_feature_flags) {
+            //     valid_format = format;
+            // }
+
+            if (p_tiling == VK_IMAGE_TILING_LINEAR &&
                 (properties.linearTilingFeatures & p_feature_flags) ==
                   p_feature_flags) {
                 valid_format = format;
             }
-            else if (p_Tiling == VK_IMAGE_TILING_OPTIMAL &&
-                     (properties.optimalTilingFeatures & p_feature_flags) ==
-                       p_feature_flags) {
+
+            if (p_tiling == VK_IMAGE_TILING_OPTIMAL &&
+                (properties.optimalTilingFeatures & p_feature_flags) ==
+                  p_feature_flags) {
                 valid_format = format;
             }
+
+            // switch (p_tiling){
+            // case VK_IMAGE_TILING_LINEAR:
+            // 	if(properties.linearTilingFeatures & p_feature_flags) {
+            // 		valid_format = format;
+            // 	}
+            // 	break;
+            // case VK_IMAGE_TILING_OPTIMAL:
+            // 	if(properties.optimalTilingFeatures & p_feature_flags) {
+            // 		valid_format = format;
+            // 	}
+            // 	break;
+            // default:
+            // 	break;
+            // }
         }
 
         vk_check_format(valid_format, __FILE__, __LINE__, __FUNCTION__);

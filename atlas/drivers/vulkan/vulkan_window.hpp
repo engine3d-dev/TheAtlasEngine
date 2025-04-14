@@ -10,18 +10,18 @@ namespace atlas::vk {
         vk_window(uint32_t p_width,
                   uint32_t p_height,
                   const std::string& p_tag);
-        virtual ~vk_window() {}
+        ~vk_window() override = default;
 
     private:
-        uint32_t read_width() const override;
-        uint32_t read_height() const override;
+        [[nodiscard]] uint32_t read_width() const override;
+        [[nodiscard]] uint32_t read_height() const override;
 
     private:
-        static void on_resize(GLFWwindow* p_window, int p_width, int p_height);
+        static void on_resize();
 
     private:
         ref<swapchain> current_swapchain() override { return m_swapchain; }
-        GLFWwindow* native_window() const override;
+        [[nodiscard]] GLFWwindow* native_window() const override;
 
     private:
         GLFWwindow* m_window;

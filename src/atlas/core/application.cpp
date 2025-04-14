@@ -1,7 +1,6 @@
 #include <core/application.hpp>
 #include <core/engine_logger.hpp>
 #include <core/event/event.hpp>
-#include <core/update_handlers/global_update.hpp>
 #include <imgui.h>
 #include <physics/jolt-cpp/jolt-imports.hpp>
 #include <physics/jolt-cpp/jolt_api.hpp>
@@ -10,10 +9,14 @@
 #include <renderer/renderer.hpp>
 #include <drivers/ui/imgui_backend.hpp>
 
+#include <core/update_handlers/sync_update.hpp>
+
 namespace atlas {
     static std::string g_tag = "engine3d";
     application* application::s_instance = nullptr;
     static API g_graphics_backend_api = API::UNSPECIFIED;
+    static float g_delta_time = 0.f;
+    static float g_physics_step = 0.f; // collision step
 
     application::application(const application_settings& p_settings) {
         s_instance = this;
@@ -23,7 +26,7 @@ namespace atlas {
         m_window = window::create(p_settings.Width, p_settings.Height, g_tag);
 
         renderer::initialize();
-        ImGuiBackend::Initialize();
+        imgui_backend::initialize();
     }
 
     application::~application() {
@@ -46,32 +49,37 @@ namespace atlas {
         s_instance->get_window().close();
     }
 
+    float application::delta_time() {
+        return g_delta_time;
+    }
+
+    float application::physics_step() {
+        return g_physics_step;
+    }
+
     void application::execute() {
+        float previous_time = 0.f;
         console_log_info("Executing mainloop!");
 
         while (m_window->is_active()) {
+            //! @brief Keeping it simply to getting our delta time
+            //! @brief Then again, I want to have a proper fps-timer
+            //! implementation to simplify calculating the fps time and accuracy
+            float current_time = (float)glfwGetTime();
+            g_delta_time = (current_time - previous_time);
+            previous_time = current_time;
+
+            // updating physic steps according to the delta time
+            g_physics_step = 1 + (60 * g_delta_time);
+
             event::update_events();
 
             renderer::begin();
-            global_update::tick_update_frequency();
+            sync_update::on_update();
 
-            //! TODO: Submit ImGuiBackend::Begin so we can have the UI also be
-            //! on the renderer thread
-            //! @note So we can make sure when submitting UI-stuff are in synced
-            //! with the renderer in terms of fetching images
-            //! TODO: ImGuiBackend::Begin/End() is needed be called after
-            //! everything gets rendered.
-            //! TODO: UI gets rendered last
-            // ImGuiBackend::Begin();
-            // if(ImGui::Begin("Setting")){
-            //     ImGui::Button("Pres Me!");
-            //     ImGui::End();
-            // }
-            // ImGuiBackend::End();
+            sync_update::on_physics_update();
 
-            // global_update::UpdateUI();
-
-            // SyncUpdate::on_ui_update();
+            sync_update::on_ui_update();
 
             renderer::end();
         }

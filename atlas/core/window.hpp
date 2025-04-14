@@ -14,14 +14,14 @@ namespace atlas {
           uint32_t p_height,
           const std::string& p_tag = "Undefined Window Title");
 
-        GLFWwindow* get_native_window() const;
+        [[nodiscard]] GLFWwindow* get_native_window() const;
 
-        uint32_t get_width() const;
-        uint32_t get_height() const;
+        [[nodiscard]] uint32_t get_width() const;
+        [[nodiscard]] uint32_t get_height() const;
 
-        bool is_active() const;
+        [[nodiscard]] bool is_active() const;
 
-        float get_aspect_ratio() const;
+        [[nodiscard]] float get_aspect_ratio() const;
 
         ref<swapchain> get_current_swapchain();
 
@@ -32,9 +32,9 @@ namespace atlas {
         void close();
 
     private:
-        virtual uint32_t read_width() const = 0;
-        virtual uint32_t read_height() const = 0;
-        virtual GLFWwindow* native_window() const = 0;
+        [[nodiscard]] virtual uint32_t read_width() const = 0;
+        [[nodiscard]] virtual uint32_t read_height() const = 0;
+        [[nodiscard]] virtual GLFWwindow* native_window() const = 0;
         virtual ref<swapchain> current_swapchain() = 0;
     };
 };

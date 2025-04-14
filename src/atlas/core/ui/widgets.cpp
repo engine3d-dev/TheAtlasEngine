@@ -274,7 +274,7 @@ namespace atlas::ui {
                                  std::string& p_filename,
                                  const std::string& p_filter) {
         if (ImGui::Button(p_tag.c_str())) {
-            p_filename = filesystem::LoadFromFileDialog(p_filter);
+            p_filename = filesystem::load_from_file_dialog(p_filter);
         }
     }
 };

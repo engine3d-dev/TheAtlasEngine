@@ -29,7 +29,7 @@ namespace atlas {
 
         ~scene_object() {
             console_log_fatal("Scene Object Tag = {} HAS DESTRUCTED!!!",
-                              m_entity.get<Tag>()->TagMetadata);
+                              m_entity.get<tag>()->TagMetadata);
             if (m_entity.is_alive()) {
                 m_entity.on_destruction();
             }
@@ -73,7 +73,7 @@ namespace atlas {
         }
 
         template<typename UComponent>
-        UComponent* get_mut() {
+        [[nodiscard]] UComponent* get_mut() {
             return m_entity.get_mut<UComponent>();
         }
 
@@ -98,8 +98,8 @@ namespace atlas {
             return m_entity.remove<UComponent>();
         }
 
-        glm::mat4 get_model() {
-            const Transform* transform_component = get<Transform>();
+        [[nodiscard]] glm::mat4 get_model() {
+            const transform* transform_component = get<transform>();
             m_model = glm::mat4(1.f);
 
             //! @note Anything vec3 has to be vec4

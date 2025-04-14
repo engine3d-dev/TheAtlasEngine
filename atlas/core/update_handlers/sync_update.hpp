@@ -1,6 +1,5 @@
 #pragma once
 #include <core/engine_logger.hpp>
-#include <core/update_handlers/timer.hpp>
 #include <deque>
 #include <functional>
 
@@ -23,13 +22,12 @@ namespace atlas {
         float delta_time();
 
         // Called by thread_manager
-        void run_update(float deltaTime);
+        // void run_update(float deltaTime);
 
-        inline std::deque<std::function<void()>> s_Update;
-        inline std::deque<std::function<void()>> s_LateUpdate;
-        inline std::deque<std::function<void()>> s_UIUpdate;
-        inline std::deque<std::function<void()>> s_RenderQueue;
-        inline std::deque<std::function<void()>> s_PhysicsQueue;
+        inline std::deque<std::function<void()>> s_update;
+        inline std::deque<std::function<void()>> s_late_update;
+        inline std::deque<std::function<void()>> s_ui_update;
+        inline std::deque<std::function<void()>> s_physica_update;
 
         //! @note Synchronize our update per frame
         template<typename UObject, typename UFunction>
@@ -37,7 +35,7 @@ namespace atlas {
             static_assert(std::is_member_pointer_v<UFunction>,
                           "Invalid sync function");
 
-            s_Update.push_back(
+            s_update.push_back(
               [p_instance, p_callable]() { (p_instance->*p_callable)(); });
         }
 
@@ -46,7 +44,7 @@ namespace atlas {
             static_assert(std::is_member_pointer_v<UFunction>,
                           "Invalid sync function");
 
-            s_PhysicsQueue.push_back(
+            s_physica_update.push_back(
               [p_instance, p_callable]() { (p_instance->*p_callable)(); });
         }
 
@@ -56,17 +54,7 @@ namespace atlas {
             static_assert(std::is_member_pointer_v<UCallable>,
                           "Invalid post function");
 
-            s_LateUpdate.push_back(
-              [p_instance, p_callable]() { (p_instance->*p_callable)(); });
-        }
-
-        //! @note Submitting our draw calls to be rendered
-        //! TODO: Should move this away from the user
-        template<typename UObject, typename UCallable>
-        inline void submit(UObject* p_instance, const UCallable& p_callable) {
-            static_assert(std::is_member_pointer_v<UCallable>,
-                          "Invalid submit function");
-            s_RenderQueue.push_back(
+            s_late_update.push_back(
               [p_instance, p_callable]() { (p_instance->*p_callable)(); });
         }
 
@@ -79,7 +67,7 @@ namespace atlas {
             static_assert(std::is_member_pointer_v<UCallable>,
                           "Invalid attach function");
 
-            s_UIUpdate.push_back(
+            s_ui_update.push_back(
               [p_instance, p_callable]() { (p_instance->*p_callable)(); });
         }
 
@@ -88,8 +76,6 @@ namespace atlas {
         void on_physics_update();
 
         void on_ui_update();
-
-        void on_scene_render();
 
         void on_late_update();
 

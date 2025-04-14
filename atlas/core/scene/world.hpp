@@ -1,6 +1,7 @@
 #pragma once
 #include <core/core.hpp>
 #include <deque>
+#include <map>
 #include <flecs.h>
 #include <string>
 
@@ -64,17 +65,40 @@ namespace atlas {
      * @note When implementing the Editor we can a
      */
     class scene_scope;
-    class world_scope {
+    // enable_shared_from cppreference link:
+    // https://en.cppreference.com/w/cpp/memory/enable_shared_from_this
+    /**
+     * @brief Lets rethink how world_scope gets created
+     * @brief The way this works is system_registry is going to essentially be
+     * how we register worlds
+     * @brief Only difference is we aren't constructing it like:
+     * register_to(this)
+     * @brief What WE are going to do is world_handler =
+     * system_registry::create(p_tag);
+     * @brief What this does is essentially creates a world scope inside your
+     * world that you want to create and the system registry will create,
+     * manage, and keep track of lifetimes of world_scopes
+     */
+    class world_scope : public std::enable_shared_from_this<world_scope> {
     public:
         world_scope() = default;
         world_scope(const std::string& p_tag);
+        ~world_scope();
 
-        std::string get_tag() { return m_tag; }
+        [[nodiscard]] std::string get_tag() const { return m_tag; }
 
-        void add_scene(ref<scene_scope> p_scene_context);
+        void add_scene(const ref<scene_scope>& p_scene_context);
 
-        flecs::world* get_registry() { return &m_scene_registry; }
-        // flecs::world& get_registry() { return m_scene_registry; }
+        // flecs::world* get_registry() { return &m_scene_registry; }
+        ref<scene_scope> get_scene(const std::string& p_tag) {
+            if (m_scene_container.contains(p_tag)) {
+                return m_scene_container[p_tag];
+            }
+
+            return nullptr;
+        }
+
+        ref<world_scope> get() { return shared_from_this(); }
 
         operator flecs::world&() { return m_scene_registry; }
 
@@ -84,8 +108,9 @@ namespace atlas {
         //! data structure
         //! @note But not by using deque, TODO: Make changes to this to use diff
         //! data structures
-        std::deque<ref<scene_scope>> m_scene_manager_queue;
-        ref<scene_scope> m_current_scene;
+        std::map<std::string, ref<scene_scope>> m_scene_container;
+        // ref<scene_scope> m_current_scene;
+        ref<world_scope> m_world_shared_instance = nullptr;
         std::string m_tag = "Undefined Tag";
     };
 }; // namespace atlas

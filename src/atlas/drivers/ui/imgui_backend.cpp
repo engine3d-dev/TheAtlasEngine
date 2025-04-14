@@ -24,7 +24,7 @@
 // }
 
 namespace atlas {
-    static void ImGuiLayoutColorModification() {
+    static void im_gui_layout_color_modification() {
         auto& colors = ImGui::GetStyle().Colors; // @note Colors is ImVec4
 
         colors[ImGuiCol_WindowBg] = ImVec4{ 0.1f, 0.105f, 0.11f, 1.0f };
@@ -59,32 +59,32 @@ namespace atlas {
           ImVec4{ 0.1f, 0.150f, 0.951f, 1.0f };
     }
 
-    static std::vector<VkCommandBuffer> s_ImGuiCommandBuffers;
+    static std::vector<VkCommandBuffer> s_im_gui_command_buffers;
     // static VkCommandPool imgui_command_pool;
-    static VkDescriptorPool s_DescriptorPool;
+    static VkDescriptorPool s_descriptor_pool;
     // static VkRenderPass imgui_renderpass;
     // static std::vector<VkFramebuffer> s_ImGuiFramebuffers;
     // static std::vector<VkImageView> s_ImGuiViewportImageViews;
     // static std::vector<VkImage> s_ImGuiViewportImages;
-    static std::vector<VkFramebuffer> s_ViewportFramebuffers;
-    VkCommandPool s_ViewportCommandPool;
-    VkRenderPass s_ViewportRenderpass;
+    static std::vector<VkFramebuffer> s_viewport_framebuffers;
+    VkCommandPool s_viewport_command_pool;
+    VkRenderPass s_viewport_renderpass;
     static vk::vk_driver m_driver;
 
-    struct ImGuiImage {
+    struct im_gui_image {
         VkImage Image;
         VkImageView ImageView;
         VkDeviceMemory ImageDeviceMemory;
     };
 
-    static std::vector<ImGuiImage> s_ImGuiViewportImages;
+    static std::vector<im_gui_image> s_im_gui_viewport_images;
 
     // static std::vector<
     // static VkCommandPool cmd_pool;
 
-    static void updateViewport(const VkCommandBuffer& p_command_buffer,
-                               int p_width,
-                               int p_height) {
+    static void update_viewport(const VkCommandBuffer& p_command_buffer,
+                                int p_width,
+                                int p_height) {
         // 1. Get the ImGui viewport's position and size
         ImGuiViewport* viewport =
           ImGui::GetMainViewport(); // Or a specific viewport if you're using
@@ -93,27 +93,27 @@ namespace atlas {
         // ImVec2 size = viewport->Size;
 
         // 2. Create the Vulkan viewport struct
-        VkViewport vkViewport = {};
-        vkViewport.x = pos.x;
-        vkViewport.y = pos.y;
-        vkViewport.width = p_width;
-        vkViewport.height = p_height;
-        vkViewport.minDepth = 0.0f;
-        vkViewport.maxDepth = 1.0f;
+        VkViewport vk_viewport = {};
+        vk_viewport.x = pos.x;
+        vk_viewport.y = pos.y;
+        vk_viewport.width = (float)p_width;
+        vk_viewport.height = (float)p_height;
+        vk_viewport.minDepth = 0.0f;
+        vk_viewport.maxDepth = 1.0f;
 
         // 3. Create a scissor rectangle (optional, but recommended)
-        VkRect2D scissorRect = {};
-        scissorRect.offset = { static_cast<int32_t>(pos.x),
-                               static_cast<int32_t>(pos.y) };
-        scissorRect.extent = { static_cast<uint32_t>(p_width),
-                               static_cast<uint32_t>(p_height) };
+        VkRect2D scissor_rect = {};
+        scissor_rect.offset = { .x = static_cast<int32_t>(pos.x),
+                                .y = static_cast<int32_t>(pos.y) };
+        scissor_rect.extent = { .width = static_cast<uint32_t>(p_width),
+                                .height = static_cast<uint32_t>(p_height) };
 
         // 4. Set the viewport and scissor in your Vulkan command buffer
-        vkCmdSetViewport(p_command_buffer, 0, 1, &vkViewport);
-        vkCmdSetScissor(p_command_buffer, 0, 1, &scissorRect);
+        vkCmdSetViewport(p_command_buffer, 0, 1, &vk_viewport);
+        vkCmdSetScissor(p_command_buffer, 0, 1, &scissor_rect);
     }
 
-    void ImGuiBackend::Initialize() {
+    void imgui_backend::initialize() {
         console_log_info("ImGui Vulkan Test: Begin Initialization!");
         m_driver = vk::vk_context::get_current_driver();
 
@@ -147,7 +147,7 @@ namespace atlas {
         // VkDescriptorPool imgui_pool;
         vk::vk_check(
           vkCreateDescriptorPool(
-            m_driver, &desc_pool_create_info, nullptr, &s_DescriptorPool),
+            m_driver, &desc_pool_create_info, nullptr, &s_descriptor_pool),
           "vkCreateDescriptorPool",
           __FILE__,
           __LINE__,
@@ -199,7 +199,7 @@ namespace atlas {
 
         vk::vk_check(
           vkCreateRenderPass(
-            m_driver, &imgui_renderpass_ci, nullptr, &s_ViewportRenderpass),
+            m_driver, &imgui_renderpass_ci, nullptr, &s_viewport_renderpass),
           "vkCreateRenderPass",
           __FILE__,
           __LINE__,
@@ -216,18 +216,18 @@ namespace atlas {
         auto swapchain_images_size = swapchain->get_images_size();
 
         // Creating viewport framebuffers
-        s_ViewportFramebuffers.resize(swapchain_images_size);
+        s_viewport_framebuffers.resize(swapchain_images_size);
         console_log_warn("Resize viewport framebuffers = {}",
-                         s_ViewportFramebuffers.size());
+                         s_viewport_framebuffers.size());
 
-        for (size_t i = 0; i < s_ViewportFramebuffers.size(); i++) {
+        for (size_t i = 0; i < s_viewport_framebuffers.size(); i++) {
             VkImageView attachment[1];
             //! @note For Framebuffer abstraction layer have the specifications
             //! @note Each framebuffer abstraction will define the renderpass
             //! themselves
             VkFramebufferCreateInfo fb_ci = {
                 .sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
-                .renderPass = s_ViewportRenderpass,
+                .renderPass = s_viewport_renderpass,
                 .attachmentCount = 1,
                 .pAttachments = attachment,
                 .width = application::get_window()
@@ -243,7 +243,7 @@ namespace atlas {
 
             vk::vk_check(
               vkCreateFramebuffer(
-                m_driver, &fb_ci, nullptr, &s_ViewportFramebuffers[i]),
+                m_driver, &fb_ci, nullptr, &s_viewport_framebuffers[i]),
               "vkCreateFramebuffer",
               __FILE__,
               __LINE__,
@@ -252,24 +252,25 @@ namespace atlas {
 
         console_log_warn(
           "After setting our framebuffers information. Framebuffer.size() = {}",
-          s_ViewportFramebuffers.size());
+          s_viewport_framebuffers.size());
 
         //! @note Creating images for the viewport
-        s_ImGuiViewportImages.resize(swapchain_images_size);
+        s_im_gui_viewport_images.resize(swapchain_images_size);
 
         console_log_trace("After setting viewport images.size() = {}",
-                          s_ImGuiViewportImages.size());
+                          s_im_gui_viewport_images.size());
         //! @note Viewport-specific images
-        for (size_t i = 0; i < s_ImGuiViewportImages.size(); i++) {
-            s_ImGuiViewportImages[i].Image =
+        for (size_t i = 0; i < s_im_gui_viewport_images.size(); i++) {
+            s_im_gui_viewport_images[i].Image =
               vk::create_image(VK_FORMAT_B8G8R8A8_SRGB,
                                swapchain->get_extent().width,
                                swapchain->get_extent().height);
 
             // Create memory to backup image
             VkMemoryRequirements memory_requirements;
-            vkGetImageMemoryRequirements(
-              m_driver, s_ImGuiViewportImages[i].Image, &memory_requirements);
+            vkGetImageMemoryRequirements(m_driver,
+                                         s_im_gui_viewport_images[i].Image,
+                                         &memory_requirements);
 
             // Allocate memory for these images
             VkMemoryAllocateInfo mem_alloc_info = {
@@ -278,10 +279,10 @@ namespace atlas {
             vkAllocateMemory(m_driver,
                              &mem_alloc_info,
                              nullptr,
-                             &s_ImGuiViewportImages[i].ImageDeviceMemory);
+                             &s_im_gui_viewport_images[i].ImageDeviceMemory);
             vkBindImageMemory(m_driver,
-                              s_ImGuiViewportImages[i].Image,
-                              s_ImGuiViewportImages[i].ImageDeviceMemory,
+                              s_im_gui_viewport_images[i].Image,
+                              s_im_gui_viewport_images[i].ImageDeviceMemory,
                               0);
         }
 
@@ -304,7 +305,7 @@ namespace atlas {
         // io.ConfigViewportsNoTaskBarIcon = true;
 
         // Setting custom dark themed imgui layout
-        ImGuiLayoutColorModification();
+        im_gui_layout_color_modification();
 
         // Setup Dear ImGui style
         // ImGui::StyleColorsDark();
@@ -329,7 +330,7 @@ namespace atlas {
         init_info.RenderPass =
           application::get_window().get_current_swapchain()->get_renderpass();
         init_info.PipelineCache = VK_NULL_HANDLE;
-        init_info.DescriptorPool = s_DescriptorPool;
+        init_info.DescriptorPool = s_descriptor_pool;
         init_info.MinImageCount = 2;
         init_info.ImageCount =
           application::get_window().get_current_swapchain()->get_images_size();
@@ -351,13 +352,13 @@ namespace atlas {
     }
 
     //! TODO: Get scene into imgui window
-    void ImGuiBackend::Begin() {
+    void imgui_backend::begin() {
         ImGui_ImplVulkan_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
     }
 
-    void ImGuiBackend::End() {
+    void imgui_backend::end() {
         ImGui::Render();
 
         auto current_cmd_buffer = vk::vk_renderer::get_current_command_buffer();
@@ -366,7 +367,7 @@ namespace atlas {
         glfwGetFramebufferSize(application::get_window(),
                                &width,
                                &height); // Or use glfwget_windowSize
-        updateViewport(
+        update_viewport(
           current_cmd_buffer,
           width,
           height); // Pass window width and height for initial viewport setup

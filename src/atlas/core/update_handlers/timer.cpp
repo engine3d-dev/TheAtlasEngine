@@ -20,7 +20,7 @@ namespace atlas {
     }
 
     float timer::elapsed() {
-        return duration_cast<microseconds>(current_time() - m_stop_watch)
+        return (float)duration_cast<microseconds>(current_time() - m_stop_watch)
           .count();
     }
 

@@ -3,8 +3,8 @@
 #include <string>
 #include <vulkan/vulkan_core.h>
 
-#include <drivers/vulkan/buffer_tutorial.hpp>
-#include <drivers/vulkan/descriptor_tutorial.hpp>
+// #include <drivers/vulkan/buffer_tutorial.hpp>
+// #include <drivers/vulkan/descriptor_tutorial.hpp>
 
 namespace atlas::vk {
     /**
@@ -17,7 +17,7 @@ namespace atlas::vk {
     class vk_renderer : public render_context {
     public:
         vk_renderer(const std::string& tag);
-        ~vk_renderer();
+        ~vk_renderer() override;
 
         //! @note Implementation-details for sending draw calls.
         static VkCommandBuffer get_current_command_buffer();
@@ -44,10 +44,10 @@ namespace atlas::vk {
         std::deque<std::function<void()>> m_main_deletion_queue;
         VkDevice m_driver = nullptr;
 
-        ref<descriptor_pool> m_global_pool;
-        std::vector<BufferTutorial> m_global_ubo_list;
-        scope<descriptor_set_layout> m_global_set_layout;
-        std::vector<VkDescriptorSet> m_global_descriptor_set;
+        // ref<descriptor_pool> m_global_pool;
+        // std::vector<BufferTutorial> m_global_ubo_list;
+        // scope<descriptor_set_layout> m_global_set_layout;
+        // std::vector<VkDescriptorSet> m_global_descriptor_set;
 
         //! @note This is just going to be the current camera component set
         camera m_current_camera_component;

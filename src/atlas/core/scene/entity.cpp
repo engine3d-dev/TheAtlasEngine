@@ -7,8 +7,8 @@ namespace atlas {
 
         //! @note These are default components the entity will store that all
         //! game objects SHOULD have by default.
-        add<Transform>();
-        set<Tag>({ p_tag });
+        add<transform>();
+        set<tag>({ p_tag });
     }
 
     entity_t::~entity_t() {

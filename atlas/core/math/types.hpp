@@ -51,24 +51,25 @@ namespace atlas {
         vector3() = default;
 
         vector3(const T& p_other)
-          : value(p_other) {}
+          : m_value(p_other) {}
 
         vector3(float x, float y, float z)
-          : value(x, y, z) {}
+          : m_value(x, y, z) {}
         vector3(const std::initializer_list<float>& values)
-          : value(*values.begin(), *values.begin() + 1, *values.begin() + 2) {}
+          : m_value(*values.begin(), *values.begin() + 1, *values.begin() + 2) {
+        }
 
-        operator glm::vec3() { return value; }
+        operator glm::vec3() { return m_value; }
 
         glm::vec3 operator=(const T& p_other) { return p_other; }
 
         bool operator==(const glm::vec3& p_other) {
-            return (value.x == p_other.x and value.y == p_other.y and
-                    value.z == p_other.z);
+            return (m_value.x == p_other.x and m_value.y == p_other.y and
+                    m_value.z == p_other.z);
         }
 
     private:
-        glm::vec3 value;
+        glm::vec3 m_value;
     };
 
     template<typename T>
@@ -76,22 +77,22 @@ namespace atlas {
         vector4() = default;
 
         vector4(const T& p_other)
-          : value(p_other) {}
+          : m_value(p_other) {}
 
         vector4(float x, float y, float z, float w)
-          : value(x, y, z, w) {}
+          : m_value(x, y, z, w) {}
 
-        operator glm::vec4() { return value; }
+        operator glm::vec4() { return m_value; }
 
         glm::vec4 operator=(const T& p_other) { return p_other; }
 
         bool operator==(const glm::vec4& p_other) {
-            return (value.x == p_other.x and value.y == p_other.y and
-                    value.z == p_other.z and value.w == p_other.w);
+            return (m_value.x == p_other.x and m_value.y == p_other.y and
+                    m_value.z == p_other.z and m_value.w == p_other.w);
         }
 
     private:
-        glm::vec4 value;
+        glm::vec4 m_value;
     };
 
     template<>
@@ -99,20 +100,20 @@ namespace atlas {
         vector2() = default;
 
         vector2(const glm::highp_vec2& p_other)
-          : value(p_other) {}
+          : m_value(p_other) {}
 
-        operator glm::highp_vec2() { return value; }
+        operator glm::highp_vec2() { return m_value; }
 
         glm::highp_vec2 operator=(const glm::highp_vec2& p_other) {
             return p_other;
         }
 
         bool operator==(const glm::vec4& p_other) {
-            return (value.x == p_other.x and value.y == p_other.y);
+            return (m_value.x == p_other.x and m_value.y == p_other.y);
         }
 
     private:
-        glm::highp_vec2 value;
+        glm::highp_vec2 m_value;
     };
 
     template<>
@@ -120,21 +121,21 @@ namespace atlas {
         vector3() = default;
 
         vector3(const glm::highp_vec3& p_other)
-          : value(p_other) {}
+          : m_value(p_other) {}
 
-        operator glm::highp_vec3() { return value; }
+        operator glm::highp_vec3() { return m_value; }
 
         glm::highp_vec3 operator=(const glm::highp_vec3& p_other) {
             return p_other;
         }
 
         bool operator==(const glm::highp_vec3& p_other) {
-            return (value.x == p_other.x and value.y == p_other.y and
-                    value.z == p_other.z);
+            return (m_value.x == p_other.x and m_value.y == p_other.y and
+                    m_value.z == p_other.z);
         }
 
     private:
-        glm::highp_vec3 value;
+        glm::highp_vec3 m_value;
     };
 
     template<>
@@ -142,21 +143,21 @@ namespace atlas {
         vector4() = default;
 
         vector4(const glm::highp_vec4& p_other)
-          : value(p_other) {}
+          : m_value(p_other) {}
 
-        operator glm::highp_vec4() { return value; }
+        operator glm::highp_vec4() { return m_value; }
 
         glm::highp_vec4 operator=(const glm::highp_vec4& p_other) {
             return p_other;
         }
 
         bool operator==(const glm::highp_vec4& p_other) {
-            return (value.x == p_other.x and value.y == p_other.y and
-                    value.z == p_other.z and value.w == p_other.w);
+            return (m_value.x == p_other.x and m_value.y == p_other.y and
+                    m_value.z == p_other.z and m_value.w == p_other.w);
         }
 
     private:
-        glm::highp_vec4 value;
+        glm::highp_vec4 m_value;
     };
 
     template<typename T>

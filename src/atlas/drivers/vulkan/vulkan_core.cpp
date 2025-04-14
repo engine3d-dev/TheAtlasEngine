@@ -50,8 +50,8 @@ namespace atlas::vk {
                  __FUNCTION__);
     }
 
-    void end_command_buffer(const VkCommandBuffer& p_command_bufferContext) {
-        vkEndCommandBuffer(p_command_bufferContext);
+    void end_command_buffer(const VkCommandBuffer& p_command_buffer_context) {
+        vkEndCommandBuffer(p_command_buffer_context);
     }
 
     void submit(VkQueue p_queue_to_use,

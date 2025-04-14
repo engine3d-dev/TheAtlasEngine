@@ -27,22 +27,22 @@ namespace std {
 namespace atlas {
 
     static bool g_loaded_successful = false;
-    Mesh::Mesh(const ref<vertex_buffer>& p_vertex_buffer,
+    mesh::mesh(const ref<vertex_buffer>& p_vertex_buffer,
                const ref<index_buffer>& p_index_buffer) {
         m_vertex_buffer = p_vertex_buffer;
         m_index_buffer = p_index_buffer;
     }
 
-    Mesh::Mesh(const std::string& p_filepath) {
+    mesh::mesh(const std::string& p_filepath) {
         //! @note TODO: DO NOT KEEP IT THIS WAY.
         *this = load(p_filepath);
     }
 
-    bool Mesh::is_loaded() const {
+    bool mesh::is_loaded() const {
         return g_loaded_successful;
     }
 
-    Mesh Mesh::load(const std::string& p_filepath) {
+    mesh mesh::load(const std::string& p_filepath) {
         tinyobj::attrib_t attrib;
         std::vector<tinyobj::shape_t> shapes;
         std::vector<tinyobj::material_t> materials;
@@ -58,7 +58,7 @@ namespace atlas {
               &attrib, &shapes, &materials, &warn, &err, p_filepath.c_str())) {
             console_log_warn("Could not load model from path {}", p_filepath);
             g_loaded_successful = false;
-            return Mesh();
+            return mesh();
         }
         else {
             console_log_info("Model Loaded = {}", p_filepath);
@@ -115,6 +115,6 @@ namespace atlas {
         }
         ref<vertex_buffer> vb = vertex_buffer::create(vertices);
         ref<index_buffer> ib = index_buffer::create(indices);
-        return Mesh(vb, ib);
+        return mesh(vb, ib);
     }
 };

@@ -1,7 +1,6 @@
 #include <atomic>
 #include <core/application.hpp>
 #include <core/engine_logger.hpp>
-#include <core/update_handlers/sync_update.hpp>
 #include <cstring>
 #include <drivers/vulkan/helper_functions.hpp>
 #include <drivers/vulkan/shaders/vulkan_shader.hpp>
@@ -30,7 +29,7 @@ namespace atlas::vk {
      * @note TODO: Should probably be its own class that also enables to
      * read/write to it to the shaders
      */
-    struct UniformBuffer {
+    struct uniform_buffer {
         VkBuffer BufferHanlder;
         VkDeviceMemory BufferMemory;
         void* uniform_bufferMappedData;
@@ -43,7 +42,7 @@ namespace atlas::vk {
     //! @note Since descriptor sets aren't working, we are creating another
     //! shader just to set the colors lol
 
-    struct CameraUbo {
+    struct camera_ubo {
         glm::mat4 Projection{ 1.f };
         glm::mat4 View{ 1.f };
         glm::mat4 Model{ 1.f };
@@ -52,7 +51,7 @@ namespace atlas::vk {
         glm::vec2 MousePosition{ 0.f };
     };
 
-    struct PointLighTest {
+    struct point_ligh_test {
         glm::vec3 Position;
         glm::vec4 Ambient;
         glm::vec3 Color;
@@ -81,44 +80,44 @@ namespace atlas::vk {
     }
 
     void vk_renderer::initialize_pipeline() {
-        auto max_frames_in_flight = vk_swapchain::MaxFramesInFlight;
+        // auto max_frames_in_flight = vk_swapchain::MaxFramesInFlight;
         m_driver = vk_context::get_current_driver();
 
-        m_global_pool = descriptor_pool::builder()
-                          .setMaxSets(max_frames_in_flight)
-                          .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                                       max_frames_in_flight)
-                          .addPoolSize(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-                                       max_frames_in_flight)
-                          .build();
+        // m_global_pool = descriptor_pool::builder()
+        //                   .setMaxSets(max_frames_in_flight)
+        //                   .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+        //                                max_frames_in_flight)
+        //                   .addPoolSize(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+        //                                max_frames_in_flight)
+        //                   .build();
 
-        m_global_set_layout = descriptor_set_layout::builder()
-                                .addBinding(0,
-                                            VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                                            VK_SHADER_STAGE_VERTEX_BIT)
-                                .build();
+        // m_global_set_layout = descriptor_set_layout::builder()
+        //                         .addBinding(0,
+        //                                     VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+        //                                     VK_SHADER_STAGE_VERTEX_BIT)
+        //                         .build();
 
-        m_global_descriptor_set =
-          std::vector<VkDescriptorSet>(max_frames_in_flight);
+        // m_global_descriptor_set =
+        //   std::vector<VkDescriptorSet>(max_frames_in_flight);
 
-        m_global_ubo_list.resize(max_frames_in_flight);
+        // m_global_ubo_list.resize(max_frames_in_flight);
 
-        for (size_t i = 0; i < m_global_ubo_list.size(); i++) {
-            m_global_ubo_list[i] =
-              BufferTutorial(sizeof(CameraUbo),
-                             1,
-                             VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-                             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-            m_global_ubo_list[i].map();
-        }
+        // for (size_t i = 0; i < m_global_ubo_list.size(); i++) {
+        //     m_global_ubo_list[i] =
+        //       BufferTutorial(sizeof(camera_ubo),
+        //                      1,
+        //                      VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+        //                      VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+        //     m_global_ubo_list[i].map();
+        // }
 
-        for (size_t i = 0; i < m_global_descriptor_set.size(); i++) {
-            auto buffer_info = m_global_ubo_list[i].descriptor_info();
+        // for (size_t i = 0; i < m_global_descriptor_set.size(); i++) {
+        //     auto buffer_info = m_global_ubo_list[i].descriptor_info();
 
-            descriptor_writer(*m_global_set_layout, *m_global_pool)
-              .writeBuffer(0, &buffer_info)
-              .build(m_global_descriptor_set[i]);
-        }
+        //     descriptor_writer(*m_global_set_layout, *m_global_pool)
+        //       .writeBuffer(0, &buffer_info)
+        //       .build(m_global_descriptor_set[i]);
+        // }
 
         //! @note Setting up push constants
         //! @note VkPipelineLayoutCreateInfo does not require a push constant to
@@ -138,7 +137,7 @@ namespace atlas::vk {
                                                    VK_SHADER_STAGE_VERTEX_BIT |
                                                    VK_SHADER_STAGE_FRAGMENT_BIT,
                                                  .offset = 0,
-                                                 .size = sizeof(CameraUbo) };
+                                                 .size = sizeof(camera_ubo) };
 
         //! @note We are setting our descriptors to work with layout(set = 0,
         //! binding = 0)
@@ -156,19 +155,16 @@ namespace atlas::vk {
 
         */
 
-        std::vector<VkDescriptorSetLayout> descriptor_set_layouts = {
-            m_global_set_layout->get_descriptor_set_layout()
-        };
+        // std::vector<VkDescriptorSetLayout> descriptor_set_layouts = {
+        //     m_global_set_layout->get_descriptor_set_layout()
+        // };
 
         VkPipelineLayoutCreateInfo pipeline_layout_create_info = {
             .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
             .pNext = nullptr,
             .flags = 0,
-            // .setLayoutCount = 0,
-            // .pSetLayouts = nullptr,
-            .setLayoutCount =
-              static_cast<uint32_t>(descriptor_set_layouts.size()),
-            .pSetLayouts = descriptor_set_layouts.data(),
+            .setLayoutCount = 0,
+            .pSetLayouts = nullptr,
             // .setLayoutCount = 1,
             // .pSetLayouts = &g_DescriptorSetLayout,
             // .setLayoutCount = 1,
@@ -256,7 +252,6 @@ namespace atlas::vk {
     }
 
     void vk_renderer::begin_frame() {
-
         if (swapchain::is_rebuild()) {
             console_log_fatal("ARE YOU CALED AFTER RESIZE?!?!");
             initialize_pipeline();
@@ -317,7 +312,7 @@ namespace atlas::vk {
 
         std::array<VkClearValue, 2> clear_values;
         clear_values[0].color = { { 0.1f, 0.1f, 0.1f, 1.0f } };
-        clear_values[1].depthStencil = { 1.0f, 0 };
+        clear_values[1].depthStencil = { .depth = 1.0f, .stencil = 0 };
 
         rp_begin_info.clearValueCount =
           static_cast<uint32_t>(clear_values.size());
@@ -354,29 +349,69 @@ namespace atlas::vk {
         vkCmdSetScissor(
           g_command_buffers[g_current_frame_index], 0, 1, &scissor);
 
-        ImGuiBackend::Begin();
+        imgui_backend::begin();
 
         //! @note Pre-computing our camera properties and applying it to our
         //! scene objects
 
         //! TODO: Fix: The bug is this only works when dealing with a single
         //! scene
-        flecs::world* world_object =
-          system_registry::get_world().get_registry();
-        flecs::query<> queried_render_targets =
-          world_object->query_builder<camera>().build();
-
-        //! @note The idea behind this is we pre-determine this at the beginning
-        //! of the frame to getting our camera
-        //! @note Then once we get our camera properties that then gets applied
-        //! to our object's that uses that camera
-        queried_render_targets.each([&](flecs::entity p_entity_id) {
+        // flecs::world* world_object =
+        // system_registry::get_world().get_registry();
+        ref<world_scope> world_object =
+          system_registry::get_world("Editor World");
+        ref<scene_scope> current_scene = world_object->get_scene("LevelScene");
+        // console_log_trace("current_scene address = {}",
+        // (void*)current_scene.get());
+        if (current_scene == nullptr) {
+            console_log_error("current_scene == nullptr!!!");
+        }
+        flecs::query<> query_camera_objects =
+          current_scene->query_builder<camera>().build();
+        query_camera_objects.each([&](flecs::entity p_entity_id) {
             if (p_entity_id.has<camera>()) {
                 if (p_entity_id.get<camera>()->IsMainCamera) {
                     m_current_camera_component = *p_entity_id.get<camera>();
                 }
             }
         });
+        // q.each([](flecs::entity p_entity_id){
+        // 	console_log_error("Entity Tag = {}",
+        // p_entity_id.get<tag>()->TagMetadata);
+        // });
+        // flecs::query<> q =
+        // current_scene->query_builder<atlas::tag>().build();
+
+        // if(query_camera_objects.is_true()) {}
+        // 	console_log_trace("world_object = nullptr!!");
+        // }
+        // else {
+        // 	console_log_trace("world_object != nullptr!");
+        // }
+
+#if 0
+        flecs::world* world_object = system_registry::get_world().get_registry();
+		
+		if(world_object != nullptr) {
+
+			flecs::query<> query_camera_objects = world_object->query_builder<camera>().build();
+
+			//! @note The idea behind this is we pre-determine this at the beginning
+			//! of the frame to getting our camera
+			//! @note Then once we get our camera properties that then gets applied
+			//! to our object's that uses that camera
+			query_camera_objects.each([&](flecs::entity p_entity_id) {
+				if (p_entity_id.has<camera>()) {
+					if (p_entity_id.get<camera>()->IsMainCamera) {
+						m_current_camera_component = *p_entity_id.get<camera>();
+					}
+				}
+			});
+		}
+		else {
+			console_log_fatal("world_object = nullptr!!!");
+		}
+#endif
     }
 
     void vk_renderer::end_frame() {
@@ -388,41 +423,45 @@ namespace atlas::vk {
 
         //! TODO: Fix: The bug is this only works when dealing with a single
         //! scene
-        flecs::world* world_object =
-          system_registry::get_world().get_registry();
+        ref<world_scope> world_object =
+          system_registry::get_world("Editor World");
+        ref<scene_scope> current_scene = world_object->get_scene("LevelScene");
+        // console_log_trace("current_scene address = {}",
+        // (void*)current_scene.get());
+        if (current_scene == nullptr) {
+            console_log_error("current_scene == nullptr!!!");
+        }
+
         flecs::query<> queried_render_targets =
-          world_object->query_builder<RenderTarget3D>().build();
+          current_scene->query_builder<rendertarget3d>().build();
 
         //! @note The idea behind this is we pre-determine this at the beginning
         //! of the frame to getting our camera
         //! @note Then once we get our camera properties that then gets applied
         //! to our object's that uses that camera
         queried_render_targets.each([&](flecs::entity p_entity_id) {
-            const Transform* transform_component = p_entity_id.get<Transform>();
+            const transform* transform_component = p_entity_id.get<transform>();
             vkCmdBindPipeline(current_cmd_buffer,
                               VK_PIPELINE_BIND_POINT_GRAPHICS,
                               g_shader->get_graphics_pipeline());
 
-            glm::mat4 model = p_entity_id.get<RenderTarget3D>()->Model;
+            glm::mat4 model = p_entity_id.get<rendertarget3d>()->Model;
             model = glm::translate(model, transform_component->Position);
             model = glm::scale(model, transform_component->Scale);
             auto rotation_mat4 =
               glm::mat4(glm::quat(transform_component->Rotation));
             model *= rotation_mat4;
 
-            /*
+            // Camera
+            // For the Projection and View matrices are going to be handled by
+            // the camera component These get determined pre-frame. Within
+            // begin_frame
 
-            Camera
-            For the Projection and View matrices are going to be handled by the
-            camera component These get determined pre-frame. Within begin_frame
+            // RenderTarget
+            // - Gets determined pre-frame and offloaded to GPU at the end of
+            // frame
 
-            RenderTarget
-            - Gets determined pre-frame and offloaded to GPU at the end of frame
-
-            */
-            CameraUbo push_const_data = {
-                // .Projection = camera_component->get_projection(),
-                // .View = camera_component->get_view(),
+            camera_ubo push_const_data = {
                 .Projection = m_current_camera_component.get_projection(),
                 .View = m_current_camera_component.get_view(),
                 .Model = model,
@@ -444,17 +483,17 @@ namespace atlas::vk {
                                VK_SHADER_STAGE_VERTEX_BIT |
                                  VK_SHADER_STAGE_FRAGMENT_BIT,
                                0,
-                               sizeof(CameraUbo),
+                               sizeof(camera_ubo),
                                &push_const_data);
 
-            if (!p_entity_id.has<RenderTarget3D>()) {
+            if (!p_entity_id.has<rendertarget3d>()) {
                 console_log_fatal("COULD NOT FIND MESH COMPONENT!!!");
                 return;
             }
 
-            auto* component = p_entity_id.get<RenderTarget3D>();
+            auto* component = p_entity_id.get<rendertarget3d>();
 
-            Mesh mesh_data = component->MeshMetaData;
+            mesh mesh_data = component->MeshMetaData;
 
             auto& vb = mesh_data.get_vertex_buffer();
             auto ib = mesh_data.get_index_buffer();
@@ -470,7 +509,90 @@ namespace atlas::vk {
             }
         });
 
-        ImGuiBackend::End();
+#if 0
+        flecs::world* world_object = system_registry::get_world().get_registry();
+        
+		if(world_object != nullptr) {
+			flecs::query<> queried_render_targets = world_object->query_builder<rendertarget3d>().build();
+
+			//! @note The idea behind this is we pre-determine this at the beginning
+			//! of the frame to getting our camera
+			//! @note Then once we get our camera properties that then gets applied
+			//! to our object's that uses that camera
+			queried_render_targets.each([&](flecs::entity p_entity_id) {
+				const transform* transform_component = p_entity_id.get<transform>();
+				vkCmdBindPipeline(current_cmd_buffer,
+								VK_PIPELINE_BIND_POINT_GRAPHICS,
+								g_shader->get_graphics_pipeline());
+
+				glm::mat4 model = p_entity_id.get<rendertarget3d>()->Model;
+				model = glm::translate(model, transform_component->Position);
+				model = glm::scale(model, transform_component->Scale);
+				auto rotation_mat4 =
+				glm::mat4(glm::quat(transform_component->Rotation));
+				model *= rotation_mat4;
+
+				// Camera
+				// For the Projection and View matrices are going to be handled by
+				// the camera component These get determined pre-frame. Within
+				// begin_frame
+
+				// RenderTarget
+				// - Gets determined pre-frame and offloaded to GPU at the end of
+				// frame
+
+				camera_ubo push_const_data = {
+					.Projection = m_current_camera_component.get_projection(),
+					.View = m_current_camera_component.get_view(),
+					.Model = model,
+					// .LightPosition = -camera_component->Front,
+					.LightPosition = -m_current_camera_component.get_front(),
+					// .LightPosition = point_light.Position,
+					.Color = transform_component->Color,
+					// .MousePosition = event::cursor_position()
+					.MousePosition = { event::cursor_position().x /
+										(float)application::get_window()
+										.get_width(),
+									event::cursor_position().y /
+										(float)application::get_window()
+										.get_height() }
+				};
+
+				vkCmdPushConstants(current_cmd_buffer,
+								m_pipeline_layout,
+								VK_SHADER_STAGE_VERTEX_BIT |
+									VK_SHADER_STAGE_FRAGMENT_BIT,
+								0,
+								sizeof(camera_ubo),
+								&push_const_data);
+
+				if (!p_entity_id.has<rendertarget3d>()) {
+					console_log_fatal("COULD NOT FIND MESH COMPONENT!!!");
+					return;
+				}
+
+				auto* component = p_entity_id.get<rendertarget3d>();
+
+				mesh mesh_data = component->MeshMetaData;
+
+				auto& vb = mesh_data.get_vertex_buffer();
+				auto ib = mesh_data.get_index_buffer();
+
+				vb->bind(current_cmd_buffer);
+
+				if (ib != nullptr || ib->has_indices()) {
+					ib->bind(current_cmd_buffer);
+					ib->draw(current_cmd_buffer);
+				}
+				else {
+					vb->draw(current_cmd_buffer);
+				}
+			});
+			console_log_fatal("world_object = nullptr!!!");
+		}
+#endif
+
+        imgui_backend::end();
         vkCmdEndRenderPass(current_cmd_buffer);
         vk::vk_check(vkEndCommandBuffer(current_cmd_buffer),
                      "vkEndCommandBuffer",

@@ -12,7 +12,7 @@ class GameDemo(ConanFile):
     def build_requirements(self):
         self.tool_requires("make/4.4.1")
         self.tool_requires("cmake/3.27.1")
-        self.tool_requires("engine3d-cmake-utils/3.0")
+        self.tool_requires("engine3d-cmake-utils/4.0")
 
     # Putting all of your packages here
     # To build engine3d/1.0 locally do the following:

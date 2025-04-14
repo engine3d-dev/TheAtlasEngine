@@ -5,15 +5,21 @@
 #include <string>
 
 namespace atlas {
+
     struct application_settings {
         std::string Name = "Undefined";
         uint32_t Width = 0;
         uint32_t Height = 0;
     };
+
     class application {
     public:
         application(const application_settings& p_settings);
         ~application();
+
+        static float delta_time();
+
+        static float physics_step();
 
         /* executes the application's mainloop */
         void execute();

@@ -4,15 +4,15 @@
 namespace atlas::vk {
     class vk_index_buffer : public index_buffer {
     public:
-        vk_index_buffer(const std::vector<uint32_t>& p_Indices);
-        virtual ~vk_index_buffer();
+        vk_index_buffer(const std::vector<uint32_t>& p_indices);
+        ~vk_index_buffer() override = default;
 
     private:
         void bind_to_index_buffer(
           const VkCommandBuffer& p_command_buffer) override;
         void render_index_buffer(
           const VkCommandBuffer& p_command_buffer) override;
-        bool contains_indices() const override;
+        [[nodiscard]] bool contains_indices() const override;
 
     private:
         VkBuffer m_index_buffer_handler;
