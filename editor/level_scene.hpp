@@ -1,4 +1,6 @@
 #pragma once
+// #define ATLAS_DEBUG_BUILD
+#include <core/core.hpp>
 #include <core/scene/scene.hpp>
 #include <core/scene/scene_object.hpp>
 

@@ -12,6 +12,7 @@ namespace atlas {
      * being.API
      * @note 1.) Lifetime of threads (render, physics, audio)
      */
+    /*
     class thread_manager {
     public:
         thread_manager();
@@ -34,4 +35,5 @@ namespace atlas {
         std::vector<scope<thread>> m_parallel_threads;
         float m_delta_time = 0.0f;
     };
+    */
 };

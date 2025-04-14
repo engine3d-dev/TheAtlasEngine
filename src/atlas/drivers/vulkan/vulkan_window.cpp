@@ -10,8 +10,8 @@ namespace atlas::vk {
     static uint32_t g_width = 0;
     static uint32_t g_height = 0;
 
-    vk_window::vk_window(uint32_t p_Width,
-                         uint32_t p_Height,
+    vk_window::vk_window(uint32_t p_width,
+                         uint32_t p_height,
                          const std::string& p_tag) {
         console_log_info("Vulkan Window Begin Initialization!");
         if (!glfwInit()) {
@@ -28,7 +28,7 @@ namespace atlas::vk {
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
         m_window = glfwCreateWindow(
-          (int)p_Width, (int)p_Height, p_tag.c_str(), nullptr, nullptr);
+          (int)p_width, (int)p_height, p_tag.c_str(), nullptr, nullptr);
         glfwMakeContextCurrent(m_window);
         console_log_warn("Vulkan Window End Initialization Completed!!");
 
@@ -47,7 +47,7 @@ namespace atlas::vk {
         console_log_warn("Vulkan: swapchain End Initialization!");
 
         glfwSetWindowUserPointer(m_window, this);
-        glfwSetWindowSizeCallback(m_window, on_resize);
+        // glfwSetWindowSizeCallback(m_window, on_resize);
         // glfwSetFramebufferSizeCallback(m_window, on_resize);
 
         // console_log_info("Before ImGui_ImplGlfw_InitForVulkan was called!");
@@ -62,20 +62,23 @@ namespace atlas::vk {
         return g_height;
     }
 
-    void vk_window::on_resize(GLFWwindow* p_window, int p_width, int p_height) {
-        auto window =
-          static_cast<GLFWwindow*>(glfwGetWindowUserPointer(p_window));
-        if (!window) {
-        }
+    void vk_window::on_resize() {
+        // auto window =
+        //   static_cast<GLFWwindow*>(glfwGetWindowUserPointer(p_window));
+        // if (!window) {
+        // }
 
-        g_width = p_width;
-        g_height = p_height;
-        if (g_width != application::get_window().get_width() ||
-            g_height != application::get_window().get_height()) {
-            application::get_window()
-              .get_current_swapchain()
-              ->set_resize_status(true);
-        }
+        // int w, h;
+        // glfwGetFramebufferSize(m_window, &w, &h);
+
+        // g_width = w;
+        // g_height = h;
+        // if (g_width != application::get_window().get_width() ||
+        //     g_height != application::get_window().get_height()) {
+        //     application::get_window()
+        //       .get_current_swapchain()
+        //       ->set_resize_status(true);
+        // }
     }
 
     GLFWwindow* vk_window::native_window() const {

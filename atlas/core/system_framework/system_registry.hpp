@@ -1,6 +1,6 @@
 #pragma once
-// #include <core/scene/world.hpp>
-#include <core/engine_logger.hpp>
+#include <map>
+#include <core/scene/world.hpp>
 
 namespace atlas {
     /**
@@ -9,26 +9,43 @@ namespace atlas {
      * @note Registry for storing world properties
      * @note Enable for scene to grab context from the world they are associated
      * with
-     * @note World Scope will act as the global wide scope
-     * @note Scene is the local scope player or game objects will be contained
-     * in
+     * @note Manages the lifetimes of world_scope created by the user
+     * @note World scope is the container of scenes
+     * @note system_registry is allowed to create, search alread-created
+     * world_scope's
      */
-    class world_scope;
     class system_registry {
     public:
-        //! @note We initialize system registry
-        static void initialize();
+        system_registry(const std::string& p_tag);
 
-        // template<typename UWorld>
-        // static void register_to(world_scope* p_world);
+        ~system_registry();
 
-        static void register_to(world_scope* p_world);
+        /**
+         * @note system_registry does the following:
+         * 1. Creates world scopes
+         * 2. Manages Lifetimes of world objects
+         * 3. Keeps tracks of the refcounting of references to these world
+         * objects
+         * 4. Provide globalized access to other worlds
+         */
 
-        // static world_scope* get_world();
-        static world_scope get_world();
+        //! @brief Instantiates new world_scope
+        static ref<world_scope> create_world(const std::string& p_tag);
+
+        //! @brief Searches and returns world_scope if found
+        //! @brief Returns nullptr if world_scope not found
+        static ref<world_scope> get_world(const std::string& p_tag);
 
     private:
-        //! @note For now we only support single world_scope creations
-        // static world_scope* s_CurrentWorld;
+        ref<world_scope> search_world(const std::string& p_tag);
+
+        void append_world(const ref<world_scope>& p_world);
+
+        ref<world_scope> append_world_scope(const ref<world_scope>& p_world);
+
+    private:
+        static system_registry* s_instance;
+        std::string m_tag = "Undefined";
+        std::map<std::string, ref<world_scope>> m_world_registered;
     };
 };

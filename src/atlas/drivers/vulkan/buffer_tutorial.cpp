@@ -5,6 +5,7 @@
 #include <vulkan/vulkan_core.h>
 
 namespace atlas::vk {
+    /*
     static uint64_t get_alignment(uint64_t p_size,
                                   uint64_t p_min_offset_alignment) {
         if (p_min_offset_alignment > 0) {
@@ -16,7 +17,7 @@ namespace atlas::vk {
     }
 
     BufferTutorial::BufferTutorial(
-      uint64_t p_size,
+      VkDeviceSize p_size,
       uint32_t p_count,
       VkBufferUsageFlags p_usage,
       VkMemoryPropertyFlags p_memory_property_flags,
@@ -165,5 +166,6 @@ namespace atlas::vk {
     void BufferTutorial::invalidate_index(int p_index) {
         invalidate(m_alignment_size, p_index * m_alignment_size);
     }
+    */
 
 };

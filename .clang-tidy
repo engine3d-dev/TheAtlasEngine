@@ -7,12 +7,12 @@ CheckOptions:
   - { key: readability-identifier-naming.VariableCase, value: lower_case }
   - { key: readability-identifier-naming.PrivateMemberCase, value: lower_case }
   - { key: readability-identifier-naming.PrivateMemberPrefix, value: m_ }
-  - { key: readability-identifier-naming.StructCase, value: CamelCase }
+  - { key: readability-identifier-naming.StructCase, value: lower_case }
   - { key: readability-identifier-naming.ParameterCasePrefix, value: p_ }
   - { key: readability-identifier-naming.ParameterCase, value: lower_case }
   - { key: readability-identifier-naming.FunctionCase, value: lower_case }
   - { key: readability-identifier-naming.MacroDefinition, value: UPPER_CASE }
-  - { key: readability-identifier-naming.EnumConstantCase, value: UPPER_CASE }
+  - { key: readability-identifier-naming.EnumConstantCase, value: CamelCase }
   - { key: readability-identifier-naming.ConstantMemberCase, value: lower_case }
   - { key: readability-identifier-naming.ClassConstantCase, value: lower_case }
   - { key: readability-identifier-naming.GlobalConstantCase, value: lower_case }

@@ -5,6 +5,9 @@
 namespace atlas::event {
     static std::map<uint32_t, joystick_info> s_controllers;
 
+    using button_id = int;
+    using controller_id = int;
+
     bool is_key_pressed(int p_key) {
         GLFWwindow* window = application::get_window();
 
@@ -38,10 +41,10 @@ namespace atlas::event {
     glm::vec2 cursor_position() {
         GLFWwindow* window = application::get_window();
 
-        double xPos, yPos;
-        glfwGetCursorPos(window, &xPos, &yPos);
+        double x_pos, y_pos;
+        glfwGetCursorPos(window, &x_pos, &y_pos);
 
-        return { xPos, yPos };
+        return { x_pos, y_pos };
     }
 
     // joystic-specific functions
@@ -67,16 +70,16 @@ namespace atlas::event {
         }
     }
 
-    bool is_button_released(int p_button_id, int p_controller_id) {
-        auto controller = s_controllers[p_controller_id];
-        return (controller.Buttons[p_button_id].ButtonState ==
-                input_state::Pressed);
-    }
+    // bool is_button_released(button_id p_button, controller_id p_controller) {
+    //     auto selected_controller = s_controllers[p_controller];
+    //     return (selected_controller.Buttons[p_button].ButtonState ==
+    //             input_state::Pressed);
+    // }
 
-    bool is_button_pressed(int p_button_id, int p_controller_id) {
-        auto controller = s_controllers[p_controller_id];
-        return (controller.Buttons[p_button_id].ButtonState == GLFW_RELEASE);
-    }
+    // bool is_button_pressed(int p_button_id, int p_controller_id) {
+    //     auto controller = s_controllers[p_controller_id];
+    //     return (controller.Buttons[p_button_id].ButtonState == GLFW_RELEASE);
+    // }
 
     bool is_joystick_button_pressed(int p_button) {
         return p_button == GLFW_PRESS;

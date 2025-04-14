@@ -3,7 +3,7 @@
 #include <nfd/nfd.h>
 
 namespace atlas::filesystem {
-    std::string LoadFromFileDialog(const std::string& p_filter) {
+    std::string load_from_file_dialog(const std::string& p_filter) {
         char* output_path = nullptr;
 
         nfdresult_t result =
@@ -17,7 +17,7 @@ namespace atlas::filesystem {
         return "";
     }
 
-    std::string SaveToFile([[maybe_unused]] const std::string& p_filter) {
+    std::string save_to_file([[maybe_unused]] const std::string& p_filter) {
         char* output_path = nullptr;
 
         nfdresult_t result =

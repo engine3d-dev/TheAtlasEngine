@@ -7,10 +7,10 @@
 #include <vulkan/vulkan_core.h>
 
 namespace atlas::vk {
-    vk_shader::vk_shader(const std::string& p_VertShader,
-                         const std::string& p_FragShader,
-                         const shader_pipeline_config& p_Config) {
-        initialize_graphics_pipeline(p_VertShader, p_FragShader, p_Config);
+    vk_shader::vk_shader(const std::string& p_vert_shader,
+                         const std::string& p_frag_shader,
+                         const shader_pipeline_config& p_config) {
+        initialize_graphics_pipeline(p_vert_shader, p_frag_shader, p_config);
     }
 
     std::vector<char> vk_shader::read_file(const std::string& p_filepath) {
@@ -20,7 +20,7 @@ namespace atlas::vk {
             console_log_error("Could not read in file \"{}\"", p_filepath);
             return {};
         }
-        size_t file_size = static_cast<size_t>(ins.tellg());
+        uint32_t file_size = static_cast<uint32_t>(ins.tellg());
         std::vector<char> buffer(file_size);
 
         ins.seekg(0);
@@ -29,11 +29,11 @@ namespace atlas::vk {
     }
 
     void vk_shader::initialize_graphics_pipeline(
-      const std::string& p_VertShader,
-      const std::string& p_FragShader,
-      const shader_pipeline_config& p_Config) {
-        auto vert = read_file(p_VertShader);
-        auto frag = read_file(p_FragShader);
+      const std::string& p_vert_shader,
+      const std::string& p_frag_shader,
+      const shader_pipeline_config& p_config) {
+        auto vert = read_file(p_vert_shader);
+        auto frag = read_file(p_frag_shader);
 
         initialize_shader_module(vert, m_vertex_shader_module);
         initialize_shader_module(frag, m_fragment_shader_module);
@@ -77,14 +77,14 @@ namespace atlas::vk {
             .pVertexAttributeDescriptions = attachment_description.data(),
         };
 
-        VkPipelineViewportStateCreateInfo PipelineViewportCreateInfo = {
+        VkPipelineViewportStateCreateInfo pipeline_viewport_create_info = {
             .sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
             .pNext = nullptr,
             .flags = 0,
             .viewportCount = 1,
-            .pViewports = &p_Config.Viewport,
+            .pViewports = &p_config.Viewport,
             .scissorCount = 1,
-            .pScissors = &p_Config.Scissor
+            .pScissors = &p_config.Scissor
         };
 
         //! @note Setting the state of our viewport to being enabled to be in
@@ -104,17 +104,17 @@ namespace atlas::vk {
             .stageCount = 2,
             .pStages = shader_stages.data(),
             .pVertexInputState = &vert_input_create_info,
-            .pInputAssemblyState = &p_Config.PipelineInputAsmInfo,
-            .pViewportState = &PipelineViewportCreateInfo,
-            .pRasterizationState = &p_Config.PipelineRasterizationCreateInfo,
-            .pMultisampleState = &p_Config.PipelineMultisampleCreateInfo,
-            .pDepthStencilState = &p_Config.PipelineDepthStencilCreateInfo,
-            .pColorBlendState = &p_Config.PipelineColorBlendCreateInfo,
+            .pInputAssemblyState = &p_config.PipelineInputAsmInfo,
+            .pViewportState = &pipeline_viewport_create_info,
+            .pRasterizationState = &p_config.PipelineRasterizationCreateInfo,
+            .pMultisampleState = &p_config.PipelineMultisampleCreateInfo,
+            .pDepthStencilState = &p_config.PipelineDepthStencilCreateInfo,
+            .pColorBlendState = &p_config.PipelineColorBlendCreateInfo,
             // .pDynamicState = nullptr,
             .pDynamicState = &dynamic_state_ci,
-            .layout = p_Config.PipelineLayout,
-            .renderPass = p_Config.PipelineRenderPass,
-            .subpass = p_Config.SubpassCount,
+            .layout = p_config.PipelineLayout,
+            .renderPass = p_config.PipelineRenderPass,
+            .subpass = p_config.SubpassCount,
             .basePipelineHandle = nullptr,
             .basePipelineIndex = -1,
         };
@@ -159,36 +159,47 @@ namespace atlas::vk {
         std::vector<VkVertexInputAttributeDescription> attribute_description{};
 
         attribute_description.push_back(
-          { 0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(vertex, Position) });
+          { .location = 0,
+            .binding = 0,
+            .format = VK_FORMAT_R32G32B32_SFLOAT,
+            .offset = offsetof(vertex, Position) });
+        attribute_description.push_back({ .location = 1,
+                                          .binding = 0,
+                                          .format = VK_FORMAT_R32G32B32_SFLOAT,
+                                          .offset = offsetof(vertex, Color) });
         attribute_description.push_back(
-          { 1, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(vertex, Color) });
+          { .location = 2,
+            .binding = 0,
+            .format = VK_FORMAT_R32G32B32_SFLOAT,
+            .offset = offsetof(vertex, Normals) });
         attribute_description.push_back(
-          { 2, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(vertex, Normals) });
-        attribute_description.push_back(
-          { 3, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(vertex, TexCoords) });
+          { .location = 3,
+            .binding = 0,
+            .format = VK_FORMAT_R32G32_SFLOAT,
+            .offset = offsetof(vertex, TexCoords) });
         return attribute_description;
     }
 
-    void vk_shader::initialize_shader_module(const std::vector<char>& p_Bin,
-                                             VkShaderModule& p_ShaderMod) {
+    void vk_shader::initialize_shader_module(const std::vector<char>& p_bin,
+                                             VkShaderModule& p_shader_mod) {
         VkShaderModuleCreateInfo shader_mod_create_info = {
             .sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
-            .codeSize = p_Bin.size(),
-            .pCode = reinterpret_cast<const uint32_t*>(p_Bin.data()),
+            .codeSize = p_bin.size(),
+            .pCode = reinterpret_cast<const uint32_t*>(p_bin.data()),
         };
 
         vk_check(vkCreateShaderModule(vk_context::get_current_driver(),
                                       &shader_mod_create_info,
                                       nullptr,
-                                      &p_ShaderMod),
+                                      &p_shader_mod),
                  "vkCreateShaderModule",
                  __FILE__,
                  __LINE__,
                  __FUNCTION__);
     }
 
-    shader_pipeline_config vk_shader::shader_configuration(uint32_t p_Width,
-                                                           uint32_t p_Height) {
+    shader_pipeline_config vk_shader::shader_configuration(uint32_t p_width,
+                                                           uint32_t p_height) {
         shader_pipeline_config config{};
 
         // VkPipelineInputAssemblyStateCreateInfo pipeline_input_asm_create_info
@@ -204,13 +215,13 @@ namespace atlas::vk {
 
         config.Viewport = { .x = 0.0f,
                             .y = 0.0f,
-                            .width = static_cast<float>(p_Width),
-                            .height = static_cast<float>(p_Height),
+                            .width = static_cast<float>(p_width),
+                            .height = static_cast<float>(p_height),
                             .minDepth = 0.0f,
                             .maxDepth = 1.0f };
 
         config.Scissor = { .offset = { 0, 0 },
-                           .extent = { p_Width, p_Height } };
+                           .extent = { p_width, p_height } };
 
         config.PipelineRasterizationCreateInfo = {
             .sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,

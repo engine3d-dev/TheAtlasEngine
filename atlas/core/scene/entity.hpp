@@ -26,7 +26,7 @@ namespace atlas {
 
         //! @note Flecs allows to check when an entity has been created
         //! @note Knowing when this entity lifecyle's ended
-        bool is_alive() const { return m_entity_id.is_alive(); }
+        [[nodiscard]] bool is_alive() const { return m_entity_id.is_alive(); }
 
         void on_destruction() { m_entity_id.destruct(); }
 
@@ -54,7 +54,7 @@ namespace atlas {
         //! @note Checks if specific component of type UComponent is provided to
         //! this entity
         template<typename UComponent>
-        bool has() const {
+        [[nodiscard]] bool has() const {
             return m_entity_id.has<UComponent>();
         }
 

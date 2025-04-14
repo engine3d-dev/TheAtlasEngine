@@ -4,14 +4,14 @@
 
 namespace atlas {
 
-    std::string g_CurrentPatternForLogs = "Undefined Pattern Specified";
+    std::string g_current_pattern_for_logs = "Undefined Pattern Specified";
     std::unordered_map<std::string, ref<spdlog::logger>>
       console_log_manager::s_loggers;
 
     void console_log_manager::initialize_logger_manager(
       const std::string& pattern) {
         // spdlog::set_pattern(pattern);
-        g_CurrentPatternForLogs = pattern;
+        g_current_pattern_for_logs = pattern;
         // m_ConsoleLogger = spdlog::stdout_color_mt(name);
         // m_ConsoleLogger->set_level(spdlog::level::trace);
 
@@ -39,7 +39,7 @@ namespace atlas {
     void console_log_manager::create_new_logger(const std::string& p_tag) {
         s_loggers[p_tag] = spdlog::stdout_color_mt(p_tag);
         s_loggers[p_tag]->set_level(spdlog::level::trace);
-        s_loggers[p_tag]->set_pattern(g_CurrentPatternForLogs);
+        s_loggers[p_tag]->set_pattern(g_current_pattern_for_logs);
     }
 
     void console_log_manager::set_current_logger(const std::string& p_tag) {
@@ -47,7 +47,7 @@ namespace atlas {
         //! @note Logs for p_tag is logs specific to the game
         s_loggers[p_tag] = spdlog::stdout_color_mt(p_tag);
         s_loggers[p_tag]->set_level(spdlog::level::trace);
-        s_loggers[p_tag]->set_pattern(g_CurrentPatternForLogs);
+        s_loggers[p_tag]->set_pattern(g_current_pattern_for_logs);
     }
 
     ref<spdlog::logger> console_log_manager::get(const std::string& p_tag) {

@@ -1,13 +1,8 @@
-#include <barrier>
-#include <condition_variable>
 #include <core/engine_logger.hpp>
-#include <core/update_handlers/thread_manager.hpp>
-#include <fmt/format.h>
-#include <thread_utils/thread_utils.hpp>
-#include <update_handlers/global_update.hpp>
 #include <update_handlers/sync_update.hpp>
 
 namespace atlas {
+    /*
     std::mutex g_sync_lock;
     std::mutex g_parallel_lock;
     //! @note conditional variable specifically for SyncUpdateManager's thread.
@@ -86,18 +81,7 @@ namespace atlas {
 
     void thread_manager::update_parallel_function() {
         //! @note 1.) Get all threads to wait on g_sync_frame
-        /*
 
-            Except they dont wait on all g_sync_frame (atomic)
-
-            1.) Barrier
-            1.1 stop all threads moving further (until hit barrier).
-                1.1.1
-
-            1.2 Then sync with global update using g_Parallel.wait
-           (g_parallel_frame)
-            - using second barrier.
-        */
         console_log_info("Are you running?");
         while (!m_thread_stop) {
             // 1.)
@@ -135,4 +119,5 @@ namespace atlas {
         g_sync_frame.notify_all();
         // g_parallel_frame.notify_all();
     }
+    */
 };
