@@ -58,8 +58,8 @@ set(
     ${INCLUDE_DIR}/physics/physics_3d/jolt/jolt_physics_engine.hpp
 
     #physics data
-    ${INCLUDE_DIR}/physics/physics_3d/data/jolt_settings.hpp
-    ${INCLUDE_DIR}/physics/physics_3d/data/jolt_config.hpp
+    ${INCLUDE_DIR}/physics/physics_3d/data/jolt_settings_data.hpp
+    ${INCLUDE_DIR}/physics/physics_3d/data/jolt_config_data.hpp
 
     # Scene Stuff
     ${INCLUDE_DIR}/core/scene/components.hpp

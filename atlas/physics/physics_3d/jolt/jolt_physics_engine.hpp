@@ -1,5 +1,5 @@
-#include <physics/physics_3d/data/jolt_settings.hpp>
-#include <physics/physics_3d/data/jolt_config.hpp>
+#include <physics/physics_3d/data/jolt_settings_data.hpp>
+#include <physics/physics_3d/data/jolt_config_data.hpp>
 
 namespace atlas::physics {
 
@@ -10,6 +10,6 @@ namespace atlas::physics {
      * from the hierarchy. (within the editor)
      *
      */
-    void create_engine(const jolt_settings& settings);
+    void create_engine(const jolt_settings_data& settings);
 
 }
