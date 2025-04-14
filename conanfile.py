@@ -27,7 +27,7 @@ class AtlasRecipe(ConanFile):
     def build_requirements(self):
         self.tool_requires("make/4.4.1")
         self.tool_requires("cmake/3.27.1")
-        self.tool_requires("engine3d-cmake-utils/3.0")
+        self.tool_requires("engine3d-cmake-utils/4.0")
 
     def requirements(self):
         self.requires("glfw/3.4", transitive_headers=True)

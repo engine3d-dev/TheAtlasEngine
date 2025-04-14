@@ -1,5 +1,4 @@
 #pragma once
-#include <core/engine_logger.hpp>
 #include <map>
 #include <core/scene/world.hpp>
 
@@ -10,16 +9,16 @@ namespace atlas {
      * @note Registry for storing world properties
      * @note Enable for scene to grab context from the world they are associated
      * with
-     * @note World Scope will act as the global wide scope
-     * @note Scene is the local scope player or game objects will be contained
-     * in
+     * @note Manages the lifetimes of world_scope created by the user
+     * @note World scope is the container of scenes
+     * @note system_registry is allowed to create, search alread-created
+     * world_scope's
      */
-    class world_scope;
     class system_registry {
     public:
         system_registry(const std::string& p_tag);
 
-        ~system_registry() { console_log_fatal("~system_registry called!!!"); }
+        ~system_registry();
 
         /**
          * @note system_registry does the following:
@@ -30,39 +29,19 @@ namespace atlas {
          * 4. Provide globalized access to other worlds
          */
 
+        //! @brief Instantiates new world_scope
         static ref<world_scope> create_world(const std::string& p_tag);
 
-        //! @brief We should be able to register multiple worlds
-        //! @brief While also selecting which world is the player's current
-        //! world they're located in
-        static void register_to(const ref<world_scope>& p_world);
-
-        static world_scope get_world();
-
+        //! @brief Searches and returns world_scope if found
+        //! @brief Returns nullptr if world_scope not found
         static ref<world_scope> get_world(const std::string& p_tag);
 
     private:
         ref<world_scope> search_world(const std::string& p_tag);
 
-        void append_world(const ref<world_scope>& p_world) {
-            if (p_world == nullptr) {
-                console_log_fatal("p_world = nullptr!!!");
-                return;
-            }
+        void append_world(const ref<world_scope>& p_world);
 
-            m_world_registered.insert({ p_world->get_tag(), p_world });
-            console_log_fatal("After inserting p_world->tag = {}",
-                              p_world->get_tag());
-        }
-
-        ref<world_scope> append_world_scope(const ref<world_scope>& p_world) {
-            if (p_world == nullptr) {
-                return nullptr;
-            }
-
-            m_world_registered.insert({ p_world->get_tag(), p_world });
-            return m_world_registered[p_world->get_tag()];
-        }
+        ref<world_scope> append_world_scope(const ref<world_scope>& p_world);
 
     private:
         static system_registry* s_instance;

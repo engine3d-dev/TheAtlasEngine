@@ -41,8 +41,7 @@ level_scene::level_scene(const std::string& p_tag)
 
     //! @note Creating our objects from our scene
     m_sphere = this->create_new_object("sphere");
-    // m_sphere->set<atlas::MeshComponent>({ "assets/models/colored_cube.obj"
-    // });
+
     m_sphere->set<atlas::rendertarget3d>(
       atlas::rendertarget3d("assets/models/colored_cube.obj"));
 
@@ -60,23 +59,6 @@ level_scene::level_scene(const std::string& p_tag)
     });
 
     m_platform->set<atlas::rendertarget3d>({ "assets/models/cube.obj" });
-
-    //! @note This is just for testing if we can query multiple components to
-    //! the entities
-    // m_test_object = create_new_object("test object");
-    // m_test_object->add_query<component1, component2, component3,
-    // component4>();
-
-    /**
-    @note Jolt's Body Interface
-    @note Used for initiating simulated objects within the physics simulation
-    @note CreateBody: Creates new physics body
-    @note AddBody: Adds newly (or created) physics body to the simulation
-    @note RemoveBody: Remove body from simulation
-    @note DestroyBody: Deinitialized destroy body
-    @note SetTransform: Sets initial position/orientation of physics body
-    @note AddForce: Apply force to the body
-    */
 
     m_camera = this->create_new_object("camera");
 
