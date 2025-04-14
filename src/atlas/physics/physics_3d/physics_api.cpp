@@ -10,12 +10,12 @@ namespace atlas::physics {
             return;
         }
 
-        if (physics_object->get<jolt_settings>() == nullptr) {
+        if (physics_object->get<jolt_settings_data>() == nullptr) {
             console_log_fatal("Missing jolt_settings component.");
             return;
         }
 
-        create_engine(*physics_object->get<jolt_settings>());
+        create_engine(*physics_object->get<jolt_settings_data>());
     }
 
 }

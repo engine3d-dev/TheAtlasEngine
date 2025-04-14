@@ -29,7 +29,7 @@ namespace atlas::vk {
      * @note TODO: Should probably be its own class that also enables to
      * read/write to it to the shaders
      */
-    struct UniformBuffer {
+    struct uniform_buffer {
         VkBuffer BufferHanlder;
         VkDeviceMemory BufferMemory;
         void* uniform_bufferMappedData;
@@ -42,7 +42,7 @@ namespace atlas::vk {
     //! @note Since descriptor sets aren't working, we are creating another
     //! shader just to set the colors lol
 
-    struct CameraUbo {
+    struct camera_ubo {
         glm::mat4 Projection{ 1.f };
         glm::mat4 View{ 1.f };
         glm::mat4 Model{ 1.f };
@@ -137,7 +137,7 @@ namespace atlas::vk {
                                                    VK_SHADER_STAGE_VERTEX_BIT |
                                                    VK_SHADER_STAGE_FRAGMENT_BIT,
                                                  .offset = 0,
-                                                 .size = sizeof(CameraUbo) };
+                                                 .size = sizeof(camera_ubo) };
 
         //! @note We are setting our descriptors to work with layout(set = 0,
         //! binding = 0)
@@ -483,7 +483,7 @@ namespace atlas::vk {
                                VK_SHADER_STAGE_VERTEX_BIT |
                                  VK_SHADER_STAGE_FRAGMENT_BIT,
                                0,
-                               sizeof(CameraUbo),
+                               sizeof(camera_ubo),
                                &push_const_data);
 
             if (!p_entity_id.has<rendertarget3d>()) {
