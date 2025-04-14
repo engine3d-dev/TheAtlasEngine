@@ -17,21 +17,6 @@ jobs:
             shell: pwsh
             run: Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 
-<<<<<<< HEAD
-            - name: Install tooling with Choco
-              shell: pwsh
-              run: |
-                  choco install cmake.install --version=3.31.6
-                  cmake --version
-                  choco install git llvm make mingw
-            
-            # - name: Installing python
-            #   run: choco install python --version=3.12.2
-            
-            - name: Pip installing conan
-              shell: pwsh
-              run: pip install conan
-=======
           - name: Install tooling with Choco
             shell: pwsh
             run: |
@@ -45,7 +30,6 @@ jobs:
           - name: Pip installing conan
             shell: pwsh
             run: pip install conan
->>>>>>> cb3a1c9b3136d61fb5f344a13f6669dedf2c986c
 
           # - name: Installing vulkan
           #   shell: pwsh
