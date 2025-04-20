@@ -1,3 +1,4 @@
+#pragma once
 #include <cstdint>
 #include <glm/glm.hpp>
 
@@ -6,7 +7,7 @@ namespace atlas::physics {
      * @brief Used to keep global data for player access and use. Tells how
      * physics bodies should act within a given scene by default.
      */
-    struct jolt_config_data {
+    struct physics_config {
         // Global gravity vector for all in scene
         glm::vec3 gravity = glm::vec3(0.0f, -9.80665f, 0.0f);
 

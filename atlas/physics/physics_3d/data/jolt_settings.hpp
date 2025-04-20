@@ -1,4 +1,4 @@
-
+#pragma once
 #include <cstdint>
 #include <glm/glm.hpp>
 #include <thread>
@@ -17,7 +17,7 @@ namespace atlas::physics {
      * should be determined in the near future.
      *
      */
-    struct jolt_settings_data {
+    struct physics_settings {
 
         // For job system
         uint32_t physics_threads = std::thread::hardware_concurrency();

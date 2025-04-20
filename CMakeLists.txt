@@ -6,7 +6,7 @@ if(${TESTS_ONLY})
   message("===================> TESTS ONLY ENABLED <=====================")
   set(DIRECTORIES src)
 else()
-  set(DIRECTORIES src Editor)
+  set(DIRECTORIES src editor)
 endif()
 
 # TODO: Enable toggling custom conan arguments for specifying which build to use

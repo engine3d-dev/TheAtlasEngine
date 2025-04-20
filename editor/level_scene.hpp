@@ -26,8 +26,6 @@ public:
         console_log_error("LevelScene::~LevelScene Destructed!!!");
     }
 
-    [[nodiscard]] float read_float() const { return 4.f; }
-
     //! @note Remove these from being overridden
     //! TODO: We should have an indication on what functions are update phased
     //! functions

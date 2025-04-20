@@ -50,16 +50,19 @@ set(
     # System-related stuff
     ${INCLUDE_DIR}/core/system_framework/system_registry.hpp
 
-
-    # physics stuff
+    #physics stuff
     ${INCLUDE_DIR}/physics/physics_3d/physics_engine.hpp
-    ${INCLUDE_DIR}/physics/physics_3d/jolt/jolt_api.hpp
     ${INCLUDE_DIR}/physics/physics_3d/physics_api.hpp
-    ${INCLUDE_DIR}/physics/physics_3d/jolt/jolt_physics_engine.hpp
+    ${INCLUDE_DIR}/physics/physics_3d/physics_engine.hpp
+
+    ${INCLUDE_DIR}/physics/physics_3d/jolt/jolt_api.hpp
+    ${INCLUDE_DIR}/physics/physics_3d/jolt/jolt_context.hpp
 
     #physics data
-    ${INCLUDE_DIR}/physics/physics_3d/data/jolt_settings_data.hpp
-    ${INCLUDE_DIR}/physics/physics_3d/data/jolt_config_data.hpp
+    ${INCLUDE_DIR}/physics/physics_3d/data/jolt_settings.hpp
+    ${INCLUDE_DIR}/physics/physics_3d/data/jolt_config.hpp
+    ${INCLUDE_DIR}/physics/physics_3d/data/collider_body.hpp
+    ${INCLUDE_DIR}/physics/physics_3d/data/physics_body.hpp
 
     # Scene Stuff
     ${INCLUDE_DIR}/core/scene/components.hpp
@@ -131,11 +134,13 @@ set(
     # serializer stuff
     ${SRC_DIR}/core/serialize/serializer.cpp
 
+    # jolt
+    ${SRC_DIR}/physics/physics_3d/jolt/jolt_api.cpp
+    ${SRC_DIR}/physics/physics_3d/jolt/jolt_context.cpp
+
     # physics stuff
     ${SRC_DIR}/physics/physics_3d/physics_engine.cpp
-    ${SRC_DIR}/physics/physics_3d/jolt/jolt_api.cpp
     ${SRC_DIR}/physics/physics_3d/physics_api.cpp
-    ${SRC_DIR}/physics/physics_3d/jolt/jolt_physics_engine.cpp
 
     # Scene stuff
     ${SRC_DIR}/core/scene/world.cpp
