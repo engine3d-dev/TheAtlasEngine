@@ -17,7 +17,7 @@ namespace atlas::physics {
      * should be determined in the near future.
      *
      */
-    struct physics_settings {
+    struct jolt_settings {
 
         // For job system
         uint32_t physics_threads = std::thread::hardware_concurrency();

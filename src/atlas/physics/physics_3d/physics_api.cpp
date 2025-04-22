@@ -10,7 +10,7 @@
 
 //     physics_api test_api = Jolt;
 
-//     ref<physics_engine_backend> initialize_engine(const physics_settings& p_settings) {
+//     ref<physics_engine_backend> initialize_engine(const jolt_settings& p_settings) {
 //         switch(test_api){
 //              case physics_api::Jolt: return create_ref<jolt_engine>(p_settings);l
 //              default: return nullptr;
@@ -25,12 +25,12 @@
 //             return;
 //         }
 
-//         if (p_physics_object->get<physics_settings>() == nullptr) {
+//         if (p_physics_object->get<jolt_settings>() == nullptr) {
 //             console_log_fatal("Missing jolt_settings component.");
 //             return;
 //         }
 
-//         engine->start_engine(*p_physics_object->get<physics_settings>());
+//         engine->start_engine(*p_physics_object->get<jolt_settings>());
 //     }
 
     

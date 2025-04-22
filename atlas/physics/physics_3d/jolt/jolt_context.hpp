@@ -1,9 +1,10 @@
 #pragma once
 
-#include <physics\physics_3d\data\jolt_settings.hpp>
-#include <physics\physics_3d\data\jolt_config.hpp>
+#include <physics\physics_3d\physics_context>
 
 namespace atlas::physics {
     
+    class jolt_context : physics_context {
 
+    }
 };

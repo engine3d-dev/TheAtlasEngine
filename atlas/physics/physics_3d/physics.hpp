@@ -15,7 +15,7 @@ namespace atlas::physics {
         switch (test_api) {
             case physics_api::Jolt:
                 return create_ref<physics_context>(
-                  *p_physics_object->get<physics_settings>());
+                  *p_physics_object->get<jolt_settings>());
             default:
                 return nullptr;
         }
