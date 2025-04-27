@@ -32,7 +32,7 @@ namespace atlas {
      * @brief Scenes are part of the world; where the world contains sets of
      * scenes per world
      */
-    class scene_scope {
+    class scene_scope : public std::enable_shared_from_this<scene_scope> {
     public:
         scene_scope()
           : m_tag("Undefined") {}
@@ -50,6 +50,8 @@ namespace atlas {
         }
 
         virtual ~scene_scope() = default;
+
+        ref<scene_scope> get() { return shared_from_this(); }
 
         std::string get_tag() { return m_tag; }
 
