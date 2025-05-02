@@ -1,5 +1,4 @@
 #pragma once
-#include <type_traits>
 #include <Jolt/Jolt.h>
 #include <Jolt/Core/Core.h>
 #include <Jolt/Physics/Body/BodyInterface.h>
@@ -21,6 +20,7 @@
 #include <Jolt/Physics/Collision/Shape/Shape.h>
 #include <Jolt/Physics/Collision/Shape/BoxShape.h>
 #include <Jolt/Physics/Collision/Shape/ConvexShape.h>
+#include <Jolt/Physics/Collision/Shape/CapsuleShape.h>
 #include <Jolt/Physics/Collision/Shape/ScaledShape.h>
 #include <Jolt/Physics/Collision/Shape/SphereShape.h>
 

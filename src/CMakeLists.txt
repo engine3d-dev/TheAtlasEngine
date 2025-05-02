@@ -51,18 +51,21 @@ set(
     ${INCLUDE_DIR}/core/system_framework/system_registry.hpp
 
     #physics stuff
-    ${INCLUDE_DIR}/physics/physics_3d/physics_engine.hpp
     ${INCLUDE_DIR}/physics/physics_3d/physics_api.hpp
     ${INCLUDE_DIR}/physics/physics_3d/physics_engine.hpp
+    ${INCLUDE_DIR}/physics/physics_3d/physics.hpp
+    ${INCLUDE_DIR}/physics/physics_3d/physics_context.hpp
 
     ${INCLUDE_DIR}/physics/physics_3d/jolt/jolt_api.hpp
     ${INCLUDE_DIR}/physics/physics_3d/jolt/jolt_context.hpp
+    ${INCLUDE_DIR}/physics/physics_3d/jolt/jolt_helper.hpp
 
     #physics data
     ${INCLUDE_DIR}/physics/physics_3d/data/jolt_settings.hpp
     ${INCLUDE_DIR}/physics/physics_3d/data/jolt_config.hpp
     ${INCLUDE_DIR}/physics/physics_3d/data/collider_body.hpp
     ${INCLUDE_DIR}/physics/physics_3d/data/physics_body.hpp
+    ${INCLUDE_DIR}/physics/physics_3d/data/transform.hpp
 
     # Scene Stuff
     ${INCLUDE_DIR}/core/scene/components.hpp
@@ -137,10 +140,13 @@ set(
     # jolt
     ${SRC_DIR}/physics/physics_3d/jolt/jolt_api.cpp
     ${SRC_DIR}/physics/physics_3d/jolt/jolt_context.cpp
+    ${SRC_DIR}/physics/physics_3d/jolt/jolt_helper.cpp
 
     # physics stuff
     ${SRC_DIR}/physics/physics_3d/physics_engine.cpp
     ${SRC_DIR}/physics/physics_3d/physics_api.cpp
+    ${SRC_DIR}/physics/physics_3d/physics_context.cpp
+    ${SRC_DIR}/physics/physics_3d/physics.cpp
 
     # Scene stuff
     ${SRC_DIR}/core/scene/world.cpp

@@ -1,12 +1,21 @@
 #pragma once
 #include <core/core.hpp>
-#include <physics/jolt-cpp/jolt-imports.hpp>
-#include <Jolt/Physics/Collision/ObjectLayer.h>
-#include <Jolt/Physics/Body/BodyManager.h>
-#include <Jolt/Physics/Body/BodyActivationListener.h>
-#include <Jolt/Physics/Collision/ContactListener.h>
+#include <physics/physics_3d/data/jolt_settings.hpp>
+#include <physics/physics_3d/jolt/jolt_context.hpp>
 
 namespace atlas::physics {
     
-    class physics_engine {};
+    class physics_engine {
+        public:
+            physics_engine() = default;
+            physics_engine(jolt_settings p_settings, ref<physics_context>& p_engine);
+
+            void start_runtime();
+            void physics_step();
+            void stop_runtime();
+
+        private:
+            jolt_settings m_settings;
+            ref<physics_context> m_engine_api;
+    };
 };

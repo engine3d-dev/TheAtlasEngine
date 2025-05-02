@@ -1,8 +1,13 @@
 #pragma once
 #include <cstdint>
-#include <glm/glm.hpp>
 #include <thread>
+#include <glm/glm.hpp>
 namespace atlas::physics {
+
+    enum thread_system : uint8_t {
+        Default = 0,
+        JobSystem = 1,
+    };
 
     /**
      * @brief A data structure to give to flecs and get the physics
@@ -20,7 +25,13 @@ namespace atlas::physics {
     struct jolt_settings {
 
         // For job system
-        uint32_t physics_threads = std::thread::hardware_concurrency();
+        thread_system thread_type = Default;
+
+        uint32_t physics_threads =
+          std::max(1u, std::thread::hardware_concurrency() - 2);
+          
+        uint32_t max_jobs = physics_threads * 32;
+        uint32_t max_barriers = physics_threads * 16;
         bool is_multithreaded = true;
 
         // Collision detection

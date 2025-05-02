@@ -3,6 +3,19 @@
 
 namespace atlas::physics {
 
+    enum body_type : uint8_t{
+        Static = 0,
+        Kenmatic = 1,
+        Dynamic = 2,
+        BodyNum
+    };
+
+    enum body_layer : uint8_t{
+        NonMoving = 0,
+        Moving = 1,
+        LayerNum
+    };
+
     struct physics_body {
         glm::vec3 linear_velocity = glm::vec3(0.0);
         glm::vec3 angular_velocity = glm::vec3(0.0f);
@@ -27,6 +40,9 @@ namespace atlas::physics {
 
         glm::uvec3 linear_constraints = glm::uvec3(1);
         glm::uvec3 angular_constraints = glm::uvec3(1);
+
+        uint8_t body_movement_type = body_type::Static;
+        uint8_t body_layer_type = body_layer::NonMoving;
 
         uint32_t body_id = 0;
     };

@@ -1,18 +1,27 @@
 #pragma once
-
-#include <physics\physics_3d\data\jolt_settings.hpp>
-#include <physics\physics_3d\data\jolt_config.hpp>
 namespace atlas::physics {
     class physics_context {
-        public:
-            physics_context(const jolt_settings settings);
-            void runtime_start();
-            void runtime_end();
+    public:
+        void create_bodies();
+        void clean_bodies();
+        void run_physics_step();
 
-        private:
-            virtual void engine_runtime_start() = 0;
-            virtual void engine_runtime_end() = 0;
+        //! @remark This has to be public to get shared pointer working
+        //! @note With one exception being some friend class but not the way
+        virtual ~physics_context() = default;
 
-        
+        /**
+         * @note:
+         *  Many more in the future like:
+         *  batching physics bodies
+         *  chucking engine location
+         *  shifting coordinates
+         */
+
+    private:
+
+        virtual void engine_create_physics_bodies() = 0;
+        virtual void engine_clean_physics_bodies() = 0;
+        virtual void engine_run_physics_step() = 0;
     };
 };
