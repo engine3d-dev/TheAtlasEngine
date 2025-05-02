@@ -61,11 +61,10 @@ set(
     ${INCLUDE_DIR}/physics/physics_3d/jolt/jolt_helper.hpp
 
     #physics data
-    ${INCLUDE_DIR}/physics/physics_3d/data/jolt_settings.hpp
-    ${INCLUDE_DIR}/physics/physics_3d/data/jolt_config.hpp
-    ${INCLUDE_DIR}/physics/physics_3d/data/collider_body.hpp
-    ${INCLUDE_DIR}/physics/physics_3d/data/physics_body.hpp
-    ${INCLUDE_DIR}/physics/physics_3d/data/transform.hpp
+    ${INCLUDE_DIR}/physics/physics_3d/components/jolt_settings.hpp
+    ${INCLUDE_DIR}/physics/physics_3d/components/jolt_config.hpp
+    ${INCLUDE_DIR}/physics/physics_3d/components/collider_body.hpp
+    ${INCLUDE_DIR}/physics/physics_3d/components/physics_body.hpp
 
     # Scene Stuff
     ${INCLUDE_DIR}/core/scene/components.hpp

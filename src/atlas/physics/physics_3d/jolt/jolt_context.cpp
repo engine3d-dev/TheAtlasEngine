@@ -4,7 +4,7 @@
 
 #include <physics/physics_3d/data/physics_body.hpp>
 #include <physics/physics_3d/data/collider_body.hpp>
-#include <physics/physics_3d/data/transform.hpp>
+#include <components/transform.hpp>
 #include <physics/types.hpp>
 #include <scene/scene.hpp>
 #include <physics/physics_3d/jolt/jolt_helper.hpp>
