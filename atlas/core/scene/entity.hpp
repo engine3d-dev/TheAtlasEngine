@@ -91,7 +91,7 @@ namespace atlas {
         }
 
         operator flecs::entity() const { return m_entity_id; }
-        
+
         operator flecs::entity() { return m_entity_id; }
 
     private:

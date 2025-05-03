@@ -122,7 +122,7 @@ namespace atlas {
         }
 
         operator flecs::entity() const { return m_entity; }
-        
+
         operator flecs::entity() { return m_entity; }
 
     private:
