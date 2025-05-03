@@ -53,6 +53,9 @@ namespace atlas {
 
         std::string get_tag() { return m_tag; }
 
+        operator flecs::world() const { return m_registry; }
+        operator flecs::world() { return m_registry; }
+
     private:
         flecs::world m_registry;
         std::string m_tag = "Undefined Tag";
