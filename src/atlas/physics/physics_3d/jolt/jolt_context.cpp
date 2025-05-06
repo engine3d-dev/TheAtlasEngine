@@ -235,8 +235,6 @@ namespace atlas::physics {
                 e, col, loc, settings_list, entity_list, m_shape_registry);
           });
 
-        console_log_info("getting here!2\n");
-
         if (settings_list.empty()) {
             console_log_error("No physics bodies to create.");
             return;
@@ -254,7 +252,7 @@ namespace atlas::physics {
                 continue;
             }
 
-            JPH::Body* body = body_interface.CreateBody(settings);
+            JPH::Body* body = body_interface.CreateBodyWithID((JPH::BodyID)settings.mUserData,settings);
             if (!body) {
                 console_log_fatal("CreateBody returned nullptr at index {}", i);
                 continue;
