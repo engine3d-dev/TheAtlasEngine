@@ -121,6 +121,10 @@ namespace atlas {
             return m_model;
         }
 
+        operator flecs::entity() const { return m_entity; }
+
+        operator flecs::entity() { return m_entity; }
+
     private:
         entity_t m_entity;
         glm::mat4 m_model;
