@@ -1,5 +1,4 @@
 #include <core/engine_logger.hpp>
-#include <drivers/vulkan/vulkan_context.hpp>
 
 extern int win_main();
 
@@ -10,7 +9,7 @@ main() {
 
     // atlas::global_update::initialize();
     // atlas::sync_update::initialize();
-    atlas::vk::vk_context::initialize();
+    // atlas::vk::vk_context::initialize();
 
     return win_main();
 }

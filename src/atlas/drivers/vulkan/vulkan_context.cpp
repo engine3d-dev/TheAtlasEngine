@@ -3,86 +3,15 @@
 #include <drivers/vulkan/vulkan-imports.hpp>
 #include <drivers/vulkan/vulkan_context.hpp>
 #include <vulkan/vulkan_core.h>
+#include <iostream>
 
 namespace atlas::vk {
     const std::vector<std::string> instance_layers = {
-        // #ifdef DEBUG
-        // Khronos Validation is a layer which encompasses all of the
-        // functionality that used to be contained in VK_LAYER_GOOGLE_threading,
-        // VK_LAYER_LUNARG_parameter_validation, VK_LAYER_LUNARG_object_tracker,
-        // VK_LAYER_LUNARG_core_validation, and VK_LAYER_GOOGLE_unique_objects
         "VK_LAYER_KHRONOS_validation",
-        // Standard Validation is a (now deprecated) meta-layer managed by the
-        // LunarG Loader.
-        // Using Standard Validation will cause the loader to load a standard
-        // set of validation layers in an optimal order:
-        // * VK_LAYER_GOOGLE_threading.
-        // * VK_LAYER_LUNARG_parameter_validation.
-        // * VK_LAYER_LUNARG_object_tracker.
-        // * VK_LAYER_LUNARG_core_validation.
-        // * VK_LAYER_GOOGLE_unique_objects.
-        "VK_LAYER_LUNARG_core_validation",
-        "VK_LAYER_LUNARG_standard_validation",
-        // PerfDoc is a Vulkan layer which attempts to identify API usage that
-        // may be discouraged, primarily by validating applications
-        // against the rules set out in the Mali Application Developer Best
-        // Practices document.
-        "VK_LAYER_ARM_mali_perf_doc"
-        // #else
-        // 	""
-        // #endif
+		"VK_LAYER_KHRONOS_synchronization2"
     };
-    VkInstance vk_context::s_instance = VK_NULL_HANDLE;
-    vk_physical_driver vk_context::s_physical_driver;
-    vk_driver vk_context::s_driver;
-
-    void vk_context::initialize() {
-        console_log_warn_tagged("vulkan", "Begin vk_context::initialize()!!");
-
-        VkApplicationInfo app_info = {
-            .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
-            .pNext = nullptr,
-            .applicationVersion = 1,
-            .pEngineName = "Engine3D",
-            .engineVersion = 1,
-            .apiVersion = VK_API_VERSION_1_3,
-        };
-
-        VkInstanceCreateInfo instance_create_info = {
-            .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
-            .pNext = nullptr,
-            .flags = 0,
-            .pApplicationInfo = &app_info
-        };
-
-        std::vector<const char*> validation_layers =
-          initialization_validation_layers();
-        std::vector<const char*> instance_extensions =
-          initialize_instance_extensions();
-
-        instance_create_info.enabledExtensionCount =
-          static_cast<uint32_t>(validation_layers.size());
-        instance_create_info.ppEnabledLayerNames = validation_layers.data();
-
-        //! @note Setting our instance extensions that will get applied to
-        //! instance-level objects like VkInstance, VkPhysicalDevice, etc.
-        instance_create_info.enabledExtensionCount =
-          static_cast<uint32_t>(instance_extensions.size());
-        instance_create_info.ppEnabledExtensionNames =
-          instance_extensions.data();
-
-        vk_check(vkCreateInstance(&instance_create_info, nullptr, &s_instance),
-                 "vkCreateInstance",
-                 __FILE__,
-                 __LINE__,
-                 __FUNCTION__);
-        console_log_warn_tagged("vulkan",
-                                "VkInstance Initialized Completed!!!");
-
-        s_physical_driver = vk_physical_driver(s_instance);
-        s_driver = vk_driver(s_physical_driver);
-    }
-
+	vk_context* vk_context::s_instance=nullptr;
+	
     //! @note Returns the validation layers that will be utilized by the vulkan
     //! instance.
     std::vector<const char*> vk_context::initialization_validation_layers() {
@@ -153,4 +82,91 @@ namespace atlas::vk {
 
         return extension_names;
     }
+
+    static VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(
+      [[maybe_unused]] VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
+      [[maybe_unused]] VkDebugUtilsMessageTypeFlagsEXT message_type,
+      [[maybe_unused]] const VkDebugUtilsMessengerCallbackDataEXT*
+        p_callback_data,
+      [[maybe_unused]] void* p_user_data) {
+        std::cerr << "validation layer:\t\t" << p_callback_data->pMessage
+                  << std::endl;
+        return false;
+    }
+
+	vk_context::vk_context() {
+		s_instance = this;
+		console_log_warn_tagged("vulkan", "Begin vk_context::initialize()!!");
+
+        VkApplicationInfo app_info = {
+            .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
+            .pNext = nullptr,
+            .applicationVersion = 1,
+            .pEngineName = "Engine3D",
+            .engineVersion = 1,
+            .apiVersion = VK_API_VERSION_1_3,
+        };
+
+        VkInstanceCreateInfo instance_create_info = {
+            .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            .pApplicationInfo = &app_info
+        };
+
+        std::vector<const char*> validation_layers =
+          initialization_validation_layers();
+        std::vector<const char*> instance_extensions =
+          initialize_instance_extensions();
+
+        instance_create_info.enabledExtensionCount =
+          static_cast<uint32_t>(validation_layers.size());
+        instance_create_info.ppEnabledLayerNames = validation_layers.data();
+
+        VkDebugUtilsMessengerCreateInfoEXT debug_create_info = {
+            .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
+            .messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+                               VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+                               VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
+            .messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+                           VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+                           VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
+            .pfnUserCallback = debug_callback,
+        };
+
+        instance_create_info.pNext =
+          (VkDebugUtilsMessengerCreateInfoEXT*)&debug_create_info;
+
+        //! @note Setting our instance extensions that will get applied to
+        //! instance-level objects like VkInstance, VkPhysicalDevice, etc.
+        instance_create_info.enabledExtensionCount =
+          static_cast<uint32_t>(instance_extensions.size());
+        instance_create_info.ppEnabledExtensionNames =
+          instance_extensions.data();
+
+        vk_check(vkCreateInstance(&instance_create_info, nullptr, &m_vulkan_instance_context),
+                 "vkCreateInstance",
+                 __FILE__,
+                 __LINE__,
+                 __FUNCTION__);
+        console_log_warn_tagged("vulkan",
+                                "VkInstance Initialized Completed!!!");
+
+        m_physical_driver = vk_physical_driver(m_vulkan_instance_context);
+        m_driver = vk_driver(m_physical_driver);
+	}
+
+	vk_context::~vk_context() = default;
+
+	void vk_context::submit_resource_free(const std::function<void()>& p_callback_resource) {
+		s_instance->m_resource_free_queue_submission.push_front(p_callback_resource);
+	}
+
+	void vk_context::impl_destroy() {
+		console_log_info("impl_destroy invoked!");
+		for(auto& callable : m_resource_free_queue_submission) {
+			callable();
+		}
+	}
+
 };
