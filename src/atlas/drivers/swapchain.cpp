@@ -8,7 +8,7 @@ namespace atlas {
         switch (application::current_api()) {
             case API::VULKAN:
                 return create_ref<vk::vk_swapchain>(
-                  vk::vk_context::get_current_selected_physical_driver(),
+                  vk::vk_context::current_physical_driver(),
                   vk::vk_context::get_current_driver(),
                   p_surface);
             default:

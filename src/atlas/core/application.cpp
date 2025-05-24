@@ -14,7 +14,7 @@
 namespace atlas {
     static std::string g_tag = "engine3d";
     application* application::s_instance = nullptr;
-    static API g_graphics_backend_api = API::UNSPECIFIED;
+    static API g_graphics_backend_api = API::VULKAN;
     static float g_delta_time = 0.f;
     static float g_physics_step = 0.f; // collision step
 

@@ -179,7 +179,7 @@ namespace atlas::vk {
                                      .pCommandBuffers = &p_command_buffer };
 
         // auto queue_graphics_idx =
-        // vk_context::get_current_selected_physical_driver().get_queue_indices().Graphics;
+        // vk_context::current_physical_driver().get_queue_indices().Graphics;
         auto graphics_queue =
           vk_context::get_current_driver().get_graphics_queue();
 
@@ -205,7 +205,7 @@ namespace atlas::vk {
             .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
             .flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
             .queueFamilyIndex =
-              vk_context::get_current_selected_physical_driver()
+              vk_context::current_physical_driver()
                 .get_queue_indices()
                 .Graphics
         };

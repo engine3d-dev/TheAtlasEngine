@@ -24,6 +24,7 @@ namespace atlas::vk {
         [[nodiscard]] GLFWwindow* native_window() const override;
 
     private:
+        VkInstance m_instance_handler=nullptr;
         GLFWwindow* m_window;
         ref<swapchain> m_swapchain;
         VkSurfaceKHR m_surface;

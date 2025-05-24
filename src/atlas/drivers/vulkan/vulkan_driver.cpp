@@ -3,6 +3,7 @@
 #include <drivers/vulkan/vulkan_context.hpp>
 #include <drivers/vulkan/vulkan_driver.hpp>
 #include <vulkan/vulkan_core.h>
+#include <drivers/vulkan/vulkan_context.hpp>
 
 namespace atlas::vk {
     vk_driver::vk_driver(const vk_physical_driver& p_physical) {
@@ -84,6 +85,9 @@ namespace atlas::vk {
                          p_physical.get_queue_indices().Graphics,
                          0,
                          &m_graphics_queue);
+        vk_context::submit_context_free([this](){
+            vkDestroyDevice(m_driver, nullptr);
+        });
     }
 
     uint32_t vk_driver::select_memory_type(
@@ -91,7 +95,7 @@ namespace atlas::vk {
       VkMemoryPropertyFlags p_property_flag) {
         VkPhysicalDeviceMemoryProperties mem_props;
         vkGetPhysicalDeviceMemoryProperties(
-          vk_context::get_current_selected_physical_driver(), &mem_props);
+          vk_context::current_physical_driver(), &mem_props);
 
         for (uint32_t i = 0; i < mem_props.memoryTypeCount; i++) {
             if ((p_type_filter & (1 << i)) and

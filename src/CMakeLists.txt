@@ -147,6 +147,7 @@ set(
     # Renderer-stuff
     ${SRC_DIR}/renderer/renderer.cpp
     ${SRC_DIR}/drivers/renderer_backend.cpp
+    ${SRC_DIR}/drivers/graphics_context.cpp
 
     ## ui-stuff backend
     ${SRC_DIR}/drivers/ui/imgui_backend.cpp

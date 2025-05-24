@@ -1,0 +1,14 @@
+#include <drivers/graphics_context.hpp>
+#include <core/application.hpp>
+#include <drivers/vulkan/vulkan_context.hpp>
+#include <core/engine_logger.hpp>
+
+namespace atlas {
+    ref<graphics_context> initialize_context(const std::string& p_tag) {
+        console_log_info("graphics_context Initialized!!");
+        switch (application::current_api()){
+        case API::VULKAN: return create_ref<vk::vk_context>(p_tag);
+        default: return nullptr;
+        }
+    }
+};

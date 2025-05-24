@@ -13,6 +13,16 @@ namespace atlas::vk {
     vk_window::vk_window(uint32_t p_width,
                          uint32_t p_height,
                          const std::string& p_tag) {
+        
+        m_instance_handler = vk_context::vk_instance_handler();
+
+        if(m_instance_handler == nullptr) {
+            console_log_fatal("VkInstance == nullptr!!!");
+        }
+        else {
+            console_log_fatal("VkInstance != nullptr!!!");
+        }
+
         console_log_info("Vulkan Window Begin Initialization!");
         if (!glfwInit()) {
             console_log_warn("GLFW: Failed to initialize");
@@ -35,7 +45,7 @@ namespace atlas::vk {
         console_log_info("Vulkan Window: Begin Initializing Window Surface!");
         vk_check(
           glfwCreateWindowSurface(
-            vk_context::get_vk_instance(), m_window, nullptr, &m_surface),
+            m_instance_handler, m_window, nullptr, &m_surface),
           "glfwCreateWindowSurface",
           __FILE__,
           __LINE__,

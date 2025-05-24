@@ -322,9 +322,9 @@ namespace atlas {
         ImGui_ImplGlfw_InitForVulkan(
           application::get_window().get_native_window(), true);
         ImGui_ImplVulkan_InitInfo init_info = {};
-        init_info.Instance = vk::vk_context::get_vk_instance();
+        init_info.Instance = vk::vk_context::vk_instance_handler();
         init_info.PhysicalDevice =
-          vk::vk_context::get_current_selected_physical_driver();
+          vk::vk_context::current_physical_driver();
         init_info.Device = m_driver;
         init_info.Queue = m_driver.get_graphics_queue();
         init_info.RenderPass =
