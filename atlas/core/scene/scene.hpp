@@ -1,8 +1,6 @@
 #pragma once
 #include <core/engine_logger.hpp>
 #include <core/scene/scene_object.hpp>
-#include <core/scene/world.hpp>
-#include <core/system_framework/system_registry.hpp>
 #include <string>
 
 namespace atlas {
