@@ -10,12 +10,12 @@ namespace atlas {
     //! @note When changing to transform change jolt_context transform_physics
     //! to transform as well
 
-    // This can be put in contacts.hpp as tranform after merging. Fix renderer.
+    // This can be put in components.hpp as tranform after merging and fixing
+    // renderer to have its own component for color and material.
     struct transform_physics {
         glm::highp_vec3 position{ 0.f };
         glm::highp_vec4 quaterion_rotation{ 0.0f };
         glm::highp_vec3 rotation{ 0.f };
         glm::highp_vec3 scale{ 1.f };
-        glm::highp_vec4 color{ 1.f };
     };
 };

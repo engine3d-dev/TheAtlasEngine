@@ -1,16 +1,17 @@
 #pragma once
 
+#include <physics/jolt-cpp/jolt_contact_listener.hpp>
 #include <core/core.hpp>
 
 #include <physics/physics_3d/physics_context.hpp>
-#include <physics/physics_3d/data/jolt_settings.hpp>
+#include <physics/jolt-cpp/jolt_components.hpp>
 #include <physics/physics_3d/jolt/interface/jolt_broad_phase.hpp>
 
 namespace atlas::physics {
 
     class jolt_context : public physics_context {
     public:
-        jolt_context(jolt_settings p_settings);
+        jolt_context(jolt::jolt_settings p_settings);
         ~jolt_context() override;
 
     private:
@@ -43,6 +44,12 @@ namespace atlas::physics {
         void engine_run_physics_step() override;
 
         /**
+         * @brief 
+         * 
+         */
+        void engine_run_contact_added() override;
+
+        /**
          * @brief Jolt enforces the system to handle the shapes created instead
          * of itself. Otherwise the ref will reach 0 and the object will crash
          * as the shape is removed from the bopy. So a map was created to
@@ -55,7 +62,7 @@ namespace atlas::physics {
 
         //! @note Must be defined before physics can be initialized otherwise
         //! jolt cannot be created properly.
-        jolt_settings m_settings;
+        jolt::jolt_settings m_settings;
 
         ref<JPH::TempAllocatorImpl> m_temp_allocator;
         ref<JPH::PhysicsSystem> m_physics_system;
@@ -65,8 +72,9 @@ namespace atlas::physics {
         ref<object_vs_broadphase_layer> m_object_vs_broadphase_filter;
         ref<object_layer_pair_filter> m_object_layer_pair_filter;
 
+        ref<contact_listener> m_contact_listener;
+
         //! @note This map is to create the scope for shapes created by Jolt.
-        std::unordered_map<uint64_t, JPH::RefConst<JPH::Shape>>
-          m_shape_registry;
+        std::unordered_map<uint64_t, JPH::RefConst<JPH::Shape>> m_shape_registry;
     };
 };

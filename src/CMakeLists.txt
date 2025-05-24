@@ -60,11 +60,9 @@ set(
     ${INCLUDE_DIR}/physics/physics_3d/jolt/jolt_context.hpp
     ${INCLUDE_DIR}/physics/physics_3d/jolt/jolt_helper.hpp
 
-    #physics data
-    ${INCLUDE_DIR}/physics/physics_3d/components/jolt_settings.hpp
-    ${INCLUDE_DIR}/physics/physics_3d/components/jolt_config.hpp
-    ${INCLUDE_DIR}/physics/physics_3d/components/collider_body.hpp
-    ${INCLUDE_DIR}/physics/physics_3d/components/physics_body.hpp
+    ${INCLUDE_DIR}/physics/jolt-cpp/jolt_collision_manager.hpp
+    ${INCLUDE_DIR}/physics/jolt-cpp/jolt_collision.hpp
+    ${INCLUDE_DIR}/physics/jolt-cpp/jolt_contact_listener.hpp
 
     # Scene Stuff
     ${INCLUDE_DIR}/core/scene/components.hpp
@@ -146,6 +144,10 @@ set(
     ${SRC_DIR}/physics/physics_3d/physics_api.cpp
     ${SRC_DIR}/physics/physics_3d/physics_context.cpp
     ${SRC_DIR}/physics/physics_3d/physics.cpp
+
+    ${SRC_DIR}/physics/jolt-cpp/jolt_collision_manager.cpp
+    ${SRC_DIR}/physics/jolt-cpp/jolt_collision.cpp
+    ${SRC_DIR}/physics/jolt-cpp/jolt_contact_listener.cpp
 
     # Scene stuff
     ${SRC_DIR}/core/scene/world.cpp

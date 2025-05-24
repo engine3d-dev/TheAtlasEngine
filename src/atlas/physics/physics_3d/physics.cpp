@@ -17,12 +17,12 @@ namespace atlas::physics {
                 //   create_ref<jolt_api>(*p_physics_object->get<jolt_config>());
                 console_log_error("Getting here 3!\n");
                 engine_api = create_ref<jolt_context>(
-                  *p_physics_object->get<jolt_settings>());
+                  *p_physics_object->get<jolt::jolt_settings>());
 
                 //engine_api->create_bodies();
                 console_log_error("Getting here 4!\n");
                 return create_ref<physics_engine>(
-                  *p_physics_object->get<jolt_settings>(), engine_api);
+                  *p_physics_object->get<jolt::jolt_settings>(), engine_api);
             }
             default:
                 return nullptr;

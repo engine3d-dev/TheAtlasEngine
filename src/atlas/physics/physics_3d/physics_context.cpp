@@ -15,4 +15,8 @@ void physics_context::run_physics_step() {
     engine_run_physics_step();
 }
 
+void physics_context::contact_added_event() {
+    engine_run_contact_added();
+}
+
 }

@@ -2,7 +2,7 @@
 
 namespace atlas::physics {
 
-    jolt_api::jolt_api(jolt_config p_config)
+    jolt_api::jolt_api(jolt::jolt_config p_config)
     {
         m_config = p_config;
     }

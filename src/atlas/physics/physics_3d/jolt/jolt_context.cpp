@@ -2,8 +2,8 @@
 #include <cstdarg>
 #include <engine_logger.hpp>
 
-#include <physics/physics_3d/data/physics_body.hpp>
-#include <physics/physics_3d/data/collider_body.hpp>
+#include <physics/jolt-cpp/jolt_components.hpp>
+#include <physics/jolt-cpp/jolt_components.hpp>
 #include <components/transform.hpp>
 #include <physics/types.hpp>
 #include <scene/scene.hpp>
@@ -21,7 +21,7 @@ namespace atlas::physics {
     }
 
     static bool factory_initialized = false;
-    jolt_context::jolt_context(jolt_settings p_settings) {
+    jolt_context::jolt_context(jolt::jolt_settings p_settings) {
         JPH::RegisterDefaultAllocator();
         JPH::Trace = trace_impl;
 
@@ -59,7 +59,9 @@ namespace atlas::physics {
                                *m_object_vs_broadphase_filter,
                                *m_object_layer_pair_filter);
 
-        console_log_info("jolt context", "Physics system initialized.");
+        m_contact_listener = create_ref<contact_listener>();
+
+        m_physics_system->SetContactListener(m_contact_listener.get());
     }
 
     void add_body(flecs::entity e,
@@ -116,14 +118,15 @@ namespace atlas::physics {
                 return;
         }
 
+        console_log_info("Activating sphere type: {}\n", body.body_type);
         JPH::BodyCreationSettings body_settings(
           created_shape,
           to_jph(location.position),
           to_jph(location.quaterion_rotation),
           (JPH::EMotionType)body.body_type,
-          (uint32_t)body.body_layer_type);
+          body.body_layer_type);
 
-        body_settings.mUserData = static_cast<uintptr_t>(e.raw_id());
+        body_settings.mUserData = static_cast<uint64_t>(e.id());
         settings_list.push_back(std::move(body_settings));
         entity_list.push_back(e);
     }
@@ -189,7 +192,7 @@ namespace atlas::physics {
           JPH::EMotionType::Static,
           0);
 
-        body_settings.mUserData = static_cast<uintptr_t>(e.raw_id());
+        body_settings.mUserData = static_cast<uint64_t>(e.id());
 
         settings_list.push_back(std::move(body_settings));
         entity_list.push_back(e);
@@ -252,7 +255,7 @@ namespace atlas::physics {
                 continue;
             }
 
-            JPH::Body* body = body_interface.CreateBodyWithID((JPH::BodyID)settings.mUserData,settings);
+            JPH::Body* body = body_interface.CreateBody(settings);
             if (!body) {
                 console_log_fatal("CreateBody returned nullptr at index {}", i);
                 continue;
@@ -298,7 +301,7 @@ namespace atlas::physics {
             body_interface.DestroyBodies(all_body_ids.data(),
                                          (int)(all_body_ids.size()));
 
-           std::unordered_map<uint64_t, JPH::RefConst<JPH::Shape>> empty;
+            std::unordered_map<uint64_t, JPH::RefConst<JPH::Shape>> empty;
 
             m_shape_registry.swap(empty);
         }
@@ -310,12 +313,40 @@ namespace atlas::physics {
 
     void jolt_context::engine_run_physics_step() {
 
-        console_log_info("jolt context", "Running physics step...");
+        auto& body_interface = m_physics_system->GetBodyInterface();
 
+        // Step the simulation
         m_physics_system->Update(application::delta_time(),
                                  (int)application::physics_step(),
                                  m_temp_allocator.get(),
                                  m_thread_system.get());
+
+        JPH::BodyIDVector all_body_ids;
+        m_physics_system->GetBodies(all_body_ids);
+        JPH::Vec3 position;
+        for (JPH::BodyID id : all_body_ids) {
+            if (!body_interface.IsActive(id)) {
+                position = body_interface.GetPosition(id);
+                console_log_info(
+                  "Target not active: {}, Position: ({},{},{})\n",
+                  (uint8_t)body_interface.GetMotionType(id),
+                  position.GetX(),
+                  position.GetY(),
+                  position.GetZ());
+
+                continue;
+            }
+            position = body_interface.GetPosition(id);
+            console_log_info("Body ID {}: Position = ({}, {}, {})",
+                             id.GetIndex(),
+                             position.GetX(),
+                             position.GetY(),
+                             position.GetZ());
+        }
+    }
+
+    void jolt_context::engine_run_contact_added() {
+      m_contact_listener->run_events_added();
     }
 
     jolt_context::~jolt_context() = default;

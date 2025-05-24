@@ -1,6 +1,6 @@
 #pragma once
 
-#include <physics/physics_3d/data/physics_body.hpp>
+#include <physics/jolt-cpp/jolt_components.hpp>
 #include <physics/physics_3d/physics_engine.hpp>
 #include <core/scene/scene_object.hpp>
 

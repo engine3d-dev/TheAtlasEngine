@@ -1,13 +1,14 @@
+#pragma once
+
 #include <Jolt/Jolt.h>
 #include <Jolt/Physics/Collision/ContactListener.h>
-#include <physics/physics_3d/data/contact_event.hpp>
-#include <vector>
+#include <physics/jolt-cpp/jolt_components.hpp>
+#include <core/scene/scene.hpp>
 
 namespace atlas::physics {
-    class contact_listener : public JPH::ContactListener {
-    public:
 
-        contact_listener();
+    class contact_listener : public JPH::ContactListener {
+    private:
         JPH::ValidateResult OnContactValidate(
           const JPH::Body& in_body1,
           const JPH::Body& in_body2,
@@ -27,11 +28,20 @@ namespace atlas::physics {
         void OnContactRemoved(
           const JPH::SubShapeIDPair& in_sub_shape_pair) override;
 
+    public:
+        contact_listener();
         void clear_events();
+        void run_events_added();
+        void run_events_persisted();
+        void run_events_removed();
 
     private:
         //! @note This is a temparary solve, waiting for event handlers
-        std::vector<contact_event> m_contact_list;
+        std::vector<jolt::contact_event> m_contacts_added;
+        std::vector<jolt::contact_event> m_contacts_persisted;
+        std::vector<jolt::contact_event> m_contacts_removed;
+
+        ref<scene_scope> m_scene;
         flecs::world m_registry;
     };
 };
