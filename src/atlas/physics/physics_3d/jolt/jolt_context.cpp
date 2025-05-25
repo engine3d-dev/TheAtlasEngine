@@ -313,7 +313,7 @@ namespace atlas::physics {
 
     void jolt_context::engine_run_physics_step() {
 
-        auto& body_interface = m_physics_system->GetBodyInterface();
+        //auto& body_interface = m_physics_system->GetBodyInterface();
 
         // Step the simulation
         m_physics_system->Update(application::delta_time(),
@@ -321,32 +321,41 @@ namespace atlas::physics {
                                  m_temp_allocator.get(),
                                  m_thread_system.get());
 
-        JPH::BodyIDVector all_body_ids;
-        m_physics_system->GetBodies(all_body_ids);
-        JPH::Vec3 position;
-        for (JPH::BodyID id : all_body_ids) {
-            if (!body_interface.IsActive(id)) {
-                position = body_interface.GetPosition(id);
-                console_log_info(
-                  "Target not active: {}, Position: ({},{},{})\n",
-                  (uint8_t)body_interface.GetMotionType(id),
-                  position.GetX(),
-                  position.GetY(),
-                  position.GetZ());
+        //JPH::BodyIDVector all_body_ids;
+        //m_physics_system->GetBodies(all_body_ids);
+        // JPH::Vec3 position;
+        // for (JPH::BodyID id : all_body_ids) {
+        //     if (!body_interface.IsActive(id)) {
+        //         position = body_interface.GetPosition(id);
 
-                continue;
-            }
-            position = body_interface.GetPosition(id);
-            console_log_info("Body ID {}: Position = ({}, {}, {})",
-                             id.GetIndex(),
-                             position.GetX(),
-                             position.GetY(),
-                             position.GetZ());
-        }
+        //           console_log_info("Body ID {}: Position = ({}, {}, {})",
+        //                      id.GetIndex(),
+        //                      position.GetX(),
+        //                      position.GetY(),
+        //                      position.GetZ());
+
+        //         continue;
+        //     }
+        //     position = body_interface.GetPosition(id);
+            // console_log_info(
+            //       "Target Velocity\nX:{},Y:{},Z:{}\nX:{},Y:{},Z:{}\nX:{},Y:{},Z:{}\n\n\nPosition: ({},{},{})\n",
+            //       body_interface.GetInverseInertia(id).GetAxisX().GetX(),
+            //       body_interface.GetInverseInertia(id).GetAxisX().GetY(),
+            //       body_interface.GetInverseInertia(id).GetAxisX().GetZ(),
+            //       body_interface.GetInverseInertia(id).GetAxisY().GetX(),
+            //       body_interface.GetInverseInertia(id).GetAxisY().GetY(),
+            //       body_interface.GetInverseInertia(id).GetAxisY().GetZ(),
+            //       body_interface.GetInverseInertia(id).GetAxisZ().GetX(),
+            //       body_interface.GetInverseInertia(id).GetAxisZ().GetY(),
+            //       body_interface.GetInverseInertia(id).GetAxisZ().GetZ(),
+            //       position.GetX(),
+            //       position.GetY(),
+            //       position.GetZ());
+        // }
     }
 
     void jolt_context::engine_run_contact_added() {
-      m_contact_listener->run_events_added();
+        m_contact_listener->run_events_added();
     }
 
     jolt_context::~jolt_context() = default;

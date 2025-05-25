@@ -114,6 +114,7 @@ namespace atlas::physics {
     void contact_listener::run_events_added()
     {
         jolt::contact_event event;
+        console_log_fatal("Contact Size: {}\n", m_contacts_added.size());
         for(uint64_t i = 0; i < m_contacts_added.size(); i++)
         {
             event = m_contacts_added.back();
@@ -130,6 +131,7 @@ namespace atlas::physics {
             else {
                 console_log_error("Object does not exsist: {}, or does not have a collider event: {}\n", target_entity.is_alive(), target_entity.has<collider_event>());
             }
+            m_contacts_added.pop_back();
         }
     }
 }
