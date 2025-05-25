@@ -6,7 +6,6 @@
 #include <Jolt/Jolt.h>
 #include <Jolt/Physics/Collision/ContactListener.h>
 
-
 namespace atlas::physics {
 
     /** ----------------- Jolt Shapes and Collisions ---------------- *
@@ -22,7 +21,6 @@ namespace atlas::physics {
         Default = 0,
         JobSystem = 1,
     };
-
 
     /**
      * @note Some of this data is not required depending on the shape
@@ -78,7 +76,7 @@ namespace atlas::physics {
         uint32_t body_id = 0;
     };
 
-    struct collider_event{
+    struct collider_event {
         uint64_t id = 0;
     };
 }
@@ -178,6 +176,8 @@ namespace atlas::physics::jolt {
         //! @note FIXME: maybe add a debug bool here
     };
 
+    // This might be able to be generalized eventually but we will have to
+    // create our own manifold before that happens.
     struct contact_event {
         uint64_t entity_a = 0;
         uint64_t entity_b = 0;

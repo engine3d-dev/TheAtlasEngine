@@ -44,8 +44,10 @@ namespace atlas::physics {
         void engine_run_physics_step() override;
 
         /**
-         * @brief 
-         * 
+         * @brief Runs a given <contact added> the frame the contact was
+         * created. Allows for all contacts to run after the physics has
+         * finished as to stop thread collision issues.
+         *
          */
         void engine_run_contact_added() override;
 
@@ -75,6 +77,7 @@ namespace atlas::physics {
         ref<contact_listener> m_contact_listener;
 
         //! @note This map is to create the scope for shapes created by Jolt.
-        std::unordered_map<uint64_t, JPH::RefConst<JPH::Shape>> m_shape_registry;
+        std::unordered_map<uint64_t, JPH::RefConst<JPH::Shape>>
+          m_shape_registry;
     };
 };

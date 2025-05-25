@@ -2,6 +2,8 @@
 namespace atlas::physics {
     class physics_context {
     public:
+        // Pass through function to allow private virtual functions to be called
+        // publically without messing up the virtual table.
         void create_bodies();
         void clean_bodies();
         void run_physics_step();
@@ -20,7 +22,6 @@ namespace atlas::physics {
          */
 
     private:
-
         virtual void engine_create_physics_bodies() = 0;
         virtual void engine_clean_physics_bodies() = 0;
         virtual void engine_run_physics_step() = 0;
