@@ -114,7 +114,7 @@ namespace atlas::physics {
     void contact_listener::run_events_added()
     {
         jolt::contact_event event;
-        console_log_fatal("Contact Size: {}\n", m_contacts_added.size());
+        // console_log_fatal("Contact Size: {}\n", m_contacts_added.size());
         for(uint64_t i = 0; i < m_contacts_added.size(); i++)
         {
             event = m_contacts_added.back();

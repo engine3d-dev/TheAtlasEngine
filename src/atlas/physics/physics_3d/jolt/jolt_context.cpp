@@ -11,6 +11,13 @@
 
 namespace atlas::physics {
 
+// Temporary solution to logging in debug mode vs regular mode can change later.
+#ifdef JPH_ENABLE_ASSERTS
+#define JPH_LOG(...) console_log_info(__VA_ARGS__)
+#else
+#define JPH_LOG(...) (void)0
+#endif
+
     static void trace_impl(const char* p_in_fmt, ...) {
         va_list list;
         va_start(list, p_in_fmt);
@@ -25,11 +32,15 @@ namespace atlas::physics {
         JPH::RegisterDefaultAllocator();
         JPH::Trace = trace_impl;
 
+        JPH_LOG("Tace implemented... Starting shape factory.");
+
         if (!factory_initialized) {
             JPH::Factory::sInstance = new JPH::Factory();
             JPH::RegisterTypes();
             factory_initialized = true;
         }
+
+        JPH_LOG("Shape factory created... Allocating memory");
 
         m_settings = p_settings;
         m_temp_allocator = create_ref<JPH::TempAllocatorImpl>(10 * 1024 * 1024);
@@ -40,7 +51,15 @@ namespace atlas::physics {
           create_ref<object_vs_broadphase_layer>();
         m_object_layer_pair_filter = create_ref<object_layer_pair_filter>();
 
+        JPH_LOG("Memory Allocated... Starting thread manager.");
+        JPH_LOG("Thread Values: ({},{},{})\n",
+                m_settings.max_jobs,
+                m_settings.max_jobs,
+                m_settings.physics_threads);
+
         if (m_settings.thread_type == thread_system::Default) {
+
+            console_log_error("Thread1");
             m_thread_system = create_scope<JPH::JobSystemThreadPool>(
               m_settings.max_jobs,
               m_settings.max_barriers,
@@ -51,6 +70,8 @@ namespace atlas::physics {
                               (int)m_settings.thread_type);
         }
 
+        JPH_LOG("Thread manager created... Starting initialization.");
+
         m_physics_system->Init(m_settings.max_bodies,
                                0,
                                m_settings.max_body_pairs,
@@ -59,9 +80,12 @@ namespace atlas::physics {
                                *m_object_vs_broadphase_filter,
                                *m_object_layer_pair_filter);
 
+        JPH_LOG("Init completed... Starting contact_listener.");
         m_contact_listener = create_ref<contact_listener>();
 
         m_physics_system->SetContactListener(m_contact_listener.get());
+
+        JPH_LOG("All initialized... engine created.");
     }
 
     void add_body(flecs::entity e,
@@ -313,7 +337,23 @@ namespace atlas::physics {
 
     void jolt_context::engine_run_physics_step() {
 
-        //auto& body_interface = m_physics_system->GetBodyInterface();
+        // Temporary solve for transform fix change later.
+        ref<world_scope> world_object =
+          system_registry::get_world("Editor World");
+        if (!world_object) {
+            console_log_error("World not found.");
+            return;
+        }
+
+        ref<scene_scope> scene = world_object->get_scene("LevelScene");
+        if (!scene) {
+            console_log_error("Scene not found.");
+            return;
+        }
+
+        flecs::world registry = *scene;
+
+        auto& body_interface = m_physics_system->GetBodyInterface();
 
         // Step the simulation
         m_physics_system->Update(application::delta_time(),
@@ -321,8 +361,30 @@ namespace atlas::physics {
                                  m_temp_allocator.get(),
                                  m_thread_system.get());
 
-        //JPH::BodyIDVector all_body_ids;
-        //m_physics_system->GetBodies(all_body_ids);
+        //! @note FIXME: Temporary solve for transform fix
+
+        JPH::BodyIDVector all_body_ids;
+        m_physics_system->GetBodies(all_body_ids);
+
+        for (JPH::BodyID id : all_body_ids) {
+            flecs::entity flecs_object;
+            flecs_object =
+              flecs::entity(registry, body_interface.GetUserData(id));
+            flecs::ref<transform> location;
+            location = flecs_object.get_ref<transform>();
+
+
+            JPH::RVec3 physics_position;
+            physics_position = body_interface.GetPosition(id);
+            location->Position = { physics_position.GetX(),
+                                  physics_position.GetY(),
+                                  physics_position.GetZ() };
+            JPH::Vec3 physics_rotation;
+            physics_rotation = body_interface.GetRotation(id).GetEulerAngles();
+            location->Rotation = { physics_rotation.GetX(),
+                                  physics_rotation.GetY(),
+                                  physics_rotation.GetZ() };
+        }
         // JPH::Vec3 position;
         // for (JPH::BodyID id : all_body_ids) {
         //     if (!body_interface.IsActive(id)) {
@@ -337,20 +399,22 @@ namespace atlas::physics {
         //         continue;
         //     }
         //     position = body_interface.GetPosition(id);
-            // console_log_info(
-            //       "Target Velocity\nX:{},Y:{},Z:{}\nX:{},Y:{},Z:{}\nX:{},Y:{},Z:{}\n\n\nPosition: ({},{},{})\n",
-            //       body_interface.GetInverseInertia(id).GetAxisX().GetX(),
-            //       body_interface.GetInverseInertia(id).GetAxisX().GetY(),
-            //       body_interface.GetInverseInertia(id).GetAxisX().GetZ(),
-            //       body_interface.GetInverseInertia(id).GetAxisY().GetX(),
-            //       body_interface.GetInverseInertia(id).GetAxisY().GetY(),
-            //       body_interface.GetInverseInertia(id).GetAxisY().GetZ(),
-            //       body_interface.GetInverseInertia(id).GetAxisZ().GetX(),
-            //       body_interface.GetInverseInertia(id).GetAxisZ().GetY(),
-            //       body_interface.GetInverseInertia(id).GetAxisZ().GetZ(),
-            //       position.GetX(),
-            //       position.GetY(),
-            //       position.GetZ());
+        // console_log_info(
+        //       "Target
+        //       Velocity\nX:{},Y:{},Z:{}\nX:{},Y:{},Z:{}\nX:{},Y:{},Z:{}\n\n\nPosition:
+        //       ({},{},{})\n",
+        //       body_interface.GetInverseInertia(id).GetAxisX().GetX(),
+        //       body_interface.GetInverseInertia(id).GetAxisX().GetY(),
+        //       body_interface.GetInverseInertia(id).GetAxisX().GetZ(),
+        //       body_interface.GetInverseInertia(id).GetAxisY().GetX(),
+        //       body_interface.GetInverseInertia(id).GetAxisY().GetY(),
+        //       body_interface.GetInverseInertia(id).GetAxisY().GetZ(),
+        //       body_interface.GetInverseInertia(id).GetAxisZ().GetX(),
+        //       body_interface.GetInverseInertia(id).GetAxisZ().GetY(),
+        //       body_interface.GetInverseInertia(id).GetAxisZ().GetZ(),
+        //       position.GetX(),
+        //       position.GetY(),
+        //       position.GetZ());
         // }
     }
 
