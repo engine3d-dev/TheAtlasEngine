@@ -15,7 +15,7 @@ namespace atlas::vk {
     public:
         vk_driver() = default;
         vk_driver(const vk_physical_driver& p_physical);
-        ~vk_driver();
+        ~vk_driver() = default;
 
         [[nodiscard]] VkQueue graphics_queue() const {
             return m_device_queues.graphics_queue;
@@ -29,7 +29,7 @@ namespace atlas::vk {
         // Now that I think about this, I may as well use this to get our
         // specific queue family from this logical device
         VkQueue get_queue(const vk_queue_options& p_present_queue);
-        
+
         [[nodiscard]] VkFormat depth_format() const;
 
         operator VkDevice() const { return m_driver; }

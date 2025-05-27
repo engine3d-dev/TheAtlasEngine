@@ -18,8 +18,8 @@ namespace atlas::vk {
             vkGetPhysicalDeviceFormatProperties(
               p_physical, current_format, &format_properties);
 
-            if (p_tiling == VK_IMAGE_TILING_LINEAR){
-                if(format_properties.linearTilingFeatures & p_feature_flag) {
+            if (p_tiling == VK_IMAGE_TILING_LINEAR) {
+                if (format_properties.linearTilingFeatures & p_feature_flag) {
                     format = current_format;
                 }
             }
@@ -32,7 +32,8 @@ namespace atlas::vk {
         return format;
     }
 
-    [[maybe_unused]] static VkFormat search_depth_format(const VkPhysicalDevice& p_physical) {
+    [[maybe_unused]] static VkFormat search_depth_format(
+      const VkPhysicalDevice& p_physical) {
         std::vector<VkFormat> candidate_formats = {
             VK_FORMAT_D32_SFLOAT,
             VK_FORMAT_D32_SFLOAT_S8_UINT,
@@ -49,17 +50,19 @@ namespace atlas::vk {
 
     vk_driver* vk_driver::s_instance = nullptr;
 
-    vk_driver::vk_driver(const vk_physical_driver& p_physical) : m_physical(p_physical) {
+    vk_driver::vk_driver(const vk_physical_driver& p_physical)
+      : m_physical(p_physical) {
         console_log_info("vk_driver::vk_driver Begin Initialization!!!");
         m_depth_format_selected = search_depth_format(m_physical);
 
         float queue_priority[1] = { 0.0f };
-        
+
         std::vector<const char*> device_extension = {
             VK_KHR_SWAPCHAIN_EXTENSION_NAME
         };
 
-        uint32_t graphics_index = m_physical.read_queue_family_indices().graphics;
+        uint32_t graphics_index =
+          m_physical.read_queue_family_indices().graphics;
 
         console_log_trace("Graphics Queue Indices = {}", graphics_index);
 
@@ -92,24 +95,28 @@ namespace atlas::vk {
 
         vk_check(vkCreateDevice(m_physical, &create_info, nullptr, &m_driver),
                  "vkCreateDevice",
-                 __FILE__, __LINE__, __FUNCTION__);
+                 __FILE__,
+                 __LINE__,
+                 __FUNCTION__);
 
         vkGetDeviceQueue(
           m_driver, graphics_index, 0, &m_device_queues.graphics_queue);
-        
+
         s_instance = this;
 
         // vk_context::submit_resource_free([this](){
-        //     console_log_trace("vk_driver called by vk_contexgt::submit_resource_free!!!");
-        //     vkDestroyDevice(m_driver, nullptr);
+        //     console_log_trace("vk_driver called by
+        //     vk_contexgt::submit_resource_free!!!"); vkDestroyDevice(m_driver,
+        //     nullptr);
         // });
 
         console_log_info("vk_driver::vk_driver end initialization!!!\n\n");
     }
 
     //! @note Returns -1 if there are no flags available/compatible/valid
-    uint32_t vk_driver::select_memory_type(uint32_t p_type_filter,
-                                VkMemoryPropertyFlags p_property_flag) {
+    uint32_t vk_driver::select_memory_type(
+      uint32_t p_type_filter,
+      VkMemoryPropertyFlags p_property_flag) {
         VkPhysicalDeviceMemoryProperties mem_props;
         vkGetPhysicalDeviceMemoryProperties(m_physical, &mem_props);
 
@@ -125,7 +132,7 @@ namespace atlas::vk {
     }
 
     VkQueue vk_driver::get_queue(const vk_queue_options& p_present_queue) {
-        VkQueue queue_handler=nullptr;
+        VkQueue queue_handler = nullptr;
         vkGetDeviceQueue(m_driver,
                          p_present_queue.family_index,
                          p_present_queue.queue_index,
@@ -133,13 +140,8 @@ namespace atlas::vk {
 
         return queue_handler;
     }
-    
+
     VkFormat vk_driver::depth_format() const {
         return m_depth_format_selected;
-    }
-
-    vk_driver::~vk_driver() {
-        console_log_warn("~vk_driver is called!!!");
-        // vkDestroyDevice(m_driver, nullptr);
     }
 };
