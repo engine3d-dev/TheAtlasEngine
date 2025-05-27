@@ -63,6 +63,7 @@ set(
     ${INCLUDE_DIR}/physics/jolt-cpp/jolt_collision_manager.hpp
     ${INCLUDE_DIR}/physics/jolt-cpp/jolt_collision.hpp
     ${INCLUDE_DIR}/physics/jolt-cpp/jolt_contact_listener.hpp
+    ${INCLUDE_DIR}/physics/jolt-cpp/jolt_error_handler.hpp
 
     # Scene Stuff
     ${INCLUDE_DIR}/core/scene/components.hpp
@@ -148,6 +149,7 @@ set(
     ${SRC_DIR}/physics/jolt-cpp/jolt_collision_manager.cpp
     ${SRC_DIR}/physics/jolt-cpp/jolt_collision.cpp
     ${SRC_DIR}/physics/jolt-cpp/jolt_contact_listener.cpp
+    ${SRC_DIR}/physics/jolt-cpp/jolt_error_handler.cpp
 
     # Scene stuff
     ${SRC_DIR}/core/scene/world.cpp

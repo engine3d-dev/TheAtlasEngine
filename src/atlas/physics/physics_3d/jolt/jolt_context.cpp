@@ -1,38 +1,20 @@
+#include <physics/jolt-cpp/jolt_error_handler.hpp>
 #include <physics/physics_3d/jolt/jolt_context.hpp>
-#include <cstdarg>
 #include <engine_logger.hpp>
 
-#include <physics/jolt-cpp/jolt_components.hpp>
-#include <physics/jolt-cpp/jolt_components.hpp>
-#include <components/transform.hpp>
 #include <physics/types.hpp>
 #include <scene/scene.hpp>
 #include <physics/physics_3d/jolt/jolt_helper.hpp>
 
 namespace atlas::physics {
 
-// Temporary solution to logging in debug mode vs regular mode can change later.
-#ifdef JPH_ENABLE_ASSERTS
-#define JPH_LOG(...) console_log_info(__VA_ARGS__)
-#else
-#define JPH_LOG(...) (void)0
-#endif
-
-    static void trace_impl(const char* p_in_fmt, ...) {
-        va_list list;
-        va_start(list, p_in_fmt);
-        char buffer[1024];
-        vsnprintf(buffer, sizeof(buffer), p_in_fmt, list);
-        va_end(list);
-        console_log_error("{}", buffer);
-    }
-
     static bool factory_initialized = false;
     jolt_context::jolt_context(jolt::jolt_settings p_settings) {
         JPH::RegisterDefaultAllocator();
         JPH::Trace = trace_impl;
+        JPH_IF_ENABLE_ASSERTS(JPH::AssertFailed = assert_failed_impl;)
 
-        JPH_LOG("Tace implemented... Starting shape factory.");
+        JPH_LOG("Trace implemented... Starting shape factory.");
 
         if (!factory_initialized) {
             JPH::Factory::sInstance = new JPH::Factory();
@@ -43,7 +25,7 @@ namespace atlas::physics {
         JPH_LOG("Shape factory created... Allocating memory");
 
         m_settings = p_settings;
-        m_temp_allocator = create_ref<JPH::TempAllocatorImpl>(10 * 1024 * 1024);
+        m_temp_allocator = create_ref<JPH::TempAllocatorImpl>(m_settings.allocation_amount);
         m_physics_system = create_ref<JPH::PhysicsSystem>();
         m_broad_phase_layer_interface =
           create_ref<broad_phase_layer_interface>();
@@ -52,16 +34,11 @@ namespace atlas::physics {
         m_object_layer_pair_filter = create_ref<object_layer_pair_filter>();
 
         JPH_LOG("Memory Allocated... Starting thread manager.");
-        JPH_LOG("Thread Values: ({},{},{})\n",
-                m_settings.max_jobs,
-                m_settings.max_jobs,
-                m_settings.physics_threads);
 
         if (m_settings.thread_type == thread_system::Default) {
 
-            console_log_error("Thread1");
             m_thread_system = create_scope<JPH::JobSystemThreadPool>(
-              m_settings.max_jobs,
+              std::pow(2, m_settings.max_jobs_power),
               m_settings.max_barriers,
               m_settings.physics_threads);
         }
@@ -88,135 +65,100 @@ namespace atlas::physics {
         JPH_LOG("All initialized... engine created.");
     }
 
-    void add_body(flecs::entity e,
-                  const physics_body& body,
-                  const collider_body& collider,
-                  const transform_physics& location,
-                  std::vector<JPH::BodyCreationSettings>& settings_list,
-                  std::vector<flecs::entity>& entity_list,
-                  std::unordered_map<uint64_t, JPH::RefConst<JPH::Shape>>&
-                    p_shape_registry) {
-        JPH::Shape* created_shape = nullptr;
+    JPH::RefConst<JPH::Shape> jolt_context::create_shape_from_collider(
+      flecs::entity e,
+      const collider_body& collider) {
+        using namespace JPH;
+
+        RefConst<Shape> created_shape;
 
         switch (collider.shape_type) {
             case collider_shape::Box: {
-                JPH::BoxShapeSettings shape_settings(
-                  to_jph(collider.half_extents));
+                BoxShapeSettings shape_settings(to_jph(collider.half_extents));
                 auto result = shape_settings.Create();
                 if (result.HasError()) {
                     console_log_fatal("Box shape creation error: {}",
                                       result.GetError());
-                    return;
+                    return nullptr;
                 }
                 created_shape = result.Get();
-                p_shape_registry[e.id()] = created_shape;
                 break;
             }
             case collider_shape::Sphere: {
-                JPH::SphereShapeSettings shape_settings(collider.radius);
+                SphereShapeSettings shape_settings(collider.radius);
                 auto result = shape_settings.Create();
                 if (result.HasError()) {
                     console_log_fatal("Sphere shape creation error: {}",
                                       result.GetError());
-                    return;
+                    return nullptr;
                 }
                 created_shape = result.Get();
-                p_shape_registry[e.id()] = created_shape;
                 break;
             }
             case collider_shape::Capsule: {
-                JPH::CapsuleShapeSettings shape_settings(
+                CapsuleShapeSettings shape_settings(
                   collider.capsule_half_height, collider.radius);
                 auto result = shape_settings.Create();
                 if (result.HasError()) {
                     console_log_fatal("Capsule shape creation error: {}",
                                       result.GetError());
-                    return;
+                    return nullptr;
                 }
                 created_shape = result.Get();
-                p_shape_registry[e.id()] = created_shape;
                 break;
             }
             default:
                 console_log_fatal("Unknown shape type.");
-                return;
+                return nullptr;
         }
 
-        console_log_info("Activating sphere type: {}\n", body.body_type);
+        JPH_ASSERT(created_shape != nullptr);
+        m_shape_registry[e.id()] = created_shape;
+        return created_shape;
+    }
+
+    void jolt_context::add_body(
+      flecs::entity e,
+      const physics_body& body,
+      const collider_body& collider,
+      const transform_physics& location,
+      std::vector<JPH::BodyCreationSettings>& settings_list,
+      std::vector<flecs::entity>& entity_list) {
+        auto shape = create_shape_from_collider(e, collider);
+        if (!shape)
+            return;
+
         JPH::BodyCreationSettings body_settings(
-          created_shape,
+          shape,
           to_jph(location.position),
           to_jph(location.quaterion_rotation),
-          (JPH::EMotionType)body.body_type,
+          static_cast<JPH::EMotionType>(body.body_type),
           body.body_layer_type);
 
-        body_settings.mUserData = static_cast<uint64_t>(e.id());
+        body_settings.mUserData = (uint64_t)(e.id());
+
         settings_list.push_back(std::move(body_settings));
         entity_list.push_back(e);
     }
 
-    void add_body_collider(
+    void jolt_context::add_body_collider(
       flecs::entity e,
       const collider_body& collider,
       const transform_physics& location,
       std::vector<JPH::BodyCreationSettings>& settings_list,
-      std::vector<flecs::entity>& entity_list,
-      std::unordered_map<uint64_t, JPH::RefConst<JPH::Shape>>&
-        p_shape_registry) {
-        JPH::Shape* created_shape = nullptr;
-
-        switch (collider.shape_type) {
-            case collider_shape::Box: {
-                JPH::BoxShapeSettings shape_settings(
-                  to_jph(collider.half_extents));
-                auto result = shape_settings.Create();
-                if (result.HasError()) {
-                    console_log_fatal("Box shape creation error: {}",
-                                      result.GetError());
-                    return;
-                }
-                created_shape = result.Get();
-                p_shape_registry[e.id()] = created_shape;
-                break;
-            }
-            case collider_shape::Sphere: {
-                JPH::SphereShapeSettings shape_settings(collider.radius);
-                auto result = shape_settings.Create();
-                if (result.HasError()) {
-                    console_log_fatal("Sphere shape creation error: {}",
-                                      result.GetError());
-                    return;
-                }
-                created_shape = result.Get();
-                p_shape_registry[e.id()] = created_shape;
-                break;
-            }
-            case collider_shape::Capsule: {
-                JPH::CapsuleShapeSettings shape_settings(
-                  collider.capsule_half_height, collider.radius);
-                auto result = shape_settings.Create();
-                if (result.HasError()) {
-                    console_log_fatal("Capsule shape creation error: {}",
-                                      result.GetError());
-                    return;
-                }
-                created_shape = result.Get();
-                p_shape_registry[e.id()] = created_shape;
-                break;
-            }
-            default:
-                console_log_fatal("Unknown shape type.");
-                return;
-        }
+      std::vector<flecs::entity>& entity_list) {
+        auto shape = create_shape_from_collider(e, collider);
+        if (!shape)
+            return;
 
         JPH::BodyCreationSettings body_settings(
-          created_shape,
+          shape,
           to_jph(location.position),
           to_jph(location.quaterion_rotation),
           JPH::EMotionType::Static,
-          0);
+          body_layer::NonMoving);
 
-        body_settings.mUserData = static_cast<uint64_t>(e.id());
+        body_settings.mUserData = (uint64_t)(e.id());
 
         settings_list.push_back(std::move(body_settings));
         entity_list.push_back(e);
@@ -244,13 +186,7 @@ namespace atlas::physics {
                     const physics_body& phys,
                     const collider_body& col,
                     const transform_physics& loc) {
-              add_body(e,
-                       phys,
-                       col,
-                       loc,
-                       settings_list,
-                       entity_list,
-                       m_shape_registry);
+              add_body(e, phys, col, loc, settings_list, entity_list);
           });
 
         scene->query_builder<collider_body, transform_physics>()
@@ -258,8 +194,7 @@ namespace atlas::physics {
           .each([&](flecs::entity e,
                     const collider_body& col,
                     const transform_physics& loc) {
-              add_body_collider(
-                e, col, loc, settings_list, entity_list, m_shape_registry);
+              add_body_collider(e, col, loc, settings_list, entity_list);
           });
 
         if (settings_list.empty()) {
@@ -272,7 +207,7 @@ namespace atlas::physics {
         body_ids.reserve(settings_list.size());
 
         for (size_t i = 0; i < settings_list.size(); ++i) {
-            const auto& settings = settings_list[i];
+            JPH::BodyCreationSettings& settings = settings_list[i];
 
             if (!settings.GetShape()) {
                 console_log_fatal("Shape is null at index {}", i);
@@ -332,7 +267,7 @@ namespace atlas::physics {
 
         console_log_info("Removed All shapes and bodies...\n");
 
-        //! @note this is where you would deserialize
+        // This is where you would deserialize
     }
 
     void jolt_context::engine_run_physics_step() {
@@ -373,49 +308,17 @@ namespace atlas::physics {
             flecs::ref<transform> location;
             location = flecs_object.get_ref<transform>();
 
-
             JPH::RVec3 physics_position;
             physics_position = body_interface.GetPosition(id);
             location->Position = { physics_position.GetX(),
-                                  physics_position.GetY(),
-                                  physics_position.GetZ() };
+                                   physics_position.GetY(),
+                                   physics_position.GetZ() };
             JPH::Vec3 physics_rotation;
             physics_rotation = body_interface.GetRotation(id).GetEulerAngles();
             location->Rotation = { physics_rotation.GetX(),
-                                  physics_rotation.GetY(),
-                                  physics_rotation.GetZ() };
+                                   physics_rotation.GetY(),
+                                   physics_rotation.GetZ() };
         }
-        // JPH::Vec3 position;
-        // for (JPH::BodyID id : all_body_ids) {
-        //     if (!body_interface.IsActive(id)) {
-        //         position = body_interface.GetPosition(id);
-
-        //           console_log_info("Body ID {}: Position = ({}, {}, {})",
-        //                      id.GetIndex(),
-        //                      position.GetX(),
-        //                      position.GetY(),
-        //                      position.GetZ());
-
-        //         continue;
-        //     }
-        //     position = body_interface.GetPosition(id);
-        // console_log_info(
-        //       "Target
-        //       Velocity\nX:{},Y:{},Z:{}\nX:{},Y:{},Z:{}\nX:{},Y:{},Z:{}\n\n\nPosition:
-        //       ({},{},{})\n",
-        //       body_interface.GetInverseInertia(id).GetAxisX().GetX(),
-        //       body_interface.GetInverseInertia(id).GetAxisX().GetY(),
-        //       body_interface.GetInverseInertia(id).GetAxisX().GetZ(),
-        //       body_interface.GetInverseInertia(id).GetAxisY().GetX(),
-        //       body_interface.GetInverseInertia(id).GetAxisY().GetY(),
-        //       body_interface.GetInverseInertia(id).GetAxisY().GetZ(),
-        //       body_interface.GetInverseInertia(id).GetAxisZ().GetX(),
-        //       body_interface.GetInverseInertia(id).GetAxisZ().GetY(),
-        //       body_interface.GetInverseInertia(id).GetAxisZ().GetZ(),
-        //       position.GetX(),
-        //       position.GetY(),
-        //       position.GetZ());
-        // }
     }
 
     void jolt_context::engine_run_contact_added() {

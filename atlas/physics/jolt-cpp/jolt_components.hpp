@@ -143,13 +143,15 @@ namespace atlas::physics::jolt {
      */
     struct jolt_settings {
 
+        unsigned int allocation_amount = 10 * 1024 * 1024;
+
         // For job system
         thread_system thread_type = Default;
 
         uint32_t physics_threads =
           std::max(1u, std::thread::hardware_concurrency() - 2);
 
-        uint32_t max_jobs = physics_threads * 32;
+        uint32_t max_jobs_power = 10;
         uint32_t max_barriers = physics_threads * 16;
         bool is_multithreaded = true;
 

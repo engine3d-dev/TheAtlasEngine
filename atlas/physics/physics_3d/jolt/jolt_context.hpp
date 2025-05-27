@@ -5,6 +5,7 @@
 
 #include <physics/physics_3d/physics_context.hpp>
 #include <physics/jolt-cpp/jolt_components.hpp>
+#include <components/transform.hpp>
 #include <physics/physics_3d/jolt/interface/jolt_broad_phase.hpp>
 
 namespace atlas::physics {
@@ -61,6 +62,31 @@ namespace atlas::physics {
          * @param shape the shape that was created.
          */
         void store_shape(uint64_t id, const JPH::RefConst<JPH::Shape>& shape);
+
+        /**
+         * @brief Creates a shape given a jolt collider
+         *
+         * @param e the entity who shape you are creating
+         * @param collider the entities jolt collider
+         * @return JPH::RefConst<JPH::Shape> The shape needs to be created and
+         * stored for ref counting and scope.
+         */
+        JPH::RefConst<JPH::Shape> create_shape_from_collider(
+          flecs::entity e,
+          const collider_body& collider);
+
+        void add_body(flecs::entity e,
+              const physics_body& body,
+              const collider_body& collider,
+              const transform_physics& location,
+              std::vector<JPH::BodyCreationSettings>& settings_list,
+              std::vector<flecs::entity>& entity_list);
+
+        void add_body_collider(flecs::entity e,
+                       const collider_body& collider,
+                       const transform_physics& location,
+                       std::vector<JPH::BodyCreationSettings>& settings_list,
+                       std::vector<flecs::entity>& entity_list);
 
         //! @note Must be defined before physics can be initialized otherwise
         //! jolt cannot be created properly.
