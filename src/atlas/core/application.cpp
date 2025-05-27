@@ -6,7 +6,6 @@
 #include <physics/jolt-cpp/jolt_api.hpp>
 #include <string>
 
-#include <renderer/renderer.hpp>
 #include <drivers/ui/imgui_backend.hpp>
 
 #include <core/update_handlers/sync_update.hpp>
@@ -19,14 +18,27 @@ namespace atlas {
     static float g_physics_step = 0.f; // collision step
 
     application::application(const application_settings& p_settings) {
-        s_instance = this;
         g_tag = p_settings.Name;
         console_log_manager::set_current_logger(g_tag);
         set_current_api(API::VULKAN);
-        m_window = window::create(p_settings.Width, p_settings.Height, g_tag);
+        window_settings settings = {
+            .width = p_settings.Width,
+            .height = p_settings.Height,
+            .name = p_settings.Name
+        };
+        m_window = create_window(settings);
 
-        renderer::initialize();
-        imgui_backend::initialize();
+        // renderer::initialize();
+        // m_renderer = create_scope<renderer>("Renderer");
+        // if(m_renderer == nullptr) {
+        //     console_log_trace("Renderer == NULLPTR!");
+        // }
+        // else {
+        //     console_log_trace("Renderer != NULLPTR!");
+        // }
+        // // renderer
+        // imgui_backend::initialize();
+        s_instance = this;
     }
 
     application::~application() {
@@ -38,7 +50,7 @@ namespace atlas {
     }
 
     ref<swapchain> application::get_current_swapchain() {
-        return get_window().get_current_swapchain();
+        return get_window().current_swapchain();
     }
 
     API application::current_api() {
@@ -46,6 +58,7 @@ namespace atlas {
     }
 
     void application::destroy() {
+        console_log_trace("application::destroy() called!!!");
         s_instance->get_window().close();
     }
 
@@ -58,35 +71,39 @@ namespace atlas {
     }
 
     void application::execute() {
-        float previous_time = 0.f;
+        // float previous_time = 0.f;
         console_log_info("Executing mainloop!");
 
-        while (m_window->is_active()) {
-            //! @brief Keeping it simply to getting our delta time
-            //! @brief Then again, I want to have a proper fps-timer
-            //! implementation to simplify calculating the fps time and accuracy
-            float current_time = (float)glfwGetTime();
-            g_delta_time = (current_time - previous_time);
-            previous_time = current_time;
+        while (m_window->available()) {
+        //     //! @brief Keeping it simply to getting our delta time
+        //     //! @brief Then again, I want to have a proper fps-timer
+        //     //! implementation to simplify calculating the fps time and accuracy
+        //     float current_time = (float)glfwGetTime();
+        //     g_delta_time = (current_time - previous_time);
+        //     previous_time = current_time;
 
-            // updating physic steps according to the delta time
-            g_physics_step = 1 + (60 * g_delta_time);
+        //     // updating physic steps according to the delta time
+        //     g_physics_step = 1 + (60 * g_delta_time);
 
             event::update_events();
 
-            renderer::begin();
+        //     // m_renderer->begin();
             sync_update::on_update();
 
-            sync_update::on_physics_update();
+        //     sync_update::on_physics_update();
 
-            sync_update::on_ui_update();
+        //     sync_update::on_ui_update();
 
-            renderer::end();
+        //     // m_renderer->end();
         }
         console_log_warn("Leaving executed mainloop!");
     }
 
-    uint32_t application::get_aspect_ratio() {
-        return get_window().get_width() / get_window().get_height();
+    void application::post_destroy() {
+        m_window->close();
+    }
+
+    float application::aspect_ratio() {
+        return s_instance->m_window->aspect_ratio();
     }
 };

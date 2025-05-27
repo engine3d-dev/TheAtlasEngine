@@ -3,6 +3,7 @@
 #include <core/window.hpp>
 #include <drivers/swapchain.hpp>
 #include <string>
+#include <renderer/renderer.hpp>
 
 namespace atlas {
 
@@ -24,6 +25,8 @@ namespace atlas {
         /* executes the application's mainloop */
         void execute();
 
+        void post_destroy();
+
         /* Returns the current window selected in the application */
         static window& get_window() { return *s_instance->m_window; }
 
@@ -36,13 +39,14 @@ namespace atlas {
         /* Destroys the application */
         static void destroy();
 
-        static uint32_t get_aspect_ratio();
+        static float aspect_ratio();
 
     private:
         void set_current_api(API api);
 
     private:
         ref<window> m_window;
+        scope<renderer> m_renderer = nullptr; 
         static application* s_instance;
     };
 
