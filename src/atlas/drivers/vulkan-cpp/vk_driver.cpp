@@ -144,4 +144,9 @@ namespace atlas::vk {
     VkFormat vk_driver::depth_format() const {
         return m_depth_format_selected;
     }
+
+    void vk_driver::destroy() {
+      vkDeviceWaitIdle(m_driver);
+      vkDestroyDevice(m_driver, nullptr);
+    }
 };

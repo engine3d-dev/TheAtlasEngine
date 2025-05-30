@@ -10,7 +10,7 @@ namespace atlas::vk {
         vk_context(const std::string& p_tag);
 
 
-        static void submit_resource_free(const std::function<void()>& p_resource);
+        static void submit_resource_free(std::function<void()>&& p_resource);
 
         static VkInstance handler();
 
@@ -18,7 +18,7 @@ namespace atlas::vk {
         static vk_driver driver_context() { return s_instance->m_driver; }
 
     private:
-        void resource_free(const std::function<void()>& p_resource);
+        void resource_free(std::function<void()>&& p_resource);
 
     private:
         void destroy_context() override;

@@ -141,12 +141,13 @@ namespace atlas::vk {
         return s_instance->m_instance_handler;
     }
 
-    void vk_context::resource_free(const std::function<void()>& p_resource) {
-        m_resources_free.push_front(p_resource);
+    void vk_context::resource_free(std::function<void()>&& p_resource) {
+        m_resources_free.push_back(p_resource);
     }
 
-    void vk_context::submit_resource_free(const std::function<void()>& p_resource) {
-        s_instance->resource_free(p_resource);
+    void vk_context::submit_resource_free(std::function<void()>&& p_resource) {
+        // s_instance->resource_free(p_resource);
+        s_instance->m_resources_free.push_back(p_resource);
     }
 
     void vk_context::destroy_context() {
@@ -154,5 +155,6 @@ namespace atlas::vk {
         for(auto& callback : m_resources_free) {
             callback();
         }
+        m_driver.destroy();
     }
 };

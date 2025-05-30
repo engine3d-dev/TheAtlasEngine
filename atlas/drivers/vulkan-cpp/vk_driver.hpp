@@ -30,6 +30,8 @@ namespace atlas::vk {
         // specific queue family from this logical device
         VkQueue get_queue(const vk_queue_options& p_present_queue);
 
+        void destroy();
+
         [[nodiscard]] VkFormat depth_format() const;
 
         operator VkDevice() const { return m_driver; }
