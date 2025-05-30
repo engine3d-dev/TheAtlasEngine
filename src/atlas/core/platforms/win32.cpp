@@ -14,8 +14,7 @@ win_main() {
       atlas::create_ref<atlas::system_registry>("system");
     atlas::ref<atlas::application> app = atlas::initialize_application();
     app->execute();
-    app->post_destroy();
-
     graphic_context->destroy();
+    app->post_destroy();
     return 0;
 }
