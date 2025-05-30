@@ -14,9 +14,10 @@ namespace atlas::vk {
 
     private:
         [[nodiscard]] window_settings settings() const override;
-        ref<swapchain> window_current_swapchain() override;
+        VkSwapchainKHR window_current_swapchain() override;
         [[nodiscard]] uint32_t read_acquired_next_frame() override;
         [[nodiscard]] GLFWwindow* native_window() const override;
+        void presentation_process(const uint32_t& p_current_frame) override;
 
     private:
         VkInstance m_instance_handler=nullptr;

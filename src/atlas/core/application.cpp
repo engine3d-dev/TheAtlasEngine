@@ -49,7 +49,7 @@ namespace atlas {
         g_graphics_backend_api = api;
     }
 
-    ref<swapchain> application::get_current_swapchain() {
+    VkSwapchainKHR application::get_current_swapchain() {
         return get_window().current_swapchain();
     }
 
@@ -73,8 +73,10 @@ namespace atlas {
     void application::execute() {
         // float previous_time = 0.f;
         console_log_info("Executing mainloop!");
-
+        
         while (m_window->available()) {
+            m_current_frame_index = m_window->acquired_next_frame();
+            console_log_fatal("Current Frame Index = {}", m_current_frame_index);
         //     //! @brief Keeping it simply to getting our delta time
         //     //! @brief Then again, I want to have a proper fps-timer
         //     //! implementation to simplify calculating the fps time and accuracy
@@ -95,6 +97,8 @@ namespace atlas {
         //     sync_update::on_ui_update();
 
         //     // m_renderer->end();
+
+            m_window->present(m_current_frame_index);
         }
         console_log_warn("Leaving executed mainloop!");
     }

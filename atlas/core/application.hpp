@@ -34,7 +34,7 @@ namespace atlas {
         static API current_api();
 
         /* Returns the currently selected swapchain */
-        ref<swapchain> get_current_swapchain();
+        VkSwapchainKHR get_current_swapchain();
 
         /* Destroys the application */
         static void destroy();
@@ -46,7 +46,9 @@ namespace atlas {
 
     private:
         ref<window> m_window;
+        bool m_is_application_running=true;
         scope<renderer> m_renderer = nullptr; 
+        uint32_t m_current_frame_index=-1;
         static application* s_instance;
     };
 

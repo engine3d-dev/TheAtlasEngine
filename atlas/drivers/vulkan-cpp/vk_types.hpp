@@ -21,6 +21,7 @@ namespace atlas::vk {
      * @brief queue index in the specific queue family to retrieve
     */
     struct vk_queue_options {
+        // uint32_t device_index=0; // device num
         uint32_t family_index=-1;
         uint32_t queue_index=0;
     };
