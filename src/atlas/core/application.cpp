@@ -9,6 +9,7 @@
 #include <drivers/ui/imgui_backend.hpp>
 
 #include <core/update_handlers/sync_update.hpp>
+#include <drivers/vulkan-cpp/vk_swapchain.hpp>
 
 namespace atlas {
     static std::string g_tag = "engine3d";
@@ -29,7 +30,8 @@ namespace atlas {
         m_window = create_window(settings);
 
         // renderer::initialize();
-        // m_renderer = create_scope<renderer>("Renderer");
+        m_renderer = create_scope<renderer>(m_window->current_swapchain());
+        m_renderer->set_background_color({1.f, 0.5f, 0.5f, 1.f});
         // if(m_renderer == nullptr) {
         //     console_log_trace("Renderer == NULLPTR!");
         // }
@@ -76,7 +78,6 @@ namespace atlas {
         
         while (m_window->available()) {
             m_current_frame_index = m_window->acquired_next_frame();
-            console_log_fatal("Current Frame Index = {}", m_current_frame_index);
         //     //! @brief Keeping it simply to getting our delta time
         //     //! @brief Then again, I want to have a proper fps-timer
         //     //! implementation to simplify calculating the fps time and accuracy
@@ -96,7 +97,9 @@ namespace atlas {
 
         //     sync_update::on_ui_update();
 
-        //     // m_renderer->end();
+            m_renderer->begin(m_current_frame_index);
+            // m_renderer->end();
+            m_renderer->end();
 
             m_window->present(m_current_frame_index);
         }
