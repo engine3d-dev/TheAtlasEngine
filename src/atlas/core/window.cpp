@@ -18,10 +18,6 @@ namespace atlas {
         return nullptr;
     }
 
-    ref<swapchain> window::current_swapchain() {
-        return window_current_swapchain();
-    }
-
     uint32_t window::width() const {
         return settings().width;
     }
@@ -36,6 +32,10 @@ namespace atlas {
 
     void window::close() {
         glfwSetWindowShouldClose(native_window(), true);
+    }
+
+    void window::present(const uint32_t& p_current_frame_idx) {
+        return presentation_process(p_current_frame_idx);
     }
 
     float window::aspect_ratio() const {

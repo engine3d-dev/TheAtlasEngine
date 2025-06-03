@@ -1,21 +1,11 @@
 #pragma once
 #include <GLFW/glfw3.h>
 #include <core/core.hpp>
-#include <drivers/swapchain.hpp>
-#include <string>
+#include <vulkan/vulkan.h>
+#include <core/utilities/types.hpp>
+#include <drivers/vulkan-cpp/vk_swapchain.hpp>
 
 namespace atlas {
-
-    /**
-     * @brief Specific settings to the window configuration
-     * @brief Contains window properties for doing things with the windows
-    */
-    struct window_settings {
-        uint32_t width = -1;
-        uint32_t height = -1;
-        std::string name = "";
-        uint32_t frames_in_flight = 2;
-    };
 
     class window {
     public:
@@ -46,7 +36,9 @@ namespace atlas {
         /**
          * @brief Returns the window's currently selected swapchain
          */
-        ref<swapchain> current_swapchain();
+        [[nodiscard]] vk::vk_swapchain current_swapchain() const {
+            return window_swapchain();
+        }
 
         operator GLFWwindow*() const { return native_window(); }
 
@@ -57,11 +49,17 @@ namespace atlas {
          */
         void close();
 
+        /**
+         * @param p_current_frame_idx is the current frame index for the next available image
+        */
+        void present(const uint32_t& p_current_frame_idx);
+
     private:
         [[nodiscard]] virtual window_settings settings() const = 0;
         [[nodiscard]] virtual GLFWwindow* native_window() const = 0;
         [[nodiscard]] virtual uint32_t read_acquired_next_frame() = 0;
-        virtual ref<swapchain> window_current_swapchain() = 0;
+        [[nodiscard]] virtual vk::vk_swapchain window_swapchain() const = 0;
+        virtual void presentation_process(const uint32_t& p_current_frame) = 0;
     };
 
     ref<window> create_window(const window_settings& p_settings);
