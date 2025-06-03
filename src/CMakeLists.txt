@@ -31,10 +31,10 @@ set(
     ${SRC_DIR}/core/system_framework/system_registry.cpp
 
     # Filesystem stuff
-    # ${SRC_DIR}/core/filesystem/file_dialog.cpp
+    ${SRC_DIR}/core/filesystem/file_dialog.cpp
 
     # serializer stuff
-    # ${SRC_DIR}/core/serialize/serializer.cpp
+    ${SRC_DIR}/core/serialize/serializer.cpp
 
     # physics stuff
     # ${SRC_DIR}/physics/physics_3d/physics_engine.cpp
@@ -50,14 +50,14 @@ set(
     # ${SRC_DIR}/core/geometry/mesh.cpp
 
     # Renderer-stuff
-    # ${SRC_DIR}/renderer/renderer.cpp
-    # ${SRC_DIR}/drivers/renderer_backend.cpp
+    ${SRC_DIR}/renderer/renderer.cpp
+    ${SRC_DIR}/drivers/render_context.cpp
     ${SRC_DIR}/drivers/graphics_context.cpp
 
     ## ui-stuff backend
     # ${SRC_DIR}/drivers/ui/imgui_backend.cpp
     
-    # ${SRC_DIR}/core/ui/widgets.cpp
+    ${SRC_DIR}/core/ui/widgets.cpp
 
     ## graphic drivers backend-agnostic
     # ${SRC_DIR}/drivers/swapchain.cpp
@@ -82,7 +82,7 @@ set(
     # ${VULKAN_SRC_DIR}/descriptor_tutorial.cpp
     # ${VULKAN_SRC_DIR}/vulkan_uniform_buffer.cpp
     # ${VULKAN_SRC_DIR}/shaders/vulkan_shader.cpp
-    # ${VULKAN_SRC_DIR}/vulkan_renderer.cpp
+    ${VULKAN_SRC_DIR}/vk_renderer.cpp
 )
 
 add_library(${PROJECT_NAME} ${all_headers} ${all_src})
