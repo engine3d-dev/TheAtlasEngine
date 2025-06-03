@@ -146,6 +146,7 @@ namespace atlas::vk {
     }
 
     void vk_driver::destroy() {
+      console_log_trace("vk_driver::destroy invoked!!");
       vkDeviceWaitIdle(m_driver);
       vkDestroyDevice(m_driver, nullptr);
     }

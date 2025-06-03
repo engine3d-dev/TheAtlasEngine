@@ -14,7 +14,6 @@ namespace atlas::vk {
             uint32_t graphics = -1;
             uint32_t compute = -1;
             uint32_t transfer = -1;
-            uint32_t present = -1;
         };
 
     public:
@@ -35,6 +34,13 @@ namespace atlas::vk {
         operator VkPhysicalDevice() { return m_physical_driver; }
 
         operator VkPhysicalDevice() const { return m_physical_driver; }
+
+        //! @brief Selects specific queue families based on the indices available per queue family
+        queue_family_indices select_graphics_queue_family(const int& p_family_index);
+
+        queue_family_indices select_compute_queue_family(const int& p_family_index);
+        
+        queue_family_indices select_transfer_queue_family(const int& p_family_index);
 
     private:
         queue_family_indices select_queue_family_indices();
