@@ -26,7 +26,8 @@ namespace atlas::vk {
         void configure(const window_settings& p_settings);
 
         //! @brief Used for when swapchain is resized then only reconfigured properties to get resizability
-        void reconfigure(const window_settings& p_settings);
+        // NOTE: Should remove this. Leaving this here is because currently deciding what might be an approach for setting up swapchain
+        // void reconfigure(const window_settings& p_settings);
 
         //! @return uint32_t the next available image to present acquired
         uint32_t read_acquired_image();
@@ -36,13 +37,21 @@ namespace atlas::vk {
             return m_swapchain_command_buffers[p_frame];
         }
 
+        [[nodiscard]] VkFramebuffer active_framebuffer(uint32_t p_frame) const {
+            return m_swapchain_framebuffers[p_frame];
+        }
+
         [[nodiscard]] VkRenderPass swapchain_renderpass() const { return m_swapchain_renderpass; }
 
         [[nodiscard]] window_settings settings() const { return m_window_settings; }
 
         [[nodiscard]] uint32_t image_size() const { return m_image_size; }
 
+        [[nodiscard]] surface_properties data() const { return m_surface_properties; }
+
         void destroy();
+
+        void submit(const VkCommandBuffer& p_command);
 
         operator VkSwapchainKHR() const { return m_swapchain_handler; }
 

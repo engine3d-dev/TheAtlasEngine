@@ -298,6 +298,10 @@ namespace atlas::vk {
 		m_present_to_queue.present_frame(p_current_frame);
 	}
 
+	void vk_swapchain::submit(const VkCommandBuffer& p_command) {
+		m_present_to_queue.submit_immediate_async(p_command);
+	}
+
 	void vk_swapchain::destroy() {
 		console_log_fatal("vk_swapchain::destroy()!!!");
 		m_present_to_queue.destroy();

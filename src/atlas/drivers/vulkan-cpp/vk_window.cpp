@@ -5,6 +5,7 @@
 #include <drivers/vulkan/helper_functions.hpp>
 
 namespace atlas::vk {
+	vk_window* vk_window::s_instance = nullptr;
     vk_window::vk_window(const window_settings& p_settings)
       : m_settings(p_settings) {
         console_log_info("vk_window begin intitialization!!!");
@@ -51,6 +52,8 @@ namespace atlas::vk {
         console_log_info("vk_window end intitialization!!!");
 
         glfwSetWindowUserPointer(m_window_handler, this);
+
+		s_instance = this;
     }
 
     void vk_window::center_window() {
@@ -71,10 +74,6 @@ namespace atlas::vk {
 
     uint32_t vk_window::read_acquired_next_frame() {
         return m_swapchain.read_acquired_image();
-    }
-
-    VkSwapchainKHR vk_window::window_current_swapchain() {
-        return m_swapchain;
     }
 
     GLFWwindow* vk_window::native_window() const {
