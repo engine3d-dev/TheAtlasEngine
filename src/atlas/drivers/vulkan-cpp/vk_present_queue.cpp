@@ -74,11 +74,18 @@ namespace atlas::vk {
             .pImageIndices = &p_current_frame,
         };
 
-        vk_check(vkQueuePresentKHR(m_present_queue_handler, &present_info),
-                 "vkQueuePresentKHR",
+        VkResult res = vkQueuePresentKHR(m_present_queue_handler, &present_info);
+		vk_check(res,
+				"vkQueuePresentKHR",
                  __FILE__,
                  __LINE__,
                  __FUNCTION__);
+		// if(m_resize_requested
+		if(res == VK_ERROR_OUT_OF_DATE_KHR || res ==  VK_SUBOPTIMAL_KHR) {
+			console_log_trace("Swapchain out of date!!!");
+			m_resize_requested = true;
+		}
+
     }
 
     uint32_t vk_present_queue::acquired_frame() {
@@ -96,6 +103,12 @@ namespace atlas::vk {
                  __FILE__,
                  __LINE__,
                  __FUNCTION__);
+		
+		if(acquired_next_image_result == VK_ERROR_OUT_OF_DATE_KHR) {
+			console_log_trace("acquired next image out of date!!!");
+			m_resize_requested = true;
+		}
+
         return image_acquired;
     }
 

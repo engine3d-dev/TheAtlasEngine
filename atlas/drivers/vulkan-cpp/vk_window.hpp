@@ -18,6 +18,7 @@ namespace atlas::vk {
         [[nodiscard]] uint32_t read_acquired_next_frame() override;
         [[nodiscard]] GLFWwindow* native_window() const override;
         void presentation_process(const uint32_t& p_current_frame) override;
+        [[nodiscard]] vk::vk_command_buffer current_active_command_buffer(const uint32_t& p_frame_idx) override { return m_swapchain.active_command_buffer(p_frame_idx); }
 
     private:
         VkInstance m_instance_handler=nullptr;

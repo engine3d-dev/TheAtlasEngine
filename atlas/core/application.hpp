@@ -40,6 +40,8 @@ namespace atlas {
 
         static float aspect_ratio();
 
+        static uint32_t current_frame();
+
     private:
         void set_current_api(API api);
 

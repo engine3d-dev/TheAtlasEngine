@@ -43,6 +43,10 @@ namespace atlas {
         s_instance = this;
     }
 
+    uint32_t application::current_frame() {
+        return s_instance->m_current_frame_index;
+    }
+
     application::~application() {
         destroy();
     }
@@ -78,6 +82,9 @@ namespace atlas {
         
         while (m_window->available()) {
             m_current_frame_index = m_window->acquired_next_frame();
+            vk::vk_command_buffer currently_active = m_window->active_command_buffer(m_current_frame_index);
+            VkFramebuffer current_fb = m_window->current_swapchain().active_framebuffer(m_current_frame_index);
+            VkRenderPass current_rp = m_window->current_swapchain().swapchain_renderpass();
         //     //! @brief Keeping it simply to getting our delta time
         //     //! @brief Then again, I want to have a proper fps-timer
         //     //! implementation to simplify calculating the fps time and accuracy
@@ -97,7 +104,7 @@ namespace atlas {
 
         //     sync_update::on_ui_update();
 
-            m_renderer->begin(m_current_frame_index);
+            m_renderer->begin(currently_active, current_fb, current_rp);
             // m_renderer->end();
             m_renderer->end();
 

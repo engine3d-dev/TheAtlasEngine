@@ -42,6 +42,10 @@ namespace atlas::vk {
         //! @return uint32_t next index to the presentable image for the current frame
         uint32_t acquired_frame();
 
+        [[nodiscard]] bool resize_requested() const { return m_resize_requested; }
+
+        void set_resize_status(bool p_status) { m_resize_requested = p_status; }
+
         //! @return bool if the presentation queue handler is valid or not
         [[nodiscard]] bool is_alive() const { return (m_present_queue_handler != nullptr); }
 
@@ -58,5 +62,6 @@ namespace atlas::vk {
         VkSwapchainKHR m_swapchain_handler=nullptr;
         VkSemaphore m_render_completed_semaphore=nullptr;
         VkSemaphore m_present_completed_semaphore=nullptr;
+        bool m_resize_requested=false;
     };
 };
