@@ -3,87 +3,10 @@
 #include <array>
 #include <drivers/vulkan/helper_functions.hpp>
 #include <drivers/vulkan-cpp/vk_context.hpp>
+#include <core/application.hpp>
 
 namespace atlas::vk {
 
-    static VkRenderPass create_simple_renderpass(
-      const VkDevice& p_driver,
-      const VkSurfaceFormatKHR& p_surface_format) {
-        VkFormat depth_format = vk_context::driver_context().depth_format();
-        VkAttachmentDescription color_attachment_description = {
-            .flags = 0,
-            .format = p_surface_format.format,
-            .samples = VK_SAMPLE_COUNT_1_BIT,
-            .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
-            .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
-            .stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-            .stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-            .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-            .finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
-        };
-
-        VkAttachmentDescription depth_attachment_description = {
-            .flags = 0,
-            .format = depth_format,
-            .samples = VK_SAMPLE_COUNT_1_BIT,
-            .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
-            .storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-            .stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-            .stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-            .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-            .finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
-        };
-
-        VkAttachmentReference color_attachment_ref = {
-            .attachment = 0, .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
-        };
-
-        VkAttachmentReference depth_attachment_reference = {
-            .attachment = 1,
-            .layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
-        };
-
-        VkSubpassDescription subpass_description = {
-            .flags = 0,
-            .pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
-            .inputAttachmentCount = 0,
-            .pInputAttachments = nullptr,
-            .colorAttachmentCount = 1,
-            .pColorAttachments = &color_attachment_ref,
-            .pResolveAttachments = nullptr,
-            .pDepthStencilAttachment =
-              &depth_attachment_reference, // enable depth buffering
-            .preserveAttachmentCount = 0,
-            .pPreserveAttachments = nullptr
-        };
-
-        std::vector<VkAttachmentDescription> attachments;
-        attachments.push_back(color_attachment_description);
-        attachments.push_back(depth_attachment_description);
-
-        VkRenderPassCreateInfo renderpass_ci = {
-            .sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
-            .pNext = nullptr,
-            .flags = 0,
-            // .attachmentCount = 1,
-            // .pAttachments = &attachment_description,
-            .attachmentCount = static_cast<uint32_t>(attachments.size()),
-            .pAttachments = attachments.data(),
-            .subpassCount = 1,
-            .pSubpasses = &subpass_description,
-            .dependencyCount = 0,
-            .pDependencies = nullptr
-        };
-
-        VkRenderPass renderpass = nullptr;
-
-        vk_check(
-          vkCreateRenderPass(p_driver, &renderpass_ci, nullptr, &renderpass),
-          "vkCreateRenderPass",
-          __FILE__, __LINE__, __FUNCTION__);
-
-        return renderpass;
-    }
     vk_renderer::vk_renderer(const std::string& p_tag) {
         console_log_manager::create_new_logger(p_tag);
         m_driver = vk_context::driver_context();
@@ -94,11 +17,11 @@ namespace atlas::vk {
         m_driver = vk_context::driver_context();
 
         // Creating main renderpass
-        m_main_renderpass = create_simple_renderpass(m_driver, m_swapchain_handler.data().surface_format);
+        // m_main_renderpass = create_simple_renderpass(m_driver, m_swapchain_handler.data().surface_format);
 
-        vk_context::submit_resource_free([this](){
-            vkDestroyRenderPass(m_driver, m_main_renderpass, nullptr);
-        });
+        // vk_context::submit_resource_free([this](){
+        //     vkDestroyRenderPass(m_driver, m_main_renderpass, nullptr);
+        // });
     }
 
     vk_renderer::~vk_renderer() = default;
@@ -107,7 +30,7 @@ namespace atlas::vk {
         m_color = {{p_color.at(0), p_color.at(1), p_color.at(2), p_color.at(3)}};
     }
 
-    void vk_renderer::start_frame([[maybe_unused]] const uint32_t& p_current_frame_idx) {
+    void vk_renderer::start_frame(const vk_command_buffer& p_current, const VkFramebuffer& p_current_fb, const VkRenderPass& p_current_renderpass) {
         std::array<VkClearValue, 2> clear_values = {};
 
         clear_values[0].color = m_color;
@@ -117,7 +40,7 @@ namespace atlas::vk {
         VkRenderPassBeginInfo renderpass_begin_info = {
             .sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
 			.pNext = nullptr,
-			.renderPass = m_main_renderpass,
+			.renderPass = p_current_renderpass,
 			.renderArea = {
 				.offset = {
 					.x = 0,
@@ -132,7 +55,7 @@ namespace atlas::vk {
 			.pClearValues = clear_values.data()
         };
 
-        m_current_command_buffer = m_swapchain_handler.active_command_buffer(p_current_frame_idx);
+        m_current_command_buffer = p_current;
         m_current_command_buffer.begin(VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
         VkViewport viewport = {
@@ -154,7 +77,8 @@ namespace atlas::vk {
 		vkCmdSetScissor(m_current_command_buffer, 0, 1, &scissor);
 
         // renderpass_begin_info.framebuffer = m_swapchain_framebuffers[p_current_frame_idx];
-        renderpass_begin_info.framebuffer = m_swapchain_handler.active_framebuffer(p_current_frame_idx);
+        // renderpass_begin_info.framebuffer = m_swapchain_handler.active_framebuffer(application::current_frame());
+        renderpass_begin_info.framebuffer = p_current_fb;
 
 		vkCmdBeginRenderPass(m_current_command_buffer,&renderpass_begin_info,VK_SUBPASS_CONTENTS_INLINE);
 

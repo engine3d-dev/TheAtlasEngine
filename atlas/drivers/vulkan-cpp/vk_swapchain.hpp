@@ -60,6 +60,10 @@ namespace atlas::vk {
         void present(const uint32_t& p_current_frame);
 
     private:
+        void recreate();
+        void on_create();
+
+    private:
         vk_physical_driver m_physical{};
         vk_driver m_driver{};
         VkSurfaceKHR m_current_surface_handler=nullptr;
@@ -77,6 +81,7 @@ namespace atlas::vk {
         //! @brief Render Pass Specifications
         VkRenderPass m_color_renderpass=nullptr;
 
+        VkSurfaceKHR m_current_surface=nullptr;
         surface_properties m_surface_properties{};
         std::vector<vk_command_buffer> m_swapchain_command_buffers{};
         std::vector<VkFramebuffer> m_swapchain_framebuffers{};

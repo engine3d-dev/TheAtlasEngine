@@ -3,6 +3,7 @@
 #include <core/core.hpp>
 #include <drivers/vulkan-cpp/vk_swapchain.hpp>
 #include <span>
+#include <drivers/vulkan-cpp/vk_command_buffer.hpp>
 
 /**
  * @note This is just a class abstraction idea
@@ -31,8 +32,8 @@ namespace atlas {
     public:
         virtual ~render_context() = default;
 
-        void begin_frame(const uint32_t& p_current_frame_index) {
-            return start_frame(p_current_frame_index);
+        void begin_frame(const vk::vk_command_buffer& p_current, const VkFramebuffer& p_current_fb, const VkRenderPass& p_current_renderpass) {
+            return start_frame(p_current, p_current_fb, p_current_renderpass);
         }
 
         void end_frame() {
@@ -44,11 +45,11 @@ namespace atlas {
         }
 
     private:
-        virtual void start_frame(const uint32_t& p_current_frame_index) = 0;
+        virtual void start_frame(const vk::vk_command_buffer& p_current, const VkFramebuffer& p_current_fb, const VkRenderPass& p_current_renderpass) = 0;
         virtual void post_frame() = 0;
 
         virtual void background_color(const std::array<float, 4>& p_color) = 0;
     };
 
-    scope<render_context> initialize_renderer(const vk::vk_swapchain& p_swapchain_handler, const std::string& p_tag);
+    scope<render_context> initialize_renderer(const vk::vk_swapchain& p_surface_properties, const std::string& p_tag);
 };

@@ -119,12 +119,17 @@ namespace atlas::vk {
     vk_swapchain::vk_swapchain(const VkSurfaceKHR& p_surface,
                                const window_settings& p_settings)
       : m_current_surface_handler(p_surface)
-      , m_window_settings(p_settings) {
+      , m_window_settings(p_settings),
+	  m_current_surface(p_surface) {
         console_log_trace("vk_swapchain begin initialization!!!");
         m_physical = vk_context::physical_driver();
         m_driver = vk_context::driver_context();
+		m_surface_properties = m_physical.get_surface_properties(m_current_surface);
 
-        m_surface_properties = m_physical.get_surface_properties(p_surface);
+		on_create();
+    }
+
+	void vk_swapchain::on_create() {
 
         //! @note Setting up presentation stuff
         // request what our minimum image count is
@@ -245,6 +250,7 @@ namespace atlas::vk {
           m_driver, m_surface_properties.surface_format);
 
         // creating framebuffers
+		console_log_error("begin vk_swapchain initializing framebuffers!!");
         m_swapchain_framebuffers.resize(m_swapchain_images.size());
 
         for (uint32_t i = 0; i < m_swapchain_images.size(); i++) {
@@ -278,6 +284,8 @@ namespace atlas::vk {
                      __FUNCTION__);
 		}
 
+		console_log_error("end of vk_swapchain framebuffers initialization!!!\n\n");
+
 		vk_queue_options options = {
 			.family_index = 0, // using defauly queue family
 			.queue_index = 0 // using defauly presentation queue available
@@ -285,10 +293,24 @@ namespace atlas::vk {
 		m_present_to_queue = vk_present_queue(m_swapchain_handler, options);
 
         console_log_trace("vk_swapchain end initialization!!!");
-    }
+		
+	}
+
+	void vk_swapchain::recreate() {
+		console_log_trace("vk_swapchain recreation!!!");
+		vkDeviceWaitIdle(m_driver);
+		destroy();
+		on_create();
+	}
 
 	uint32_t vk_swapchain::read_acquired_image() {
 		m_present_to_queue.wait_idle();
+
+		if(m_present_to_queue.resize_requested()) {
+			console_log_fatal("presentation queue recreation requested!!!!");
+			recreate();
+			m_present_to_queue.set_resize_status(false);
+		}
 
 		uint32_t frame_idx = m_present_to_queue.acquired_frame();
 		return frame_idx;
@@ -304,13 +326,15 @@ namespace atlas::vk {
 
 	void vk_swapchain::destroy() {
 		console_log_fatal("vk_swapchain::destroy()!!!");
-		m_present_to_queue.destroy();
+
 		for (size_t i = 0; i < m_swapchain_framebuffers.size(); i++) {
 			vkDestroyFramebuffer(
 		m_driver, m_swapchain_framebuffers[i], nullptr);
 		}
 
 		vkDestroyRenderPass(m_driver, m_swapchain_renderpass, nullptr);
+
+		m_present_to_queue.destroy();
 
 		for (size_t i = 0; i < m_swapchain_command_buffers.size(); i++) {
 			m_swapchain_command_buffers[i].destroy();
