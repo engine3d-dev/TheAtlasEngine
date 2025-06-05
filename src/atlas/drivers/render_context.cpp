@@ -5,13 +5,10 @@
 
 namespace atlas {
 
-    scope<render_context> initialize_renderer(
-      const vk::vk_swapchain& p_swapchain_handler,
-      const std::string& p_tag) {
+    scope<render_context> initialize_renderer(const vk::vk_swapchain& p_swapchain, const std::string& p_tag) {
         switch (application::current_api()) {
             case API::VULKAN:
-                return create_scope<vk::vk_renderer>(p_swapchain_handler,
-                                                     p_tag);
+                return create_scope<vk::vk_renderer>(p_swapchain, p_tag);
             default:
                 return nullptr;
         }

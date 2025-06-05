@@ -4,6 +4,7 @@
 #include <drivers/vulkan-cpp/vk_command_buffer.hpp>
 #include <drivers/vulkan-cpp/vk_types.hpp>
 #include <drivers/vulkan-cpp/vk_present_queue.hpp>
+#include <drivers/vulkan-cpp/vk_renderpass.hpp>
 
 namespace atlas::vk {
     /**
@@ -41,7 +42,7 @@ namespace atlas::vk {
             return m_swapchain_framebuffers[p_frame];
         }
 
-        [[nodiscard]] VkRenderPass swapchain_renderpass() const { return m_swapchain_renderpass; }
+        [[nodiscard]] VkRenderPass swapchain_renderpass() const { return m_swapchain_main_renderpass; }
 
         [[nodiscard]] window_settings settings() const { return m_window_settings; }
 
@@ -92,7 +93,8 @@ namespace atlas::vk {
     
         //! @brief Main swapchain renderpass
         //! @brief color renderpass
-        VkRenderPass m_swapchain_renderpass=nullptr;
+        // VkRenderPass m_swapchain_renderpass=nullptr;
+        vk_renderpass m_swapchain_main_renderpass{};
 
         vk_present_queue m_present_to_queue{};
     };

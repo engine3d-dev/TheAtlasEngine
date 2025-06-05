@@ -30,7 +30,7 @@ namespace atlas {
         m_window = create_window(settings);
 
         // renderer::initialize();
-        m_renderer = create_scope<renderer>(m_window->current_swapchain());
+        m_renderer = create_scope<renderer>(m_window->current_swapchain(), "Renderer");
         m_renderer->set_background_color({1.f, 0.5f, 0.5f, 1.f});
         // if(m_renderer == nullptr) {
         //     console_log_trace("Renderer == NULLPTR!");
@@ -82,9 +82,12 @@ namespace atlas {
         
         while (m_window->available()) {
             m_current_frame_index = m_window->acquired_next_frame();
+
+            // TODO: Going to need to figure out where to put this
+            // Added this here because to ensure the handlers being used by the renderer is in sync when swapchain is resized 
             vk::vk_command_buffer currently_active = m_window->active_command_buffer(m_current_frame_index);
-            VkFramebuffer current_fb = m_window->current_swapchain().active_framebuffer(m_current_frame_index);
-            VkRenderPass current_rp = m_window->current_swapchain().swapchain_renderpass();
+            // VkFramebuffer current_fb = m_window->current_swapchain().active_framebuffer(m_current_frame_index);
+            // VkRenderPass current_rp = m_window->current_swapchain().swapchain_renderpass();
         //     //! @brief Keeping it simply to getting our delta time
         //     //! @brief Then again, I want to have a proper fps-timer
         //     //! implementation to simplify calculating the fps time and accuracy
@@ -104,7 +107,7 @@ namespace atlas {
 
         //     sync_update::on_ui_update();
 
-            m_renderer->begin(currently_active, current_fb, current_rp);
+            m_renderer->begin(currently_active, m_window->current_swapchain());
             // m_renderer->end();
             m_renderer->end();
 
@@ -119,5 +122,9 @@ namespace atlas {
 
     float application::aspect_ratio() {
         return s_instance->m_window->aspect_ratio();
+    }
+
+    uint32_t application::image_size() {
+        return s_instance->m_window->current_swapchain().image_size();
     }
 };

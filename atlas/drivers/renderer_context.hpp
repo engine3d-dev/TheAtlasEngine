@@ -32,8 +32,8 @@ namespace atlas {
     public:
         virtual ~render_context() = default;
 
-        void begin_frame(const vk::vk_command_buffer& p_current, const VkFramebuffer& p_current_fb, const VkRenderPass& p_current_renderpass) {
-            return start_frame(p_current, p_current_fb, p_current_renderpass);
+        void begin_frame(const vk::vk_command_buffer& p_current, const vk::vk_swapchain& p_swapchain_handler) {
+            return start_frame(p_current, p_swapchain_handler);
         }
 
         void end_frame() {
@@ -45,11 +45,11 @@ namespace atlas {
         }
 
     private:
-        virtual void start_frame(const vk::vk_command_buffer& p_current, const VkFramebuffer& p_current_fb, const VkRenderPass& p_current_renderpass) = 0;
+        virtual void start_frame(const vk::vk_command_buffer& p_current, const vk::vk_swapchain& p_swapchain_handler) = 0;
         virtual void post_frame() = 0;
 
         virtual void background_color(const std::array<float, 4>& p_color) = 0;
     };
 
-    scope<render_context> initialize_renderer(const vk::vk_swapchain& p_surface_properties, const std::string& p_tag);
+    scope<render_context> initialize_renderer(const vk::vk_swapchain& p_swapchain, const std::string& p_tag);
 };

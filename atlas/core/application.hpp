@@ -42,6 +42,9 @@ namespace atlas {
 
         static uint32_t current_frame();
 
+        //! @brief Returns uint32_t the size of images the swapchain accepts 
+        static uint32_t image_size();
+
     private:
         void set_current_api(API api);
 
