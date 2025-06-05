@@ -7,21 +7,10 @@
 
 namespace atlas::vk {
 
-    vk_renderer::vk_renderer(const std::string& p_tag) {
+    vk_renderer::vk_renderer(const vk_swapchain& p_swapchain, const std::string& p_tag){
         console_log_manager::create_new_logger(p_tag);
         m_driver = vk_context::driver_context();
-    }
-
-    vk_renderer::vk_renderer(const vk_swapchain& p_swapchain_handler, const std::string& p_tag) : m_swapchain_handler(p_swapchain_handler) {
-        console_log_manager::create_new_logger(p_tag);
-        m_driver = vk_context::driver_context();
-
-        // Creating main renderpass
-        // m_main_renderpass = create_simple_renderpass(m_driver, m_swapchain_handler.data().surface_format);
-
-        // vk_context::submit_resource_free([this](){
-        //     vkDestroyRenderPass(m_driver, m_main_renderpass, nullptr);
-        // });
+        m_main_swapchain = p_swapchain;
     }
 
     vk_renderer::~vk_renderer() = default;
@@ -30,17 +19,18 @@ namespace atlas::vk {
         m_color = {{p_color.at(0), p_color.at(1), p_color.at(2), p_color.at(3)}};
     }
 
-    void vk_renderer::start_frame(const vk_command_buffer& p_current, const VkFramebuffer& p_current_fb, const VkRenderPass& p_current_renderpass) {
+    void vk_renderer::start_frame(const vk_command_buffer& p_current, const vk::vk_swapchain& p_swapchain_handler) {
+        m_main_swapchain = p_swapchain_handler;
         std::array<VkClearValue, 2> clear_values = {};
 
         clear_values[0].color = m_color;
         clear_values[1].depthStencil = {1.f, 0};
-        window_settings settings = m_swapchain_handler.settings();
+        window_settings settings = m_main_swapchain.settings();
 
         VkRenderPassBeginInfo renderpass_begin_info = {
             .sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
 			.pNext = nullptr,
-			.renderPass = p_current_renderpass,
+			.renderPass = m_main_swapchain.swapchain_renderpass(),
 			.renderArea = {
 				.offset = {
 					.x = 0,
@@ -78,7 +68,7 @@ namespace atlas::vk {
 
         // renderpass_begin_info.framebuffer = m_swapchain_framebuffers[p_current_frame_idx];
         // renderpass_begin_info.framebuffer = m_swapchain_handler.active_framebuffer(application::current_frame());
-        renderpass_begin_info.framebuffer = p_current_fb;
+        renderpass_begin_info.framebuffer = m_main_swapchain.active_framebuffer(application::current_frame());
 
 		vkCmdBeginRenderPass(m_current_command_buffer,&renderpass_begin_info,VK_SUBPASS_CONTENTS_INLINE);
 
@@ -88,6 +78,6 @@ namespace atlas::vk {
         vkCmdEndRenderPass(m_current_command_buffer);
         m_current_command_buffer.end();
 
-        m_swapchain_handler.submit(m_current_command_buffer);
+        m_main_swapchain.submit(m_current_command_buffer);
     }
 };
