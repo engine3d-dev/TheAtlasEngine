@@ -1,7 +1,8 @@
 #pragma once
-#ifndef _LIBCPP_ENABLE_CXX20_TYPE_TRAITS
-#define _LIBCPP_ENABLE_CXX20_TYPE_TRAITS
-#endif
+
+#include <type_traits> // NOLINT
+using ignore_unused_include_type_traits = std::is_same<int, int>;
+
 #include <Jolt/Jolt.h>
 #include <Jolt/Core/Core.h>
 #include <Jolt/Physics/Body/BodyInterface.h>
