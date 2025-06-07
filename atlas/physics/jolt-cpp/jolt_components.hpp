@@ -10,8 +10,10 @@
 namespace atlas::physics {
 
     /** ----------------- Jolt Shapes and Collisions ---------------- *
-     *  @brief Required in order for collision in Jolt to work.       *
-     *                                                                */
+     *  @name Collider Shape
+     *  @brief Required in order for collision types to be synced with jolts
+     * shape filters
+     */
     enum class collider_shape : uint8_t {
         Box,
         Sphere,
@@ -48,6 +50,13 @@ namespace atlas::physics {
 
     enum body_layer : uint8_t { NonMoving = 0, Moving = 1, LayerNum };
 
+    /**
+     * @brief These are one time use calls. They are made to develop settings
+     * for rigid bodies.
+     *
+     * @warning Some of these values should be read only. Meaning it might be
+     * good to think about a read only version of imgui types.
+     */
     struct physics_body {
         glm::vec3 linear_velocity = glm::vec3(0.0);
         glm::vec3 angular_velocity = glm::vec3(0.0f);
@@ -78,6 +87,7 @@ namespace atlas::physics {
     };
 }
 
+//! @note created for future use of dynamic physics material
 enum combine_friction : uint8_t {
     FrictionDefualt = 0,
     FrictionMax = 1,
@@ -85,6 +95,7 @@ enum combine_friction : uint8_t {
     FrictionNumTypes = 3,
 };
 
+//! @note Created for future use of dynamic physics material
 enum combine_restitution : uint8_t {
     RestitutionDefualt = 0,
     RestitutionMax = 1,
@@ -127,10 +138,11 @@ namespace atlas::physics {
         bool enable_collision_callbacks = true;
     };
 
-    /** --------------- Jolt Intialization Setting ----------------- *
-     * @brief A data structure to give to flecs and get the physics  *
-     * engine prepped for Init() phase.                              *
-     *                                                               */
+    /** 
+     * @name Jolt settings
+     * @brief A data structure to give to flecs and get the physics  
+     * engine prepped for Init() phase.                              
+     */                                                               
 
     /**
      * @note This includes global configs for each scene and how the

@@ -9,13 +9,34 @@
 #include <physics/physics_3d/jolt/interface/jolt_broad_phase.hpp>
 
 namespace atlas::physics {
-
+    /**
+     * @brief This class is made to be 1 of three api wrappers for jolt. Jolt
+     * context is specifically for engine only use of the api. It wraps the
+     * inititialization, the physics step and the clean up. Allow use not to
+     * have to write batching algorithms for each time we want to change the
+     * settings of jolt physics.
+     *
+     * @remark This is different that jolt_api, which is the user wrapper. It is
+     * meant to contain all the effects that can happen during runtime. Where
+     * most of the data can be called by the user. m_physics_system is the only
+     * link between the two classes. Both of which use it for different
+     * purposes. Jolt context to control the functionality of the entire systems
+     * and the Jolt Api for user based control of the system and bodies.
+     * 
+     * @remark The third api is collisions which has its own context for jolt.
+     */
     class jolt_context : public physics_context {
     public:
         jolt_context(jolt_settings p_settings);
         ~jolt_context() override;
 
+        /**
+         * @brief Gives access to the physics system. Is given to jolt_api as
+         * well.
+         *
+         */
         ref<JPH::PhysicsSystem> m_physics_system;
+
     private:
         /**
          * @brief Creates all of the physics bodies at the start of runtime.
@@ -76,33 +97,71 @@ namespace atlas::physics {
           flecs::entity e,
           const collider_body& collider);
 
+        /**
+         * @brief Creates the body and shapes from queries of Rigidbody and
+         * collider
+         *
+         * @param e Entity that you want to create
+         * @param body The associated physics body (optional)
+         * @param collider The collider associated with the entity
+         * @param location The transform (physics_transform for now)
+         * @param out_settings_list Return values for settings
+         * @param out_entity_list Return values for entity ids
+         */
         void add_body(flecs::entity e,
-              const physics_body& body,
-              const collider_body& collider,
-              const transform_physics& location,
-              std::vector<JPH::BodyCreationSettings>& settings_list,
-              std::vector<flecs::entity>& entity_list);
-
-        void add_body_collider(flecs::entity e,
-                       const collider_body& collider,
-                       const transform_physics& location,
-                       std::vector<JPH::BodyCreationSettings>& settings_list,
-                       std::vector<flecs::entity>& entity_list);
+                      const physics_body* body_opt,
+                      const collider_body& collider,
+                      const transform_physics& location,
+                      std::vector<JPH::BodyCreationSettings>& settings_list,
+                      std::vector<flecs::entity>& entity_list);
 
         //! @note Must be defined before physics can be initialized otherwise
         //! jolt cannot be created properly.
         jolt_settings m_settings;
 
+        /**
+         * @brief Creates a static allocation of all data
+         *
+         */
         ref<JPH::TempAllocatorImpl> m_temp_allocator;
+
+        /**
+         * @brief Sets up a thread system, either jolts or custom based on
+         * thread settings in m_settings
+         *
+         */
         scope<JPH::JobSystemThreadPool> m_thread_system;
 
+        /**
+         * @brief Creates filtering for the quad tree in terms of movement
+         *
+         */
         ref<broad_phase_layer_interface> m_broad_phase_layer_interface;
+
+        /**
+         * @brief Creates a filter for the quad tree in terms of objects types
+         *
+         */
         ref<object_vs_broadphase_layer> m_object_vs_broadphase_filter;
+
+        /**
+         * @brief Creates a filter for pairs of collisions
+         *
+         */
         ref<object_layer_pair_filter> m_object_layer_pair_filter;
 
+        /**
+         * @brief Creates a way to recognize collisions
+         *
+         */
         ref<contact_listener> m_contact_listener;
 
-        //! @note This map is to create the scope for shapes created by Jolt.
+        /**
+         * @note This map is to create the scope for shapes created by Jolt.
+         *
+         * @warning This is a temperary solve as it only allows pooling without
+         * regard for adding a body during runtime.
+         */
         std::unordered_map<uint64_t, JPH::RefConst<JPH::Shape>>
           m_shape_registry;
     };
