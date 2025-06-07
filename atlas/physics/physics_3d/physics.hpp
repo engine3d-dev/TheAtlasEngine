@@ -1,7 +1,7 @@
 #pragma once
 
-#include <physics/jolt-cpp/jolt_components.hpp>
 #include <physics/physics_3d/physics_engine.hpp>
+#include <physics/jolt-cpp/jolt_components.hpp>
 #include <core/scene/scene_object.hpp>
 
 namespace atlas::physics {
@@ -9,7 +9,7 @@ namespace atlas::physics {
     enum physics_backend : uint8_t { JoltBackend };
 
     ref<physics_engine> initialize_engine(
-      const ref<scene_object>& p_physics_object);
+      const ref<scene_object>& p_physics_object, flecs::world& p_registery);
 
     void add_force(glm::vec3 force, physics_body body);
 

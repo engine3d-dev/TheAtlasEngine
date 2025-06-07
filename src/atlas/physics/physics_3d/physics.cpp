@@ -1,5 +1,5 @@
 #include <physics/physics_3d/physics.hpp>
-#include <physics/physics_3d/physics_api.hpp>
+#include <physics/physics_3d/jolt/jolt_api.hpp>
 #include <physics/physics_3d/physics_context.hpp>
 #include <physics/physics_3d/jolt/jolt_context.hpp>
 
@@ -10,27 +10,31 @@ namespace atlas::physics {
     ref<physics_api> backend_api;
 
     ref<physics_engine> initialize_engine(
-      const ref<scene_object>& p_physics_object) {
+      const ref<scene_object>& p_physics_object,
+      flecs::world& p_registery) {
         switch (test_api) {
             case physics_backend::JoltBackend: {
-                // backend_api =
-                //   create_ref<jolt_api>(*p_physics_object->get<jolt_config>());
-                console_log_error("Getting here 3!\n");
-                engine_api = create_ref<jolt_context>(
-                  *p_physics_object->get<jolt::jolt_settings>());
 
-                //engine_api->create_bodies();
-                console_log_error("Getting here 4!\n");
+                ref<jolt_context> engine_access = create_ref<jolt_context>(
+                  *p_physics_object->get<jolt_settings>());
+
+                jolt_api user_api(*p_physics_object->get_mut<jolt_config>(),
+                                  engine_access->m_physics_system,
+                                  p_registery);
+                backend_api = create_ref<jolt_api>(user_api);
+
+                engine_api = engine_access;
+
                 return create_ref<physics_engine>(
-                  *p_physics_object->get<jolt::jolt_settings>(), engine_api);
+                  *p_physics_object->get<jolt_settings>(),
+                  engine_api,
+                  backend_api);
             }
             default:
                 return nullptr;
         }
         return nullptr;
     }
-
-    
 
     // void add_force(glm::vec3 force, physics_body body);
 

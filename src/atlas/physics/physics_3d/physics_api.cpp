@@ -1,37 +1,12 @@
-// // #include <physics/physics_3d/physics_engine_backend.hpp>
-// #include <core/scene/scene_object.hpp>
+#include <core/engine_logger.hpp>
+#include <physics/physics_3d/physics_api.hpp>
 
+namespace atlas::physics {
+    void physics_api::update_jolt_values() {
+        retrieve_values();
+    }
 
-// namespace atlas::physics {
-
-//     enum physics_api : uint8_t {
-//         Jolt
-//     };
-
-//     physics_api test_api = Jolt;
-
-//     ref<physics_engine_backend> initialize_engine(const jolt_settings& p_settings) {
-//         switch(test_api){
-//              case physics_api::Jolt: return create_ref<jolt_engine>(p_settings);l
-//              default: return nullptr;
-//         }
-//         return nullptr;
-//     }
-
-//     void create(const ref<scene_object>& p_physics_object) {
-
-//         if (p_physics_object == nullptr) {
-//             console_log_fatal("Missing physics scene object.");
-//             return;
-//         }
-
-//         if (p_physics_object->get<jolt_settings>() == nullptr) {
-//             console_log_fatal("Missing jolt_settings component.");
-//             return;
-//         }
-
-//         engine->start_engine(*p_physics_object->get<jolt_settings>());
-//     }
-
-    
-// }
+    void physics_api::update_atlas_values() {
+        return_values();
+    }
+}

@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <thread>
 #include <Jolt/Jolt.h>
+#include <Jolt/Physics/PhysicsSystem.h>
 #include <Jolt/Physics/Collision/ContactListener.h>
 
 namespace atlas::physics {
@@ -31,6 +32,8 @@ namespace atlas::physics {
      */
 
     struct collider_body {
+        bool collision_enabled = true;
+
         collider_shape shape_type = collider_shape::Box;
 
         glm::vec3 half_extents = glm::vec3(0.5f);
@@ -52,23 +55,17 @@ namespace atlas::physics {
         glm::vec3 cumulative_force = glm::vec3(0.0);
         glm::vec3 cumulative_torque = glm::vec3(0.0);
 
-        float mass = 1.0f;
+        float mass_factor = 1.0f;
+        glm::vec3 center_mass_position = glm::vec3(0.0);
         float linear_damping = 0.0f;
         float angular_damping = 0.0f;
 
-        glm::vec3 inertia = glm::vec3(1.0f);
-        glm::vec3 inverse_inertia = glm::vec3(1.0f);
-
         bool use_gravity = true;
         float gravity_factor = 1.0f;
-        bool collision_enabled = true;
 
         uint8_t body_type = 2;
-        uint32_t friction = 1.0f;
-        uint32_t restitution = 1.0f;
-
-        glm::uvec3 linear_constraints = glm::uvec3(1);
-        glm::uvec3 angular_constraints = glm::uvec3(1);
+        float friction = 0.8f;
+        float restitution = 0.2f;
 
         uint8_t body_movement_type = body_type::Static;
         uint8_t body_layer_type = body_layer::Moving;
@@ -81,12 +78,21 @@ namespace atlas::physics {
     };
 }
 
-/*
- * I seperated, what generalized physics data is and what is specifically
- * related to jolt. We can change later if needed however, be wary that these
- * data structs below only work with jolt.
- */
-namespace atlas::physics::jolt {
+enum combine_friction : uint8_t {
+    FrictionDefualt = 0,
+    FrictionMax = 1,
+    FrictionMin = 2,
+    FrictionNumTypes = 3,
+};
+
+enum combine_restitution : uint8_t {
+    RestitutionDefualt = 0,
+    RestitutionMax = 1,
+    RestitutionMin = 2,
+    RestitutionNumTypes = 3,
+};
+
+namespace atlas::physics {
 
     /** ----------------- Jolt Runtime Config ----------------       *
      * @brief Used to keep global data for player access and use.    *
@@ -97,18 +103,14 @@ namespace atlas::physics::jolt {
         // Global gravity vector for all in scene
         glm::vec3 gravity = glm::vec3(0.0f, -9.80665f, 0.0f);
 
-        // Time step for fps within the physics
-        // If false set to 1/maxFps
-        float fixed_time_step = 1.0f / 60.0f;
-        bool use_fixed_timestep = false;
+        // Friction Setting
+        // This needs to be set to a function which makes it harder
+        combine_friction friction_type = combine_friction::FrictionDefualt;
 
-        // solver for velocity and position
-        uint32_t position_iterations = 6;
-        uint32_t velocity_iterations = 6;
-
-        // When to turn objects on and off depending on speed
-        float sleep_velocity_threshold = 0.05f;
-        float sleep_angular_velocity_threshold = 0.05f;
+        // Restitution Settings
+        // Same thing need functions for each.
+        combine_restitution restitution_type =
+          combine_restitution::RestitutionDefualt;
 
         //! @note In seconds
         float time_before_sleep = 5.0f;
@@ -122,7 +124,6 @@ namespace atlas::physics::jolt {
         float restitution_threshold = 1.0f;
 
         bool enable_constraints = true;
-        bool enable_contacts = true;
         bool enable_collision_callbacks = true;
     };
 
@@ -174,6 +175,19 @@ namespace atlas::physics::jolt {
         uint32_t max_bodies = 16384;
         uint32_t max_body_pairs = 32768;
         uint32_t max_contact_constraints = 8192;
+
+        // Time step for fps within the physics
+        // If false set to 1/maxFps
+        float fixed_time_step = 1.0f / 60.0f;
+        bool use_fixed_timestep = false;
+
+        // solver for velocity and position
+        uint32_t position_iterations = 1;
+        uint32_t velocity_iterations = 8;
+
+        // When to turn objects on and off depending on speed
+        float sleep_velocity_threshold = 0.05f;
+        float sleep_angular_velocity_threshold = 0.05f;
 
         //! @note FIXME: maybe add a debug bool here
     };

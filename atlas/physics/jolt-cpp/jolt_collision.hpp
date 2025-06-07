@@ -11,12 +11,12 @@ namespace atlas::physics {
         jolt_collision();
         jolt_collision(flecs::entity_t p_entity_id);
 
-        void collision_added(jolt::contact_event& p_event);
+        void collision_added(contact_event& p_event);
         // void collision_removed();
         // void collison_persisted();
 
     private:
-        virtual void on_collision_added(jolt::contact_event& p_event);
+        virtual void on_collision_added(contact_event& p_event);
         // virtual void on_collision_persisted() = 0;
         // virtual void on_collision_removed() = 0;
 

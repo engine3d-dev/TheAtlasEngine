@@ -32,7 +32,7 @@ namespace atlas::physics {
          * a specified jolt_collision
          * @param p_event Describes the collision that took place
          */
-        void run_collision_added(uint64_t p_id, jolt::contact_event& p_event);
+        void run_collision_added(uint64_t p_id, contact_event& p_event);
         // run_collision_persisted(uint64_t id);
         // run_collision_persisted(uint64_t id);
 

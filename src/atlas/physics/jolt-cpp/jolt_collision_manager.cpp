@@ -19,7 +19,7 @@ namespace atlas::physics {
 
     void jolt_collision_manager::run_collision_added(
       uint64_t p_id,
-      jolt::contact_event& p_event) {
+      contact_event& p_event) {
         auto it = m_handlers.find(p_id);
         if (it == m_handlers.end()) {
             console_log_error("Key {} does not exist!\n", p_id);

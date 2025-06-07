@@ -37,9 +37,9 @@ namespace atlas::physics {
 
     private:
         //! @note This is a temparary solve, waiting for event handlers
-        std::vector<jolt::contact_event> m_contacts_added;
-        std::vector<jolt::contact_event> m_contacts_persisted;
-        std::vector<jolt::contact_event> m_contacts_removed;
+        std::vector<contact_event> m_contacts_added;
+        std::vector<contact_event> m_contacts_persisted;
+        std::vector<contact_event> m_contacts_removed;
 
         ref<scene_scope> m_scene;
         flecs::world m_registry;

@@ -12,9 +12,10 @@ namespace atlas::physics {
 
     class jolt_context : public physics_context {
     public:
-        jolt_context(jolt::jolt_settings p_settings);
+        jolt_context(jolt_settings p_settings);
         ~jolt_context() override;
 
+        ref<JPH::PhysicsSystem> m_physics_system;
     private:
         /**
          * @brief Creates all of the physics bodies at the start of runtime.
@@ -90,10 +91,9 @@ namespace atlas::physics {
 
         //! @note Must be defined before physics can be initialized otherwise
         //! jolt cannot be created properly.
-        jolt::jolt_settings m_settings;
+        jolt_settings m_settings;
 
         ref<JPH::TempAllocatorImpl> m_temp_allocator;
-        ref<JPH::PhysicsSystem> m_physics_system;
         scope<JPH::JobSystemThreadPool> m_thread_system;
 
         ref<broad_phase_layer_interface> m_broad_phase_layer_interface;

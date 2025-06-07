@@ -32,15 +32,15 @@ namespace atlas::physics {
         jolt_collision_manager::subscribe_action(m_id, *this);
     }
 
-    void jolt_collision::collision_added(jolt::contact_event& p_event) {
+    void jolt_collision::collision_added(contact_event& p_event) {
         on_collision_added(p_event);
     }
 
-    void jolt_collision::on_collision_added(jolt::contact_event& p_event) {
+    void jolt_collision::on_collision_added(contact_event& p_event) {
         console_log_info(
           "Default collision added:\nEvent:\n\tMain Entity ID: {}\n\tCollider "
           "Entity ID: {}\n\tManifold Offset: ({},{},{})\n\tIs A Sensor "
-          "Trigger: {}",
+          "Trigger: {}\n",
           p_event.entity_a,
           p_event.entity_b,
           p_event.manifold.mBaseOffset.GetX(),

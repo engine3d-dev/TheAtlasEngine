@@ -7,9 +7,8 @@
 #include <physics/physics_3d/jolt/jolt_helper.hpp>
 
 namespace atlas::physics {
-
     static bool factory_initialized = false;
-    jolt_context::jolt_context(jolt::jolt_settings p_settings) {
+    jolt_context::jolt_context(jolt_settings p_settings) {
         JPH::RegisterDefaultAllocator();
         JPH::Trace = trace_impl;
         JPH_IF_ENABLE_ASSERTS(JPH::AssertFailed = assert_failed_impl;)
@@ -180,7 +179,7 @@ namespace atlas::physics {
             console_log_error("Scene not found.");
             return;
         }
-        console_log_info("getting here!\n");
+
         scene->query_builder<physics_body, collider_body, transform_physics>()
           .each([&](flecs::entity e,
                     const physics_body& phys,
@@ -225,11 +224,11 @@ namespace atlas::physics {
 
             if (entity_list[i].has<physics_body>())
                 entity_list[i].get_mut<physics_body>()->body_id =
-                  body_id.GetIndex();
+                  body_id.GetIndexAndSequenceNumber();
 
             if (entity_list[i].has<collider_body>())
                 entity_list[i].get_mut<collider_body>()->body_id =
-                  body_id.GetIndex();
+                  body_id.GetIndexAndSequenceNumber();
         }
 
         auto state = body_interface.AddBodiesPrepare(
@@ -238,7 +237,7 @@ namespace atlas::physics {
                                          static_cast<int>(body_ids.size()),
                                          state,
                                          JPH::EActivation::Activate);
-
+        
         console_log_info("Batch inserted {} bodies successfully.",
                          body_ids.size());
     }
@@ -272,53 +271,11 @@ namespace atlas::physics {
 
     void jolt_context::engine_run_physics_step() {
 
-        // Temporary solve for transform fix change later.
-        ref<world_scope> world_object =
-          system_registry::get_world("Editor World");
-        if (!world_object) {
-            console_log_error("World not found.");
-            return;
-        }
-
-        ref<scene_scope> scene = world_object->get_scene("LevelScene");
-        if (!scene) {
-            console_log_error("Scene not found.");
-            return;
-        }
-
-        flecs::world registry = *scene;
-
-        auto& body_interface = m_physics_system->GetBodyInterface();
-
         // Step the simulation
         m_physics_system->Update(application::delta_time(),
                                  (int)application::physics_step(),
                                  m_temp_allocator.get(),
                                  m_thread_system.get());
-
-        //! @note FIXME: Temporary solve for transform fix
-
-        JPH::BodyIDVector all_body_ids;
-        m_physics_system->GetBodies(all_body_ids);
-
-        for (JPH::BodyID id : all_body_ids) {
-            flecs::entity flecs_object;
-            flecs_object =
-              flecs::entity(registry, body_interface.GetUserData(id));
-            flecs::ref<transform> location;
-            location = flecs_object.get_ref<transform>();
-
-            JPH::RVec3 physics_position;
-            physics_position = body_interface.GetPosition(id);
-            location->Position = { physics_position.GetX(),
-                                   physics_position.GetY(),
-                                   physics_position.GetZ() };
-            JPH::Vec3 physics_rotation;
-            physics_rotation = body_interface.GetRotation(id).GetEulerAngles();
-            location->Rotation = { physics_rotation.GetX(),
-                                   physics_rotation.GetY(),
-                                   physics_rotation.GetZ() };
-        }
     }
 
     void jolt_context::engine_run_contact_added() {
