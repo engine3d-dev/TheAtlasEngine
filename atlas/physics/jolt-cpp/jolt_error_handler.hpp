@@ -1,4 +1,7 @@
 #pragma once
+#ifndef _LIBCPP_ENABLE_CXX20_TYPE_TRAITS
+#define _LIBCPP_ENABLE_CXX20_TYPE_TRAITS
+#endif
 #include <physics/jolt-cpp/jolt-imports.hpp>
 
 /**
