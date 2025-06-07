@@ -1,7 +1,6 @@
 #pragma once
 
-#include <type_traits> // NOLINT
-using ignore_unused_include_type_traits = std::is_same<int, int>;
+#include <type_traits>
 
 #include <Jolt/Jolt.h>
 #include <Jolt/Core/Core.h>

@@ -10,6 +10,8 @@ set(VULKAN_SHADERS_SRC_DIR ${VULKAN_SRC_DIR}/Shaders)
 set(
     all_headers
 
+    ${INCLUDE_DIR}/physics/jolt-cpp/jolt-imports.hpp
+
     # Event stuff
     ${INCLUDE_DIR}/core/event/key_codes.hpp
     ${INCLUDE_DIR}/core/event/mouse_codes.hpp
