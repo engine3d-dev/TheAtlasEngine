@@ -1,6 +1,6 @@
 #include <drivers/vulkan-cpp/vk_present_queue.hpp>
 #include <drivers/vulkan-cpp/vk_context.hpp>
-#include <drivers/vulkan/helper_functions.hpp>
+#include <drivers/vulkan-cpp/helper_functions.hpp>
 #include <core/engine_logger.hpp>
 
 namespace atlas::vk {
@@ -97,17 +97,17 @@ namespace atlas::vk {
                                 m_present_completed_semaphore,
                                 nullptr,
                                 &image_acquired);
+		
+		if(acquired_next_image_result == VK_ERROR_OUT_OF_DATE_KHR) {
+			console_log_trace("acquired next image out of date!!!");
+			m_resize_requested = true;
+		}
 
         vk_check(acquired_next_image_result,
                  "vkAcquireNextImageKHR",
                  __FILE__,
                  __LINE__,
                  __FUNCTION__);
-		
-		if(acquired_next_image_result == VK_ERROR_OUT_OF_DATE_KHR) {
-			console_log_trace("acquired next image out of date!!!");
-			m_resize_requested = true;
-		}
 
         return image_acquired;
     }
