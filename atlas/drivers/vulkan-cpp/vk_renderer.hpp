@@ -3,6 +3,14 @@
 #include <drivers/renderer_context.hpp>
 #include <drivers/vulkan-cpp/vk_swapchain.hpp>
 #include <drivers/vulkan-cpp/vk_command_buffer.hpp>
+#include <drivers/vulkan-cpp/vk_shader_group.hpp>
+#include <drivers/vulkan-cpp/vk_pipeline.hpp>
+#include <drivers/vulkan-cpp/vk_uniform_buffer.hpp>
+#include <vector>
+#include <drivers/vulkan-cpp/vk_texture.hpp>
+#include <drivers/vulkan-cpp/mesh.hpp>
+#include <drivers/vulkan-cpp/vk_uniform_buffer.hpp>
+#include <vector>
 
 namespace atlas::vk {
     /**
@@ -23,20 +31,27 @@ namespace atlas::vk {
     */
     class vk_renderer : public render_context {
     public:
-        vk_renderer(const std::string& p_tag);
-        vk_renderer(const vk_swapchain& p_swapchain_handler, const std::string& p_tag);
+        vk_renderer(const vk_swapchain& p_swapchain, const std::string& p_tag);
         
         ~vk_renderer() override;
 
     private:
-        void start_frame(const vk_command_buffer& p_current, const VkFramebuffer& p_current_fb, const VkRenderPass& p_current_renderpass) override;
+        void start_frame(const vk_command_buffer& p_current, const vk::vk_swapchain& p_swapchain_handler) override;
         void post_frame() override;
         void background_color(const std::array<float, 4>& p_color) override;
 
     private:
         vk_driver m_driver{};
-        vk_swapchain m_swapchain_handler;
+        vk_swapchain m_main_swapchain{};
         vk_command_buffer m_current_command_buffer{};
         VkClearColorValue m_color;
+
+        vk_shader_group m_shader_group;
+        vk_pipeline m_main_pipeline{};
+        std::vector<vk_uniform_buffer> m_uniform_buffers{};
+        mesh m_test_mesh;
+        std::vector<vk_uniform_buffer> m_global_uniforms{};
+        uint32_t m_image_count=0;
+        descriptor_set m_descriptor_set_test{};
     };
 };
