@@ -10,15 +10,15 @@ namespace atlas {
     // scope<render_context> g_renderer_backend = nullptr;
     renderer* renderer::s_instance= nullptr;
 
-    renderer::renderer(const vk::vk_swapchain& p_swapchain_handler, const std::string& p_tag) {
+    renderer::renderer(const vk::vk_swapchain& p_swapchain, const std::string& p_tag) {
         console_log_info("Begin Renderer Initialization!!!");
-        m_render_context = initialize_renderer(p_swapchain_handler, p_tag);
+        m_render_context = initialize_renderer(p_swapchain, p_tag);
 
         console_log_info("End Renderer Initialization!!!\n\n");
     }
 
-    void renderer::begin(const vk::vk_command_buffer& p_current, const VkFramebuffer& p_current_fb, const VkRenderPass& p_current_rp) {
-        return m_render_context->begin_frame(p_current, p_current_fb, p_current_rp);
+    void renderer::begin(const vk::vk_command_buffer& p_current, const vk::vk_swapchain& p_current_rp) {
+        return m_render_context->begin_frame(p_current, p_current_rp);
     }
 
     void renderer::end() {
