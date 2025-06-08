@@ -2,7 +2,7 @@
 #include <drivers/vulkan-cpp/vk_context.hpp>
 #include <span>
 #include <core/engine_logger.hpp>
-#include <drivers/vulkan/helper_functions.hpp>
+#include <drivers/vulkan-cpp/helper_functions.hpp>
 
 namespace atlas::vk {
     [[maybe_unused]] static VkFormat search_supported_depth_format(

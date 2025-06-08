@@ -1,6 +1,6 @@
 #include <drivers/vulkan-cpp/vk_renderpass.hpp>
 #include <drivers/vulkan-cpp/vk_context.hpp>
-#include <drivers/vulkan/helper_functions.hpp>
+#include <drivers/vulkan-cpp/helper_functions.hpp>
 #include <core/engine_logger.hpp>
 
 namespace atlas::vk {

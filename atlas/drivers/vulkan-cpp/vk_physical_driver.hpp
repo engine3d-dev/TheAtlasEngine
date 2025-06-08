@@ -35,13 +35,6 @@ namespace atlas::vk {
 
         operator VkPhysicalDevice() const { return m_physical_driver; }
 
-        //! @brief Selects specific queue families based on the indices available per queue family
-        queue_family_indices select_graphics_queue_family(const int& p_family_index);
-
-        queue_family_indices select_compute_queue_family(const int& p_family_index);
-        
-        queue_family_indices select_transfer_queue_family(const int& p_family_index);
-
     private:
         queue_family_indices select_queue_family_indices();
 

@@ -2,7 +2,7 @@
 #include <drivers/vulkan-cpp/vk_context.hpp>
 #include <core/engine_logger.hpp>
 #include <iostream>
-#include <drivers/vulkan/helper_functions.hpp>
+#include <drivers/vulkan-cpp/helper_functions.hpp>
 
 namespace atlas::vk {
     std::vector<const char*> initialize_instance_extensions() {

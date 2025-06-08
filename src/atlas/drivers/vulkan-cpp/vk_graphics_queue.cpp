@@ -1,6 +1,6 @@
 #include <drivers/vulkan-cpp/vk_graphics_queue.hpp>
 #include <drivers/vulkan-cpp/vk_context.hpp>
-#include <drivers/vulkan/helper_functions.hpp>
+#include <drivers/vulkan-cpp/helper_functions.hpp>
 
 namespace atlas::vk {
 

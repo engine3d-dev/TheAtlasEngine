@@ -2,7 +2,7 @@
 #include <drivers/vulkan-cpp/vk_window.hpp>
 #include <core/engine_logger.hpp>
 #include <drivers/vulkan-cpp/vk_context.hpp>
-#include <drivers/vulkan/helper_functions.hpp>
+#include <drivers/vulkan-cpp/helper_functions.hpp>
 
 namespace atlas::vk {
 	vk_window* vk_window::s_instance = nullptr;
