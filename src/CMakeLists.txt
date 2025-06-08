@@ -13,7 +13,7 @@ set(
     ${SRC_DIR}/core/event/event.cpp
 
     # ${SRC_DIR}/thread_utils/thread_utils.cpp
-    # ${SRC_DIR}/core/image/stb_image.cpp
+    ${SRC_DIR}/core/image/stb_image.cpp
 
     ${SRC_DIR}/core/engine_logger.cpp
     ${SRC_DIR}/core/window.cpp
@@ -52,7 +52,6 @@ set(
     ${SRC_DIR}/renderer/renderer.cpp
     ${SRC_DIR}/drivers/render_context.cpp
     ${SRC_DIR}/drivers/graphics_context.cpp
-    ${SRC_DIR}/drivers/image/stb_image.cpp
 
     ## ui-stuff backend
     # ${SRC_DIR}/drivers/ui/imgui_backend.cpp
