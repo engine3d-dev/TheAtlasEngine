@@ -59,12 +59,6 @@ set(
     
     ${SRC_DIR}/core/ui/widgets.cpp
 
-    ## graphic drivers backend-agnostic
-    # ${SRC_DIR}/drivers/swapchain.cpp
-    # ${SRC_DIR}/drivers/vertex_buffer.cpp
-    # ${SRC_DIR}/drivers/index_buffer.cpp
-    # ${SRC_DIR}/drivers/shader.cpp
-
     ## Vulkan Driver stuff
     ${VULKAN_SRC_DIR}/vk_window.cpp
     # ${VULKAN_SRC_DIR}/vulkan_core.cpp
