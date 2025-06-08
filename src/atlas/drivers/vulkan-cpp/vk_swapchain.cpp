@@ -1,7 +1,7 @@
 #include <drivers/vulkan-cpp/vk_swapchain.hpp>
 #include <drivers/vulkan-cpp/vk_context.hpp>
 #include <core/engine_logger.hpp>
-#include <drivers/vulkan/helper_functions.hpp>
+#include <drivers/vulkan-cpp/helper_functions.hpp>
 #include <drivers/vulkan-cpp/vk_types.hpp>
 #include <array>
 
@@ -109,6 +109,7 @@ namespace atlas::vk {
         // Creating Images
         console_log_info("vk_swapchain begin images initialization!!!");
         m_swapchain_images.resize(image_count);
+		m_image_size = image_count;
         m_swapchain_depth_images.resize(image_count);
 
         console_log_info("swapchain images.size() = {}",
@@ -290,7 +291,7 @@ namespace atlas::vk {
 		m_present_to_queue.wait_idle();
 
 		if(m_present_to_queue.resize_requested()) {
-			console_log_fatal("presentation queue recreation requested!!!!");
+			console_log_fatal("BEFORE ACQUIRED_FRAME() GETS CALLED!!!!");
 			recreate();
 			m_present_to_queue.set_resize_status(false);
 			console_log_error("resize requesteed = {}", m_present_to_queue.resize_requested());
@@ -301,12 +302,6 @@ namespace atlas::vk {
 	}
 
 	void vk_swapchain::present(const uint32_t& p_current_frame) {
-		if(m_present_to_queue.resize_requested()) {
-			console_log_fatal("presentation queue recreation requested!!!!");
-			recreate();
-			m_present_to_queue.set_resize_status(false);
-			console_log_error("resize requesteed = {}", m_present_to_queue.resize_requested());
-		}
 		m_present_to_queue.present_frame(p_current_frame);
 	}
 
