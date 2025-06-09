@@ -17,7 +17,7 @@ namespace atlas {
 
     struct transform {
         glm::highp_vec3 Position{ 0.f };
-        glm::highp_vec4 QuaternionRotation{ 0.f ,0,0,1};
+        glm::highp_vec4 QuaternionRotation{ 0.f, 0, 0, 1 };
         glm::highp_vec3 Rotation{ 0.f };
         glm::highp_vec3 Scale{ 1.f };
         glm::highp_vec4 Color{ 1.f };
