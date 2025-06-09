@@ -22,7 +22,7 @@ namespace atlas::physics {
      * link between the two classes. Both of which use it for different
      * purposes. Jolt context to control the functionality of the entire systems
      * and the Jolt Api for user based control of the system and bodies.
-     * 
+     *
      * @remark The third api is collisions which has its own context for jolt.
      */
     class jolt_context : public physics_context {

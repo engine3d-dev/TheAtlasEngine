@@ -4,7 +4,6 @@
 #include <physics/physics_3d/jolt/jolt_context.hpp>
 #include <physics/physics_3d/physics_api.hpp>
 
-
 namespace atlas::physics {
 
     /**
@@ -17,7 +16,8 @@ namespace atlas::physics {
         // Required by maps but should not be used in anyother circumstance.
         physics_engine() = default;
         physics_engine(jolt_settings p_settings,
-                       ref<physics_context>& p_engine, ref<physics_api>& p_user_api);
+                       ref<physics_context>& p_engine,
+                       ref<physics_api>& p_user_api);
 
         /**
          * @brief The runtime is specifically the way to start the physics,

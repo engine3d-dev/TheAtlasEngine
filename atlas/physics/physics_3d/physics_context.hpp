@@ -1,5 +1,13 @@
 #pragma once
 namespace atlas::physics {
+    /**
+     * @brief The context is the way to interact with only the engine. It is the
+     * api for all the background funcitons and information that the user
+     * shouldn not see. It is a virtual based type erasure class so thatmany
+     * engines can implement the same functions. Specifically realted to backend
+     * engine creation like batching, starting runtime, etc...
+     *
+     */
     class physics_context {
     public:
         // Pass through function to allow private virtual functions to be called

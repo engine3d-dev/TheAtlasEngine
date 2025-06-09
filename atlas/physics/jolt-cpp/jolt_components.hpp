@@ -9,7 +9,7 @@
 
 namespace atlas::physics {
 
-    /** ----------------- Jolt Shapes and Collisions ---------------- *
+    /**
      *  @name Collider Shape
      *  @brief Required in order for collision types to be synced with jolts
      * shape filters
@@ -26,7 +26,8 @@ namespace atlas::physics {
     };
 
     /**
-     * @note Some of this data is not required depending on the shape
+     * @name Collider Body
+     * @brief Some of this data is not required depending on the shape
      *
      * @remark If there is a way to hide or disable certains action in the
      * editor depending on the collider_shape, it would be good to do so in
@@ -51,6 +52,7 @@ namespace atlas::physics {
     enum body_layer : uint8_t { NonMoving = 0, Moving = 1, LayerNum };
 
     /**
+     * @name Physics Body
      * @brief These are one time use calls. They are made to develop settings
      * for rigid bodies.
      *
@@ -80,6 +82,7 @@ namespace atlas::physics {
         uint8_t body_layer_type = body_layer::Moving;
 
         uint32_t body_id = 0;
+        int count = 0;
     };
 
     struct collider_event {
@@ -87,7 +90,7 @@ namespace atlas::physics {
     };
 }
 
-//! @note created for future use of dynamic physics material
+//! @brief created for future use of dynamic physics material
 enum combine_friction : uint8_t {
     FrictionDefualt = 0,
     FrictionMax = 1,
@@ -95,7 +98,7 @@ enum combine_friction : uint8_t {
     FrictionNumTypes = 3,
 };
 
-//! @note Created for future use of dynamic physics material
+//! @brief Created for future use of dynamic physics material
 enum combine_restitution : uint8_t {
     RestitutionDefualt = 0,
     RestitutionMax = 1,
@@ -105,11 +108,11 @@ enum combine_restitution : uint8_t {
 
 namespace atlas::physics {
 
-    /** ----------------- Jolt Runtime Config ----------------       *
-     * @brief Used to keep global data for player access and use.    *
-     * Tells how physics bodies should act within a given scene by   *
-     * default.                                                      *
-     *                                                               */
+    /**
+     * @brief Used to keep global data for player access and use.
+     * Tells how physics bodies should act within a given scene by
+     * default.
+     */
     struct jolt_config {
         // Global gravity vector for all in scene
         glm::vec3 gravity = glm::vec3(0.0f, -9.80665f, 0.0f);
@@ -123,7 +126,7 @@ namespace atlas::physics {
         combine_restitution restitution_type =
           combine_restitution::RestitutionDefualt;
 
-        //! @note In seconds
+        //! @brief In seconds
         float time_before_sleep = 5.0f;
 
         // What 1 unit refers to in meters
@@ -138,14 +141,14 @@ namespace atlas::physics {
         bool enable_collision_callbacks = true;
     };
 
-    /** 
+    /**
      * @name Jolt settings
-     * @brief A data structure to give to flecs and get the physics  
-     * engine prepped for Init() phase.                              
-     */                                                               
+     * @brief A data structure to give to flecs and get the physics
+     * engine prepped for Init() phase.
+     */
 
     /**
-     * @note This includes global configs for each scene and how the
+     * @brief This includes global configs for each scene and how the
      * physics engine will behave in a paticular scene.
      *
      * @remark world_bounds_min && world_bounds_max: These values are
@@ -201,7 +204,7 @@ namespace atlas::physics {
         float sleep_velocity_threshold = 0.05f;
         float sleep_angular_velocity_threshold = 0.05f;
 
-        //! @note FIXME: maybe add a debug bool here
+        //! @brief FIXME: maybe add a debug bool here
     };
 
     // This might be able to be generalized eventually but we will have to

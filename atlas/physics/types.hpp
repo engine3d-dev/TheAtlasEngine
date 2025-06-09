@@ -3,6 +3,12 @@
 #include <physics/jolt-cpp/jolt-imports.hpp>
 #include <glm/glm.hpp>
 
+/**
+ * @brief Types are still be filled out. When this is completed to_jph() can be
+ * removed.
+ *
+ */
+
 namespace atlas::physics {
 
     template<typename T>
@@ -23,7 +29,9 @@ namespace atlas::physics {
             return m_value;
         }
 
-        bool operator==(const glm::vec3& other) const { return m_value == other; }
+        bool operator==(const glm::vec3& other) const {
+            return m_value == other;
+        }
 
     private:
         glm::vec3 m_value;
@@ -42,7 +50,9 @@ namespace atlas::physics {
             return m_value;
         }
 
-        bool operator==(const glm::vec3& other) const { return m_value == other; }
+        bool operator==(const glm::vec3& other) const {
+            return m_value == other;
+        }
 
     private:
         glm::vec3 m_value;
@@ -111,7 +121,9 @@ namespace atlas::physics {
             return m_value;
         }
 
-        bool operator==(const glm::vec4& other) const { return m_value == other; }
+        bool operator==(const glm::vec4& other) const {
+            return m_value == other;
+        }
 
     private:
         glm::vec4 m_value;
@@ -130,7 +142,9 @@ namespace atlas::physics {
             return m_value;
         }
 
-        bool operator==(const glm::vec4& other) const { return m_value == other; }
+        bool operator==(const glm::vec4& other) const {
+            return m_value == other;
+        }
 
     private:
         glm::vec4 m_value;
@@ -167,7 +181,9 @@ namespace atlas::physics {
             return m_value;
         }
 
-        bool operator==(const glm::mat4& other) const { return m_value == other; }
+        bool operator==(const glm::mat4& other) const {
+            return m_value == other;
+        }
 
     private:
         glm::mat4 m_value;

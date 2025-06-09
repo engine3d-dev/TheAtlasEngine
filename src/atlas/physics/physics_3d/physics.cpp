@@ -36,16 +36,31 @@ namespace atlas::physics {
         return nullptr;
     }
 
-    // void add_force(glm::vec3 force, physics_body body);
-
+    void add_force(const glm::vec3& force, const physics_body& body) {
+        backend_api->add_force_by_body(force, body);
+    }
+    //! TODO: Create the world point force funciton
     // void add_force_world_point(glm::vec3 force,
     //                            glm::vec3 position,
-    //                            physics_body body);
+    //                            physics_body body) {
 
-    // void add_force_on_contact(glm::vec3 force, physics_body body);
+    //                            }
 
-    // void set_velocity(const glm::vec3& velocity, physics_body body);
+    void add_velocity(const glm::vec3& velocity, const physics_body& body) {
+        backend_api->add_linear_velocity_by_body(velocity, body);
+    }
 
-    // void set_angular_velocity(const glm::vec3& angular_velocity, physics_body
-    // body);
+    void add_angular_velocity(const glm::vec3& angular_velocity,
+                              const physics_body& body) {
+        backend_api->add_angular_velocity_by_body(angular_velocity, body);
+    }
+
+    void set_velocity(const glm::vec3& velocity, const physics_body& body) {
+        backend_api->set_linear_velocity_by_body(velocity, body);
+    }
+
+    void set_angular_velocity(const glm::vec3& angular_velocity,
+                              const physics_body& body) {
+        backend_api->set_angular_velocity_by_body(angular_velocity, body);
+    }
 }
