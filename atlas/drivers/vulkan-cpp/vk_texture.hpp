@@ -15,11 +15,11 @@ namespace atlas::vk {
 
         [[nodiscard]] vk_image data() const { return m_texture_image; }
 
-        [[nodiscard]] VkImageView image_view() const { return m_texture_image.ImageView; }
+        [[nodiscard]] VkImageView image_view() const { return m_texture_image.image_view; }
 
-        [[nodiscard]] VkImage image() const { return m_texture_image.Image; }
+        [[nodiscard]] VkImage image() const { return m_texture_image.image; }
 
-        [[nodiscard]] VkSampler sampler() const { return m_texture_image.Sampler; }
+        [[nodiscard]] VkSampler sampler() const { return m_texture_image.sampler; }
 
         void update_texture(vk_image& p_image, uint32_t p_width, uint32_t p_height, VkFormat p_format, const  void* p_data);
 

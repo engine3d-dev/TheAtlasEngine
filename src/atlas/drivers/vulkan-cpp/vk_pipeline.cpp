@@ -35,36 +35,34 @@ namespace atlas::vk {
     vk_pipeline::vk_pipeline(const VkRenderPass& p_renderpass,
                              vk_shader_group& p_shader_group) {
         m_driver = vk_context::driver_context();
-		m_shader_group = p_shader_group;
+        m_shader_group = p_shader_group;
 
         console_log_info("m_shader_modules.size() = {}", m_shader_group.size());
 
         create(p_renderpass);
     }
 
-	vk_pipeline::vk_pipeline(const VkRenderPass& p_renderpass, const vk_shader_group& p_shader_group, const VkDescriptorSetLayout& p_descriptor_layout) {
-		m_driver = vk_context::driver_context();
-		m_shader_group = p_shader_group;
-		m_descriptor_set_layout = p_descriptor_layout;
-		create(p_renderpass);
-	}
+    vk_pipeline::vk_pipeline(const VkRenderPass& p_renderpass,
+                             const vk_shader_group& p_shader_group,
+                             const VkDescriptorSetLayout& p_descriptor_layout) {
+        m_driver = vk_context::driver_context();
+        m_shader_group = p_shader_group;
+        m_descriptor_set_layout = p_descriptor_layout;
+        create(p_renderpass);
+    }
 
     void vk_pipeline::create(const VkRenderPass& p_renderpass) {
         console_log_info("vk_pipeline::create begin initialization!!!");
-        console_log_info("Debug #0.0");
-		std::vector<VkPipelineShaderStageCreateInfo> pipeline_shader_stages(
+        std::vector<VkPipelineShaderStageCreateInfo> pipeline_shader_stages(
           m_shader_group.size());
 
         uint32_t shader_source_index = 0;
-
-		console_log_warn("Debug #1");
 
         // Loading shader handlers loaded from vk_shader_group
         for (const vk_shader_module& info : m_shader_group.data()) {
             VkShaderStageFlagBits shader_stage_flag =
               shader_stage_to_vk(info.stage);
             std::string stage = shader_stage_to_string(shader_stage_flag);
-			console_log_info("Shader Stage Loaded = {}", stage);
 
             pipeline_shader_stages[shader_source_index] = {
                 .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
@@ -75,8 +73,6 @@ namespace atlas::vk {
 
             shader_source_index++;
         }
-
-		console_log_warn("Debug #2");
 
         // Loading in the vertex attributes and vertex binding attribtues into
         // the pipeline
@@ -95,8 +91,6 @@ namespace atlas::vk {
             .pVertexAttributeDescriptions = vertex_attributes.data()
         };
 
-		console_log_warn("Debug #3");
-
         VkPipelineInputAssemblyStateCreateInfo input_assembly = {
             .sType =
               VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
@@ -104,7 +98,6 @@ namespace atlas::vk {
             .primitiveRestartEnable = VK_FALSE,
         };
 
- 
         VkPipelineViewportStateCreateInfo viewport_state = {
             .sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
             .viewportCount = 1,
@@ -114,10 +107,10 @@ namespace atlas::vk {
         //! @note Rasterization
         VkPipelineRasterizationStateCreateInfo rasterizer_ci = {
             .sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
-            .depthClampEnable = VK_FALSE,
+            .depthClampEnable = false,
             .rasterizerDiscardEnable =
-              VK_FALSE, // set to true make fragmenta that are beyond near/far
-                        // planes clamped to them as opposed to discarding them
+              false, // set to true make fragmenta that are beyond near/far
+                     // planes clamped to them as opposed to discarding them
             .polygonMode =
               VK_POLYGON_MODE_FILL, // if set to true then geometry never passes
                                     // through rasterizer stage. This basically
@@ -139,7 +132,7 @@ namespace atlas::vk {
         VkPipelineMultisampleStateCreateInfo multisampling_ci = {
             .sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
             .rasterizationSamples = VK_SAMPLE_COUNT_1_BIT,
-            .sampleShadingEnable = VK_FALSE,
+            .sampleShadingEnable = false,
             // .minSampleShading = 1.0f,          // Optional
             // .pSampleMask = nullptr,            // Optional
             // .alphaToCoverageEnable = VK_FALSE, // Optional
@@ -209,11 +202,11 @@ namespace atlas::vk {
             pipeline_layout_ci.pSetLayouts = &m_descriptor_set_layout;
         }
         else {
-			// TODO: Uncomment this when adding back in descriptor sets
-			// For now I will disable it to get the base working and add descriptor
-			// sets back in afterwards
-			pipeline_layout_ci.setLayoutCount = 0;
-			pipeline_layout_ci.pSetLayouts = nullptr;
+            // TODO: Uncomment this when adding back in descriptor sets
+            // For now I will disable it to get the base working and add
+            // descriptor sets back in afterwards
+            pipeline_layout_ci.setLayoutCount = 0;
+            pipeline_layout_ci.pSetLayouts = nullptr;
         }
 
         vk_check(vkCreatePipelineLayout(
@@ -222,8 +215,9 @@ namespace atlas::vk {
                  __FILE__,
                  __LINE__,
                  __FUNCTION__);
-		
-		console_log_info("pipeline_shader_stages.size() = {}", pipeline_shader_stages.size());
+
+        console_log_info("pipeline_shader_stages.size() = {}",
+                         pipeline_shader_stages.size());
 
         VkGraphicsPipelineCreateInfo graphics_pipeline_ci = {
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
@@ -257,16 +251,18 @@ namespace atlas::vk {
                      __FILE__,
                      __LINE__,
                      __FUNCTION__);
-        
+
         console_log_info("vk_pipeline end initialization!!!\n\n");
     }
 
     void vk_pipeline::bind(const VkCommandBuffer& p_current) {
-        vkCmdBindPipeline(p_current, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_handler);
+        vkCmdBindPipeline(
+          p_current, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_handler);
     }
 
     void vk_pipeline::destroy() {
-		// vkDestroyDescriptorSetLayout(m_driver, m_descriptor_set_layout, nullptr);
+        // vkDestroyDescriptorSetLayout(m_driver, m_descriptor_set_layout,
+        // nullptr);
         vkDestroyPipelineLayout(m_driver, m_pipeline_layout, nullptr);
         vkDestroyPipeline(m_driver, m_pipeline_handler, nullptr);
     }

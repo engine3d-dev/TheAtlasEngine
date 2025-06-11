@@ -65,7 +65,7 @@ namespace atlas::vk {
 
         // 3.) Create Image View
         VkImageAspectFlags aspect_flags = VK_IMAGE_ASPECT_COLOR_BIT;
-        m_texture_image.ImageView = create_image_view(m_texture_image.Image, format, aspect_flags);
+        m_texture_image.image_view = create_image_view(m_texture_image.image, format, aspect_flags);
 
         vk_filter_range sampler_range = {
             .min = VK_FILTER_LINEAR,
@@ -74,7 +74,7 @@ namespace atlas::vk {
 
         VkSamplerAddressMode addr_mode = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 
-        m_texture_image.Sampler = create_sampler(sampler_range, addr_mode);
+        m_texture_image.sampler = create_sampler(sampler_range, addr_mode);
         m_is_image_loaded = true;
     }
 
@@ -100,37 +100,36 @@ namespace atlas::vk {
         int layer_count = 1;
         uint32_t image_size = layer_count * layer_size;
 
-        VkBufferUsageFlags usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-        VkMemoryPropertyFlags property = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-                                         VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
 
         // 3. creating data for staging buffers
         // m_staging_buffer = create_buffer(image_size, usage, property);
 
         vk_buffer_info staging_info = {
             .device_size = (uint32_t)image_size,
-            .usage = usage,
-            .memory_property_flag = property
+            .usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+            .memory_property_flag = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_CACHED_BIT,
+                                        //  VK_MEMORY_PROPERTY_HOST_COHERENT_BIT; // Is slower then HOST_CACHED_BIT, reminder comment to benchmark in milliseconds.
         };
+
         m_staging_buffer = create_buffer(staging_info);
 
         // 4. maps the buffer data to that parameters
         write(m_staging_buffer, p_data, image_size);
 
         // 5. transition image layout
-        transition_image_layout(p_image.Image,
+        transition_image_layout(p_image.image,
                                 p_format,
                                 VK_IMAGE_LAYOUT_UNDEFINED,
                                 VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
         // // 6. Copy buffer to image
-        copy(m_copy_command_buffer, p_image.Image,
+        copy(m_copy_command_buffer, p_image.image,
                              m_staging_buffer.handler,
                              p_width,
                              p_height);
 
         // // 7. transition image layout again
-        transition_image_layout(p_image.Image,
+        transition_image_layout(p_image.image,
                                 p_format,
                                 VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                                 VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
@@ -139,11 +138,11 @@ namespace atlas::vk {
     }
 
     void texture::destroy() {
-        vkDestroyImageView(m_driver, m_texture_image.ImageView, nullptr);
-        vkDestroyImage(m_driver, m_texture_image.Image, nullptr);
-        vkDestroySampler(m_driver, m_texture_image.Sampler, nullptr);
+        vkDestroyImageView(m_driver, m_texture_image.image_view, nullptr);
+        vkDestroyImage(m_driver, m_texture_image.image, nullptr);
+        vkDestroySampler(m_driver, m_texture_image.sampler, nullptr);
 
-        vkFreeMemory(m_driver, m_texture_image.DeviceMemory, nullptr);
+        vkFreeMemory(m_driver, m_texture_image.device_memory, nullptr);
 
         vkDestroyBuffer(m_driver, m_staging_buffer.handler, nullptr);
         vkFreeMemory(m_driver, m_staging_buffer.device_memory, nullptr);

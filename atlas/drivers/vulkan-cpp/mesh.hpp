@@ -9,6 +9,7 @@
 #include <glm/gtx/hash.hpp>
 #include <string>
 #include <drivers/vulkan-cpp/vk_texture.hpp>
+#include <filesystem>
 
 namespace atlas::vk {
 
@@ -20,7 +21,7 @@ namespace atlas::vk {
     public:
         mesh() = default;
         mesh(const std::span<vertex>& p_vertices, const std::span<uint32_t>& p_indices);
-        mesh(const std::string& p_filename);
+        mesh(const std::filesystem::path& p_filename);
 
         void draw(const VkCommandBuffer& p_current);
 
