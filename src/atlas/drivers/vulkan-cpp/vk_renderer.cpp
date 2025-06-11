@@ -62,10 +62,10 @@ namespace atlas::vk {
 
         // Setting the parameters for setting up the descriptor set layout
         descriptor_set_layout main_layout = {
-            .allocate_count = m_image_count,            // the count of descriptor set layout to allocated
-            .max_sets = m_image_count,                  // max of descriptor sets to allocated
+            .allocate_count = m_image_count,            // the count how many descriptor set layout able to be allocated
+            .max_sets = m_image_count,                  // max of descriptor sets able to allocate
             .size_bytes = sizeof(camera_ubo),           // size of bytes of the uniforms utilized by this descriptor sets
-            .allocation_info = allocation_info,         // setting up allocation information descriptor sets need to know about the uniforms its using
+            .allocation_info = allocation_info,         // specify the collection of multiple descriptor sets pool allocation sizes
             .bindings = descriptor_set_layout_bindings  // specifying layout bindings specified in the shader for specific information thats gonna be passed into this descriptor sets
         };
 
