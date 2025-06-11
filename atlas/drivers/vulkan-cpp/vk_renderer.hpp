@@ -11,6 +11,7 @@
 #include <drivers/vulkan-cpp/mesh.hpp>
 #include <drivers/vulkan-cpp/vk_uniform_buffer.hpp>
 #include <vector>
+#include <map>
 
 namespace atlas::vk {
     /**
@@ -33,7 +34,7 @@ namespace atlas::vk {
     public:
         vk_renderer(const vk_swapchain& p_swapchain, const std::string& p_tag);
         
-        ~vk_renderer() override;
+        ~vk_renderer() override = default;
 
     private:
         void start_frame(const vk_command_buffer& p_current, const vk::vk_swapchain& p_swapchain_handler) override;
@@ -53,5 +54,11 @@ namespace atlas::vk {
         std::vector<vk_uniform_buffer> m_global_uniforms{};
         uint32_t m_image_count=0;
         descriptor_set m_descriptor_set_test{};
+
+        // This is for caching any loaded mesh and only modifying this mesh if that entity is there.
+        // It is for this vk_renderer to manage
+        // std::string = the name of the entity
+        // mesh = corresponding to the entity that is being loaded
+        std::map<std::string, mesh> m_cached_meshes;
     };
 };

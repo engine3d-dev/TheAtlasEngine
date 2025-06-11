@@ -18,40 +18,32 @@ namespace atlas::vk {
         ImageAndSampler=2
     };
 
-    struct vk_descriptor_set_properties {
-        vk_descriptor_set_properties(const std::string& p_name,
-                                     const uint32_t p_layout_binding,
-                                     const descriptor_type& p_type,
-                                     const shader_stage& p_stage,
-                                     bool p_has_samplers = false)
-          : name(p_name)
-          , binding(p_layout_binding)
-          , type(p_type)
-          , stage(p_stage)
-          , has_samplers(p_has_samplers) {}
-
-        std::string name = "Undefined";
-        uint32_t binding = -1;
-        descriptor_type type;
-        shader_stage stage;
-        bool has_samplers = false;
-    };
-
-    class write_descriptor_set {
-    public:
-
-    private:
+    /**
+     * @param allocate_count
+     * @brief count of descriptor set layouts to allocate for this descriptor set
+     * 
+     * @param size_bytes
+     * @brief Size of bytes of uniforms to allocate for the descriptor sets
+     * 
+     * @param max_sets
+     * @brief maximum of descriptor sets that can be allocated
+     * 
+    */
+    struct descriptor_set_layout {
+        uint32_t allocate_count=0;
+        uint32_t max_sets=0;
+        uint32_t size_bytes=0;
+        std::span<VkDescriptorPoolSize> allocation_info;
+        std::span<VkDescriptorSetLayoutBinding> bindings;
     };
 
     class descriptor_set {
     public:
         descriptor_set() = default;
-        descriptor_set(uint32_t p_count, const std::initializer_list<VkDescriptorSetLayoutBinding>& p_list);
-        descriptor_set(const std::span<VkDescriptorSetLayoutBinding>& p_descriptors);
-
+        descriptor_set(const descriptor_set_layout&);
         ~descriptor_set() = default;
 
-        void bind(const VkCommandBuffer& p_current, uint32_t p_frame_index, const VkPipelineLayout& p_layout);
+        void bind(const VkCommandBuffer& p_current, uint32_t p_frame_index, const VkPipelineLayout&);
 
         /**
          * 
@@ -74,7 +66,8 @@ namespace atlas::vk {
 
     private:
         VkDevice m_driver=nullptr;
-        uint32_t m_descriptor_count=0;
+        uint32_t m_allocated_descriptors=0;
+        uint32_t m_size_bytes=0;
         VkDescriptorPool m_descriptor_pool=nullptr;
         VkDescriptorSetLayout m_descriptor_set_layout=nullptr;
         std::vector<VkDescriptorSet> m_descriptor_sets{};

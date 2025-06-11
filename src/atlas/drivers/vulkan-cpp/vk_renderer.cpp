@@ -23,8 +23,8 @@ namespace atlas::vk {
 
         m_shader_group.set_vertex_attributes({
             {.location = 0, .binding = 0, .format = VK_FORMAT_R32G32B32_SFLOAT, .offset = offsetof(vk::vertex, position)},
-		{.location = 1, .binding = 0, .format = VK_FORMAT_R32G32B32A32_SFLOAT, .offset = offsetof(vk::vertex, color)},
-        {.location = 2, .binding = 0, .format = VK_FORMAT_R32G32B32A32_SFLOAT, .offset = offsetof(vk::vertex, normals)},
+		{.location = 1, .binding = 0, .format = VK_FORMAT_R32G32B32_SFLOAT, .offset = offsetof(vk::vertex, color)},
+        {.location = 2, .binding = 0, .format = VK_FORMAT_R32G32B32_SFLOAT, .offset = offsetof(vk::vertex, normals)},
 		{.location = 3, .binding = 0, .format = VK_FORMAT_R32G32_SFLOAT, .offset = offsetof(vk::vertex, uv)}
         });
 
@@ -42,24 +42,38 @@ namespace atlas::vk {
             m_global_uniforms[i] = vk_uniform_buffer(sizeof(camera_ubo));
         }
 
-        m_descriptor_set_test = descriptor_set(m_image_count, {
-            {.binding = 0, .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, .descriptorCount = 1, .stageFlags = VK_SHADER_STAGE_VERTEX_BIT, .pImmutableSamplers  = nullptr},
-		{.binding = 1, .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, .descriptorCount = 1, .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT, .pImmutableSamplers  = nullptr}
-        });
+        std::array<VkDescriptorSetLayoutBinding, 2> descriptor_set_layout_bindings = {
+            {
+            VkDescriptorSetLayoutBinding{.binding = 0, .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, .descriptorCount = 1, .stageFlags = VK_SHADER_STAGE_VERTEX_BIT, .pImmutableSamplers  = nullptr},
+            VkDescriptorSetLayoutBinding{.binding = 1, .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, .descriptorCount = 1, .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT, .pImmutableSamplers  = nullptr}
+            }
+        };
+
+        std::array<VkDescriptorPoolSize, 2> allocation_info = {
+            VkDescriptorPoolSize{
+                .type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                .descriptorCount = static_cast<uint32_t>(m_image_count),
+            },
+            VkDescriptorPoolSize{
+                .type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+                .descriptorCount = static_cast<uint32_t>(m_image_count),
+            }
+        };
+
+        // Setting the parameters for setting up the descriptor set layout
+        descriptor_set_layout main_layout = {
+            .allocate_count = m_image_count,            // the count of descriptor set layout to allocated
+            .max_sets = m_image_count,                  // max of descriptor sets to allocated
+            .size_bytes = sizeof(camera_ubo),           // size of bytes of the uniforms utilized by this descriptor sets
+            .allocation_info = allocation_info,         // setting up allocation information descriptor sets need to know about the uniforms its using
+            .bindings = descriptor_set_layout_bindings  // specifying layout bindings specified in the shader for specific information thats gonna be passed into this descriptor sets
+        };
+
+        m_descriptor_set_test = descriptor_set(main_layout);
 
         m_main_pipeline = vk_pipeline(m_main_swapchain.swapchain_renderpass(), m_shader_group, m_descriptor_set_test.get_layout());
 
-
-        // m_test_texture = texture(std::filesystem::path("assets/models/viking_room.png"));
-
-        // if(m_test_texture.loaded()) {
-        //     console_log_info("viking_room.png is loaded!!!");
-        // }
-        // else {
-        //     console_log_info("viking_room.png not loaded!!!");
-        // }
-
-        m_test_mesh = mesh("assets/models/viking_room.obj");
+        m_test_mesh = mesh(std::filesystem::path("assets/models/viking_room.obj"));
         m_test_mesh.set_texture(0, "assets/models/viking_room.png");
 
         m_descriptor_set_test.update_test_descriptors(m_global_uniforms, m_test_mesh.get_texture(0));
@@ -77,14 +91,12 @@ namespace atlas::vk {
         });
     }
 
-    vk_renderer::~vk_renderer() = default;
-
     void vk_renderer::background_color(const std::array<float, 4>& p_color) {
         m_color = {{p_color.at(0), p_color.at(1), p_color.at(2), p_color.at(3)}};
     }
 
-    void vk_renderer::start_frame(const vk_command_buffer& p_current, const vk::vk_swapchain& p_swapchain_handler) {
-        m_main_swapchain = p_swapchain_handler;
+    void vk_renderer::start_frame(const vk_command_buffer& p_current, [[maybe_unused]] const vk::vk_swapchain& p_swapchain_handler) {
+        // m_main_swapchain = p_swapchain_handler;
         // m_main_pipeline = vk_pipeline(p_swapchain_handler.swapchain_renderpass(), m_shader_group);
         uint32_t current_frame = application::current_frame();
 

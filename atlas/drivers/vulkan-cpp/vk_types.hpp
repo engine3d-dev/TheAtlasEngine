@@ -67,11 +67,16 @@ namespace atlas::vk {
     };
 
 
+    struct vk_image_handler {
+        VkImage image=nullptr;
+        VkImageView image_view=nullptr;
+    };
+
     struct vk_image {
-        VkImage Image = nullptr;
-        VkImageView ImageView = nullptr;
-        VkSampler Sampler = nullptr;
-        VkDeviceMemory DeviceMemory = nullptr;
+        VkImage image = nullptr;
+        VkImageView image_view = nullptr;
+        VkSampler sampler = nullptr;
+        VkDeviceMemory device_memory = nullptr;
     };
 
     //! @brief contains the min and max ranges for the VkFilter
@@ -123,7 +128,7 @@ namespace atlas::vk {
         glm::vec2 uv;
 
         bool operator==(const vertex& other) const {
-            return position == other.position && color == other.color && uv == other.uv && normals == other.normals;
+            return position == other.position and color == other.color and uv == other.uv and normals == other.normals;
         }
     };
 
