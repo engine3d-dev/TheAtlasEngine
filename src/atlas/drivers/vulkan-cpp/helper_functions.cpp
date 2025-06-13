@@ -63,10 +63,6 @@ namespace atlas::vk {
         return "VkQueueFlag not Selected";
     }
 
-    using allocation_size = uint32_t;
-    using buffer_use_flag = VkBufferUsageFlags;
-    using property_flag = VkMemoryPropertyFlags;
-
     vk_buffer create_buffer(const vk_buffer_info& p_construct_info) {
         vk_driver driver = vk_context::driver_context();
 
@@ -222,7 +218,7 @@ namespace atlas::vk {
         // VkImage image=nullptr;
         vk_image image;
 
-        vk_check(vkCreateImage(driver, &image_ci, nullptr, &image.Image),
+        vk_check(vkCreateImage(driver, &image_ci, nullptr, &image.image),
                  "vkCreateImage",
                  __FILE__,
                  __LINE__,
@@ -230,7 +226,7 @@ namespace atlas::vk {
 
         // 2. get buffer memory requirements
         VkMemoryRequirements memory_requirements;
-        vkGetImageMemoryRequirements(driver, image.Image, &memory_requirements);
+        vkGetImageMemoryRequirements(driver, image.image, &memory_requirements);
 
         // 3. get memory type index
         uint32_t memory_type_index = driver.select_memory_type(
@@ -245,14 +241,14 @@ namespace atlas::vk {
         };
 
         vk_check(vkAllocateMemory(
-                   driver, &memory_alloc_info, nullptr, &image.DeviceMemory),
+                   driver, &memory_alloc_info, nullptr, &image.device_memory),
                  "vkAllocateMemory",
                  __FILE__,
                  __LINE__,
                  __FUNCTION__);
 
         // 5. bind image memory
-        vk_check(vkBindImageMemory(driver, image.Image, image.DeviceMemory, 0),
+        vk_check(vkBindImageMemory(driver, image.image, image.device_memory, 0),
                  "vkBindImageMemory",
                  __FILE__,
                  __LINE__,
@@ -329,7 +325,6 @@ namespace atlas::vk {
 
     VkSampler create_sampler(const vk_filter_range& p_range,
                              VkSamplerAddressMode p_address_mode) {
-        // VkDevice driver = vk_driver::driver_context();
         VkDevice driver = vk_context::driver_context();
 
         VkSamplerCreateInfo sampler_info = {
@@ -708,162 +703,6 @@ namespace atlas::vk {
         vkUnmapMemory(driver, p_buffer.device_memory);
     }
 
-    /*
-    VkCommandBufferBeginInfo commend_buffer_begin_info(
-      const VkCommandBufferUsageFlags& p_usage) {
-        VkCommandBufferBeginInfo begin_info = {
-            .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-            .pNext = nullptr,
-            .flags = p_usage,
-            .pInheritanceInfo = nullptr
-        };
-
-        return begin_info;
-    }
-
-    VkCommandPool create_single_command_pool() {
-        VkDevice driver = vk_driver::driver_context();
-        vk_physical_driver physical = vk_physical_driver::physical_driver();
-        uint32_t graphics_queue_index = physical.get_queue_indices().Graphics;
-        VkCommandPoolCreateInfo pool_ci = {
-            .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
-            .pNext = nullptr,
-            .flags = 0,
-            .queueFamilyIndex = graphics_queue_index
-        };
-
-        VkCommandPool command_pool = nullptr;
-        vk_check(vkCreateCommandPool(driver, &pool_ci, nullptr, &command_pool),
-                 "vkCreateCommandPool",
-                 __FUNCTION__);
-
-        return command_pool;
-    }
-
-    VkCommandBuffer create_single_command_buffer(
-      const VkCommandPool& p_command_pool) {
-        VkDevice driver = vk_driver::driver_context();
-
-        VkCommandBufferAllocateInfo command_buffer_alloc_info = {
-            .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
-            .pNext = NULL,
-            .commandPool = p_command_pool,
-            .level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
-            .commandBufferCount = 1
-        };
-
-        VkCommandBuffer command_buffer = nullptr;
-        vk_check(vkAllocateCommandBuffers(
-                   driver, &command_buffer_alloc_info, &command_buffer),
-                 "vkAllocateCommandBuffers",
-                 __FUNCTION__);
-
-        return command_buffer;
-    }
-
-    void write(const vk_buffer& p_buffer,
-               const void* p_data,
-               size_t p_size_in_bytes) {
-        VkDevice driver = vk_driver::driver_context();
-        void* mapped = nullptr;
-        vk_check(
-          vkMapMemory(
-            driver, p_buffer.DeviceMemory, 0, p_size_in_bytes, 0, &mapped),
-          "vkMapMemory",
-          __FUNCTION__);
-        memcpy(mapped, p_data, p_size_in_bytes);
-        vkUnmapMemory(driver, p_buffer.DeviceMemory);
-    }
-
-    void write(const vk_buffer& p_buffer,
-               const std::span<uint32_t>& p_in_buffer) {
-        VkDeviceSize buffer_size = p_in_buffer.size_bytes();
-        VkDevice driver = vk_driver::driver_context();
-        void* mapped = nullptr;
-        vk_check(vkMapMemory(
-                   driver, p_buffer.DeviceMemory, 0, buffer_size, 0, &mapped),
-                 "vkMapMemory",
-                 __FUNCTION__);
-        memcpy(mapped, p_in_buffer.data(), buffer_size);
-        vkUnmapMemory(driver, p_buffer.DeviceMemory);
-    }
-
-
-    void copy(const vk_buffer& p_src, const vk_buffer& p_dst, uint32_t
-    p_size_of_bytes) { VkDevice driver = vk_driver::driver_context(); VkQueue
-    graphics_queue =vk_driver::driver_context().get_graphics_queue();
-        VkCommandPool command_pool = create_single_command_pool();
-        VkCommandBuffer copy_cmd_buffer =
-    create_single_command_buffer(command_pool);
-
-        begin_command_buffer(copy_cmd_buffer,
-    VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT); VkBufferCopy copy_region{};
-        copy_region.size = (VkDeviceSize)p_size_of_bytes;
-        vkCmdCopyBuffer(copy_cmd_buffer, p_src.BufferHandler,
-    p_dst.BufferHandler, 1, &copy_region); end_command_buffer(copy_cmd_buffer);
-
-        VkSubmitInfo submit_info{};
-        submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-        submit_info.commandBufferCount = 1;
-        submit_info.pCommandBuffers = &copy_cmd_buffer;
-        vkQueueSubmit(graphics_queue, 1, &submit_info, nullptr);
-        vkQueueWaitIdle(graphics_queue);
-
-        vkFreeCommandBuffers(driver, command_pool, 1, &copy_cmd_buffer);
-        vkDestroyCommandPool(driver, command_pool, nullptr);
-    }
-
-    void write(const vk_buffer& p_buffer,
-               const std::span<float>& p_in_buffer) {
-        VkDeviceSize buffer_size =
-          p_in_buffer
-            .size_bytes(); // does equivalent to doing sizeof(p_in_buffer[0]) *
-                           // p_in_buffer.size();
-        VkDevice driver = vk_driver::driver_context();
-        void* mapped = nullptr;
-        vk_check(vkMapMemory(
-                   driver, p_buffer.DeviceMemory, 0, buffer_size, 0, &mapped),
-                 "vkMapMemory",
-                 __FUNCTION__);
-        memcpy(mapped, p_in_buffer.data(), buffer_size);
-        vkUnmapMemory(driver, p_buffer.DeviceMemory);
-    }
-
-    void write(const vk_buffer& p_buffer,
-               const std::span<vertex>& p_in_buffer) {
-        VkDeviceSize buffer_size =
-          p_in_buffer
-            .size_bytes(); // does equivalent to doing sizeof(p_in_buffer[0]) *
-                           // p_in_buffer.size();
-        VkDevice driver = vk_driver::driver_context();
-        void* mapped = nullptr;
-        vk_check(vkMapMemory(
-                   driver, p_buffer.DeviceMemory, 0, buffer_size, 0, &mapped),
-                 "vkMapMemory",
-                 __FUNCTION__);
-        memcpy(mapped, p_in_buffer.data(), buffer_size);
-        vkUnmapMemory(driver, p_buffer.DeviceMemory);
-    }
-
-    void vk_check(const VkResult& result,
-                  const char* p_tag,
-                  const char* p_function_name,
-                  const char* p_filepath,
-                  uint32_t p_line) {
-        if (result != VK_SUCCESS) {
-            console_log_error_tagged("vulkan",
-                                     "VkResult failed taking in {0} file: {1} "
-                                     "--- Line: {2} --- In Function: {3}",
-                                     p_tag,
-                                     p_filepath,
-                                     p_line,
-                                     p_function_name);
-            console_log_error_tagged(
-              "vulkan", "VkResult returned: {}", (int)result);
-        }
-    }
-    */
-
     void vk_check_format(VkFormat p_format,
                          const char* p_function_name,
                          const char* p_filepath,
@@ -897,31 +736,6 @@ namespace atlas::vk {
           __FUNCTION__);
         return semaphore;
     }
-
-    // std::string vk_queue_flags_to_string(VkQueueFlagBits p_flags) {
-    //     switch (p_flags) {
-    //         case VK_QUEUE_GRAPHICS_BIT:
-    //             return "VK_QUEUE_GRAPHICS_BIT";
-    //         case VK_QUEUE_COMPUTE_BIT:
-    //             return "VK_QUEUE_COMPUTE_BIT";
-    //         case VK_QUEUE_TRANSFER_BIT:
-    //             return "VK_QUEUE_TRANSFER_BIT";
-    //         case VK_QUEUE_SPARSE_BINDING_BIT:
-    //             return "VK_QUEUE_SPARSE_BINDING_BIT";
-    //         case VK_QUEUE_PROTECTED_BIT:
-    //             return "VK_QUEUE_PROTECTED_BIT";
-    //         case VK_QUEUE_VIDEO_DECODE_BIT_KHR:
-    //             return "VK_QUEUE_VIDEO_DECODE_BIT_KHR";
-    //         case VK_QUEUE_VIDEO_ENCODE_BIT_KHR:
-    //             return "VK_QUEUE_VIDEO_ENCODE_BIT_KHR";
-    //         case VK_QUEUE_OPTICAL_FLOW_BIT_NV:
-    //             return "VK_QUEUE_OPTICAL_FLOW_BIT_NV";
-    //         case VK_QUEUE_FLAG_BITS_MAX_ENUM:
-    //             return "VK_QUEUE_FLAG_BITS_MAX_ENUM";
-    //     }
-
-    //     return "VkQueueFlag not Selected";
-    // }
 
     std::string vk_present_mode_to_string(VkPresentModeKHR p_present_mode) {
         switch (p_present_mode) {

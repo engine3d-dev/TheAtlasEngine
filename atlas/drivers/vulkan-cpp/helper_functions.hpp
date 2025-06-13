@@ -6,9 +6,7 @@
 #include <drivers/vulkan-cpp/vk_command_buffer.hpp>
 
 namespace atlas::vk {
-    // const char* vk_to_string(VkResult res);
-    //! @note Terminates if the result was unsuccessful!
-    //! @note TODO --- We shouldn't std::terminate, look into alternatives.
+
     void vk_check(VkResult p_result,
                   const char* p_tag,
                   const char* p_filepath,
@@ -48,15 +46,10 @@ namespace atlas::vk {
                                   uint32_t p_width,
                                   uint32_t p_height);
 	
-	
-
     VkCommandPool create_single_command_pool();
 
     VkCommandBuffer create_single_command_buffer(
       const VkCommandPool& p_command_pool);
-
-    // VkCommandBufferBeginInfo command_buffer_begin_info(
-    //   const VkCommandBufferUsageFlags& p_usage);
 
     void begin_command_buffer(const VkCommandBuffer& p_command_buffer,
                               VkCommandBufferUsageFlags p_usage_flags);
@@ -79,17 +72,10 @@ namespace atlas::vk {
     void write(const vk_buffer& p_buffer,
                const std::span<uint32_t>& p_in_buffer);
 	
-	// // Maps/Unmaps a buffer handler from std::span<float>
-    // void write(const vk_buffer& p_buffer,
-    //            const std::span<float>& p_in_buffer);
-	
 	// // Maps/Unmaps a buffer handler from std::span<vertex>
     void write(const vk_buffer& p_buffer,
                const std::span<vertex>& p_in_buffer);
     
-	// // Copies from one buffer source into another buffer source with a specific size of bytes to be stored the buffer that is being copied to
-	// void copy(const vk_buffer& p_src, const vk_buffer& p_dst, uint32_t p_size_of_bytes);
-
 	/**
 	 * @param VkFormat input is the format to check if this format's a stencil attachment
 	*/
@@ -108,11 +94,6 @@ namespace atlas::vk {
 	 * @brief This function creates a copy command buffer
 	 * @brief Meaning it should accept a created command buffer from the user rather than constructing one itself
 	*/
-	// void image_memory_barrier(VkCommandBuffer& p_command_buffer,
-	// 	VkImage& p_image,
-	// 	VkFormat p_format,
-	// 	VkImageLayout p_old,
-	// 	VkImageLayout p_new);
 	
 	/**
 	 * @name transition_image_layout
@@ -131,21 +112,6 @@ namespace atlas::vk {
 		VkFormat p_format,
 		VkImageLayout p_old,
 		VkImageLayout p_new);
-
-    // const char* vk_to_string(VkResult res);
-    //! @note Terminates if the result was unsuccessful!
-    //! @note TODO --- I dont think this should std::terminate, but it should at least throw an issue.
-	//! @note Something to do is have specific functions for handling in specifics of critical errors happening
-    // void vk_check(const VkResult& p_result,
-    //               const char* p_tag,
-    //               const char* p_function_name,
-    //               const char* p_filepath = __FILE__,
-    //               uint32_t p_line = __LINE__);
-
-    // void vk_check_format(VkFormat p_format,
-    //                      const char* p_function_name,
-    //                      const char* p_filepath = __FILE__,
-    //                      uint32_t p_line = __LINE__);
 
     std::string vk_queue_flags_to_string(VkQueueFlagBits p_flags);
 
