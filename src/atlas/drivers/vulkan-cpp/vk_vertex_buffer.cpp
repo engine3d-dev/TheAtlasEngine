@@ -12,17 +12,17 @@ namespace atlas::vk {
         m_vertices_count = p_vertices.size();
         m_vertices_byte_size_count = p_vertices.size_bytes();
 
-        vk_buffer_info staging_info = {
-            .device_size = m_vertices_byte_size_count,
-            .usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-            .memory_property_flag = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-                                    VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-        };
-
         /*
         1.) Creating staging buffer
             * VK_BUFFER_USAGE_STORAGE_BUFFER_BIT sets becaused required for buffers represented for storing vertices
         */
+        vk_buffer_info staging_info = {
+            .device_size = (uint32_t)m_vertices_byte_size_count,
+            .usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+            .memory_property_flag = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                                    VK_MEMORY_PROPERTY_HOST_CACHED_BIT,
+        };
+
         vk_buffer staging_buffer = create_buffer(staging_info);
 
         // 2.) Maps the staging buffer via through vkMap/vkUnmap
@@ -34,10 +34,11 @@ namespace atlas::vk {
             .usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
             .memory_property_flag = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
         };
+
         m_vertex_handler = create_buffer(vertex_info);
 
         // 4. Copying vertices from staging buffer to the actual vertex buffer handlers
-        copy(staging_buffer, m_vertex_handler, p_vertices.size());
+        copy(staging_buffer, m_vertex_handler, m_vertices_byte_size_count);
 
         // 5.) Cleanup staging buffer
         vkFreeMemory(m_driver, staging_buffer.device_memory, nullptr);
@@ -47,8 +48,11 @@ namespace atlas::vk {
 
     void vk_vertex_buffer::bind(const VkCommandBuffer& p_current) {
         // VkBuffer handlers[] = { m_vertex_handler.handler };
+        // std::span<VkBuffer> handlers = std::span();
+        std::array<VkBuffer, 1> handlers = { m_vertex_handler.handler };
+        // std::span<VkBuffer> data = handlers;
         VkDeviceSize offsets[] = { 0 };
-        vkCmdBindVertexBuffers(p_current, 0, 1, &m_vertex_handler.handler, offsets);
+        vkCmdBindVertexBuffers(p_current, 0, 1, handlers.data(), offsets);
     }
 
     void vk_vertex_buffer::draw(const VkCommandBuffer& p_current) {
@@ -56,8 +60,14 @@ namespace atlas::vk {
     }
 
     void vk_vertex_buffer::destroy() {
-        vkFreeMemory(m_driver, m_vertex_handler.device_memory, nullptr);
-        vkDestroyBuffer(m_driver, m_vertex_handler.handler, nullptr);
+        if(m_vertex_handler.device_memory != nullptr) {
+            vkFreeMemory(m_driver, m_vertex_handler.device_memory, nullptr);
+        }
+
+        if(m_vertex_handler.handler != nullptr) {
+            vkDestroyBuffer(m_driver, m_vertex_handler.handler, nullptr);
+        }
+        
         m_vertex_handler.allocation_size = 0;
         // m_vertex_handler = {};
     }
