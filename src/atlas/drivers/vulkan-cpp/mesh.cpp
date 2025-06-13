@@ -9,7 +9,7 @@ namespace atlas::vk {
         m_ibo = vk_index_buffer(p_indices);
     }
 
-    mesh::mesh(const std::string& p_filename) {
+    mesh::mesh(const std::filesystem::path& p_filename) {
         tinyobj::attrib_t attrib;
         std::vector<tinyobj::shape_t> shapes;
         std::vector<tinyobj::material_t> materials;
@@ -22,14 +22,14 @@ namespace atlas::vk {
         //! that mesh will return the boolean as false because it wasnt
         //! successful
         if (!tinyobj::LoadObj(
-            &attrib, &shapes, &materials, &warn, &err, p_filename.c_str())) {
-            console_log_warn("Could not load model from path {}", p_filename);
+            &attrib, &shapes, &materials, &warn, &err, p_filename.string().c_str())) {
+            console_log_warn("Could not load model from path {}", p_filename.string());
         }
         else {
-            console_log_info("Model Loaded = {}", p_filename);
+            console_log_info("Model Loaded = {}", p_filename.string());
         }
 
-        std::vector<vk::vertex> vertices;
+        std::vector<vertex> vertices;
         std::vector<uint32_t> indices;
         std::unordered_map<vertex, uint32_t> unique_vertices{};
 
@@ -73,7 +73,6 @@ namespace atlas::vk {
                     };
                 }
 
-                // vertices.push_back(vertex);
                 if (!unique_vertices.contains(vertex)) {
                     unique_vertices[vertex] =
                       static_cast<uint32_t>(vertices.size());
@@ -83,9 +82,6 @@ namespace atlas::vk {
                 indices.push_back(unique_vertices[vertex]);
             }
         }
-
-        console_log_fatal("vertices.size() = {}", vertices.size());
-        console_log_fatal("indices.size() = {}", indices.size());
 
         m_vbo = vk_vertex_buffer(vertices);
         m_ibo = vk_index_buffer(indices);

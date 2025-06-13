@@ -16,15 +16,15 @@ namespace atlas::vk {
 
         void draw(const VkCommandBuffer& p_current);
 
-        [[nodiscard]] size_t size() const { return 0; }
+        [[nodiscard]] size_t size() const { return m_vertices_count; }
 
-        [[nodiscard]] size_t size_bytes() const { return 0; }
+        [[nodiscard]] size_t size_bytes() const { return m_vertices_byte_size_count; }
 
         void destroy();
 
-        operator VkBuffer() { return nullptr; }
+        operator VkBuffer() { return m_vertex_handler.handler; }
 
-        operator VkBuffer() const { return nullptr; }
+        operator VkBuffer() const { return m_vertex_handler.handler; }
 
     private:
         VkDevice m_driver=nullptr;
