@@ -53,8 +53,7 @@ namespace atlas::vk {
         //! @brief update descriptor if by single uniforms
         void update(const vk_uniform_buffer& p_uniforms);
 
-        //! @brief update descriptor if accepting multiple textures
-        void update(const std::span<texture>& p_textures);
+        void update(const std::span<vk_uniform_buffer>& p_uniforms, const std::span<texture>& p_textures);
 
         void destroy();
 

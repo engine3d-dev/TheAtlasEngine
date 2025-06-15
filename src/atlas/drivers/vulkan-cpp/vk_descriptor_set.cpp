@@ -36,18 +36,7 @@ namespace atlas::vk {
     descriptor_set::descriptor_set(const uint32_t& p_set_slot, const descriptor_set_layout& p_layout) : m_set_slot(p_set_slot), m_allocated_descriptors(p_layout.allocate_count), m_size_bytes(p_layout.size_bytes) {
         m_driver = vk_context::driver_context();
 
-        // std::array<VkDescriptorPoolSize, 2> pool_sizes;
-        // pool_sizes[0] = {
-        //     .type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-        //     .descriptorCount = static_cast<uint32_t>(m_descriptor_count),
-        // };
-
-        // pool_sizes[1] = {
-        //     .type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-        //     .descriptorCount = static_cast<uint32_t>(m_descriptor_count),
-        // };
-
-        // 1. Setting up descriptor pool
+        // 1. Setting up descriptor pool for allocations
         VkDescriptorPoolCreateInfo desc_pool_ci = {
             .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
             .pNext = nullptr,
@@ -103,6 +92,69 @@ namespace atlas::vk {
                  __FILE__,
                  __LINE__,
                  __FUNCTION__);
+    }
+
+    void descriptor_set::update(const std::span<vk_uniform_buffer>& p_uniforms, const std::span<texture>& p_textures) {
+        std::vector<VkDescriptorBufferInfo> buffer_infos;
+        std::vector<VkDescriptorImageInfo> image_infos;
+
+        // Loading all uniforms specified into this descriptor set
+        for(const auto& uniform : p_uniforms) {
+            buffer_infos.push_back({
+                .buffer = uniform,
+                .offset = 0,
+                .range = uniform.size_bytes()
+            });
+        }
+
+        // If there are any textures, load the image_view's and samplers to write them through the descriptor set
+        if(!p_textures.empty()) {
+            for(const auto& texture : p_textures) {
+                image_infos.push_back({
+                    .sampler = texture.sampler(),
+                    .imageView = texture.image_view(),
+                    .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+                });
+            }
+        }
+        else {
+            image_infos.push_back({
+                .sampler = nullptr,
+                .imageView = nullptr,
+                .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+            });
+        }
+
+        // Updating descriptor sets so shaders can utilize the uniforms and textures
+        for(size_t i = 0; i < m_allocated_descriptors; i++) {
+            std::vector<VkWriteDescriptorSet> write_descriptors;
+            VkWriteDescriptorSet write_buffer {
+                .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+                .pNext = nullptr,
+                .dstSet = m_descriptor_sets[i],
+                .dstBinding = 0,
+                .dstArrayElement = 0,
+                .descriptorCount = static_cast<uint32_t>(buffer_infos.size()),
+                .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                .pBufferInfo = buffer_infos.data(),
+            };
+
+            write_descriptors.push_back(write_buffer);
+
+            VkWriteDescriptorSet write_image {
+                .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+                .pNext = nullptr,
+                .dstSet = m_descriptor_sets[i],
+                .dstBinding = 1,
+                .dstArrayElement = 0,
+                .descriptorCount = static_cast<uint32_t>(image_infos.size()),
+                .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+                .pImageInfo = image_infos.data()
+            };
+            write_descriptors.push_back(write_image);
+
+            vkUpdateDescriptorSets(m_driver, static_cast<uint32_t>(write_descriptors.size()), write_descriptors.data(), 0, nullptr);
+        }
     }
 
     void descriptor_set::update_test_descriptors(const std::span<vk_uniform_buffer>& p_uniforms, [[maybe_unused]] const texture& p_texture) {
@@ -193,31 +245,8 @@ namespace atlas::vk {
         }
     }
 
-    void descriptor_set::update(const std::span<texture>& p_textures) {
-        for(size_t i = 0; i < m_allocated_descriptors; i++) {
-            VkDescriptorImageInfo image_info = {
-                .sampler = p_textures[0].sampler(),
-                .imageView = p_textures[0].image_view(),
-                .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-            };
 
-            // std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
-            std::array<VkWriteDescriptorSet, 1> write_descriptors;
-            write_descriptors[0] = {
-                .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-                .pNext = nullptr,
-                .dstSet = m_descriptor_sets[i],
-                .dstBinding = 0,
-                .dstArrayElement = 0,
-                .descriptorCount = 1,
-                .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                .pImageInfo = &image_info,
-            };
-            vkUpdateDescriptorSets(m_driver, static_cast<uint32_t>(write_descriptors.size()-1), write_descriptors.data(), 0, nullptr);
-        }
-    }
-
-    /**
+    /*
      p_set_index is to tell vulkan which "slot" to put the descriptor set in
 
      beacuse our layout is like as shown here
