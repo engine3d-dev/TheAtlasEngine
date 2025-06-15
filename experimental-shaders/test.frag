@@ -9,11 +9,15 @@ layout (location = 3) in vec4 materialColor;
 
 layout(location = 0) out vec4 outColor;
 
+layout (set = 1, binding = 1) uniform sampler2D texture1;
+layout (set = 1, binding = 2) uniform sampler2D texture2;
+
 void main(){
     // vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
     // outColor = texture(texSampler, fragTexCoords) * color;
     // vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
-    vec4 color = materialColor;
+    vec4 color = texture(texture1, fragTexCoords) * materialColor;
+    // vec4 color = texture(texture1, fragTexCoords) + texture(texture2, fragTexCoords) * materialColor;
     // vec4 color = in_fragColor;
     outColor = color;
     // outColor = texture(texSampler, fragTexCoords) * color;

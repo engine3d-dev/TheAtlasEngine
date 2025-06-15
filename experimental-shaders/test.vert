@@ -24,7 +24,7 @@ layout (set = 1, binding = 0) uniform MaterialSource {
 
 // layout (set = 1, binding = 0) uniform sampler2D albedo_texture;
 
-layout (set = 1, binding = 1) uniform sampler2D first_texture;
+// layout (set = 1, binding = 1) uniform sampler2D first_texture;
 
 void main() {
 	gl_Position = ubo.MVP * vec4(inPosition, 1.0);
