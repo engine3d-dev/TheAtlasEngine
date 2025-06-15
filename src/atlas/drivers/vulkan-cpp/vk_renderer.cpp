@@ -11,7 +11,7 @@ namespace atlas::vk {
 
     vk_renderer::vk_renderer(const vk_swapchain& p_swapchain, const std::string& p_tag){
         console_log_manager::create_new_logger(p_tag);
-        m_driver = vk_context::driver_context();
+        // m_driver = vk_context::driver_context();
         console_log_info("vk_renderer Begin construction!!!");
         m_main_swapchain = p_swapchain;
         m_image_count = m_main_swapchain.image_size();
@@ -20,12 +20,12 @@ namespace atlas::vk {
             {"experimental-shaders/test.vert", shader_stage::Vertex},
             {"experimental-shaders/test.frag", shader_stage::Fragment}
         });
-
+        
         m_shader_group.set_vertex_attributes({
-            {.location = 0, .binding = 0, .format = VK_FORMAT_R32G32B32_SFLOAT, .offset = offsetof(vk::vertex, position)},
-		{.location = 1, .binding = 0, .format = VK_FORMAT_R32G32B32_SFLOAT, .offset = offsetof(vk::vertex, color)},
-        {.location = 2, .binding = 0, .format = VK_FORMAT_R32G32B32_SFLOAT, .offset = offsetof(vk::vertex, normals)},
-		{.location = 3, .binding = 0, .format = VK_FORMAT_R32G32_SFLOAT, .offset = offsetof(vk::vertex, uv)}
+            { .location = 0, .binding = 0, .format = VK_FORMAT_R32G32B32_SFLOAT, .offset = offsetof(vk::vertex, position) },
+            { .location = 1, .binding = 0, .format = VK_FORMAT_R32G32B32_SFLOAT, .offset = offsetof(vk::vertex, color) },
+            { .location = 2, .binding = 0, .format = VK_FORMAT_R32G32B32_SFLOAT, .offset = offsetof(vk::vertex, normals) },
+            { .location = 3, .binding = 0, .format = VK_FORMAT_R32G32_SFLOAT,    .offset = offsetof(vk::vertex, uv) }
         });
 
         m_shader_group.set_vertex_bind_attributes({
@@ -42,52 +42,103 @@ namespace atlas::vk {
             m_global_uniforms[i] = vk_uniform_buffer(sizeof(camera_ubo));
         }
 
-        std::array<VkDescriptorSetLayoutBinding, 2> descriptor_set_layout_bindings = {
-            {
+        std::vector<VkDescriptorSetLayoutBinding> set0_descriptor_set_layout_bindings = {
             VkDescriptorSetLayoutBinding{.binding = 0, .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, .descriptorCount = 1, .stageFlags = VK_SHADER_STAGE_VERTEX_BIT, .pImmutableSamplers  = nullptr},
-            VkDescriptorSetLayoutBinding{.binding = 1, .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, .descriptorCount = 1, .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT, .pImmutableSamplers  = nullptr}
-            }
+            // VkDescriptorSetLayoutBinding{.binding = 1, .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, .descriptorCount = 1, .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT, .pImmutableSamplers  = nullptr}
         };
 
-        std::array<VkDescriptorPoolSize, 2> allocation_info = {
+        std::vector<VkDescriptorPoolSize> set0_allocation_info = {
             VkDescriptorPoolSize{
                 .type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
                 .descriptorCount = static_cast<uint32_t>(m_image_count),
             },
-            VkDescriptorPoolSize{
-                .type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                .descriptorCount = static_cast<uint32_t>(m_image_count),
-            }
+            // VkDescriptorPoolSize{
+            //     .type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+            //     .descriptorCount = static_cast<uint32_t>(m_image_count),
+            // }
         };
 
         // Setting the parameters for setting up the descriptor set layout
-        descriptor_set_layout main_layout = {
+        // Descriptor set = 0
+        descriptor_set_layout set0_descriptor_layout = {
             .allocate_count = m_image_count,            // the count how many descriptor set layout able to be allocated
             .max_sets = m_image_count,                  // max of descriptor sets able to allocate
             .size_bytes = sizeof(camera_ubo),           // size of bytes of the uniforms utilized by this descriptor sets
-            .allocation_info = allocation_info,         // specify the collection of multiple descriptor sets pool allocation sizes
-            .bindings = descriptor_set_layout_bindings  // specifying layout bindings specified in the shader for specific information thats gonna be passed into this descriptor sets
+            .allocation_info = set0_allocation_info,         // specify the collection of multiple descriptor sets pool allocation sizes
+            .bindings = set0_descriptor_set_layout_bindings  // specifying layout bindings specified in the shader for specific information thats gonna be passed into this descriptor sets
         };
 
-        m_descriptor_set_test = descriptor_set(main_layout);
+        m_descriptor_set0 = descriptor_set(0, set0_descriptor_layout);
+        
+        // Descriptor set = 1
 
-        m_main_pipeline = vk_pipeline(m_main_swapchain.swapchain_renderpass(), m_shader_group, m_descriptor_set_test.get_layout());
+        std::vector<VkDescriptorSetLayoutBinding> set1_descriptor_set_layout_bindings = {
+            VkDescriptorSetLayoutBinding{.binding = 0, .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, .descriptorCount = 1, .stageFlags = VK_SHADER_STAGE_VERTEX_BIT, .pImmutableSamplers  = nullptr},
+        };
 
-        m_test_mesh = mesh(std::filesystem::path("assets/models/viking_room.obj"));
-        m_test_mesh.set_texture(0, "assets/models/viking_room.png");
+        std::vector<VkDescriptorPoolSize> set1_allocation_info = {
+            VkDescriptorPoolSize{
+                .type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                .descriptorCount = static_cast<uint32_t>(m_image_count),
+            },
+        };
 
-        m_descriptor_set_test.update_test_descriptors(m_global_uniforms, m_test_mesh.get_texture(0));
+        descriptor_set_layout material_descriptor_layout = {
+            .allocate_count = m_image_count,            // the count how many descriptor set layout able to be allocated
+            .max_sets = m_image_count,                  // max of descriptor sets able to allocate
+            .size_bytes = sizeof(material),           // size of bytes of the uniforms utilized by this descriptor sets
+            .allocation_info = set1_allocation_info,         // specify the collection of multiple descriptor sets pool allocation sizes
+            .bindings = set1_descriptor_set_layout_bindings  // specifying layout bindings specified in the shader for specific information thats gonna be passed into this descriptor sets
+        };
+        m_descriptor_set1 = descriptor_set(1, material_descriptor_layout);
 
+        m_descriptor_set2 = descriptor_set(1, material_descriptor_layout);
+
+        m_mesh0_material_ubo = vk_uniform_buffer(sizeof(material));
+        m_mesh1_material_ubo = vk_uniform_buffer(sizeof(material));
+
+        std::vector<VkDescriptorSetLayout> set_layouts = {
+            m_descriptor_set0.get_layout(),
+            m_descriptor_set1.get_layout(),
+            m_descriptor_set2.get_layout()
+        };
+        /*
+            Pipeline Layout
+            [Set 0] [Set 1] [Set 2]    [Set 3]
+               |      |       |          |
+               v      v       v          v
+            Camera   Material Textures Lights
+            UBO      UBO     UBO     UBO
+        */
+        m_main_pipeline = vk_pipeline(m_main_swapchain.swapchain_renderpass(), m_shader_group, set_layouts);
+
+        m_mesh0 = mesh(std::filesystem::path("assets/models/viking_room.obj"));
+        m_mesh0.set_texture(0, "assets/models/viking_room.png");
+
+        m_mesh1 = mesh(std::filesystem::path("assets/models/colored_cube.obj"));
+        m_mesh1.set_texture(0, "assets/models/wood.png");
+
+        m_descriptor_set0.update(m_global_uniforms);
+
+        m_descriptor_set1.update(m_mesh0_material_ubo);
+        m_descriptor_set2.update(m_mesh1_material_ubo);
+        // m_descriptor_set_test.update_test_descriptors(m_global_uniforms, m_mesh0.get_texture(0));
 
         vk_context::submit_resource_free([this](){
             m_shader_group.destroy();
-            m_descriptor_set_test.destroy();
             m_main_pipeline.destroy();
-            m_test_mesh.destroy();
+            m_descriptor_set0.destroy();
+            m_descriptor_set1.destroy();
+            m_descriptor_set2.destroy();
+            m_mesh0_material_ubo.destroy();
+            m_mesh1_material_ubo.destroy();
 
             for(size_t i = 0; i < m_global_uniforms.size(); i++) {
                 m_global_uniforms[i].destroy();
             }
+
+            m_mesh0.destroy();
+            m_mesh1.destroy();
         });
     }
 
@@ -96,8 +147,7 @@ namespace atlas::vk {
     }
 
     void vk_renderer::start_frame(const vk_command_buffer& p_current, [[maybe_unused]] const vk::vk_swapchain& p_swapchain_handler) {
-        // m_main_swapchain = p_swapchain_handler;
-        // m_main_pipeline = vk_pipeline(p_swapchain_handler.swapchain_renderpass(), m_shader_group);
+        // m_main_swapchain = p_swapchain_handler; // ?? This is here to do some testing with swapchain validation
         uint32_t current_frame = application::current_frame();
 
         std::array<VkClearValue, 2> clear_values = {};
@@ -145,8 +195,6 @@ namespace atlas::vk {
 
 		vkCmdSetScissor(m_current_command_buffer, 0, 1, &scissor);
 
-        // renderpass_begin_info.framebuffer = m_swapchain_framebuffers[p_current_frame_idx];
-        // renderpass_begin_info.framebuffer = m_swapchain_handler.active_framebuffer(application::current_frame());
         renderpass_begin_info.framebuffer = m_main_swapchain.active_framebuffer(current_frame);
 
 		vkCmdBeginRenderPass(m_current_command_buffer,&renderpass_begin_info,VK_SUBPASS_CONTENTS_INLINE);
@@ -158,19 +206,52 @@ namespace atlas::vk {
         float time = std::chrono::duration<float, std::chrono::seconds::period>(current_time - start_time).count();
 
         camera_ubo ubo{};
-        ubo.Model = glm::translate(ubo.Model, glm::vec3(0.f, 0.f, 0.f));
+        ubo.Model = glm::translate(ubo.Model, glm::vec3(0.f, 0.f, -0.8f));
+        ubo.Model = glm::scale(ubo.Model, glm::vec3(0.5f, 0.5f, 0.5f));
         ubo.Model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
         ubo.View = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
         ubo.Projection = glm::perspective(glm::radians(45.0f), (float)settings.width / (float) settings.height, 0.1f, 10.0f);
         ubo.Projection[1][1] *= -1;
 
-        glm::mat4 mvp = ubo.Projection * ubo.View * ubo.Model;
-        m_global_uniforms[current_frame].update(&mvp, sizeof(mvp));
+        // For now, using this. Will need to remove this before vulkan integration merging into dev
+        // This is for testing and to hopefully have a global_ubo for globalized uniforms
+        global_ubo global_frame_ubo = {
+            .mvp = ubo.Projection * ubo.View * ubo.Model
+        };
 
-        // Draw stuff
+        // glm::mat4 mvp = ubo.Projection * ubo.View * ubo.Model;
+        m_global_uniforms[current_frame].update(&global_frame_ubo, sizeof(global_frame_ubo));
+        material mesh0_material_ubo = {
+            .color = {0.5f, 0.5f, 0.5f, 1.0f}
+        };
+        m_mesh0_material_ubo.update(&mesh0_material_ubo, sizeof(mesh0_material_ubo));
+
+        // Apply viking_room texture to mesh1 (viking_room.obj)
         m_main_pipeline.bind(p_current);
-        m_descriptor_set_test.bind(p_current, current_frame, m_main_pipeline.get_layout());
-        m_test_mesh.draw(p_current);
+        m_descriptor_set0.bind(p_current, current_frame, m_main_pipeline.get_layout());
+        m_descriptor_set1.bind(p_current, current_frame, m_main_pipeline.get_layout());
+
+        m_mesh0.draw(p_current);
+
+        // Drawing mesh2
+        /*
+
+        material_ubo is the ubo specific per-object
+        * Meaning each scene object (mesh) is going to have their own descriptor set that is going to be for referencing the mesh material resource
+        */
+        material mesh1_material_ubo = {
+            .color = {1.f, 1.f, 1.f, 0.5f}
+        };
+
+        m_mesh1_material_ubo.update(&mesh1_material_ubo, sizeof(mesh1_material_ubo));
+
+        m_descriptor_set0.bind(p_current, current_frame, m_main_pipeline.get_layout());
+        m_descriptor_set2.bind(p_current, current_frame, m_main_pipeline.get_layout());
+        m_mesh1.draw(p_current);
+        // Apply wood texture to mesh2 (sphere.obj)
+        // m_main_pipeline.bind(p_current);
+        // m_descriptor_set_test2.bind(p_current, current_frame, m_main_pipeline.get_layout());
+        // m_test_mesh2.draw(p_current);
 
     }
 

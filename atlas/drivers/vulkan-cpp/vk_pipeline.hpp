@@ -9,7 +9,7 @@ namespace atlas::vk {
     public:
         vk_pipeline() = default;
         vk_pipeline(const VkRenderPass& p_renderpass, vk_shader_group& p_shader_group);
-        vk_pipeline(const VkRenderPass& p_renderpass, const vk_shader_group& p_shader_group, const VkDescriptorSetLayout& p_descriptor_layout);
+        vk_pipeline(const VkRenderPass& p_renderpass, const vk_shader_group& p_shader_group, const std::span<VkDescriptorSetLayout>& p_descriptor_layout);
 
         void create(const VkRenderPass& p_renderpass);
 
@@ -30,6 +30,7 @@ namespace atlas::vk {
         VkPipelineLayout m_pipeline_layout=nullptr;
         VkPipeline m_pipeline_handler=nullptr;
         vk_shader_group m_shader_group;
-        VkDescriptorSetLayout m_descriptor_set_layout=nullptr;
+        // VkDescriptorSetLayout m_descriptor_set_layout=nullptr;
+        std::span<VkDescriptorSetLayout> m_descriptor_layouts{};
     };
 };

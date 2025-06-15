@@ -44,10 +44,10 @@ namespace atlas::vk {
 
     vk_pipeline::vk_pipeline(const VkRenderPass& p_renderpass,
                              const vk_shader_group& p_shader_group,
-                             const VkDescriptorSetLayout& p_descriptor_layout) {
+                             const std::span<VkDescriptorSetLayout>& p_descriptor_layout) {
         m_driver = vk_context::driver_context();
         m_shader_group = p_shader_group;
-        m_descriptor_set_layout = p_descriptor_layout;
+        m_descriptor_layouts = p_descriptor_layout;
         create(p_renderpass);
     }
 
@@ -197,9 +197,10 @@ namespace atlas::vk {
         //! This is just to double-check that the descriptor set layout is
         //! valid. If the descriptor set layout is invalid, then proceed but not
         //! use the descriptor set layout
-        if (m_descriptor_set_layout != nullptr) {
-            pipeline_layout_ci.setLayoutCount = 1;
-            pipeline_layout_ci.pSetLayouts = &m_descriptor_set_layout;
+        // if (m_descriptor_set_layout != nullptr) {
+		if(!m_descriptor_layouts.empty()) {
+            pipeline_layout_ci.setLayoutCount = static_cast<uint32_t>(m_descriptor_layouts.size());
+            pipeline_layout_ci.pSetLayouts = m_descriptor_layouts.data();
         }
         else {
             // TODO: Uncomment this when adding back in descriptor sets

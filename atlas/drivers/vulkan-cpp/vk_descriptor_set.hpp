@@ -18,29 +18,15 @@ namespace atlas::vk {
         ImageAndSampler=2
     };
 
-    /**
-     * @param allocate_count
-     * @brief count of descriptor set layouts to allocate for this descriptor set
-     * 
-     * @param size_bytes
-     * @brief Size of bytes of uniforms to allocate for the descriptor sets
-     * 
-     * @param max_sets
-     * @brief maximum of descriptor sets that can be allocated
-     * 
-    */
-    struct descriptor_set_layout {
-        uint32_t allocate_count=0;
-        uint32_t max_sets=0;
-        uint32_t size_bytes=0;
-        std::span<VkDescriptorPoolSize> allocation_info;
-        std::span<VkDescriptorSetLayoutBinding> bindings;
-    };
-
     class descriptor_set {
     public:
         descriptor_set() = default;
-        descriptor_set(const descriptor_set_layout&);
+        /**
+         * @param p_set_slot is the slot index to bind this descriptor set
+         * Tells vulkan when binding this descriptor set where the resources location for shader to know where to access the resources binded
+         * 
+        */
+        descriptor_set(const uint32_t& p_set_slot, const descriptor_set_layout&);
         ~descriptor_set() = default;
 
         void bind(const VkCommandBuffer& p_current, uint32_t p_frame_index, const VkPipelineLayout&);
@@ -54,7 +40,6 @@ namespace atlas::vk {
          * Where we invoke the mesh we want to update with the following invokation call here
          * vk::mesh will also contain the matrices such as glm::mat4 that is the model matrix
         */
-        // void update_mesh(const std::span<vk_uniform_buffer>& p_uniforms, const mesh& p_mesh);
 
         [[nodiscard]] VkDescriptorPool get_pool() const { return m_descriptor_pool; }
 
@@ -62,10 +47,20 @@ namespace atlas::vk {
 
         void update_test_descriptors(const std::span<vk_uniform_buffer>& p_uniforms, const texture& p_texture);
 
+        //! @brief update descriptor if ofloading multiple uniforms
+        void update(const std::span<vk_uniform_buffer>& p_uniforms);
+
+        //! @brief update descriptor if by single uniforms
+        void update(const vk_uniform_buffer& p_uniforms);
+
+        //! @brief update descriptor if accepting multiple textures
+        void update(const std::span<texture>& p_textures);
+
         void destroy();
 
     private:
         VkDevice m_driver=nullptr;
+        uint32_t m_set_slot = 0;
         uint32_t m_allocated_descriptors=0;
         uint32_t m_size_bytes=0;
         VkDescriptorPool m_descriptor_pool=nullptr;

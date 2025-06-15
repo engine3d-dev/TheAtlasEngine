@@ -42,7 +42,7 @@ namespace atlas::vk {
         void background_color(const std::array<float, 4>& p_color) override;
 
     private:
-        vk_driver m_driver{};
+        // vk_driver m_driver{};
         vk_swapchain m_main_swapchain{};
         vk_command_buffer m_current_command_buffer{};
         VkClearColorValue m_color;
@@ -50,10 +50,15 @@ namespace atlas::vk {
         vk_shader_group m_shader_group;
         vk_pipeline m_main_pipeline{};
         std::vector<vk_uniform_buffer> m_uniform_buffers{};
-        mesh m_test_mesh;
+        mesh m_mesh0;
         std::vector<vk_uniform_buffer> m_global_uniforms{};
+        vk_uniform_buffer m_mesh0_material_ubo{};
         uint32_t m_image_count=0;
-        descriptor_set m_descriptor_set_test{};
+        descriptor_set m_descriptor_set0{};
+        descriptor_set m_descriptor_set1{};
+        descriptor_set m_descriptor_set2{};
+        mesh m_mesh1;
+        vk_uniform_buffer m_mesh1_material_ubo{};
 
         // This is for caching any loaded mesh and only modifying this mesh if that entity is there.
         // It is for this vk_renderer to manage

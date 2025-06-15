@@ -33,7 +33,7 @@ namespace atlas::vk {
     }
 
 
-    descriptor_set::descriptor_set(const descriptor_set_layout& p_layout) : m_allocated_descriptors(p_layout.allocate_count), m_size_bytes(p_layout.size_bytes) {
+    descriptor_set::descriptor_set(const uint32_t& p_set_slot, const descriptor_set_layout& p_layout) : m_set_slot(p_set_slot), m_allocated_descriptors(p_layout.allocate_count), m_size_bytes(p_layout.size_bytes) {
         m_driver = vk_context::driver_context();
 
         // std::array<VkDescriptorPoolSize, 2> pool_sizes;
@@ -105,22 +105,22 @@ namespace atlas::vk {
                  __FUNCTION__);
     }
 
-    void descriptor_set::update_test_descriptors(const std::span<vk_uniform_buffer>& p_uniforms, const texture& p_texture) {
+    void descriptor_set::update_test_descriptors(const std::span<vk_uniform_buffer>& p_uniforms, [[maybe_unused]] const texture& p_texture) {
         for(size_t i = 0; i < m_allocated_descriptors; i++) {
             VkDescriptorBufferInfo buffer_info = {
                 .buffer = p_uniforms[i],
                 .offset = 0,
-                .range = m_size_bytes, // m_size_bytes replaces doing things like: sizeof(camera_ubo)
+                .range = p_uniforms.size_bytes(), // m_size_bytes replaces doing things like: sizeof(camera_ubo)
             };
 
-            VkDescriptorImageInfo image_info = {
-                .sampler = p_texture.sampler(),
-                .imageView = p_texture.image_view(),
-                .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-            };
+            // VkDescriptorImageInfo image_info = {
+            //     .sampler = p_texture.sampler(),
+            //     .imageView = p_texture.image_view(),
+            //     .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            // };
 
             // std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
-            std::array<VkWriteDescriptorSet, 2> write_descriptors;
+            std::array<VkWriteDescriptorSet, 1> write_descriptors;
             write_descriptors[0] = {
                 .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
                 .pNext = nullptr,
@@ -131,20 +131,116 @@ namespace atlas::vk {
                 .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
                 .pBufferInfo = &buffer_info,
             };
-            write_descriptors[1] = {
+            // write_descriptors[1] = {
+            //     .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+            //     .pNext = nullptr,
+            //     .dstSet = m_descriptor_sets[i],
+            //     .dstBinding = 1,
+            //     .dstArrayElement = 0,
+            //     .descriptorCount = 1,
+            //     .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+            //     .pImageInfo = &image_info,
+            // };
+            vkUpdateDescriptorSets(m_driver, static_cast<uint32_t>(write_descriptors.size()), write_descriptors.data(), 0, nullptr); 
+        }
+    }
+
+    void descriptor_set::update(const std::span<vk_uniform_buffer>& p_uniforms) {
+        for(size_t i = 0; i < m_allocated_descriptors; i++) {
+            VkDescriptorBufferInfo buffer_info = {
+                .buffer = p_uniforms[i],
+                .offset = 0,
+                .range = m_size_bytes, // m_size_bytes replaces doing things like: sizeof(camera_ubo)
+            };
+
+            // std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
+            std::array<VkWriteDescriptorSet, 1> write_descriptors;
+            write_descriptors[0] = {
                 .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
                 .pNext = nullptr,
                 .dstSet = m_descriptor_sets[i],
-                .dstBinding = 1,
+                .dstBinding = 0,
+                .dstArrayElement = 0,
+                .descriptorCount = 1,
+                .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                .pBufferInfo = &buffer_info,
+            };
+            vkUpdateDescriptorSets(m_driver, static_cast<uint32_t>(write_descriptors.size()), write_descriptors.data(), 0, nullptr);
+        }
+    }
+
+    void descriptor_set::update(const vk_uniform_buffer& p_uniform) {
+        for(size_t i = 0; i < m_allocated_descriptors; i++) {
+            VkDescriptorBufferInfo buffer_info = {
+                .buffer = p_uniform,
+                .offset = 0,
+                .range = m_size_bytes, // m_size_bytes replaces doing things like: sizeof(camera_ubo)
+            };
+
+            // std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
+            std::array<VkWriteDescriptorSet, 1> write_descriptors;
+            write_descriptors[0] = {
+                .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+                .pNext = nullptr,
+                .dstSet = m_descriptor_sets[i],
+                .dstBinding = 0,
+                .dstArrayElement = 0,
+                .descriptorCount = 1,
+                .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                .pBufferInfo = &buffer_info,
+            };
+            vkUpdateDescriptorSets(m_driver, static_cast<uint32_t>(write_descriptors.size()), write_descriptors.data(), 0, nullptr);
+        }
+    }
+
+    void descriptor_set::update(const std::span<texture>& p_textures) {
+        for(size_t i = 0; i < m_allocated_descriptors; i++) {
+            VkDescriptorImageInfo image_info = {
+                .sampler = p_textures[0].sampler(),
+                .imageView = p_textures[0].image_view(),
+                .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            };
+
+            // std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
+            std::array<VkWriteDescriptorSet, 1> write_descriptors;
+            write_descriptors[0] = {
+                .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+                .pNext = nullptr,
+                .dstSet = m_descriptor_sets[i],
+                .dstBinding = 0,
                 .dstArrayElement = 0,
                 .descriptorCount = 1,
                 .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
                 .pImageInfo = &image_info,
             };
-            vkUpdateDescriptorSets(m_driver, static_cast<uint32_t>(write_descriptors.size()), write_descriptors.data(), 0, nullptr); 
+            vkUpdateDescriptorSets(m_driver, static_cast<uint32_t>(write_descriptors.size()-1), write_descriptors.data(), 0, nullptr);
         }
     }
 
+    /**
+     p_set_index is to tell vulkan which "slot" to put the descriptor set in
+
+     beacuse our layout is like as shown here
+
+     layout (set = 0, binding = 0) uniform GlobalUbo {
+        mat4 mvp;
+     } ubo;
+
+     layout (set = 1, binding = 0) uniform MaterialUbo {
+        vec4 color;
+     } material_src;
+
+     * If you bind the descriptor set at the wrong slot, the shader will not be able to bind to the resources
+     * If you bind to set index 0 but the set is at 1, the shader will not be able to find it and give you validation error
+     * If you bind two different descriptor sets at the same index, the second one overwrites the first one
+     * 
+     * [Requirements for Descriptor Set Binding]
+     * Assign each descriptor set a slot index, to ensure it is the correct slot being binded.
+     * Ensure that the shader resource group would be able to find that particular resource binded to this descriptor set
+     * No descriptor sets should overwrite each other
+     * Error occurred: Reason why validation errors occurred was because I was binding to index slot 0, when the validation layers and vulkan were searching for index slot 1 instead
+     * 
+    */
     void descriptor_set::bind(const VkCommandBuffer& p_current,
                               uint32_t p_frame_index,
                               const VkPipelineLayout& p_pipeline_layout) {
@@ -152,7 +248,7 @@ namespace atlas::vk {
             vkCmdBindDescriptorSets(p_current,
                                     VK_PIPELINE_BIND_POINT_GRAPHICS,
                                     p_pipeline_layout,
-                                    0,
+                                    m_set_slot,
                                     1,
                                     &m_descriptor_sets[p_frame_index],
                                     0,
@@ -161,8 +257,13 @@ namespace atlas::vk {
     }
 
     void descriptor_set::destroy() {
-        vkDestroyDescriptorPool(m_driver, m_descriptor_pool, nullptr);
-        vkDestroyDescriptorSetLayout(
-          m_driver, m_descriptor_set_layout, nullptr);
+        if(m_descriptor_pool != nullptr) {
+            vkDestroyDescriptorPool(m_driver, m_descriptor_pool, nullptr);
+        }
+
+        if(m_descriptor_set_layout != nullptr) {
+            vkDestroyDescriptorSetLayout(
+            m_driver, m_descriptor_set_layout, nullptr);
+        }
     }
 };
