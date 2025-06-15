@@ -87,15 +87,13 @@ namespace atlas::vk {
         m_ibo = vk_index_buffer(indices);
     }
 
-    void mesh::set_texture(uint32_t p_index, const std::string& p_filename) {
-        m_texture_slots[p_index] = texture(p_filename);
-
-        if(m_texture_slots[p_index].loaded()) {
-            console_log_info("texture slot {} has successfully loaded file = {}", p_index, p_filename);
-        }
+    void mesh::add_texture(const std::filesystem::path& p_path) {
+        m_textures.emplace_back(p_path.string());
     }
 
     void mesh::draw(const VkCommandBuffer& p_current) {
+        // TODO -- Rather then having vbo and ibo's contain the function to the draw calls.
+        // Need to expand this on having draw calls in batches
         m_vbo.bind(p_current);
         if(m_ibo.size() > 0) {
             m_ibo.bind(p_current);
@@ -110,9 +108,9 @@ namespace atlas::vk {
         m_vbo.destroy();
         m_ibo.destroy();
 
-        for(size_t i = 0; i < m_texture_slots.size(); i++) {
-            if(m_texture_slots[i].loaded()) {
-                m_texture_slots[i].destroy();
+        for(size_t i = 0; i < m_textures.size(); i++) {
+            if(m_textures[i].loaded()) {
+                m_textures[i].destroy();
             }
         }
     }
