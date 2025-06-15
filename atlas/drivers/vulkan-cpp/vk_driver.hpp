@@ -5,6 +5,11 @@
 
 namespace atlas::vk {
 
+    /**
+     * @brief vulkan implementation of extracting a logical device
+     * 
+     * TODO -- Implement a device manager for managing multiple available logical devices for potential of multi-viewport support
+    */
     class vk_driver {
         struct device_queue_family {
             VkQueue graphics_queue;

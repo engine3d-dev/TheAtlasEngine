@@ -3,6 +3,7 @@
 #include <core/window.hpp>
 #include <string>
 #include <renderer/renderer.hpp>
+#include <drivers/vulkan-cpp/vk_imgui.hpp>
 
 namespace atlas {
 
@@ -53,6 +54,7 @@ namespace atlas {
         bool m_is_application_running=true;
         scope<renderer> m_renderer = nullptr; 
         uint32_t m_current_frame_index=-1;
+        vk::imgui_context m_ui_context;
         static application* s_instance;
     };
 

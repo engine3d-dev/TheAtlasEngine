@@ -268,6 +268,8 @@ namespace atlas::ui {
 
             ImGui::EndMenuBar();
         }
+
+        ImGui::End();
     }
 
     void button_open_file_dialog(const std::string& p_tag,
