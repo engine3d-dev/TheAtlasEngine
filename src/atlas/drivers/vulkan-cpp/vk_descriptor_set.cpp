@@ -19,6 +19,32 @@ namespace atlas::vk {
         console_log_error("descriptor set type specified is invalid!!!");
     }
 
+    VkDescriptorType to_descriptor_set_type(const buffer& p_type) {
+        switch (p_type) {
+            case buffer::Storage:
+                return VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+            case buffer::Uniform:
+                return VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+            case buffer::ImageSampler:
+                return VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        }
+
+        console_log_error("descriptor set type specified is invalid!!!");
+    }
+
+    std::string descriptor_set_type_to_string(const VkDescriptorType& p_type) {
+        switch (p_type){
+        case VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
+            return "VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER";
+        case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER:
+            return "VK_DESCRIPTOR_TYPE_STORAGE_BUFFER";
+        case VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
+            return "VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER";
+        default:
+            return "vulkan descriptor type default!!";
+        }
+    }
+
     VkShaderStageFlags to_vk_shader_stage(const shader_stage& p_stage) {
         switch (p_stage) {
             case shader_stage::Vertex:
@@ -30,6 +56,94 @@ namespace atlas::vk {
 
         console_log_error(
           "vulkan shader stage that you specified was invalid!!!");
+    }
+
+    descriptor_set::descriptor_set(const uint32_t& p_set_slot, const descriptor_set_layout2& p_layout) : m_set_slot(p_set_slot), m_allocated_descriptors(p_layout.allocate_count), m_size_bytes(p_layout.size_bytes) {
+        m_driver = vk_context::driver_context();
+
+        std::vector<VkDescriptorPoolSize> pool_sizes(p_layout.entry.size());
+        std::vector<VkDescriptorSetLayoutBinding> descriptor_set_layout_bindings(p_layout.entry.size());
+
+        console_log_fatal("entries.size() = {}", p_layout.entry.size());
+
+        for(size_t i = 0; i < pool_sizes.size(); i++) {
+            VkDescriptorType type = to_descriptor_set_type(p_layout.entry[i].type);
+            std::string type_str = descriptor_set_type_to_string(type);
+            pool_sizes[i] = {
+                .type = type,
+                .descriptorCount = static_cast<uint32_t>(p_layout.entry[i].descriptor_count)
+            };
+            console_log_fatal("pool_sizes[{}].type = {}", i, type_str);
+        }
+
+        for(size_t i = 0; i < descriptor_set_layout_bindings.size(); i++) {
+            VkDescriptorType type = to_descriptor_set_type(p_layout.entry[i].type);
+            std::string type_str = descriptor_set_type_to_string(type);
+            console_log_fatal("descriptor_set_layout_bindings[{}].type = {}", i, type_str);
+            descriptor_set_layout_bindings[i] = {
+                .binding = p_layout.entry[i].binding_point.binding,
+                .descriptorType = to_descriptor_set_type(p_layout.entry[i].type),
+                .descriptorCount = p_layout.entry[i].descriptor_count,
+                .stageFlags = to_vk_shader_stage(p_layout.entry[i].binding_point.stage),
+            };
+
+            console_log_fatal("p_layout.entry[{}].binding_point.binding = {}", i, p_layout.entry[i].binding_point.binding);
+            console_log_fatal("p_layout.entry[{}].desciptor_count = {}", i, p_layout.entry[i].descriptor_count);
+        }
+        
+        
+        VkDescriptorPoolCreateInfo pool_ci = {
+            .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            .maxSets = p_layout.max_sets,
+            .poolSizeCount = static_cast<uint32_t>(pool_sizes.size()),
+            .pPoolSizes = pool_sizes.data()
+        };
+
+        vk_check(vkCreateDescriptorPool(
+                   m_driver, &pool_ci, nullptr, &m_descriptor_pool),
+                 "vkCreateDescriptorPool",
+                 __FILE__,
+                 __LINE__,
+                 __FUNCTION__);
+
+        VkDescriptorSetLayoutCreateInfo descriptor_layout_ci = {
+            .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            .bindingCount = static_cast<uint32_t>(descriptor_set_layout_bindings.size()),
+            .pBindings = descriptor_set_layout_bindings.data()
+        };
+
+        vk_check(vkCreateDescriptorSetLayout(m_driver,
+                                             &descriptor_layout_ci,
+                                             nullptr,
+                                             &m_descriptor_set_layout),
+                 "vkCreateDescriptorSetLayout",
+                 __FILE__,
+                 __LINE__,
+                 __FUNCTION__);
+
+        std::vector<VkDescriptorSetLayout> layouts(m_allocated_descriptors,
+                                                   m_descriptor_set_layout);
+        VkDescriptorSetAllocateInfo descriptor_set_alloc_info = {
+            .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
+            .pNext = nullptr,
+            .descriptorPool = m_descriptor_pool,
+            .descriptorSetCount = m_allocated_descriptors,
+            .pSetLayouts = layouts.data()
+        };
+
+        m_descriptor_sets.resize(m_allocated_descriptors);
+
+        vk_check(vkAllocateDescriptorSets(m_driver,
+                                          &descriptor_set_alloc_info,
+                                          m_descriptor_sets.data()),
+                 "vkAllocateDescriptorSets",
+                 __FILE__,
+                 __LINE__,
+                 __FUNCTION__);
     }
 
 
@@ -97,6 +211,8 @@ namespace atlas::vk {
     void descriptor_set::update(const std::span<vk_uniform_buffer>& p_uniforms, const std::span<texture>& p_textures) {
         std::vector<VkDescriptorBufferInfo> buffer_infos;
         std::vector<VkDescriptorImageInfo> image_infos;
+
+        // console_log_fatal("size_bytes() = {}", p_uniforms.size_bytes());
 
         // Loading all uniforms specified into this descriptor set
         for(const auto& uniform : p_uniforms) {

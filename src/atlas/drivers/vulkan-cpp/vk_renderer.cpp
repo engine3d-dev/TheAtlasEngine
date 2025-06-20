@@ -11,10 +11,9 @@ namespace atlas::vk {
 
     vk_renderer::vk_renderer(const vk_swapchain& p_swapchain, const std::string& p_tag){
         console_log_manager::create_new_logger(p_tag);
-        // m_driver = vk_context::driver_context();
         console_log_info("vk_renderer Begin construction!!!");
         m_main_swapchain = p_swapchain;
-        m_image_count = m_main_swapchain.image_size();
+        m_image_count = p_swapchain.image_size();
 
         m_shader_group = vk_shader_group({
             {"experimental-shaders/test.vert", shader_stage::Vertex},
@@ -58,16 +57,72 @@ namespace atlas::vk {
             // }
         };
 
-        // Setting the parameters for setting up the descriptor set layout
-        // Descriptor set = 0
-        descriptor_set_layout set0_descriptor_layout = {
+
+        /*
+        struct descriptor_binding_point {
+            uint32_t binding;
+            shader_stage stage;
+        };
+
+        struct descriptor_binding_entry {
+            buffer type;
+            descriptor_binding_point bind_point;
+            uint32_t descriptor_count;
+        };
+
+        // Usage: One per buffer_type in this case its only for one uniform at set = 0
+        descriptor_binding_entry desc0_binding_entry = {
+            .type = vk::buffer::uniform,
+            .bind_point = {
+                .binding = 0, equivalent to VkDescriptorSetLayoutBinding::binding
+                .descriptor_count = 1, // equivalent to VkDescriptorSetLayoutBinding::descriptorCount
+            },
+            .allocation_count = m_image_count // allocation info for pool for VkDescriptorPoolSize::descriptorCount
+        };
+
+        std::array<descriptor_context> context = {desc0_context};
+
+        descriptor_set_layout set0_layout = {
             .allocate_count = m_image_count,            // the count how many descriptor set layout able to be allocated
             .max_sets = m_image_count,                  // max of descriptor sets able to allocate
             .size_bytes = sizeof(camera_ubo),           // size of bytes of the uniforms utilized by this descriptor sets
-            .allocation_info = set0_allocation_info,         // specify the collection of multiple descriptor sets pool allocation sizes
-            .bindings = set0_descriptor_set_layout_bindings  // specifying layout bindings specified in the shader for specific information thats gonna be passed into this descriptor sets
+
+            // This removes the need for .allocation_info and .bindings that takes in a std::span
+            .entry = desc0_binding_entry                // Contains information related to the binding point, which takes in a std::span<descriptor_binding_entry>
+        };
+        
+        */
+
+        // Setting the parameters for setting up the descriptor set layout
+        // Descriptor set = 0
+        // descriptor_set_layout set0_descriptor_layout = {
+        //     .allocate_count = m_image_count,            // the count how many descriptor set layout able to be allocated
+        //     .max_sets = m_image_count,                  // max of descriptor sets able to allocate
+        //     .size_bytes = sizeof(camera_ubo),           // size of bytes of the uniforms utilized by this descriptor sets
+        //     .allocation_info = set0_allocation_info,         // specify the collection of multiple descriptor sets pool allocation sizes
+        //     .bindings = set0_descriptor_set_layout_bindings  // specifying layout bindings specified in the shader for specific information thats gonna be passed into this descriptor sets
+        // };
+        std::vector<descriptor_binding_entry> entries = {
+            descriptor_binding_entry{ // specifies "layout (set = 0, binding = 0) uniform GlobalUbo"
+                .type = vk::buffer::Uniform,
+                .binding_point = {
+                    .binding = 0,
+                    .stage = shader_stage::Vertex
+                },
+                .descriptor_count = 1,
+            }
         };
 
+        descriptor_set_layout2 set0_descriptor_layout = {
+            .allocate_count = m_image_count,            // the count how many descriptor set layout able to be allocated
+            .max_sets = m_image_count,                  // max of descriptor sets able to allocate
+            .size_bytes = sizeof(camera_ubo),           // size of bytes of the uniforms utilized by this descriptor sets
+            // .allocation_info = set0_allocation_info,         // specify the collection of multiple descriptor sets pool allocation sizes
+            // .bindings = set0_descriptor_set_layout_bindings  // specifying layout bindings specified in the shader for specific information thats gonna be passed into this descriptor sets
+            .entry = entries
+        };
+
+        // m_descriptor_set0 = descriptor_set(0, set0_descriptor_layout);
         m_descriptor_set0 = descriptor_set(0, set0_descriptor_layout);
         
         // Descriptor set = 1
@@ -85,7 +140,7 @@ namespace atlas::vk {
             },
             VkDescriptorPoolSize{
                 .type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                .descriptorCount = static_cast<uint32_t>(m_image_count),
+                .descriptorCount = static_cast<uint32_t>(m_image_count) * 2,
             },
         };
 
@@ -135,89 +190,27 @@ namespace atlas::vk {
         * Then once we do that we pass this into the set = 1, binding = 1 that is a sampler2D
         */
         m_mesh0 = mesh(std::filesystem::path("assets/models/viking_room.obj"));
-        // m_mesh0.set_texture(0, "assets/models/viking_room.png");
-        // m_mesh0.set_texture("viking_room", std::filesystem::path("assets/models/viking_room.png"));
-        m_mesh0.add_texture(std::filesystem::path("assets/models/viking_room.png"));
-        m_mesh0.add_texture(std::filesystem::path("assets/models/container_diffuse.png"));
-
-        // m_mesh0.set_texture("container_diffuse", std::filesystem::path("assets/models/container_diffuse.png"));
-
-
-
+        m_mesh0.add_texture(1, std::filesystem::path("assets/models/viking_room.png"));
+        m_mesh0.add_texture(2, std::filesystem::path("assets/models/container_diffuse.png"));
 
         m_mesh1 = mesh(std::filesystem::path("assets/models/colored_cube.obj"));
-        m_mesh1.add_texture(std::filesystem::path("assets/models/wood.png"));
-        // m_mesh1.set_texture(0, "assets/models/wood.png");
-        // m_mesh1.set_texture("wood", std::filesystem::path("assets/models/wood.png"));
+        m_mesh1.add_texture(1, std::filesystem::path("assets/models/wood.png"));
 
 
         m_descriptor_set0.update(m_global_uniforms);
-
-
-        // std::vector<VkDescriptorImageInfo> image_infos;
-        // image_infos.resize(m_mesh0.read_textures().size());
         console_log_error("textures.sizez() = {}", m_mesh0.read_textures().size());
-
-        // std::vector<VkDescriptorBufferInfo> buffer_infos;
-        // buffer_infos.resize(1);
-        // VkDescriptorBufferInfo buffer_info = {
-        //     .buffer = m_mesh0_material_ubo,
-        //     .offset = 0,
-        //     .range = m_mesh1_material_ubo.size_bytes(), // m_size_bytes replaces doing things like: sizeof(camera_ubo)
-        // };
-
-        // VkWriteDescriptorSet write = {
-        //     .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-        //     .pNext = nullptr,
-        //     .dstBinding = 0,
-        //     .dstArrayElement = 0,
-        //     .descriptorCount = 1,
-        //     .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-        //     .pBufferInfo = &buffer_info,
-        // };
-
-        // VkWriteDescriptorSet image_write = {
-        //     .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-        //     .pNext = nullptr,
-        //     .dstBinding = 0,
-        //     .dstArrayElement = 0,
-        //     .descriptorCount = 1,
-        //     .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-        //     .pImageInfo = &image_info,
-        // };
 
 
         std::array<vk_uniform_buffer, 1> buffers = {
             m_mesh0_material_ubo
         };
 
-        // std::array<texture, 1> textures = {
-
-        // };
-        // m_descriptor_set1.test_update(write);
         m_descriptor_set1.update(buffers, m_mesh0.read_textures());
 
-        // Uncomment as this is the originally working code
-        // m_descriptor_set1.update(m_mesh0_material_ubo);
-        // m_descriptor_set1.update(mesh0_write);
-        // VkDescriptorBufferInfo buffer_info = {
-        //     .buffer = m_mesh0_material_ubo,
-        //     .offset = 0,
-        //     .range = sizeof(material), // m_size_bytes replaces doing things like: sizeof(camera_ubo)
-        // };
-
-        // VkDescriptorImageInfo image_info = {
-
-        // };
-
-        // m_descriptor_set1.test_update(buffer_info, {});
         std::array<vk_uniform_buffer, 1> buffers2 = {
             m_mesh1_material_ubo
         };
         m_descriptor_set2.update(buffers2, m_mesh1.read_textures());
-
-        // m_descriptor_set2.update(m_mesh1_material_ubo);
-        // m_descriptor_set_test.update_test_descriptors(m_global_uniforms, m_mesh0.get_texture(0));
 
         vk_context::submit_resource_free([this](){
             m_shader_group.destroy();
@@ -310,6 +303,7 @@ namespace atlas::vk {
         float time = std::chrono::duration<float, std::chrono::seconds::period>(current_time - start_time).count();
 
         camera_ubo ubo{};
+        ubo.Model = glm::mat4(1.f);
         ubo.Model = glm::translate(ubo.Model, glm::vec3(0.f, 0.f, -0.8f));
         ubo.Model = glm::scale(ubo.Model, glm::vec3(0.5f, 0.5f, 0.5f));
         ubo.Model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
@@ -320,12 +314,13 @@ namespace atlas::vk {
         // For now, using this. Will need to remove this before vulkan integration merging into dev
         // This is for testing and to hopefully have a global_ubo for globalized uniforms
         global_ubo global_frame_ubo = {
-            .mvp = ubo.Projection * ubo.View * ubo.Model
+            .mvp = ubo.Projection * ubo.View
         };
 
         // glm::mat4 mvp = ubo.Projection * ubo.View * ubo.Model;
         m_global_uniforms[current_frame].update(&global_frame_ubo);
         material mesh0_material_ubo = {
+            .model = ubo.Model,
             .color = {1.f, 1.f, 1.f, 1.0f}
         };
         m_mesh0_material_ubo.update(&mesh0_material_ubo);
@@ -343,10 +338,15 @@ namespace atlas::vk {
         material_ubo is the ubo specific per-object
         * Meaning each scene object (mesh) is going to have their own descriptor set that is going to be for referencing the mesh material resource
         */
+        ubo.Model = glm::mat4(1.f);
+        ubo.Model = glm::translate(ubo.Model, glm::vec3(0.f, 0.f, -0.8f));
+        ubo.Model = glm::scale(ubo.Model, glm::vec3(10.f, 10.f,10.f));
+        ubo.Model = glm::rotate(glm::mat4(1.0f), time * glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
         material mesh1_material_ubo = {
+            .model = ubo.Model,
             .color = {1.f, 1.f, 1.f, 0.5f}
         };
-
+        
         m_mesh1_material_ubo.update(&mesh1_material_ubo);
 
         m_descriptor_set0.bind(p_current, current_frame, m_main_pipeline.get_layout());

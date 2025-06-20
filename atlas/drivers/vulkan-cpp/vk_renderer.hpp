@@ -37,12 +37,11 @@ namespace atlas::vk {
         ~vk_renderer() override = default;
 
     private:
-        void start_frame(const vk_command_buffer& p_current, const vk::vk_swapchain& p_swapchain_handler) override;
+        void start_frame(const vk_command_buffer& p_current, const vk_swapchain& p_swapchain_handler) override;
         void post_frame() override;
         void background_color(const std::array<float, 4>& p_color) override;
 
     private:
-        // vk_driver m_driver{};
         vk_swapchain m_main_swapchain{};
         vk_command_buffer m_current_command_buffer{};
         VkClearColorValue m_color;

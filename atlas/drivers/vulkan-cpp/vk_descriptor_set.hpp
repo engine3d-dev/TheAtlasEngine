@@ -18,6 +18,38 @@ namespace atlas::vk {
         ImageAndSampler=2
     };
 
+    enum buffer : uint8_t {
+        Storage=0,
+        Uniform=1,
+        ImageSampler=2
+    };
+
+    struct descriptor_binding_point {
+        uint32_t binding;
+        shader_stage stage;
+    };
+
+    struct descriptor_binding_entry {
+        buffer type;
+        descriptor_binding_point binding_point;
+        uint32_t descriptor_count;
+    };
+
+    // struct descriptor_set_layout {
+    //     uint32_t allocate_count=0;
+    //     uint32_t max_sets=0;
+    //     uint32_t size_bytes=0;
+    //     std::span<VkDescriptorPoolSize> allocation_info;
+    //     std::span<VkDescriptorSetLayoutBinding> bindings;
+    // };
+
+    struct descriptor_set_layout2 {
+        uint32_t allocate_count=0;
+        uint32_t max_sets=0;
+        uint32_t size_bytes=0;
+        std::span<descriptor_binding_entry> entry;
+    };
+
     class descriptor_set {
     public:
         descriptor_set() = default;
@@ -27,6 +59,7 @@ namespace atlas::vk {
          * 
         */
         descriptor_set(const uint32_t& p_set_slot, const descriptor_set_layout&);
+        descriptor_set(const uint32_t& p_set_slot, const descriptor_set_layout2& p_entry);
         ~descriptor_set() = default;
 
         void bind(const VkCommandBuffer& p_current, uint32_t p_frame_index, const VkPipelineLayout&);

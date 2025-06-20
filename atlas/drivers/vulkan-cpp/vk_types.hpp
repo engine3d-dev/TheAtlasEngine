@@ -2,6 +2,8 @@
 #include <vulkan/vulkan.h>
 #include <span>
 #include <glm/glm.hpp>
+#include <string>
+#include <vector>
 
 namespace atlas::vk {
     /**
@@ -72,6 +74,7 @@ namespace atlas::vk {
         VkImageView image_view=nullptr;
     };
 
+    //! @brief vulkan image handler with resources; used when handling textures
     struct vk_image {
         VkImage image = nullptr;
         VkImageView image_view = nullptr;
@@ -79,7 +82,7 @@ namespace atlas::vk {
         VkDeviceMemory device_memory = nullptr;
     };
 
-    //! @brief contains the min and max ranges for the VkFilter
+    //! @brief Range between min and max for the VkFilter
     struct vk_filter_range {
         VkFilter min;
         VkFilter max;
@@ -97,9 +100,9 @@ namespace atlas::vk {
     };
 
     /**
-     * @brief Renderpass Specifications
+     * @brief Renderpass specifictations for VkRenderpass
      * 
-     * These specifications are for configuring the attachments and descriptions of the renderpass being created
+     * Specifying requirements needed for specifying the vulkan renderpass handlers
     */
     struct vk_renderpass_options {
         bool cache=false; // set this to true if you want to use the default constructed configuration
@@ -109,16 +112,46 @@ namespace atlas::vk {
         std::span<VkSubpassDependency> dependencies{};
     };
 
+    //! @brief vulkan buffer struct to define the handlers and memory specifications required for buffer handlers in vulkan
     struct vk_buffer {
         VkBuffer handler = nullptr;
         VkDeviceMemory device_memory = nullptr;
         uint32_t allocation_size = 0; // device allocation size
     };
 
+    //! @brief Specifications of the vulkan buffer handlers and the use and memory bits associated with the buffer handlers
     struct vk_buffer_info {
         uint32_t device_size=0;
         VkBufferUsageFlags usage;
         VkMemoryPropertyFlags memory_property_flag;
+    };
+
+    /**
+     * @param allocate_count
+     * @brief count of descriptor set layouts to allocate for this descriptor set
+     * 
+     * @param size_bytes
+     * @brief Size of bytes of uniforms to allocate for the descriptor sets
+     * 
+     * @param max_sets
+     * @brief maximum of descriptor sets that can be allocated
+     * 
+    */
+    struct descriptor_set_layout {
+        uint32_t allocate_count=0;
+        uint32_t max_sets=0;
+        uint32_t size_bytes=0;
+        std::span<VkDescriptorPoolSize> allocation_info;
+        std::span<VkDescriptorSetLayoutBinding> bindings;
+    };
+
+    /**
+     * @brief specify the types of descriptors that should be
+     * written to specific descriptors of specified layout
+    */
+    struct write_descriptors {
+        std::span<VkDescriptorBufferInfo> buffer_infos={};
+        std::span<VkDescriptorImageInfo> image_infos={};
     };
 
     struct vertex {
@@ -148,6 +181,21 @@ namespace atlas::vk {
         glm::mat4 Projection{ 1.f };
         glm::mat4 View{ 1.f };
         glm::mat4 Model{ 1.f };
+    };
+
+    //! @brief Just for testing purposes for sending this struct over to the shader
+    struct global_ubo {
+        glm::mat4 mvp={1.f};
+    };
+
+    /**
+     * @brief material is going to define properties about how a scene object itself gets rendered
+     * 
+    */
+    struct material {
+        glm::mat4 model={1.f};
+        glm::vec4 color{1.f};
+        // std::vector<std::string> texture_paths;
     };
 
 };
