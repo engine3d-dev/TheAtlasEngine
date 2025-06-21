@@ -16,19 +16,19 @@ namespace atlas::vk {
         m_image_count = p_swapchain.image_size();
 
         m_shader_group = vk_shader_group({
-            {"experimental-shaders/test.vert", shader_stage::Vertex},
-            {"experimental-shaders/test.frag", shader_stage::Fragment}
+            {"experimental-shaders/test.vert", shader_stage::vertex},
+            {"experimental-shaders/test.frag", shader_stage::fragment}
         });
         
         m_shader_group.set_vertex_attributes({
-            { .location = 0, .binding = 0, .format = VK_FORMAT_R32G32B32_SFLOAT, .offset = offsetof(vk::vertex, position) },
-            { .location = 1, .binding = 0, .format = VK_FORMAT_R32G32B32_SFLOAT, .offset = offsetof(vk::vertex, color) },
-            { .location = 2, .binding = 0, .format = VK_FORMAT_R32G32B32_SFLOAT, .offset = offsetof(vk::vertex, normals) },
-            { .location = 3, .binding = 0, .format = VK_FORMAT_R32G32_SFLOAT,    .offset = offsetof(vk::vertex, uv) }
+            { .location = 0, .binding = 0, .format = VK_FORMAT_R32G32B32_SFLOAT, .offset = offsetof(vk::vertex_input, position) },
+            { .location = 1, .binding = 0, .format = VK_FORMAT_R32G32B32_SFLOAT, .offset = offsetof(vk::vertex_input, color) },
+            { .location = 2, .binding = 0, .format = VK_FORMAT_R32G32B32_SFLOAT, .offset = offsetof(vk::vertex_input, normals) },
+            { .location = 3, .binding = 0, .format = VK_FORMAT_R32G32_SFLOAT,    .offset = offsetof(vk::vertex_input, uv) }
         });
 
         m_shader_group.set_vertex_bind_attributes({
-            {.binding = 0, .stride = sizeof(vk::vertex), .inputRate = VK_VERTEX_INPUT_RATE_VERTEX}
+            {.binding = 0, .stride = sizeof(vk::vertex_input), .inputRate = VK_VERTEX_INPUT_RATE_VERTEX}
         });
 
         console_log_info("vk_renderer End construction!!!");
@@ -104,16 +104,16 @@ namespace atlas::vk {
         // };
         std::vector<descriptor_binding_entry> entries = {
             descriptor_binding_entry{ // specifies "layout (set = 0, binding = 0) uniform GlobalUbo"
-                .type = vk::buffer::Uniform,
+                .type = vk::buffer::uniform,
                 .binding_point = {
                     .binding = 0,
-                    .stage = shader_stage::Vertex
+                    .stage = shader_stage::vertex
                 },
                 .descriptor_count = 1,
             }
         };
 
-        descriptor_set_layout2 set0_descriptor_layout = {
+        descriptor_set_layout set0_descriptor_layout = {
             .allocate_count = m_image_count,            // the count how many descriptor set layout able to be allocated
             .max_sets = m_image_count,                  // max of descriptor sets able to allocate
             .size_bytes = sizeof(camera_ubo),           // size of bytes of the uniforms utilized by this descriptor sets
@@ -127,29 +127,62 @@ namespace atlas::vk {
         
         // Descriptor set = 1
         // Describing layout of descriptor set 1 that will be used across the meshes
-        std::vector<VkDescriptorSetLayoutBinding> set1_descriptor_set_layout_bindings = {
-            VkDescriptorSetLayoutBinding{.binding = 0, .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, .descriptorCount = 1, .stageFlags = VK_SHADER_STAGE_VERTEX_BIT, .pImmutableSamplers  = nullptr},
-            VkDescriptorSetLayoutBinding{.binding = 1, .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, .descriptorCount = 1, .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT, .pImmutableSamplers  = nullptr},
-            VkDescriptorSetLayoutBinding{.binding = 2, .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, .descriptorCount = 1, .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT, .pImmutableSamplers  = nullptr},
+        // std::vector<VkDescriptorSetLayoutBinding> set1_descriptor_set_layout_bindings = {
+        //     VkDescriptorSetLayoutBinding{.binding = 0, .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, .descriptorCount = 1, .stageFlags = VK_SHADER_STAGE_VERTEX_BIT, .pImmutableSamplers  = nullptr},
+        //     VkDescriptorSetLayoutBinding{.binding = 1, .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, .descriptorCount = 1, .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT, .pImmutableSamplers  = nullptr},
+        //     VkDescriptorSetLayoutBinding{.binding = 2, .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, .descriptorCount = 1, .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT, .pImmutableSamplers  = nullptr},
+        // };
+
+        // std::vector<VkDescriptorPoolSize> set1_allocation_info = {
+        //     VkDescriptorPoolSize{
+        //         .type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+        //         .descriptorCount = static_cast<uint32_t>(m_image_count),
+        //     },
+        //     VkDescriptorPoolSize{
+        //         .type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+        //         .descriptorCount = static_cast<uint32_t>(m_image_count) * 2,
+        //     },
+        // };
+
+        std::vector<descriptor_binding_entry> set1_entries = {
+            descriptor_binding_entry{
+                .type = vk::buffer::uniform,
+                .binding_point = {
+                    .binding = 0,
+                    .stage = shader_stage::vertex
+                },
+                .descriptor_count = 1
+            },
+            descriptor_binding_entry{
+                .type = vk::buffer::image_sampler,
+                .binding_point = {
+                    .binding = 1,
+                    .stage = shader_stage::fragment
+                },
+                .descriptor_count = 1
+            },
+            descriptor_binding_entry{
+                .type = vk::buffer::image_sampler,
+                .binding_point = {
+                    .binding = 2,
+                    .stage = shader_stage::fragment
+                },
+                .descriptor_count = 1
+            }
         };
 
-        std::vector<VkDescriptorPoolSize> set1_allocation_info = {
-            VkDescriptorPoolSize{
-                .type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                .descriptorCount = static_cast<uint32_t>(m_image_count),
-            },
-            VkDescriptorPoolSize{
-                .type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                .descriptorCount = static_cast<uint32_t>(m_image_count) * 2,
-            },
-        };
-
+        // descriptor_set_layout material_descriptor_layout = {
+        //     .allocate_count = m_image_count,            // the count how many descriptor set layout able to be allocated
+        //     .max_sets = m_image_count,                  // max of descriptor sets able to allocate
+        //     .size_bytes = sizeof(material),           // size of bytes of the uniforms utilized by this descriptor sets
+        //     .allocation_info = set1_allocation_info,         // specify the collection of multiple descriptor sets pool allocation sizes
+        //     .bindings = set1_descriptor_set_layout_bindings  // specifying layout bindings specified in the shader for specific information thats gonna be passed into this descriptor sets
+        // };
         descriptor_set_layout material_descriptor_layout = {
             .allocate_count = m_image_count,            // the count how many descriptor set layout able to be allocated
             .max_sets = m_image_count,                  // max of descriptor sets able to allocate
             .size_bytes = sizeof(material),           // size of bytes of the uniforms utilized by this descriptor sets
-            .allocation_info = set1_allocation_info,         // specify the collection of multiple descriptor sets pool allocation sizes
-            .bindings = set1_descriptor_set_layout_bindings  // specifying layout bindings specified in the shader for specific information thats gonna be passed into this descriptor sets
+            .entry = set1_entries
         };
         m_descriptor_set1 = descriptor_set(1, material_descriptor_layout);
 
@@ -198,6 +231,7 @@ namespace atlas::vk {
 
 
         m_descriptor_set0.update(m_global_uniforms);
+        // m_descriptor_set0.update(m_global_uniforms, {});
         console_log_error("textures.sizez() = {}", m_mesh0.read_textures().size());
 
 
