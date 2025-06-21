@@ -51,10 +51,10 @@ namespace atlas::vk {
         shaderc_shader_kind shader_type;
 
         switch (p_shader_source.stage){
-        case shader_stage::Vertex:
+        case shader_stage::vertex:
             shader_type = shaderc_glsl_vertex_shader;
             break;
-        case shader_stage::Fragment:
+        case shader_stage::fragment:
             shader_type = shaderc_glsl_fragment_shader;
         default:
             break;

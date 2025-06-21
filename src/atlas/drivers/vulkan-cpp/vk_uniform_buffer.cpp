@@ -4,19 +4,9 @@
 #include <core/engine_logger.hpp>
 
 namespace atlas::vk {
-    vk_buffer create_uniform_buffer(uint32_t p_size) {
-        vk_buffer_info uniform_info = {
-            .device_size = p_size,
-            .usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-            .memory_property_flag = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-                                    VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
-        };
-        vk_buffer buffer_data = create_buffer(uniform_info);
 
-        return buffer_data;
-    }
-
-    vk_uniform_buffer::vk_uniform_buffer(uint32_t p_size_in_bytes) : m_size_bytes(p_size_in_bytes) {
+    vk_uniform_buffer::vk_uniform_buffer(uint32_t p_size_in_bytes)
+      : m_size_bytes(p_size_in_bytes) {
         m_driver = vk_context::driver_context();
 
         m_uniform_buffer_data = create_uniform_buffer(p_size_in_bytes);

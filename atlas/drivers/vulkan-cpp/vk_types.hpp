@@ -2,8 +2,6 @@
 #include <vulkan/vulkan.h>
 #include <span>
 #include <glm/glm.hpp>
-#include <string>
-#include <vector>
 
 namespace atlas::vk {
     /**
@@ -24,11 +22,11 @@ namespace atlas::vk {
      * 
      * Have independent lifetimes that can be managed independently of
      * primary command buffers, allowing for more flexible resource management
-     */
+    */
     enum command_buffer_levels : uint8_t {
-        Primary = 0,
-        Secondary = 1,
-        MaxEnum = 2
+        primary = 0,
+        secondary = 1,
+        max_enum = 2
     };
 
     /**
@@ -137,40 +135,63 @@ namespace atlas::vk {
      * @brief maximum of descriptor sets that can be allocated
      * 
     */
+    // struct descriptor_set_layout {
+    //     uint32_t allocate_count=0;
+    //     uint32_t max_sets=0;
+    //     uint32_t size_bytes=0;
+    //     std::span<VkDescriptorPoolSize> allocation_info;
+    //     std::span<VkDescriptorSetLayoutBinding> bindings;
+    // };
+
+    enum buffer : uint8_t {
+        uniform=0,
+        storage=1,
+        image_sampler=2
+    };
+
+    enum shader_stage {
+        undefined=-1,
+        vertex=0,
+        fragment=1
+    };
+
+    struct descriptor_binding_point {
+        uint32_t binding;
+        shader_stage stage;
+    };
+
+    struct descriptor_binding_entry {
+        buffer type;
+        descriptor_binding_point binding_point;
+        uint32_t descriptor_count;
+    };
+
+
     struct descriptor_set_layout {
         uint32_t allocate_count=0;
         uint32_t max_sets=0;
         uint32_t size_bytes=0;
-        std::span<VkDescriptorPoolSize> allocation_info;
-        std::span<VkDescriptorSetLayoutBinding> bindings;
+        std::span<descriptor_binding_entry> entry;
     };
 
     /**
      * @brief specify the types of descriptors that should be
      * written to specific descriptors of specified layout
     */
-    struct write_descriptors {
-        std::span<VkDescriptorBufferInfo> buffer_infos={};
-        std::span<VkDescriptorImageInfo> image_infos={};
-    };
+    // struct write_descriptors {
+    //     std::span<VkDescriptorBufferInfo> buffer_infos={};
+    //     std::span<VkDescriptorImageInfo> image_infos={};
+    // };
 
-    struct vertex {
+    struct vertex_input {
         glm::vec3 position;
         glm::vec3 color;
         glm::vec3 normals;
         glm::vec2 uv;
 
-        bool operator==(const vertex& other) const {
+        bool operator==(const vertex_input& other) const {
             return position == other.position and color == other.color and uv == other.uv and normals == other.normals;
         }
-    };
-
-    
-
-    enum shader_stage {
-        Undefined=-1,
-        Vertex=0,
-        Fragment=1
     };
 
 

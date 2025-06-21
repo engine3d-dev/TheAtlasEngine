@@ -15,8 +15,8 @@ namespace atlas {
 namespace std {
 
     template<>
-    struct hash<atlas::vk::vertex> {
-        size_t operator()(const atlas::vk::vertex& vertex) const {
+    struct hash<atlas::vk::vertex_input> {
+        size_t operator()(const atlas::vk::vertex_input& vertex) const {
             size_t seed = 0;
             atlas::hash_combine(seed,
                                 vertex.position,

@@ -4,7 +4,8 @@
 #include <drivers/vulkan-cpp/hash.hpp>
 
 namespace atlas::vk {
-    mesh::mesh(const std::span<vertex>& p_vertices, const std::span<uint32_t>& p_indices) {
+    mesh::mesh(const std::span<vertex_input>& p_vertices,
+               const std::span<uint32_t>& p_indices) {
         m_vbo = vk_vertex_buffer(p_vertices);
         m_ibo = vk_index_buffer(p_indices);
     }
@@ -21,21 +22,26 @@ namespace atlas::vk {
         //! @note Return default constructor automatically returns false means
         //! that mesh will return the boolean as false because it wasnt
         //! successful
-        if (!tinyobj::LoadObj(
-            &attrib, &shapes, &materials, &warn, &err, p_filename.string().c_str())) {
-            console_log_warn("Could not load model from path {}", p_filename.string());
+        if (!tinyobj::LoadObj(&attrib,
+                              &shapes,
+                              &materials,
+                              &warn,
+                              &err,
+                              p_filename.string().c_str())) {
+            console_log_warn("Could not load model from path {}",
+                             p_filename.string());
         }
         else {
             console_log_info("Model Loaded = {}", p_filename.string());
         }
 
-        std::vector<vertex> vertices;
+        std::vector<vertex_input> vertices;
         std::vector<uint32_t> indices;
-        std::unordered_map<vertex, uint32_t> unique_vertices{};
+        std::unordered_map<vertex_input, uint32_t> unique_vertices{};
 
         for (const auto& shape : shapes) {
             for (const auto& index : shape.mesh.indices) {
-                vertex vertex{};
+                vertex_input vertex{};
 
                 // vertices.push_back(vertex);
                 if (!unique_vertices.contains(vertex)) {
@@ -69,7 +75,7 @@ namespace atlas::vk {
                 if (index.texcoord_index >= 0) {
                     vertex.uv = {
                         attrib.texcoords[2 * index.texcoord_index + 0],
-                    1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
+                        1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
                     };
                 }
 
@@ -87,15 +93,16 @@ namespace atlas::vk {
         m_ibo = vk_index_buffer(indices);
     }
 
-    void mesh::add_texture(const std::filesystem::path& p_path) {
-        m_textures.emplace_back(p_path.string());
+    void mesh::add_texture(uint32_t p_binding,
+                           const std::filesystem::path& p_path) {
+        m_textures.emplace_back(p_binding, p_path.string());
     }
 
     void mesh::draw(const VkCommandBuffer& p_current) {
-        // TODO -- Rather then having vbo and ibo's contain the function to the draw calls.
-        // Need to expand this on having draw calls in batches
+        // TODO -- Rather then having vbo and ibo's contain the function to the
+        // draw calls. Need to expand this on having draw calls in batches
         m_vbo.bind(p_current);
-        if(m_ibo.size() > 0) {
+        if (m_ibo.size() > 0) {
             m_ibo.bind(p_current);
             m_ibo.draw(p_current);
         }
@@ -108,8 +115,8 @@ namespace atlas::vk {
         m_vbo.destroy();
         m_ibo.destroy();
 
-        for(size_t i = 0; i < m_textures.size(); i++) {
-            if(m_textures[i].loaded()) {
+        for (size_t i = 0; i < m_textures.size(); i++) {
+            if (m_textures[i].loaded()) {
                 m_textures[i].destroy();
             }
         }

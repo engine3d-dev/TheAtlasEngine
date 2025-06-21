@@ -4,21 +4,6 @@
 #include <drivers/vulkan-cpp/helper_functions.hpp>
 
 namespace atlas::vk {
-
-    VkCommandBufferLevel to_command_buffer_level(
-      const command_buffer_levels& p_level_input) {
-        switch (p_level_input) {
-            case command_buffer_levels::Primary:
-                return VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-            case command_buffer_levels::Secondary:
-                return VK_COMMAND_BUFFER_LEVEL_SECONDARY;
-            case command_buffer_levels::MaxEnum:
-                return VK_COMMAND_BUFFER_LEVEL_MAX_ENUM;
-        }
-
-        console_log_error("command_buffer_levels was invalid!!!");
-    }
-
     vk_command_buffer::vk_command_buffer(
       const command_buffer_settings& p_settings) {
         m_driver = vk_context::driver_context();
@@ -41,7 +26,7 @@ namespace atlas::vk {
             .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
             .pNext = nullptr,
             .commandPool = m_command_pool,
-            .level = to_command_buffer_level(p_settings.levels),
+            .level = to_vk_command_buffer_level(p_settings.levels),
             .commandBufferCount = 1
         };
 

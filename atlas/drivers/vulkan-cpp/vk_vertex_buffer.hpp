@@ -8,7 +8,7 @@ namespace atlas::vk {
     public:
         vk_vertex_buffer() = default;
 
-        vk_vertex_buffer(const std::span<vertex>& p_vertices);
+        vk_vertex_buffer(const std::span<vertex_input>& p_vertices);
 
         ~vk_vertex_buffer() = default;
 

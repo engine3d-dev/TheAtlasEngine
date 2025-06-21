@@ -5,32 +5,6 @@
 #include <drivers/vulkan-cpp/vk_context.hpp>
 
 namespace atlas::vk {
-    static VkShaderStageFlagBits shader_stage_to_vk(
-      const shader_stage& p_stage) {
-        switch (p_stage) {
-            case shader_stage::Vertex:
-                return VK_SHADER_STAGE_VERTEX_BIT;
-            case shader_stage::Fragment:
-                return VK_SHADER_STAGE_FRAGMENT_BIT;
-            default:
-                break;
-        }
-
-        return VK_SHADER_STAGE_VERTEX_BIT;
-    }
-
-    std::string shader_stage_to_string(VkShaderStageFlagBits p_stage_flags) {
-        switch (p_stage_flags) {
-            case VK_SHADER_STAGE_VERTEX_BIT:
-                return "VK_SHADER_STAGE_VERTEX_BIT";
-            case VK_SHADER_STAGE_FRAGMENT_BIT:
-                return "VK_SHADER_STAGE_FRAGMENT_BIT";
-            default:
-                break;
-        }
-
-        return "";
-    }
 
     vk_pipeline::vk_pipeline(const VkRenderPass& p_renderpass,
                              vk_shader_group& p_shader_group) {
@@ -61,8 +35,7 @@ namespace atlas::vk {
         // Loading shader handlers loaded from vk_shader_group
         for (const vk_shader_module& info : m_shader_group.data()) {
             VkShaderStageFlagBits shader_stage_flag =
-              shader_stage_to_vk(info.stage);
-            std::string stage = shader_stage_to_string(shader_stage_flag);
+              to_vk_shader_stage_bits(info.stage);
 
             pipeline_shader_stages[shader_source_index] = {
                 .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,

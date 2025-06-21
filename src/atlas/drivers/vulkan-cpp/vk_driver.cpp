@@ -5,7 +5,7 @@
 #include <drivers/vulkan-cpp/helper_functions.hpp>
 
 namespace atlas::vk {
-    [[maybe_unused]] static VkFormat search_supported_depth_format(
+    static VkFormat search_supported_depth_format(
       const VkPhysicalDevice& p_physical,
       const std::span<VkFormat>& p_formats,
       VkImageTiling p_tiling,
@@ -32,7 +32,7 @@ namespace atlas::vk {
         return format;
     }
 
-    [[maybe_unused]] static VkFormat search_depth_format(
+    static VkFormat search_depth_format(
       const VkPhysicalDevice& p_physical) {
         std::vector<VkFormat> candidate_formats = {
             VK_FORMAT_D32_SFLOAT,

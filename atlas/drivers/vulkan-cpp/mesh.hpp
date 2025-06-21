@@ -25,7 +25,7 @@ namespace atlas::vk {
     class mesh {
     public:
         mesh() = default;
-        mesh(const std::span<vertex>& p_vertices, const std::span<uint32_t>& p_indices);
+        mesh(const std::span<vertex_input>& p_vertices, const std::span<uint32_t>& p_indices);
         mesh(const std::filesystem::path& p_filename);
 
         void draw(const VkCommandBuffer& p_current);
@@ -37,7 +37,7 @@ namespace atlas::vk {
         [[nodiscard]] vk_index_buffer get_index() const { return m_ibo; }
 
         //! @brief Loading texture with specified filepath
-        void add_texture(const std::filesystem::path& p_path);
+        void add_texture(uint32_t p_binding, const std::filesystem::path& p_path);
 
         [[nodiscard]] std::span<texture> read_textures() {
             return m_textures;
@@ -46,7 +46,7 @@ namespace atlas::vk {
     private:
         std::vector<texture> m_textures;
         // These are data that the mesh will write to specific descriptor sets
-        std::vector<write_descriptors> m_write_descriptors;
+        // std::vector<write_descriptors> m_write_descriptors;
         vk_vertex_buffer m_vbo{};
         vk_index_buffer m_ibo{};
     };

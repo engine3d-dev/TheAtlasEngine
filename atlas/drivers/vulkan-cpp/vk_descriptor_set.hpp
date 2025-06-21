@@ -12,44 +12,6 @@
 
 namespace atlas::vk {
 
-    enum descriptor_type : uint8_t {
-        StorageBuffer=0,
-        UniformBuffer=1,
-        ImageAndSampler=2
-    };
-
-    enum buffer : uint8_t {
-        Storage=0,
-        Uniform=1,
-        ImageSampler=2
-    };
-
-    struct descriptor_binding_point {
-        uint32_t binding;
-        shader_stage stage;
-    };
-
-    struct descriptor_binding_entry {
-        buffer type;
-        descriptor_binding_point binding_point;
-        uint32_t descriptor_count;
-    };
-
-    // struct descriptor_set_layout {
-    //     uint32_t allocate_count=0;
-    //     uint32_t max_sets=0;
-    //     uint32_t size_bytes=0;
-    //     std::span<VkDescriptorPoolSize> allocation_info;
-    //     std::span<VkDescriptorSetLayoutBinding> bindings;
-    // };
-
-    struct descriptor_set_layout2 {
-        uint32_t allocate_count=0;
-        uint32_t max_sets=0;
-        uint32_t size_bytes=0;
-        std::span<descriptor_binding_entry> entry;
-    };
-
     class descriptor_set {
     public:
         descriptor_set() = default;
@@ -58,8 +20,7 @@ namespace atlas::vk {
          * Tells vulkan when binding this descriptor set where the resources location for shader to know where to access the resources binded
          * 
         */
-        descriptor_set(const uint32_t& p_set_slot, const descriptor_set_layout&);
-        descriptor_set(const uint32_t& p_set_slot, const descriptor_set_layout2& p_entry);
+        descriptor_set(const uint32_t& p_set_slot, const descriptor_set_layout& p_entry);
         ~descriptor_set() = default;
 
         void bind(const VkCommandBuffer& p_current, uint32_t p_frame_index, const VkPipelineLayout&);
@@ -74,19 +35,13 @@ namespace atlas::vk {
          * vk::mesh will also contain the matrices such as glm::mat4 that is the model matrix
         */
 
-        [[nodiscard]] VkDescriptorPool get_pool() const { return m_descriptor_pool; }
-
         [[nodiscard]] VkDescriptorSetLayout get_layout() const { return m_descriptor_set_layout; }
 
-        void update_test_descriptors(const std::span<vk_uniform_buffer>& p_uniforms, const texture& p_texture);
-
-        //! @brief update descriptor if ofloading multiple uniforms
-        void update(const std::span<vk_uniform_buffer>& p_uniforms);
-
-        //! @brief update descriptor if by single uniforms
-        void update(const vk_uniform_buffer& p_uniforms);
-
+        //! @brief Updating descriptors with uniforms/textures specified
         void update(const std::span<vk_uniform_buffer>& p_uniforms, const std::span<texture>& p_textures);
+
+        void update(const std::span<vk_uniform_buffer>& p_uniforms);
+        // void update(const vk_uniform_buffer& p_uniforms);
 
         void destroy();
 

@@ -6,36 +6,6 @@
 #include <array>
 
 namespace atlas::vk {
-    VkPresentModeKHR select_compatible_present_mode(
-      const VkPresentModeKHR& p_request,
-      const std::vector<VkPresentModeKHR>& p_modes) {
-        for (const auto& mode : p_modes) {
-            if (mode == p_request) {
-                return mode;
-            }
-        }
-        return VK_PRESENT_MODE_FIFO_KHR;
-    }
-
-    // validate the capabilities to ensure we are not requesting the maximum
-    // over the amount of images we are able to request
-    static uint32_t select_images_size(
-      const VkSurfaceCapabilitiesKHR& p_surface_capabilities) {
-        uint32_t requested_images = p_surface_capabilities.minImageCount + 1;
-
-        uint32_t final_image_count = 0;
-
-        if ((p_surface_capabilities.maxImageCount > 0) and
-            (requested_images > p_surface_capabilities.maxImageCount)) {
-            final_image_count = p_surface_capabilities.maxImageCount;
-        }
-        else {
-            final_image_count = requested_images;
-        }
-
-        return final_image_count;
-    }
-
 
     vk_swapchain::vk_swapchain(const VkSurfaceKHR& p_surface,
                                const window_settings& p_settings)
@@ -158,7 +128,7 @@ namespace atlas::vk {
         for (size_t i = 0; i < m_swapchain_command_buffers.size(); i++) {
             command_buffer_settings settings = {
                 present_index,
-                command_buffer_levels::Primary,
+                command_buffer_levels::primary,
                 VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT
             };
 

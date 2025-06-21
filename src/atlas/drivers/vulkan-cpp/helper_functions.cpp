@@ -357,7 +357,7 @@ namespace atlas::vk {
     }
 
     void write(const vk_buffer& p_buffer,
-               const std::span<vertex>& p_in_buffer) {
+               const std::span<vertex_input>& p_in_buffer) {
         VkDeviceSize buffer_size =
           p_in_buffer
             .size_bytes(); // does equivalent to doing sizeof(p_in_buffer[0]) *
@@ -627,7 +627,7 @@ namespace atlas::vk {
         VkQueue graphics_queue = vk_context::driver_context().graphics_queue();
         command_buffer_settings properties = {
             0,
-            command_buffer_levels::Primary,
+            command_buffer_levels::primary,
             VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
         };
 
@@ -1265,5 +1265,119 @@ namespace atlas::vk {
             default:
                 return "VkFormat Specified Invalid!!!";
         }
+    }
+
+    VkCommandBufferLevel to_vk_command_buffer_level(
+      const command_buffer_levels& p_levels) {
+        switch (p_levels) {
+            case command_buffer_levels::primary:
+                return VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+            case command_buffer_levels::secondary:
+                return VK_COMMAND_BUFFER_LEVEL_SECONDARY;
+            case command_buffer_levels::max_enum:
+                return VK_COMMAND_BUFFER_LEVEL_MAX_ENUM;
+        }
+
+        console_log_error("command_buffer_levels was invalid!!!");
+    }
+
+    VkShaderStageFlags to_vk_shader_stage(const shader_stage& p_stage) {
+        switch (p_stage) {
+            case shader_stage::vertex:
+                return VK_SHADER_STAGE_VERTEX_BIT;
+            case shader_stage::fragment:
+                return VK_SHADER_STAGE_FRAGMENT_BIT;
+            default:
+                return 0;
+        }
+    }
+
+    VkShaderStageFlagBits to_vk_shader_stage_bits(const shader_stage& p_stage) {
+        switch (p_stage) {
+            case shader_stage::vertex:
+                return VK_SHADER_STAGE_VERTEX_BIT;
+            case shader_stage::fragment:
+                return VK_SHADER_STAGE_FRAGMENT_BIT;
+            default:
+                break;
+        }
+
+        return VK_SHADER_STAGE_VERTEX_BIT;
+    }
+
+    vk_buffer create_uniform_buffer(uint32_t p_size) {
+        vk_buffer_info uniform_info = {
+            .device_size = p_size,
+            .usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+            .memory_property_flag = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                                    VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+        };
+        vk_buffer buffer_data = create_buffer(uniform_info);
+
+        return buffer_data;
+    }
+
+    VkDescriptorType to_vk_descriptor_type(const buffer& p_type) {
+        switch (p_type) {
+            case buffer::storage:
+                return VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+            case buffer::uniform:
+                return VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+            case buffer::image_sampler:
+                return VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        }
+
+        console_log_error("descriptor set type specified is invalid!!!");
+    }
+
+    int bytes_per_texture_format(VkFormat p_format) {
+        switch (p_format) {
+            case VK_FORMAT_R8_SINT:
+            case VK_FORMAT_R8_UNORM:
+                return 1;
+            case VK_FORMAT_R16_SFLOAT:
+                return 2;
+            case VK_FORMAT_R16G16_SFLOAT:
+            case VK_FORMAT_B8G8R8A8_UNORM:
+            case VK_FORMAT_R8G8B8A8_UNORM:
+                return 4;
+            case VK_FORMAT_R16G16B16A16_SFLOAT:
+                return 4 * sizeof(uint16_t);
+            case VK_FORMAT_R32G32B32A32_SFLOAT:
+                return 4 * sizeof(float);
+            default:
+                console_log_fatal("Error unknown format!!!");
+                return 0;
+        }
+
+        return 0;
+    }
+
+    VkPresentModeKHR select_compatible_present_mode(
+      const VkPresentModeKHR& p_request,
+      const std::span<VkPresentModeKHR>& p_modes) {
+        for (const auto& mode : p_modes) {
+            if (mode == p_request) {
+                return mode;
+            }
+        }
+        return VK_PRESENT_MODE_FIFO_KHR;
+    }
+
+    uint32_t select_images_size(
+      const VkSurfaceCapabilitiesKHR& p_surface_capabilities) {
+        uint32_t requested_images = p_surface_capabilities.minImageCount + 1;
+
+        uint32_t final_image_count = 0;
+
+        if ((p_surface_capabilities.maxImageCount > 0) and
+            (requested_images > p_surface_capabilities.maxImageCount)) {
+            final_image_count = p_surface_capabilities.maxImageCount;
+        }
+        else {
+            final_image_count = requested_images;
+        }
+
+        return final_image_count;
     }
 };

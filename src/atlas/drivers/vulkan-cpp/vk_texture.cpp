@@ -6,35 +6,12 @@
 
 namespace atlas::vk {
 
-    int bytes_per_texture_format(VkFormat p_format) {
-        switch (p_format) {
-            case VK_FORMAT_R8_SINT:
-            case VK_FORMAT_R8_UNORM:
-                return 1;
-            case VK_FORMAT_R16_SFLOAT:
-                return 2;
-            case VK_FORMAT_R16G16_SFLOAT:
-            case VK_FORMAT_B8G8R8A8_UNORM:
-            case VK_FORMAT_R8G8B8A8_UNORM:
-                return 4;
-            case VK_FORMAT_R16G16B16A16_SFLOAT:
-                return 4 * sizeof(uint16_t);
-            case VK_FORMAT_R32G32B32A32_SFLOAT:
-                return 4 * sizeof(float);
-            default:
-                console_log_fatal("Error unknown format!!!");
-                return 0;
-        }
-
-        return 0;
-    }
-
-    texture::texture([[maybe_unused]] const std::filesystem::path& p_filepath) {
+    texture::texture(uint32_t p_binding, const std::filesystem::path& p_filepath) : m_binding(p_binding) {
         m_driver = vk_context::driver_context();
 
         command_buffer_settings settings = {
             0,
-            command_buffer_levels::Primary,
+            command_buffer_levels::primary,
             VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
         };
 

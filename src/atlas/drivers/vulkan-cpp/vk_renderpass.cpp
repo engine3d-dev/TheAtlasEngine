@@ -41,10 +41,8 @@ namespace atlas::vk {
 
         VkResult res = vkCreateRenderPass(
           m_driver, &renderpass_ci, nullptr, &m_renderpass_handler);
-        
+
         vk_check(res, "vkCreateRenderPass", __FILE__, __LINE__, __FUNCTION__);
-
-
     }
 
     void vk_renderpass::destroy() {

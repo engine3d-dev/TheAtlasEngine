@@ -11,12 +11,12 @@ namespace atlas::vk {
 
     struct shader_info {
         std::string source="";
-        shader_stage stage=Undefined;
+        shader_stage stage=undefined;
     };
 
     struct vk_shader_module {
         VkShaderModule module_handler=nullptr;
-        shader_stage stage=Undefined;
+        shader_stage stage=undefined;
     };
 
     class vk_shader_group {
