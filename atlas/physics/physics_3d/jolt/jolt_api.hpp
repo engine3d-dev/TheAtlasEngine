@@ -31,8 +31,8 @@ namespace atlas::physics {
                  flecs::world& p_registery);
 
     private:
-        jolt_config& m_config;
-        ref<JPH::PhysicsSystem>& m_physics_system;
+        jolt_config m_config;
+        ref<JPH::PhysicsSystem> m_physics_system;
         flecs::world m_registery;
 
         /**

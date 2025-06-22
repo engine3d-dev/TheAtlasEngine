@@ -85,12 +85,23 @@ namespace atlas::physics {
         int count = 0;
     };
 
+    /**
+     * @brief This is a replacement for an event system to handle collider.
+     * It will be replaced by an event system once we have functional one up
+     * and running.
+     *
+     * Its point is to associate entities with user made jolt collisions.
+     *
+     */
     struct collider_event {
         uint64_t id = 0;
     };
 }
 
 //! @brief created for future use of dynamic physics material
+//! @remark FIXME: This needs to be associated with our own interpretations of
+//! how friction should work. Or have a way for users to override these
+//! functions. Do not delete for it will be needed in the near furture.
 enum combine_friction : uint8_t {
     FrictionDefualt = 0,
     FrictionMax = 1,
@@ -99,6 +110,9 @@ enum combine_friction : uint8_t {
 };
 
 //! @brief Created for future use of dynamic physics material
+//! @remark FIXME: Same thing here, this will be used in the near future. As it
+//! is required by the basic jolt system. However, disccussion need to be made
+//! about how we allow users to overwrite resititution.
 enum combine_restitution : uint8_t {
     RestitutionDefualt = 0,
     RestitutionMax = 1,

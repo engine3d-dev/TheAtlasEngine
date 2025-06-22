@@ -11,10 +11,9 @@
 namespace atlas::physics {
 
     /**
-     * @brief How we handle in atlas
+     * @brief Enforced by JPH to handle assert and give users and ourselves a
+     * way to track where those asserts are coming from in Jolt.
      *
-     * @param p_in_fmt A way to get the string from JPH_ASSERT()
-     * @param ... Other arguements passed in JPH_ASSERTS() like cleaning
      */
     void trace_impl(const char* p_in_fmt, ...);
 

@@ -33,6 +33,11 @@ namespace atlas::physics {
         target.set<collider_event>({ .id = p_entity_id });
 
         //! TODO: This is a temporary solve until we have events working.
+        // Subscribe action allows users to develop children for jolt_collision
+        // with their own code. They can then subscrube those actions that they
+        // create to an associated entity. Given an id. This allows them to
+        // handle collision in way they want. Through jolt_collisions optional
+        // virtual functions.
         jolt_collision_manager::subscribe_action(m_id, *this);
     }
 

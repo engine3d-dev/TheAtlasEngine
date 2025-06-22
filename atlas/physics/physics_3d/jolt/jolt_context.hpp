@@ -32,7 +32,9 @@ namespace atlas::physics {
 
         /**
          * @brief Gives access to the physics system. Is given to jolt_api as
-         * well.
+         * well. This is to allow us to give seperation of concerns. However,
+         * may change now do to Jolt conflict and unhandled dangling pointers
+         * within jolt_api.
          *
          */
         ref<JPH::PhysicsSystem> m_physics_system;
@@ -99,14 +101,12 @@ namespace atlas::physics {
 
         /**
          * @brief Creates the body and shapes from queries of Rigidbody and
-         * collider
+         * collider. Calling Jolt create body from the physics_system to allow
+         * jolt to keep track of each shape and associate to each physics body.
+         * It then moves that physics body into the jolt simulation. Allowing
+         * Jolt to manipulate the numbers associated with it during
+         * physics_step().
          *
-         * @param e Entity that you want to create
-         * @param body The associated physics body (optional)
-         * @param collider The collider associated with the entity
-         * @param location The transform (physics_transform for now)
-         * @param out_settings_list Return values for settings
-         * @param out_entity_list Return values for entity ids
          */
         void add_body(flecs::entity e,
                       const physics_body* body_opt,
