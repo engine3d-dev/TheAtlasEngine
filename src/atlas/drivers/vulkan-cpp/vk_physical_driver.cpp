@@ -7,8 +7,6 @@ namespace atlas::vk {
     vk_physical_driver* vk_physical_driver::s_instance = nullptr;
 
     vk_physical_driver::vk_physical_driver(const VkInstance& p_instance) {
-        console_log_info(
-          "vk_physical_driver::vk_physical_driver Begin Initialization!!!");
 
         uint32_t device_count = 0;
         vkEnumeratePhysicalDevices(p_instance, &device_count, nullptr);
@@ -48,8 +46,6 @@ namespace atlas::vk {
         m_queue_indices = select_queue_family_indices();
 
         s_instance = this;
-        console_log_info(
-          "vk_physical_driver::vk_physical_driver End Initialization!!!\n\n");
     }
 
     vk_physical_driver::~vk_physical_driver() = default;

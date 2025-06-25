@@ -7,7 +7,7 @@
 namespace atlas {
     ref<window> create_window(const window_settings& p_settings) {
         switch (application::current_api()) {
-            case VULKAN:
+            case api::vulkan:
                 return create_ref<vk::vk_window>(p_settings);
             default:
                 console_log_error(

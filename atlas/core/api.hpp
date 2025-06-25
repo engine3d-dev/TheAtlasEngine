@@ -1,6 +1,6 @@
 #pragma once
 
 namespace atlas {
-    enum API { VULKAN, DIRECTX11, DIRECTX12, UNSPECIFIED };
+    enum api { vulkan, dx11, fx12, undefined };
 
 };

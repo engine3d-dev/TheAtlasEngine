@@ -7,6 +7,7 @@ namespace atlas::vk {
     class vk_window : public window {
     public:
         vk_window(const window_settings& p_settings);
+        ~vk_window() override;
 
 
     private:

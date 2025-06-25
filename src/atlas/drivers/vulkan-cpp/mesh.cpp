@@ -31,9 +31,6 @@ namespace atlas::vk {
             console_log_warn("Could not load model from path {}",
                              p_filename.string());
         }
-        else {
-            console_log_info("Model Loaded = {}", p_filename.string());
-        }
 
         std::vector<vertex_input> vertices;
         std::vector<uint32_t> indices;

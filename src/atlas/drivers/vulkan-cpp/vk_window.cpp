@@ -8,7 +8,6 @@ namespace atlas::vk {
 	vk_window* vk_window::s_instance = nullptr;
     vk_window::vk_window(const window_settings& p_settings)
       : m_settings(p_settings) {
-        console_log_info("vk_window begin intitialization!!!");
 
         if (!glfwVulkanSupported()) {
             console_log_warn("GLFW: Vulkan is not supported!");
@@ -28,8 +27,6 @@ namespace atlas::vk {
 
         glfwMakeContextCurrent(m_window_handler);
 
-        console_log_info(
-          "vk_window::create_window_surface begin initialization!");
         vk_check(
           glfwCreateWindowSurface(
             m_instance_handler, m_window_handler, nullptr, &m_window_surface),
@@ -37,8 +34,6 @@ namespace atlas::vk {
           __FILE__,
           __LINE__,
           __FUNCTION__);
-        console_log_info(
-          "vk_window::create_window_surface end initialization!!!\n\n");
 
         center_window();
 
@@ -49,12 +44,16 @@ namespace atlas::vk {
 			m_swapchain.destroy();
         });
 
-        console_log_info("vk_window end intitialization!!!");
-
         glfwSetWindowUserPointer(m_window_handler, this);
 
 		s_instance = this;
     }
+
+	vk_window::~vk_window() {
+		vkDestroySurfaceKHR(m_instance_handler, m_window_surface, nullptr);
+		vkDestroyInstance(m_instance_handler, nullptr);
+		glfwDestroyWindow(m_window_handler);
+	}
 
     void vk_window::center_window() {
         GLFWmonitor* monitor = glfwGetPrimaryMonitor();

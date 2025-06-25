@@ -31,7 +31,7 @@ namespace atlas {
         static window& get_window() { return *s_instance->m_window; }
 
         /* Retrieves the current selected graphics API */
-        static API current_api();
+        static api current_api();
 
         /* Returns the currently selected swapchain */
         VkSwapchainKHR get_current_swapchain();
@@ -47,7 +47,7 @@ namespace atlas {
         static uint32_t image_size();
 
     private:
-        void set_current_api(API api);
+        void set_current_api(api api);
 
     private:
         ref<window> m_window;

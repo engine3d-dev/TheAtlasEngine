@@ -44,17 +44,9 @@ namespace atlas::vk {
     }
 
     imgui_context::imgui_context(GLFWwindow* p_window_handler, const vk_swapchain& p_current_swapchain_handler, const VkRenderPass& p_current_renderpass) {
-        console_log_warn("vk_imgui Begin Initialization!!!");
         m_instance = vk_context::handler();
         m_physical = vk_context::physical_driver();
         m_driver = vk_context::driver_context();
-
-        if(m_driver == nullptr) {
-            console_log_fatal("m_driver == nullptr!");
-        }
-        else {
-            console_log_fatal("m_driver != nullptr!");
-        }
 
         m_current_swapchain_handler = p_current_swapchain_handler;
 
@@ -124,7 +116,6 @@ namespace atlas::vk {
           __FUNCTION__);
         
         recreate(p_window_handler, p_current_swapchain_handler.image_size(), p_current_renderpass);
-        console_log_warn("vk_imgui End Initialization!!!");
     }
 
     void imgui_context::recreate(GLFWwindow* p_window_handler, const uint32_t& p_image_size, const VkRenderPass& p_current_renderpass) {
@@ -144,7 +135,6 @@ namespace atlas::vk {
         ImGui_ImplVulkan_Init(&init_info);
 
         vk_context::submit_resource_free([](){
-            console_log_warn("vk_imgui freed its resources!!!");
             //! @note This will probably be submitted at construction to be destructed when the application shutsdown
             ImGui_ImplVulkan_Shutdown();
             // vkDestroyDescriptorPool(m_driver, m_desc_pool, nullptr);

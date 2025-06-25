@@ -52,7 +52,6 @@ namespace atlas::vk {
 
     vk_driver::vk_driver(const vk_physical_driver& p_physical)
       : m_physical(p_physical) {
-        console_log_info("vk_driver::vk_driver Begin Initialization!!!");
         m_depth_format_selected = search_depth_format(m_physical);
 
         float queue_priority[1] = { 0.0f };
@@ -63,8 +62,6 @@ namespace atlas::vk {
 
         uint32_t graphics_index =
           m_physical.read_queue_family_indices().graphics;
-
-        console_log_trace("Graphics Queue Indices = {}", graphics_index);
 
         VkDeviceQueueCreateInfo queue_create_info = {
             .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
@@ -103,14 +100,6 @@ namespace atlas::vk {
           m_driver, graphics_index, 0, &m_device_queues.graphics_queue);
 
         s_instance = this;
-
-        // vk_context::submit_resource_free([this](){
-        //     console_log_trace("vk_driver called by
-        //     vk_contexgt::submit_resource_free!!!"); vkDestroyDevice(m_driver,
-        //     nullptr);
-        // });
-
-        console_log_info("vk_driver::vk_driver end initialization!!!\n\n");
     }
 
     //! @note Returns -1 if there are no flags available/compatible/valid
@@ -146,7 +135,6 @@ namespace atlas::vk {
     }
 
     void vk_driver::destroy() {
-      console_log_trace("vk_driver::destroy invoked!!");
       vkDeviceWaitIdle(m_driver);
       vkDestroyDevice(m_driver, nullptr);
     }

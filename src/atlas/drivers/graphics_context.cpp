@@ -6,10 +6,11 @@
 
 namespace atlas {
     ref<graphics_context> initialize_context(const std::string& p_tag) {
-        console_log_info("graphics_context Initialized!!");
-        switch (application::current_api()){
-        case API::VULKAN: return create_ref<vk::vk_context>(p_tag);
-        default: return nullptr;
+        switch (application::current_api()) {
+            case api::vulkan:
+                return create_ref<vk::vk_context>(p_tag);
+            default:
+                return nullptr;
         }
     }
 };

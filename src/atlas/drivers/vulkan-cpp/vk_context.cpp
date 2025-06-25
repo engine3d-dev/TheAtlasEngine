@@ -49,8 +49,7 @@ namespace atlas::vk {
       [[maybe_unused]] VkDebugUtilsMessageTypeFlagsEXT p_message_type,
       const VkDebugUtilsMessengerCallbackDataEXT* p_callback_data,
       [[maybe_unused]] void* p_user_data) {
-        std::cerr << "validation layer:\t\t" << p_callback_data->pMessage
-                  << std::endl;
+        console_log_trace("validation layer:\t\t{}",  p_callback_data->pMessage);
         return false;
     }
 
@@ -58,8 +57,6 @@ namespace atlas::vk {
 
     vk_context::vk_context(const std::string& p_tag) {
         console_log_manager::create_new_logger(p_tag);
-
-        console_log_info("vk_context begin initialization!!!");
 
         VkApplicationInfo app_info = {
             .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
@@ -97,7 +94,7 @@ namespace atlas::vk {
         available_validation_layers.resize(layer_count);
         vkEnumerateInstanceLayerProperties(&layer_count,
                                            available_validation_layers.data());
-
+        
         console_log_trace("================================================");
         console_log_trace("\tValidation Layers Available");
         console_log_trace("================================================");
@@ -107,7 +104,8 @@ namespace atlas::vk {
             console_log_trace("Version\t\t\t{}", (int)properties.specVersion);
         }
 
-        console_log_trace("================================================");
+        console_log_trace("\n");
+        console_log_trace("================================================\n");
 
         VkDebugUtilsMessengerCreateInfoEXT debug_create_info = {
             .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
@@ -122,14 +120,12 @@ namespace atlas::vk {
 
         create_info.pNext =
           (VkDebugUtilsMessengerCreateInfoEXT*)&debug_create_info;
-
+        
         vk_check(vkCreateInstance(&create_info, nullptr, &m_instance_handler),
                  "vkCreateInstance",
                  __FILE__,
                  __LINE__,
                  __FUNCTION__);
-
-        console_log_info("vk_context end initialization!!!\n\n");
 
         s_instance = this;
 
@@ -146,15 +142,14 @@ namespace atlas::vk {
     }
 
     void vk_context::submit_resource_free(std::function<void()>&& p_resource) {
-        // s_instance->resource_free(p_resource);
         s_instance->m_resources_free.push_back(p_resource);
     }
 
     void vk_context::destroy_context() {
-        console_log_info("vk_context::destroy_context() called!!");
         for(auto& callback : m_resources_free) {
             callback();
         }
+
         m_driver.destroy();
     }
 };

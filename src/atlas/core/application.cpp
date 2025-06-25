@@ -14,14 +14,14 @@
 namespace atlas {
     static std::string g_tag = "engine3d";
     application* application::s_instance = nullptr;
-    static API g_graphics_backend_api = API::VULKAN;
+    static api g_graphics_backend_api = api::vulkan;
     static float g_delta_time = 0.f;
     static float g_physics_step = 0.f; // collision step
 
     application::application(const application_settings& p_settings) {
         g_tag = p_settings.Name;
         console_log_manager::set_current_logger(g_tag);
-        set_current_api(API::VULKAN);
+        set_current_api(api::vulkan);
         window_settings settings = {
             .width = p_settings.Width,
             .height = p_settings.Height,
@@ -52,7 +52,7 @@ namespace atlas {
         destroy();
     }
 
-    void application::set_current_api(API api) {
+    void application::set_current_api(api api) {
         g_graphics_backend_api = api;
     }
 
@@ -60,7 +60,7 @@ namespace atlas {
         return get_window().current_swapchain();
     }
 
-    API application::current_api() {
+    api application::current_api() {
         return g_graphics_backend_api;
     }
 
