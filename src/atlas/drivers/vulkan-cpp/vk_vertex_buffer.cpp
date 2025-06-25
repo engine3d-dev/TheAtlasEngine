@@ -8,8 +8,6 @@ namespace atlas::vk {
 
     vk_vertex_buffer::vk_vertex_buffer(
       const std::span<vertex_input>& p_vertices) {
-
-        console_log_info("vk_vertex_buffer Begin Initialization!!!");
         m_driver = vk_context::driver_context();
         m_vertices_count = p_vertices.size();
         m_vertices_byte_size_count = p_vertices.size_bytes();
@@ -49,7 +47,6 @@ namespace atlas::vk {
         // 5.) Cleanup staging buffer
         vkFreeMemory(m_driver, staging_buffer.device_memory, nullptr);
         vkDestroyBuffer(m_driver, staging_buffer.handler, nullptr);
-        console_log_info("vk_vertex_buffer END Initialization!!!\n\n");
     }
 
     void vk_vertex_buffer::bind(const VkCommandBuffer& p_current) {

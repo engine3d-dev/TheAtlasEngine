@@ -12,7 +12,6 @@ namespace atlas::vk {
       : m_current_surface_handler(p_surface)
       , m_window_settings(p_settings),
 	  m_current_surface(p_surface) {
-        console_log_trace("vk_swapchain begin initialization!!!");
         m_physical = vk_context::physical_driver();
         m_driver = vk_context::driver_context();
 		m_surface_properties = m_physical.get_surface_properties(m_current_surface);
@@ -33,7 +32,7 @@ namespace atlas::vk {
         // setting our presentation properties
         uint32_t present_index =
           m_physical.read_presentation_index(m_current_surface_handler);
-        console_log_trace("Presentation Index = {}", present_index);
+
         vk_queue_options present_properties = { .family_index = present_index };
 
         VkSwapchainCreateInfoKHR swapchain_ci = {
@@ -77,13 +76,10 @@ namespace atlas::vk {
                                 images.data()); // used to store in the images
 
         // Creating Images
-        console_log_info("vk_swapchain begin images initialization!!!");
         m_swapchain_images.resize(image_count);
 		m_image_size = image_count;
         m_swapchain_depth_images.resize(image_count);
 
-        console_log_info("swapchain images.size() = {}",
-                         m_swapchain_images.size());
         VkFormat depth_format = m_driver.depth_format();
         uint32_t layer_count = 1;
         uint32_t mip_levels = 1;
@@ -116,14 +112,9 @@ namespace atlas::vk {
                                 VK_IMAGE_ASPECT_DEPTH_BIT);
         }
 
-        console_log_info("vk_swapchain end image initialization!!!");
-
         // command buffers
-        console_log_info("vk_swapchain begin initializing command buffers!!!!");
 
         m_swapchain_command_buffers.resize(image_count);
-        console_log_trace("command buffers.size() = {}",
-                          m_swapchain_command_buffers.size());
 
         for (size_t i = 0; i < m_swapchain_command_buffers.size(); i++) {
             command_buffer_settings settings = {
@@ -134,9 +125,6 @@ namespace atlas::vk {
 
             m_swapchain_command_buffers[i] = vk_command_buffer(settings);
         }
-
-        console_log_info(
-          "vk_swapchain successfully initialized command buffers!!!!\n\n");
 
         // m_swapchain_renderpass = create_simple_renderpass(
         //   m_driver, m_surface_properties.surface_format);
@@ -205,7 +193,6 @@ namespace atlas::vk {
 		m_swapchain_main_renderpass = vk_renderpass(renderpass_options);
 
         // creating framebuffers
-		console_log_error("begin vk_swapchain initializing framebuffers!!");
         m_swapchain_framebuffers.resize(m_swapchain_images.size());
 
         for (uint32_t i = 0; i < m_swapchain_images.size(); i++) {
@@ -239,20 +226,15 @@ namespace atlas::vk {
                      __FUNCTION__);
 		}
 
-		console_log_error("end of vk_swapchain framebuffers initialization!!!\n\n");
-
 		vk_queue_options options = {
 			.family_index = 0, // using defauly queue family
 			.queue_index = 0 // using defauly presentation queue available
 		};
 		m_present_to_queue = vk_present_queue(m_swapchain_handler, options);
 
-        console_log_trace("vk_swapchain end initialization!!!");
-		
 	}
 
 	void vk_swapchain::recreate() {
-		console_log_trace("vk_swapchain recreation!!!");
 		destroy();
 		on_create();
 	}
@@ -261,10 +243,8 @@ namespace atlas::vk {
 		m_present_to_queue.wait_idle();
 
 		if(m_present_to_queue.resize_requested()) {
-			console_log_fatal("BEFORE ACQUIRED_FRAME() GETS CALLED!!!!");
 			recreate();
 			m_present_to_queue.set_resize_status(false);
-			console_log_error("resize requesteed = {}", m_present_to_queue.resize_requested());
 		}
 
 		uint32_t frame_idx = m_present_to_queue.acquired_frame();
@@ -280,7 +260,6 @@ namespace atlas::vk {
 	}
 
 	void vk_swapchain::destroy() {
-		console_log_fatal("vk_swapchain::destroy()!!!");
 		vkDeviceWaitIdle(m_driver);
 
 		for (size_t i = 0; i < m_swapchain_framebuffers.size(); i++) {

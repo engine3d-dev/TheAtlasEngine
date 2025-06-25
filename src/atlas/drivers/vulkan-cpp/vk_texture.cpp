@@ -30,9 +30,6 @@ namespace atlas::vk {
             m_is_image_loaded = false;
             return;
         }
-        else {
-            console_log_info("Loading filepath = {} successful", p_filepath.string());
-        }
 
         // 2. Create Image Data
         // 2.1 Updating Texture data
@@ -64,8 +61,6 @@ namespace atlas::vk {
 
         // 2. update texture data
         update_texture(m_texture_image, p_width, p_height, p_format, p_data);
-
-        console_log_fatal("create_texture_from_data update END initialization!!!\n\n");
     }
 
     void texture::update_texture(vk_image& p_image, uint32_t p_width, uint32_t p_height, VkFormat p_format, const  void* p_data) {
@@ -110,8 +105,6 @@ namespace atlas::vk {
                                 p_format,
                                 VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                                 VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-
-        console_log_error("create_texture_from_data end initialization successfully!!!");
     }
 
     void texture::destroy() {

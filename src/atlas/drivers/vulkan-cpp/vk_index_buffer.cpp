@@ -7,7 +7,6 @@ namespace atlas::vk {
     vk_index_buffer::vk_index_buffer(const std::span<uint32_t>& p_indices) {
         m_driver = vk_context::driver_context();
         m_indices_count = static_cast<uint32_t>(p_indices.size());
-        console_log_info("vk_index_buffer Begin Initialization!!!");
 
         vk_buffer_info index_buffer_info = {
             .device_size = (uint32_t)p_indices.size_bytes(),
@@ -19,8 +18,6 @@ namespace atlas::vk {
         m_index_buffer_handler = create_buffer(index_buffer_info);
 
         write(m_index_buffer_handler, p_indices);
-
-        console_log_info("vk_index_buffer End Initialization!!!");
     }
 
     void vk_index_buffer::bind(const VkCommandBuffer& p_current) {
@@ -33,11 +30,12 @@ namespace atlas::vk {
     }
 
     void vk_index_buffer::destroy() {
-        if(m_index_buffer_handler.device_memory != nullptr) {
-            vkFreeMemory(m_driver, m_index_buffer_handler.device_memory, nullptr);
+        if (m_index_buffer_handler.device_memory != nullptr) {
+            vkFreeMemory(
+              m_driver, m_index_buffer_handler.device_memory, nullptr);
         }
 
-        if(m_index_buffer_handler.handler != nullptr) {
+        if (m_index_buffer_handler.handler != nullptr) {
             vkDestroyBuffer(m_driver, m_index_buffer_handler.handler, nullptr);
         }
     }

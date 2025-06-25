@@ -10,17 +10,12 @@ namespace atlas::vk {
       const vk_queue_options& p_queue_options)
       : m_swapchain_handler(p_swapchain_handler) {
 
-        console_log_info(
-          "vk_present_queue::vk_present_queue begin initialization!!!");
         m_driver = vk_context::driver_context();
 
         m_present_queue_handler = m_driver.get_queue(p_queue_options);
 
         m_render_completed_semaphore = create_semaphore(m_driver);
         m_present_completed_semaphore = create_semaphore(m_driver);
-
-        console_log_info(
-          "vk_present_queue::vk_present_queue end initialization!!!");
     }
 
     void vk_present_queue::submit_immediate_async(
@@ -74,18 +69,14 @@ namespace atlas::vk {
             .pImageIndices = &p_current_frame,
         };
 
-        VkResult res = vkQueuePresentKHR(m_present_queue_handler, &present_info);
-		vk_check(res,
-				"vkQueuePresentKHR",
-                 __FILE__,
-                 __LINE__,
-                 __FUNCTION__);
-		// if(m_resize_requested
-		if(res == VK_ERROR_OUT_OF_DATE_KHR || res ==  VK_SUBOPTIMAL_KHR) {
-			console_log_trace("Swapchain out of date!!!");
-			m_resize_requested = true;
-		}
-
+        VkResult res =
+          vkQueuePresentKHR(m_present_queue_handler, &present_info);
+        vk_check(res, "vkQueuePresentKHR", __FILE__, __LINE__, __FUNCTION__);
+        // if(m_resize_requested
+        if (res == VK_ERROR_OUT_OF_DATE_KHR || res == VK_SUBOPTIMAL_KHR) {
+            console_log_trace("Swapchain out of date!!!");
+            m_resize_requested = true;
+        }
     }
 
     uint32_t vk_present_queue::acquired_frame() {
@@ -97,11 +88,11 @@ namespace atlas::vk {
                                 m_present_completed_semaphore,
                                 nullptr,
                                 &image_acquired);
-		
-		if(acquired_next_image_result == VK_ERROR_OUT_OF_DATE_KHR) {
-			console_log_trace("acquired next image out of date!!!");
-			m_resize_requested = true;
-		}
+
+        if (acquired_next_image_result == VK_ERROR_OUT_OF_DATE_KHR) {
+            console_log_trace("acquired next image out of date!!!");
+            m_resize_requested = true;
+        }
 
         vk_check(acquired_next_image_result,
                  "vkAcquireNextImageKHR",
@@ -117,7 +108,8 @@ namespace atlas::vk {
     }
 
     void vk_present_queue::destroy() {
-        // Ensure that the driver before destroying the semaphore that they finish execution beforehand
+        // Ensure that the driver before destroying the semaphore that they
+        // finish execution beforehand
         vkDeviceWaitIdle(m_driver);
         vkDestroySemaphore(m_driver, m_present_completed_semaphore, nullptr);
         vkDestroySemaphore(m_driver, m_render_completed_semaphore, nullptr);

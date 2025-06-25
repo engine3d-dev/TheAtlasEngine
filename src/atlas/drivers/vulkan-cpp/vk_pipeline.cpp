@@ -11,8 +11,6 @@ namespace atlas::vk {
         m_driver = vk_context::driver_context();
         m_shader_group = p_shader_group;
 
-        console_log_info("m_shader_modules.size() = {}", m_shader_group.size());
-
         create(p_renderpass);
     }
 
@@ -26,7 +24,6 @@ namespace atlas::vk {
     }
 
     void vk_pipeline::create(const VkRenderPass& p_renderpass) {
-        console_log_info("vk_pipeline::create begin initialization!!!");
         std::vector<VkPipelineShaderStageCreateInfo> pipeline_shader_stages(
           m_shader_group.size());
 
@@ -190,9 +187,6 @@ namespace atlas::vk {
                  __LINE__,
                  __FUNCTION__);
 
-        console_log_info("pipeline_shader_stages.size() = {}",
-                         pipeline_shader_stages.size());
-
         VkGraphicsPipelineCreateInfo graphics_pipeline_ci = {
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
             .pNext = nullptr,
@@ -226,7 +220,6 @@ namespace atlas::vk {
                      __LINE__,
                      __FUNCTION__);
 
-        console_log_info("vk_pipeline end initialization!!!\n\n");
     }
 
     void vk_pipeline::bind(const VkCommandBuffer& p_current) {
@@ -235,8 +228,6 @@ namespace atlas::vk {
     }
 
     void vk_pipeline::destroy() {
-        // vkDestroyDescriptorSetLayout(m_driver, m_descriptor_set_layout,
-        // nullptr);
         vkDestroyPipelineLayout(m_driver, m_pipeline_layout, nullptr);
         vkDestroyPipeline(m_driver, m_pipeline_handler, nullptr);
     }
