@@ -8,6 +8,29 @@
 
 namespace atlas::vk {
 
+    static VkFormat to_vk_format(const format& p_format) {
+        switch (p_format){
+        case format::rg32_sfloat:
+            return VK_FORMAT_R32G32_SFLOAT;
+        case format::rgb32_sfloat:
+            return VK_FORMAT_R32G32B32A32_SFLOAT;
+        default:
+            return VK_FORMAT_UNDEFINED;
+        }
+    }
+
+    static VkVertexInputRate to_vk_input_rate(const input_rate& p_input_rate) {
+        switch (p_input_rate){
+        case input_rate::vertex:
+            return VK_VERTEX_INPUT_RATE_VERTEX;
+        case input_rate::instance:
+            return VK_VERTEX_INPUT_RATE_INSTANCE;
+        default:
+            return VK_VERTEX_INPUT_RATE_MAX_ENUM;
+        }
+    }
+    
+
     static std::string read_file(const std::string& p_file) {
         std::ifstream ins(p_file, std::ios::ate | std::ios::binary);
 
@@ -155,5 +178,32 @@ namespace atlas::vk {
     
     void vk_shader_group::set_vertex_bind_attributes(const std::span<VkVertexInputBindingDescription>& p_bind_attributes) {
         m_vertex_binding_attributes = std::vector<VkVertexInputBindingDescription>(p_bind_attributes.begin(), p_bind_attributes.end());
+    }
+
+    void vk_shader_group::vertex_attributes(const std::span<vertex_attribute>& p_vertex_attributes) {
+        // Loading up the vertex binding attributes
+        // Vertex binding attributes can be a binding point for specific vertex attribute data
+        m_vertex_binding_attributes.resize(p_vertex_attributes.size());
+
+        for(size_t i = 0; i < m_vertex_binding_attributes.size(); i++) {
+            const vertex_attribute attribute = p_vertex_attributes[i];
+            m_vertex_attributes.resize(attribute.entries.size());
+            m_vertex_binding_attributes[i] = {
+                .binding = attribute.binding,
+                .stride = attribute.stride,
+                .inputRate = to_vk_input_rate(attribute.input_rate)
+            };
+
+            // Setting the data values to the correct vertex attribute entry
+            for(size_t j = 0; j < attribute.entries.size(); j++) {
+                const vertex_attribute_entry attr_entry = attribute.entries[j];
+                m_vertex_attributes[j] = {
+                    .location = attr_entry.location,
+                    .binding = attribute.binding,
+                    .format = to_vk_format(attr_entry.format),
+                    .offset = attr_entry.stride
+                };
+            }
+        }
     }
 };

@@ -143,6 +143,11 @@ namespace atlas::vk {
     //     std::span<VkDescriptorSetLayoutBinding> bindings;
     // };
 
+    enum class format : uint64_t {
+        rgb32_sfloat, // Represent R32G32B32_SFLOAT
+        rg32_sfloat, // Represent R32G32_SFLOAT
+    };
+
     enum buffer : uint8_t {
         uniform=0,
         storage=1,
@@ -173,15 +178,6 @@ namespace atlas::vk {
         uint32_t size_bytes=0;
         std::span<descriptor_binding_entry> entry;
     };
-
-    /**
-     * @brief specify the types of descriptors that should be
-     * written to specific descriptors of specified layout
-    */
-    // struct write_descriptors {
-    //     std::span<VkDescriptorBufferInfo> buffer_infos={};
-    //     std::span<VkDescriptorImageInfo> image_infos={};
-    // };
 
     struct vertex_input {
         glm::vec3 position;

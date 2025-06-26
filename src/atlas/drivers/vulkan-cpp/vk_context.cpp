@@ -38,6 +38,8 @@ namespace atlas::vk {
 
         return extension_names;
     }
+
+#ifdef _DEBUG
     const std::vector<const char*> validation_layers = {
         "VK_LAYER_KHRONOS_validation",
         "VK_LAYER_KHRONOS_synchronization2"
@@ -52,6 +54,7 @@ namespace atlas::vk {
         console_log_trace("validation layer:\t\t{}",  p_callback_data->pMessage);
         return false;
     }
+#endif
 
     vk_context* vk_context::s_instance = nullptr;
 
@@ -76,11 +79,13 @@ namespace atlas::vk {
 
         //! @note Setting up the required extensions for vulkan
         std::vector<const char*> extensions = initialize_instance_extensions();
+#if _DEBUG
         extensions.push_back("VK_EXT_debug_utils");
+#endif
         create_info.enabledExtensionCount =
           static_cast<uint32_t>(extensions.size());
         create_info.ppEnabledExtensionNames = extensions.data();
-
+#ifdef _DEBUG
         // by default we enable validation layers used for debugging!
         create_info.enabledLayerCount =
           static_cast<uint32_t>(validation_layers.size());
@@ -120,7 +125,11 @@ namespace atlas::vk {
 
         create_info.pNext =
           (VkDebugUtilsMessengerCreateInfoEXT*)&debug_create_info;
-        
+#else
+        create_info.enabledLayerCount = 0;
+        create_info.ppEnabledLayerNames = nullptr;
+        create_info.pNext = nullptr;
+#endif        
         vk_check(vkCreateInstance(&create_info, nullptr, &m_instance_handler),
                  "vkCreateInstance",
                  __FILE__,
