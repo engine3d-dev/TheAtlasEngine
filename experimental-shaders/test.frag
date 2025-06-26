@@ -16,8 +16,8 @@ void main(){
     // vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
     // outColor = texture(texSampler, fragTexCoords) * color;
     // vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
-    vec4 color = texture(texture1, fragTexCoords) * materialColor;
-    // vec4 color = texture(texture1, fragTexCoords) + texture(texture2, fragTexCoords) * materialColor;
+    // vec4 color = texture(texture1, fragTexCoords) + texture(texture2, fragTexCoords) * materialColor; // not working
+    vec4 color = texture(texture1, fragTexCoords) * materialColor; // working
     // vec4 color = in_fragColor;
     outColor = color;
     // outColor = texture(texSampler, fragTexCoords) * color;

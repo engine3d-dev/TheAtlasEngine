@@ -19,15 +19,18 @@ layout (set = 0, binding = 0) uniform UniformBuffer {
 
 // To create a set=1, you just create another vk::descriptor_set object after the first descriptor set, because thats automatic.
 layout (set = 1, binding = 0) uniform MaterialSource {
+	mat4 model;
 	vec4 color; // base color for object (NOTE: if materialColor uses this, we get error because we do not have a specific descriptor set for this layout yet, come back after getting food)
 } material_src;
+
+layout (set = 2, binding = 0) uniform sampler2D texture_array[]; // unbounded array
 
 // layout (set = 1, binding = 0) uniform sampler2D albedo_texture;
 
 // layout (set = 1, binding = 1) uniform sampler2D first_texture;
 
 void main() {
-	gl_Position = ubo.MVP * vec4(inPosition, 1.0);
+	gl_Position = (ubo.MVP * material_src.model) * vec4(inPosition, 1.0);
 	fragColor = vec4(inColor, 1.0);
 	fragTexCoords = inTexCoords;
 	fragNormals = inNormals;
