@@ -10,6 +10,8 @@ set(VULKAN_SHADERS_SRC_DIR ${VULKAN_SRC_DIR}/Shaders)
 set(
     all_headers
 
+    ${INCLUDE_DIR}/physics/jolt-cpp/jolt-imports.hpp
+
     # Event stuff
     ${INCLUDE_DIR}/core/event/key_codes.hpp
     ${INCLUDE_DIR}/core/event/mouse_codes.hpp
@@ -50,16 +52,20 @@ set(
     # System-related stuff
     ${INCLUDE_DIR}/core/system_framework/system_registry.hpp
 
-
-    # physics stuff
-    ${INCLUDE_DIR}/physics/physics_3d/physics_engine.hpp
-    ${INCLUDE_DIR}/physics/physics_3d/jolt/jolt_api.hpp
+    #physics stuff
     ${INCLUDE_DIR}/physics/physics_3d/physics_api.hpp
-    ${INCLUDE_DIR}/physics/physics_3d/jolt/jolt_physics_engine.hpp
+    ${INCLUDE_DIR}/physics/physics_3d/physics_engine.hpp
+    ${INCLUDE_DIR}/physics/physics_3d/physics.hpp
+    ${INCLUDE_DIR}/physics/physics_3d/physics_context.hpp
 
-    #physics data
-    ${INCLUDE_DIR}/physics/physics_3d/data/jolt_settings.hpp
-    ${INCLUDE_DIR}/physics/physics_3d/data/jolt_config.hpp
+    ${INCLUDE_DIR}/physics/physics_3d/jolt/jolt_api.hpp
+    ${INCLUDE_DIR}/physics/physics_3d/jolt/jolt_context.hpp
+    ${INCLUDE_DIR}/physics/physics_3d/jolt/jolt_helper.hpp
+
+    ${INCLUDE_DIR}/physics/jolt-cpp/jolt_collision_manager.hpp
+    ${INCLUDE_DIR}/physics/jolt-cpp/jolt_collision.hpp
+    ${INCLUDE_DIR}/physics/jolt-cpp/jolt_contact_listener.hpp
+    ${INCLUDE_DIR}/physics/jolt-cpp/jolt_error_handler.hpp
 
     # Scene Stuff
     ${INCLUDE_DIR}/core/scene/components.hpp
@@ -131,11 +137,21 @@ set(
     # serializer stuff
     ${SRC_DIR}/core/serialize/serializer.cpp
 
+    # jolt
+    ${SRC_DIR}/physics/physics_3d/jolt/jolt_api.cpp
+    ${SRC_DIR}/physics/physics_3d/jolt/jolt_context.cpp
+    ${SRC_DIR}/physics/physics_3d/jolt/jolt_helper.cpp
+
     # physics stuff
     ${SRC_DIR}/physics/physics_3d/physics_engine.cpp
-    ${SRC_DIR}/physics/physics_3d/jolt/jolt_api.cpp
     ${SRC_DIR}/physics/physics_3d/physics_api.cpp
-    ${SRC_DIR}/physics/physics_3d/jolt/jolt_physics_engine.cpp
+    ${SRC_DIR}/physics/physics_3d/physics_context.cpp
+    ${SRC_DIR}/physics/physics_3d/physics.cpp
+
+    ${SRC_DIR}/physics/jolt-cpp/jolt_collision_manager.cpp
+    ${SRC_DIR}/physics/jolt-cpp/jolt_collision.cpp
+    ${SRC_DIR}/physics/jolt-cpp/jolt_contact_listener.cpp
+    ${SRC_DIR}/physics/jolt-cpp/jolt_error_handler.cpp
 
     # Scene stuff
     ${SRC_DIR}/core/scene/world.cpp
