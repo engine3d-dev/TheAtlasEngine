@@ -35,11 +35,21 @@ set(
     # serializer stuff
     ${SRC_DIR}/core/serialize/serializer.cpp
 
+    # jolt
+    ${SRC_DIR}/physics/physics_3d/jolt/jolt_api.cpp
+    ${SRC_DIR}/physics/physics_3d/jolt/jolt_context.cpp
+    ${SRC_DIR}/physics/physics_3d/jolt/jolt_helper.cpp
+
     # physics stuff
-    # ${SRC_DIR}/physics/physics_3d/physics_engine.cpp
-    # ${SRC_DIR}/physics/physics_3d/jolt/jolt_api.cpp
-    # ${SRC_DIR}/physics/physics_3d/physics_api.cpp
-    # ${SRC_DIR}/physics/physics_3d/jolt/jolt_physics_engine.cpp
+    ${SRC_DIR}/physics/physics_3d/physics_engine.cpp
+    ${SRC_DIR}/physics/physics_3d/physics_api.cpp
+    ${SRC_DIR}/physics/physics_3d/physics_context.cpp
+    ${SRC_DIR}/physics/physics_3d/physics.cpp
+
+    ${SRC_DIR}/physics/jolt-cpp/jolt_collision_manager.cpp
+    ${SRC_DIR}/physics/jolt-cpp/jolt_collision.cpp
+    ${SRC_DIR}/physics/jolt-cpp/jolt_contact_listener.cpp
+    ${SRC_DIR}/physics/jolt-cpp/jolt_error_handler.cpp
 
     # Scene stuff
     ${SRC_DIR}/core/scene/world.cpp
