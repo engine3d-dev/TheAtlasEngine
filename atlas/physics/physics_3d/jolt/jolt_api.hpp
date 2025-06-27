@@ -26,32 +26,13 @@ namespace atlas::physics {
          * FIXME: This is a temperary solve until have a funciton like
          * get_active_scenes()
          */
-        jolt_api(jolt_config& p_config,
+        jolt_api(jolt_config p_config,
                  ref<JPH::PhysicsSystem>& p_physics_system,
                  flecs::world& p_registery);
 
     private:
-        jolt_config m_config;
-        ref<JPH::PhysicsSystem> m_physics_system;
-        flecs::world m_registery;
 
-        /**
-         * @brief Flecs querys deticated to reading and writing from jolt and
-         * atlas. Targeting transforms and colliders.
-         *
-         */
-        flecs::query<transform, collider_body> m_read_transform;
-        flecs::query<physics_body> m_read_body;
-
-        /**
-         * @brief Flecs querys deticated to reading and writing from jolt and
-         * atlas. Targeting physics bodies.
-         *
-         */
-        flecs::query<transform, collider_body> m_query_transform;
-        flecs::query<physics_body> m_query_body;
-
-        /**
+         /**
          * @brief Sends all atlas values to jolt
          *
          */
@@ -108,5 +89,25 @@ namespace atlas::physics {
          */
         void set_angular_velocity(const glm::vec3& p_angular_velocity,
                                   const uint32_t& p_body_id) override;
+
+        jolt_config m_config;
+        ref<JPH::PhysicsSystem> m_physics_system;
+        flecs::world m_registery;
+
+        /**
+         * @brief Flecs querys deticated to reading and writing from jolt and
+         * atlas. Targeting transforms and colliders.
+         *
+         */
+        flecs::query<transform, collider_body> m_read_transform;
+        flecs::query<physics_body> m_read_body;
+
+        /**
+         * @brief Flecs querys deticated to reading and writing from jolt and
+         * atlas. Targeting physics bodies.
+         *
+         */
+        flecs::query<transform, collider_body> m_query_transform;
+        flecs::query<physics_body> m_query_body;
     };
 };

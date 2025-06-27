@@ -6,11 +6,11 @@
 
 namespace atlas::physics {
 
-    jolt_api::jolt_api(jolt_config& p_config,
+    jolt_api::jolt_api(jolt_config p_config,
                        ref<JPH::PhysicsSystem>& p_physics_system,
-                       flecs::world& p_registery)
-      : m_config(p_config)
-      , m_physics_system(p_physics_system) {
+                       flecs::world& p_registery) {
+        m_config = p_config;
+        m_physics_system = p_physics_system;
         m_registery = p_registery;
 
         m_read_transform = p_registery.query<transform, collider_body>();
