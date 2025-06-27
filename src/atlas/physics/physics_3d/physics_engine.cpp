@@ -2,9 +2,9 @@
 
 namespace atlas::physics {
 
-    physics_engine::physics_engine(jolt_settings p_settings,
-                                   ref<physics_context>& p_engine,
-                                   ref<physics_api>& p_user_api)
+    physics_engine::physics_engine(const jolt_settings& p_settings,
+                                   const ref<physics_context>& p_engine,
+                                   const ref<physics_api>& p_user_api)
       : m_settings(p_settings)
       , m_engine_api(p_engine)
       , m_backend_api(p_user_api) {};

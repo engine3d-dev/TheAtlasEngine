@@ -11,7 +11,7 @@ namespace atlas::physics {
     // There should only every be one factoy. Even if there are multiple engine
     // running at the same time.
     static bool factory_initialized = false;
-    jolt_context::jolt_context(jolt_settings p_settings) {
+    jolt_context::jolt_context(const jolt_settings& p_settings) {
         // Sets up static arena
         JPH::RegisterDefaultAllocator();
 
