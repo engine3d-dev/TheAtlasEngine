@@ -31,8 +31,7 @@ namespace atlas::physics {
                  flecs::world& p_registery);
 
     private:
-
-         /**
+        /**
          * @brief Sends all atlas values to jolt
          *
          */
