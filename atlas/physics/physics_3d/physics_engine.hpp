@@ -15,7 +15,7 @@ namespace atlas::physics {
     public:
         // Required by maps but should not be used in anyother circumstance.
         physics_engine() = default;
-        physics_engine(jolt_settings p_settings,
+        physics_engine(const jolt_settings& p_settings,
                        ref<physics_context>& p_engine,
                        ref<physics_api>& p_user_api);
 
