@@ -26,9 +26,9 @@ namespace atlas::physics {
          * FIXME: This is a temperary solve until have a funciton like
          * get_active_scenes()
          */
-        jolt_api(jolt_config p_config,
-                 ref<JPH::PhysicsSystem>& p_physics_system,
-                 flecs::world& p_registery);
+        jolt_api(const jolt_config& p_config,
+                 const ref<JPH::PhysicsSystem>& p_physics_system,
+                 const flecs::world& p_registery);
 
     private:
         /**

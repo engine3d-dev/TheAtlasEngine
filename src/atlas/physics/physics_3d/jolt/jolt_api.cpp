@@ -6,10 +6,11 @@
 
 namespace atlas::physics {
 
-    jolt_api::jolt_api(jolt_config p_config,
-                       ref<JPH::PhysicsSystem>& p_physics_system,
-                       flecs::world& p_registery) {
-        m_config = p_config;
+    jolt_api::jolt_api(const jolt_config& p_config,
+                       const ref<JPH::PhysicsSystem>& p_physics_system,
+                       const flecs::world& p_registery)
+      : m_config(p_config) {
+
         m_physics_system = p_physics_system;
         m_registery = p_registery;
 
