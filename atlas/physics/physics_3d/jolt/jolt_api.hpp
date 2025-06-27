@@ -24,7 +24,7 @@ namespace atlas::physics {
          * between the engine and users
          * @param p_registery The world this api is associated with.
          * FIXME: This is a temperary solve until have a funciton like
-         * get_active_scenes()
+         * get_active_scenes(), added const
          */
         jolt_api(const jolt_config& p_config,
                  const ref<JPH::PhysicsSystem>& p_physics_system,
