@@ -22,7 +22,8 @@ jobs:
             run: |
                 choco install cmake.install --version=3.31.6
                 cmake --version
-                choco install git llvm make mingw
+                choco install llvm --version 19
+                choco install git make mingw
           
           # - name: Installing python
           #   run: choco install python --version=3.12.2
