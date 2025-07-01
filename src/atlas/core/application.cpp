@@ -78,12 +78,16 @@ namespace atlas {
     }
 
     void application::execute() {
-        // float previous_time = 0.f;
+        float previous_time = 0.f;
         console_log_info("Executing mainloop!");
         // uint32_t currently_active_frame=0; // command buffers to process commands
 
         
         while (m_window->available()) {
+            float current_time = (float)glfwGetTime();
+            g_delta_time = (current_time - previous_time);
+            previous_time = current_time;
+            
             m_current_frame_index = m_window->acquired_next_frame();
             
             // Current commands that are going to be iterated through
@@ -98,16 +102,17 @@ namespace atlas {
 
             sync_update::on_update();
 
-            // sync_update::on_physics_update();
+            sync_update::on_physics_update();
 
             // TODO: Introduce scene renderer that will make use of the begin/end semantics for setting up tasks during pre-frame operations
             m_renderer->begin(currently_active, m_window->current_swapchain());
             
             // TODO: UI will have its own renderpass, command buffers, and framebuffers specifically for UI-widgets
-            // m_ui_context.begin(currently_active, m_current_frame_index);
-            // m_ui_context.draw_hud({}, m_window->current_swapchain().settings());
-            // sync_update::on_ui_update();
-            // m_ui_context.end();
+            m_ui_context.begin(currently_active, m_current_frame_index);
+
+            sync_update::on_ui_update();
+            
+            m_ui_context.end();
 
             m_renderer->end();
 

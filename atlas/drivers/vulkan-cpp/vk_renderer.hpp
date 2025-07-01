@@ -12,6 +12,7 @@
 #include <drivers/vulkan-cpp/vk_uniform_buffer.hpp>
 #include <vector>
 #include <map>
+#include <core/scene/components.hpp>
 
 namespace atlas::vk {
     /**
@@ -48,21 +49,47 @@ namespace atlas::vk {
 
         vk_shader_group m_shader_group;
         vk_pipeline m_main_pipeline{};
-        std::vector<vk_uniform_buffer> m_uniform_buffers{};
-        mesh m_mesh0;
-        std::vector<vk_uniform_buffer> m_global_uniforms{};
-        vk_uniform_buffer m_mesh0_material_ubo{};
         uint32_t m_image_count=0;
-        descriptor_set m_descriptor_set0{};
-        descriptor_set m_descriptor_set1{};
-        descriptor_set m_descriptor_set2{};
-        mesh m_mesh1;
-        vk_uniform_buffer m_mesh1_material_ubo{};
+
+        // descriptor set and global uniforms for global camera data
+        std::vector<vk_uniform_buffer> m_global_uniforms{};
+        descriptor_set m_global_descriptor{};
+
+        std::vector<VkDescriptorSetLayout> m_geometry_descriptor_layout;
+
+        // --------------------------------------------
+        // Mesh 0 - Viking Room + Viking Room Texture
+        // --------------------------------------------
+        // mesh m_mesh0;
+        // descriptor_set m_descriptor_set1{}; // viking room mesh
+        // vk_uniform_buffer m_mesh0_material_ubo{}; // uniform for viking room mesh
+
+        // --------------------------------------------
+        // Mesh 1 - Cube + wood texture
+        // --------------------------------------------
+        // mesh m_mesh1;
+        // descriptor_set m_descriptor_set2{}; // cube wood
+        // vk_uniform_buffer m_mesh1_material_ubo{}; // material uniform for cube
 
         // This is for caching any loaded mesh and only modifying this mesh if that entity is there.
         // It is for this vk_renderer to manage
         // std::string = the name of the entity
         // mesh = corresponding to the entity that is being loaded
         std::map<std::string, mesh> m_cached_meshes;
+
+
+        std::map<std::string, descriptor_set_layout> m_descriptor_table;
+
+        // std::string = entity name
+        // descriptor_set for now will represent the material descriptor set
+        std::map<std::string, descriptor_set> m_geometry_descriptor;
+        descriptor_set_layout m_material_descriptor_layout;
+
+
+
+        bool m_begin_initialize=true;
+        uint32_t m_current_frame=0;
+        camera m_camera;
+        glm::mat4 m_model={1.f};
     };
 };
