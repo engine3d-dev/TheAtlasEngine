@@ -20,6 +20,14 @@ namespace atlas::vk {
         }
     }
 
+    // VkImageLayout to_vk_image_layout(const image_layout& p_layout) {
+    //     switch (p_layout){
+    //     case image_layout::shader_read_only: return VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    //     default:
+    //         break;
+    //     }
+    // }
+
     descriptor_set::descriptor_set(const uint32_t& p_set_slot, const descriptor_set_layout& p_layout) : m_set_slot(p_set_slot), m_allocated_descriptors(p_layout.allocate_count), m_size_bytes(p_layout.size_bytes) {
         m_driver = vk_context::driver_context();
 
@@ -117,19 +125,10 @@ namespace atlas::vk {
         }
 
         // If there are any textures, load the image_view's and samplers to write them through the descriptor set
-        if(!p_textures.empty()) {
-            for(const auto& texture : p_textures) {
-                image_infos.push_back({
-                    .sampler = texture.sampler(),
-                    .imageView = texture.image_view(),
-                    .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
-                });
-            }
-        }
-        else {
+        for(const auto& texture : p_textures) {
             image_infos.push_back({
-                .sampler = nullptr,
-                .imageView = nullptr,
+                .sampler = texture.sampler(),
+                .imageView = texture.image_view(),
                 .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
             });
         }
@@ -193,6 +192,78 @@ namespace atlas::vk {
             vkUpdateDescriptorSets(m_driver, static_cast<uint32_t>(write_descriptors.size()), write_descriptors.data(), 0, nullptr);
         }
     }
+
+
+    /*
+    void descriptor_set::update(const std::span<write_descriptors>& p_write_descriptors) {
+        std::vector<VkDescriptorBufferInfo> buffer_infos;
+        std::vector<VkDescriptorImageInfo> image_infos;
+        bool has_images = false;
+
+        // Setting up buffer infos
+        std::vector<VkWriteDescriptorSet> write_descriptors_sets(p_write_descriptors.size());
+        for(const auto& write : p_write_descriptors) {
+            buffer_infos.resize(write.uniforms.size());
+
+            for(size_t j = 0; j < write.uniforms.size(); j++) {
+                buffer_infos[j] = {
+                    .buffer = write.uniforms[j],
+                    .offset = 0,
+                    .range = write.uniforms.size_bytes()
+                };
+            }
+        }
+
+        for(const auto& write : p_write_descriptors) {
+            image_infos.resize(write.image.data.size());
+
+            has_images = (!write.image.data.empty());
+
+            for(size_t j = 0; j < write.image.data.size(); j++) {
+                image_infos[j] = {
+                    .sampler = write.image.data[j].sampler(),
+                    .imageView = write.image.data[j].image_view(),
+                    .imageLayout = to_vk_image_layout(write.image.layout)
+                };
+            }
+        }
+
+        for(size_t i = 0; i < m_allocated_descriptors; i++) {
+            std::vector<VkWriteDescriptorSet> write_descriptors;
+            VkWriteDescriptorSet write_buffer {
+                .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+                .pNext = nullptr,
+                .dstSet = m_descriptor_sets[i],
+                .dstBinding = 0,
+                .dstArrayElement = 0,
+                .descriptorCount = static_cast<uint32_t>(buffer_infos.size()),
+                .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                .pBufferInfo = buffer_infos.data(),
+            };
+
+            write_descriptors.push_back(write_buffer);
+
+            VkWriteDescriptorSet write_image {
+                .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+                .pNext = nullptr,
+                .dstSet = m_descriptor_sets[i],
+                .dstBinding = 1,
+                .dstArrayElement = 0,
+                .descriptorCount = static_cast<uint32_t>(image_infos.size()),
+                .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+                .pImageInfo = image_infos.data()
+            };
+
+            // Only write the textures to descriptors if there are textures to write
+            if(has_images) {
+                write_descriptors.push_back(write_image);
+            }
+
+            vkUpdateDescriptorSets(m_driver, static_cast<uint32_t>(write_descriptors.size()), write_descriptors.data(), 0, nullptr);
+        }
+    }
+        */
+
 
 
     /*

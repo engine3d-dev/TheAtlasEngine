@@ -6,7 +6,7 @@
 
 namespace atlas::vk {
 
-    texture::texture(uint32_t p_binding, const std::filesystem::path& p_filepath) : m_binding(p_binding) {
+    texture::texture(const std::filesystem::path& p_filepath) {
         m_driver = vk_context::driver_context();
 
         command_buffer_settings settings = {

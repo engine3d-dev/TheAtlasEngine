@@ -12,6 +12,25 @@
 
 namespace atlas::vk {
 
+    // TODO: These structs are for adding some high-level specifications for writing resources via to the descriptors
+    // struct write_buffer_descriptor {
+    //     std::span<vk_uniform_buffer> data;
+    // };
+
+    // struct write_image_descriptor {
+    //     std::span<texture> data;
+    //     image_layout layout;
+    // };
+
+    // struct write_descriptors {
+    //     std::span<vk_uniform_buffer> uniforms;
+    //     // std::span<texture> images;
+    //     write_image_descriptor image;
+    //     uint32_t dst_binding;
+    //     uint32_t descriptor_count;
+    //     buffer descriptor_type;
+    // };
+
     class descriptor_set {
     public:
         descriptor_set() = default;
@@ -41,6 +60,8 @@ namespace atlas::vk {
         void update(const std::span<vk_uniform_buffer>& p_uniforms, const std::span<texture>& p_textures);
 
         void update(const std::span<vk_uniform_buffer>& p_uniforms);
+
+        // void update(const std::span<write_descriptors>& p_descriptors);
         // void update(const vk_uniform_buffer& p_uniforms);
 
         void destroy();

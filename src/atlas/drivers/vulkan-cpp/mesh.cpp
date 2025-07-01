@@ -90,14 +90,19 @@ namespace atlas::vk {
         m_ibo = vk_index_buffer(indices);
     }
 
-    void mesh::add_texture(uint32_t p_binding,
-                           const std::filesystem::path& p_path) {
-        m_textures.emplace_back(p_binding, p_path.string());
+    void mesh::initialize_uniforms(uint32_t p_size_bytes_ubo) {
+        m_geoemtry_ubo = vk_uniform_buffer(p_size_bytes_ubo);
+    }
+
+    void mesh::update_uniform(const material& p_material_ubo) {
+        m_geoemtry_ubo.update(&p_material_ubo);
+    }
+
+    void mesh::add_texture(const std::filesystem::path& p_path) {
+        m_textures.emplace_back(p_path.string());
     }
 
     void mesh::draw(const VkCommandBuffer& p_current) {
-        // TODO -- Rather then having vbo and ibo's contain the function to the
-        // draw calls. Need to expand this on having draw calls in batches
         m_vbo.bind(p_current);
         if (m_ibo.size() > 0) {
             m_ibo.bind(p_current);
@@ -117,5 +122,7 @@ namespace atlas::vk {
                 m_textures[i].destroy();
             }
         }
+
+        m_geoemtry_ubo.destroy();
     }
 };

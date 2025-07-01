@@ -139,6 +139,7 @@ namespace atlas::vk {
     }
 
     vk_shader_group::vk_shader_group(const std::span<shader_info>& p_shader_sources) : m_shader_sources(p_shader_sources.begin(), p_shader_sources.end()) {
+        m_driver = vk_context::driver_context();
         compile();
     }
 

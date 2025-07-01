@@ -8,7 +8,7 @@ namespace atlas::vk {
     class texture {
     public:
         texture() = default;
-        texture(uint32_t p_binding, const std::filesystem::path& p_filepath);
+        texture(const std::filesystem::path& p_filepath);
 
 
         [[nodiscard]] bool loaded() const { return m_is_image_loaded; }
@@ -20,8 +20,6 @@ namespace atlas::vk {
         [[nodiscard]] VkImage image() const { return m_texture_image.image; }
 
         [[nodiscard]] VkSampler sampler() const { return m_texture_image.sampler; }
-
-        [[nodiscard]] uint32_t binding() const { return m_binding; }
 
         void update_texture(vk_image& p_image, uint32_t p_width, uint32_t p_height, VkFormat p_format, const  void* p_data);
 
@@ -42,6 +40,5 @@ namespace atlas::vk {
         vk_command_buffer m_copy_command_buffer{};
         uint32_t m_width=0;
         uint32_t m_height=0;
-        uint32_t m_binding=0;
     };
 };
