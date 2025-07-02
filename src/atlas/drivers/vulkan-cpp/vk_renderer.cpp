@@ -8,6 +8,8 @@
 #include <core/scene/world.hpp>
 #include <drivers/vulkan-cpp/vk_types.hpp>
 
+#include <future>
+
 namespace atlas::vk {
 
 
@@ -210,6 +212,9 @@ namespace atlas::vk {
                 std::string name = std::string(p_entity.name().c_str());
                 const material* target = p_entity.get<material>();
 
+                //! @brief My attempt at loading meshes asynchronously and seeing that the mesh gets loaded and rendering already-loaded mesh.
+                // std::future<mesh> launch_mesh_loading = std::async(std::launch::async, [target](){ return mesh(target->model_path); } );
+                // mesh new_mesh = launch_mesh_loading.get();
                 mesh new_mesh(std::filesystem::path(target->model_path));
                 console_log_error("loaded = {}", new_mesh.loaded());
                 if(new_mesh.loaded()) {
@@ -219,6 +224,8 @@ namespace atlas::vk {
                     m_cached_meshes[name].add_texture(target->texture_path);
 
                     m_geometry_descriptor[name] = descriptor_set(1, material_layout);
+
+                    // Apply mesh-specific uniforms to the mesh-specific descriptor (model matrix, color, etc)
                     std::array<vk_uniform_buffer, 1> material_uniforms = {
                         m_cached_meshes[name].material_ubo()
                     };
@@ -303,11 +310,11 @@ namespace atlas::vk {
         flecs::query<> query_targets = current_scene->query_builder<material>().build();
         m_main_pipeline.bind(m_current_command_buffer);
         query_targets.each([this](flecs::entity p_entity){
-            const material* target = p_entity.get<material>();
+            // const material* target = p_entity.get<material>();
             //! @brief This is going to be removed, because to prepare for the offloading of the rendering, that'll get done in preparation of that frame.
             //! @brief Meaning utilizing
-            // TODO: Probably have a way of handling reloading when a mesh 3d model filepath changes 
-            if(target->texture_reload) {}
+            //! TODO: Probably have a way of handling reloading when a mesh 3d model filepath changes; this should be done when preparing the frame not as its rendering
+            // if(target->texture_reload) {}
 
             const transform* transform_component = p_entity.get<transform>();
             const material* material_component = p_entity.get<material>();
