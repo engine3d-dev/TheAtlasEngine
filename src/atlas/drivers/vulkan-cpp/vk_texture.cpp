@@ -6,6 +6,47 @@
 
 namespace atlas::vk {
 
+    texture::texture(const texture_extent& p_extent) {
+        m_driver = vk_context::driver_context();
+
+        command_buffer_settings settings = {
+            0,
+            command_buffer_levels::primary,
+            VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
+        };
+
+        m_copy_command_buffer = vk_command_buffer(settings);
+
+        // 1.) Load in extent dimensions
+        std::vector<std::vector<uint32_t>> image_white_texture(p_extent.width, std::vector<uint32_t>(p_extent.height));
+
+        for(size_t i = 0; i < image_white_texture.size(); i++) {
+            for(size_t j = 0; j < image_white_texture[0].size(); j++) {
+                image_white_texture[i][j] = 0xffffffff;
+            }
+        }
+
+        VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;
+        create_texture_from_data(p_extent.width, p_extent.height, image_white_texture.data(), format);
+        m_width = p_extent.width;
+        m_height = p_extent.height;
+
+        // 3.) Create Image View
+        VkImageAspectFlags aspect_flags = VK_IMAGE_ASPECT_COLOR_BIT;
+        m_texture_image.image_view = create_image_view(m_texture_image.image, format, aspect_flags);
+
+        vk_filter_range sampler_range = {
+            .min = VK_FILTER_LINEAR,
+            .max = VK_FILTER_LINEAR
+        };
+
+        VkSamplerAddressMode addr_mode = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+
+        m_texture_image.sampler = create_sampler(sampler_range, addr_mode);
+        m_is_image_loaded = true;
+
+    }
+
     texture::texture(const std::filesystem::path& p_filepath) {
         m_driver = vk_context::driver_context();
 
@@ -117,6 +158,8 @@ namespace atlas::vk {
         vkDestroyBuffer(m_driver, m_staging_buffer.handler, nullptr);
         vkFreeMemory(m_driver, m_staging_buffer.device_memory, nullptr);
 
-        m_copy_command_buffer.destroy();
+        if(m_copy_command_buffer.is_valid()) {
+            m_copy_command_buffer.destroy();
+        }
     }
 };

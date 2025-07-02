@@ -74,5 +74,6 @@ namespace atlas::vk {
         VkDescriptorPool m_descriptor_pool=nullptr;
         VkDescriptorSetLayout m_descriptor_set_layout=nullptr;
         std::vector<VkDescriptorSet> m_descriptor_sets{};
+        texture m_error_texture;
     };
 };

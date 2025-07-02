@@ -30,7 +30,11 @@ namespace atlas::vk {
 
     descriptor_set::descriptor_set(const uint32_t& p_set_slot, const descriptor_set_layout& p_layout) : m_set_slot(p_set_slot), m_allocated_descriptors(p_layout.allocate_count), m_size_bytes(p_layout.size_bytes) {
         m_driver = vk_context::driver_context();
-
+        texture_extent extent = {
+            .width = 1,
+            .height = 1
+        };
+        m_error_texture = texture(extent);
         std::vector<VkDescriptorPoolSize> pool_sizes(p_layout.entry.size());
         std::vector<VkDescriptorSetLayoutBinding> descriptor_set_layout_bindings(p_layout.entry.size());
 
@@ -126,11 +130,20 @@ namespace atlas::vk {
 
         // If there are any textures, load the image_view's and samplers to write them through the descriptor set
         for(const auto& texture : p_textures) {
-            image_infos.push_back({
-                .sampler = texture.sampler(),
-                .imageView = texture.image_view(),
-                .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
-            });
+            if(texture.loaded()) {
+                image_infos.push_back({
+                    .sampler = texture.sampler(),
+                    .imageView = texture.image_view(),
+                    .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+                });
+            }
+            else { // if no image supplied for loading or loading failed, then use error/default texture
+                image_infos.push_back({
+                    .sampler = m_error_texture.sampler(),
+                    .imageView = m_error_texture.image_view(),
+                    .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+                });
+            }
         }
 
         // Updating descriptor sets so shaders can utilize the uniforms and textures
@@ -160,10 +173,7 @@ namespace atlas::vk {
                 .pImageInfo = image_infos.data()
             };
 
-            // Only write the textures to descriptors if there are textures to write
-            if(!p_textures.empty()) {
-                write_descriptors.push_back(write_image);
-            }
+            write_descriptors.push_back(write_image);
 
             vkUpdateDescriptorSets(m_driver, static_cast<uint32_t>(write_descriptors.size()), write_descriptors.data(), 0, nullptr);
         }
@@ -193,103 +203,6 @@ namespace atlas::vk {
         }
     }
 
-
-    /*
-    void descriptor_set::update(const std::span<write_descriptors>& p_write_descriptors) {
-        std::vector<VkDescriptorBufferInfo> buffer_infos;
-        std::vector<VkDescriptorImageInfo> image_infos;
-        bool has_images = false;
-
-        // Setting up buffer infos
-        std::vector<VkWriteDescriptorSet> write_descriptors_sets(p_write_descriptors.size());
-        for(const auto& write : p_write_descriptors) {
-            buffer_infos.resize(write.uniforms.size());
-
-            for(size_t j = 0; j < write.uniforms.size(); j++) {
-                buffer_infos[j] = {
-                    .buffer = write.uniforms[j],
-                    .offset = 0,
-                    .range = write.uniforms.size_bytes()
-                };
-            }
-        }
-
-        for(const auto& write : p_write_descriptors) {
-            image_infos.resize(write.image.data.size());
-
-            has_images = (!write.image.data.empty());
-
-            for(size_t j = 0; j < write.image.data.size(); j++) {
-                image_infos[j] = {
-                    .sampler = write.image.data[j].sampler(),
-                    .imageView = write.image.data[j].image_view(),
-                    .imageLayout = to_vk_image_layout(write.image.layout)
-                };
-            }
-        }
-
-        for(size_t i = 0; i < m_allocated_descriptors; i++) {
-            std::vector<VkWriteDescriptorSet> write_descriptors;
-            VkWriteDescriptorSet write_buffer {
-                .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-                .pNext = nullptr,
-                .dstSet = m_descriptor_sets[i],
-                .dstBinding = 0,
-                .dstArrayElement = 0,
-                .descriptorCount = static_cast<uint32_t>(buffer_infos.size()),
-                .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                .pBufferInfo = buffer_infos.data(),
-            };
-
-            write_descriptors.push_back(write_buffer);
-
-            VkWriteDescriptorSet write_image {
-                .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-                .pNext = nullptr,
-                .dstSet = m_descriptor_sets[i],
-                .dstBinding = 1,
-                .dstArrayElement = 0,
-                .descriptorCount = static_cast<uint32_t>(image_infos.size()),
-                .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                .pImageInfo = image_infos.data()
-            };
-
-            // Only write the textures to descriptors if there are textures to write
-            if(has_images) {
-                write_descriptors.push_back(write_image);
-            }
-
-            vkUpdateDescriptorSets(m_driver, static_cast<uint32_t>(write_descriptors.size()), write_descriptors.data(), 0, nullptr);
-        }
-    }
-        */
-
-
-
-    /*
-     p_set_index is to tell vulkan which "slot" to put the descriptor set in
-
-     beacuse our layout is like as shown here
-
-     layout (set = 0, binding = 0) uniform GlobalUbo {
-        mat4 mvp;
-     } ubo;
-
-     layout (set = 1, binding = 0) uniform MaterialUbo {
-        vec4 color;
-     } material_src;
-
-     * If you bind the descriptor set at the wrong slot, the shader will not be able to bind to the resources
-     * If you bind to set index 0 but the set is at 1, the shader will not be able to find it and give you validation error
-     * If you bind two different descriptor sets at the same index, the second one overwrites the first one
-     * 
-     * [Requirements for Descriptor Set Binding]
-     * Assign each descriptor set a slot index, to ensure it is the correct slot being binded.
-     * Ensure that the shader resource group would be able to find that particular resource binded to this descriptor set
-     * No descriptor sets should overwrite each other
-     * Error occurred: Reason why validation errors occurred was because I was binding to index slot 0, when the validation layers and vulkan were searching for index slot 1 instead
-     * 
-    */
     void descriptor_set::bind(const VkCommandBuffer& p_current,
                               uint32_t p_frame_index,
                               const VkPipelineLayout& p_pipeline_layout) {
@@ -314,5 +227,7 @@ namespace atlas::vk {
             vkDestroyDescriptorSetLayout(
             m_driver, m_descriptor_set_layout, nullptr);
         }
+
+        m_error_texture.destroy();
     }
 };

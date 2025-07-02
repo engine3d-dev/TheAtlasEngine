@@ -5,9 +5,17 @@
 #include <drivers/vulkan-cpp/vk_command_buffer.hpp>
 
 namespace atlas::vk {
+    struct texture_extent {
+        uint32_t width;
+        uint32_t height;
+        // Considering parameters here for setting mipmap parameters (??)
+        // bool mipmap_enabled=false;
+        // uint32_t mipmappings=0;
+    };
     class texture {
     public:
         texture() = default;
+        texture(const texture_extent& p_extent);
         texture(const std::filesystem::path& p_filepath);
 
 
