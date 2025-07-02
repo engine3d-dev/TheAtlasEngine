@@ -33,7 +33,7 @@ namespace atlas::vk {
         };
 
         std::array<vertex_attribute, 1> attribute = {
-            vertex_attribute{
+            vertex_attribute{ // layout (set = 0, binding = 0)
                 .binding = 0,
                 .entries = attribute_entries,
                 .stride = sizeof(vk::vertex_input),
@@ -70,36 +70,6 @@ namespace atlas::vk {
         };
 
         m_global_descriptor = descriptor_set(0, set0_descriptor_layout);
-
-
-        // Descriptor Set 1
-        // Something to Note: beause we already have the binding available here
-        // What we can do, is also reuse these binding points to also set the .dstBinding parameter set in the VkWriteDescriptorSet
-        std::vector<descriptor_binding_entry> set1_entries = {
-            descriptor_binding_entry{ // entry for layout (set = 1, binding = 0)
-                .type = vk::buffer::uniform,
-                .binding_point = {
-                    .binding = 0,
-                    .stage = shader_stage::vertex
-                },
-                .descriptor_count = 1
-            },
-            descriptor_binding_entry{ // entry for layout (set = 1, binding = 1)
-                .type = vk::buffer::combined_image_sampler,
-                .binding_point = {
-                    .binding = 1,
-                    .stage = shader_stage::fragment
-                },
-                .descriptor_count = 1
-            },
-        };
-
-        m_material_descriptor_layout  = {
-            .allocate_count = m_image_count,            // the count how many descriptor set layout able to be allocated
-            .max_sets = m_image_count,                  // max of descriptor sets able to allocate
-            .size_bytes = sizeof(material_uniform),             // size of bytes of the uniforms utilized by this descriptor sets
-            .entry = set1_entries                       // specifies pool sizes and descriptor layout
-        };
 
         m_geometry_descriptor_layout = {
             m_global_descriptor.get_layout(),
@@ -206,6 +176,7 @@ namespace atlas::vk {
                 .size_bytes = sizeof(material_uniform),           // size of bytes of the uniforms utilized by this descriptor sets
                 .entry = material_set1_entries                            // specifies pool sizes and descriptor layout
             };
+
             flecs::query<> caching = current_scene->query_builder<material>().build();
 
             caching.each([this, material_layout](flecs::entity p_entity){

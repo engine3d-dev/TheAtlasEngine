@@ -5,9 +5,7 @@
 #include <drivers/vulkan-cpp/vk_command_buffer.hpp>
 #include <drivers/vulkan-cpp/vk_shader_group.hpp>
 #include <drivers/vulkan-cpp/vk_pipeline.hpp>
-#include <drivers/vulkan-cpp/vk_uniform_buffer.hpp>
 #include <vector>
-#include <drivers/vulkan-cpp/vk_texture.hpp>
 #include <drivers/vulkan-cpp/mesh.hpp>
 #include <drivers/vulkan-cpp/vk_uniform_buffer.hpp>
 #include <vector>
@@ -51,25 +49,12 @@ namespace atlas::vk {
         vk_pipeline m_main_pipeline{};
         uint32_t m_image_count=0;
 
-        // descriptor set and global uniforms for global camera data
+        // descriptors for global uniforms for global camera data
         std::vector<vk_uniform_buffer> m_global_uniforms{};
         descriptor_set m_global_descriptor{};
 
+        // Contain descriptor layouts that gets used by the main VkPipeline (graphics pipeline)
         std::vector<VkDescriptorSetLayout> m_geometry_descriptor_layout;
-
-        // --------------------------------------------
-        // Mesh 0 - Viking Room + Viking Room Texture
-        // --------------------------------------------
-        // mesh m_mesh0;
-        // descriptor_set m_descriptor_set1{}; // viking room mesh
-        // vk_uniform_buffer m_mesh0_material_ubo{}; // uniform for viking room mesh
-
-        // --------------------------------------------
-        // Mesh 1 - Cube + wood texture
-        // --------------------------------------------
-        // mesh m_mesh1;
-        // descriptor_set m_descriptor_set2{}; // cube wood
-        // vk_uniform_buffer m_mesh1_material_ubo{}; // material uniform for cube
 
         // This is for caching any loaded mesh and only modifying this mesh if that entity is there.
         // It is for this vk_renderer to manage
@@ -77,15 +62,10 @@ namespace atlas::vk {
         // mesh = corresponding to the entity that is being loaded
         std::map<std::string, mesh> m_cached_meshes;
 
-
-        std::map<std::string, descriptor_set_layout> m_descriptor_table;
-
         // std::string = entity name
         // descriptor_set for now will represent the material descriptor set
         std::map<std::string, descriptor_set> m_geometry_descriptor;
         descriptor_set_layout m_material_descriptor_layout;
-
-
 
         bool m_begin_initialize=true;
         uint32_t m_current_frame=0;
