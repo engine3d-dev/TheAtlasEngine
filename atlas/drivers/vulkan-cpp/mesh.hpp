@@ -31,7 +31,7 @@ namespace atlas::vk {
 
         void initialize_uniforms(uint32_t p_size_bytes_ubo);
 
-        void update_uniform(const material& p_material_ubo);
+        void update_uniform(const material_uniform& p_material_ubo);
 
         [[nodiscard]] vk_uniform_buffer material_ubo() const { return m_geoemtry_ubo; }
 
@@ -55,6 +55,5 @@ namespace atlas::vk {
         vk_vertex_buffer m_vbo{};
         vk_index_buffer m_ibo{};
         vk_uniform_buffer m_geoemtry_ubo;
-        material m_geometry_material;
     };
 };

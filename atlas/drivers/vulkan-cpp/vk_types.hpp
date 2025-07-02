@@ -151,7 +151,8 @@ namespace atlas::vk {
     enum buffer : uint8_t {
         uniform=0,
         storage=1,
-        image_sampler=2
+        combined_image_sampler=2,
+        sampled_image=3
     };
 
     enum shader_stage {
@@ -197,7 +198,6 @@ namespace atlas::vk {
     struct camera_ubo {
         glm::mat4 Projection{ 1.f };
         glm::mat4 View{ 1.f };
-        glm::mat4 Model{ 1.f };
     };
 
     //! @brief Just for testing purposes for sending this struct over to the shader
@@ -209,7 +209,7 @@ namespace atlas::vk {
      * @brief material is going to define properties about how a scene object itself gets rendered
      * 
     */
-    struct material {
+    struct material_uniform {
         glm::mat4 model={1.f};
         glm::vec4 color{1.f};
         // std::vector<std::string> texture_paths;

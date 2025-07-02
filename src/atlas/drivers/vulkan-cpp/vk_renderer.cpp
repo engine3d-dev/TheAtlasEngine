@@ -10,6 +10,7 @@
 
 #include <core/system_framework/system_registry.hpp>
 #include <core/scene/world.hpp>
+#include <drivers/vulkan-cpp/vk_types.hpp>
 
 namespace atlas::vk {
 
@@ -86,7 +87,7 @@ namespace atlas::vk {
                 .descriptor_count = 1
             },
             descriptor_binding_entry{ // entry for layout (set = 1, binding = 1)
-                .type = vk::buffer::image_sampler,
+                .type = vk::buffer::combined_image_sampler,
                 .binding_point = {
                     .binding = 1,
                     .stage = shader_stage::fragment
@@ -105,7 +106,7 @@ namespace atlas::vk {
         m_material_descriptor_layout  = {
             .allocate_count = m_image_count,            // the count how many descriptor set layout able to be allocated
             .max_sets = m_image_count,                  // max of descriptor sets able to allocate
-            .size_bytes = sizeof(material),             // size of bytes of the uniforms utilized by this descriptor sets
+            .size_bytes = sizeof(material_uniform),             // size of bytes of the uniforms utilized by this descriptor sets
             .entry = set1_entries                       // specifies pool sizes and descriptor layout
         };
 
@@ -279,7 +280,7 @@ namespace atlas::vk {
                     .descriptor_count = 1
                 },
                 descriptor_binding_entry{ // entry for layout (set = 1, binding = 1)
-                    .type = vk::buffer::image_sampler,
+                    .type = vk::buffer::combined_image_sampler,
                     .binding_point = {
                         .binding = 1,
                         .stage = shader_stage::fragment
@@ -287,7 +288,7 @@ namespace atlas::vk {
                     .descriptor_count = 1
                 },
                 // descriptor_binding_entry{ // entry for layout (set = 1, binding = 2)
-                //     .type = vk::buffer::image_sampler,
+                //     .type = vk::buffer::combined_image_sampler,
                 //     .binding_point = {
                 //         .binding = 1,
                 //         .stage = shader_stage::fragment
@@ -299,19 +300,19 @@ namespace atlas::vk {
             descriptor_set_layout material_layout = {
                 .allocate_count = m_image_count,            // the count how many descriptor set layout able to be allocated
                 .max_sets = m_image_count,                  // max of descriptor sets able to allocate
-                .size_bytes = sizeof(material),           // size of bytes of the uniforms utilized by this descriptor sets
+                .size_bytes = sizeof(material_uniform),           // size of bytes of the uniforms utilized by this descriptor sets
                 .entry = material_set1_entries                            // specifies pool sizes and descriptor layout
             };
-            flecs::query<> caching = current_scene->query_builder<rendertarget3d>().build();
+            flecs::query<> caching = current_scene->query_builder<material>().build();
 
             caching.each([this, material_layout](flecs::entity p_entity){
                 std::string name = std::string(p_entity.name().c_str());
-                const rendertarget3d* target = p_entity.get<rendertarget3d>();
+                const material* target = p_entity.get<material>();
 
                 m_cached_meshes.emplace(name, mesh(std::filesystem::path(target->model_path)));
 
-                m_cached_meshes[name].initialize_uniforms(sizeof(material));
-                m_cached_meshes[name].add_texture(target->Filepath);
+                m_cached_meshes[name].initialize_uniforms(sizeof(material_uniform));
+                m_cached_meshes[name].add_texture(target->texture_path);
 
                 m_geometry_descriptor[name] = descriptor_set(1, material_layout);
                 std::array<vk_uniform_buffer, 1> material_uniforms = {
@@ -433,13 +434,13 @@ namespace atlas::vk {
 
         //! TODO: Replace rendertarget3d with a material component
         // Should rmeove glm::mat4 from material-specific components
-        flecs::query<> query_targets = current_scene->query_builder<rendertarget3d>().build();
+        flecs::query<> query_targets = current_scene->query_builder<material>().build();
         m_main_pipeline.bind(m_current_command_buffer);
         query_targets.each([this](flecs::entity p_entity){
-            const rendertarget3d* target = p_entity.get<rendertarget3d>();
+            const material* target = p_entity.get<material>();
             //! @brief This is going to be removed, because to prepare for the offloading of the rendering, that'll get done in preparation of that frame.
             //! @brief Meaning utilizing 
-            if(target->is_texture_dirty) {
+            if(target->texture_reload) {
                 
                 
                     // When I get back, these are TODO's
@@ -461,6 +462,7 @@ namespace atlas::vk {
                 
             }
             const transform* transform_component = p_entity.get<transform>();
+            const material* material_component = p_entity.get<material>();
             m_model = glm::mat4(1.f);
             m_model = glm::translate(m_model, transform_component->Position);
             m_model = glm::scale(m_model, transform_component->Scale);
@@ -470,10 +472,9 @@ namespace atlas::vk {
 
             
             // Mesh used for viking_room - replaced with std::map equivalent
-            material mesh_material_ubo = {
+            material_uniform mesh_material_ubo = {
                 .model = m_model,
-                // .color = {1.f, 1.f, 1.f, 1.0f}
-                .color = transform_component->Color
+                .color = material_component->color
             };
 
             std::string entity_name = std::string(p_entity.name().c_str());

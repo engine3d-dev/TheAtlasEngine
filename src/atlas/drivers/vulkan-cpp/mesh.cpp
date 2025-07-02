@@ -94,7 +94,7 @@ namespace atlas::vk {
         m_geoemtry_ubo = vk_uniform_buffer(p_size_bytes_ubo);
     }
 
-    void mesh::update_uniform(const material& p_material_ubo) {
+    void mesh::update_uniform(const material_uniform& p_material_ubo) {
         m_geoemtry_ubo.update(&p_material_ubo);
     }
 
