@@ -127,7 +127,10 @@ namespace atlas::vk {
 
             for(auto[key, value] : m_cached_meshes) {
                 console_log_fatal("Entity {} Destroyed in vk_renderer!!!", key);
-                value.destroy();
+                // To ensure that the mesh we are destroying are valid
+                if(value.loaded()) {
+                    value.destroy();
+                }
             }
 
             for(auto[key, value] : m_geometry_descriptor) {
@@ -207,18 +210,22 @@ namespace atlas::vk {
                 std::string name = std::string(p_entity.name().c_str());
                 const material* target = p_entity.get<material>();
 
-                m_cached_meshes.emplace(name, mesh(std::filesystem::path(target->model_path)));
+                mesh new_mesh(std::filesystem::path(target->model_path));
+                console_log_error("loaded = {}", new_mesh.loaded());
+                if(new_mesh.loaded()) {
+                    m_cached_meshes.emplace(name, new_mesh);
 
-                m_cached_meshes[name].initialize_uniforms(sizeof(material_uniform));
-                m_cached_meshes[name].add_texture(target->texture_path);
+                    m_cached_meshes[name].initialize_uniforms(sizeof(material_uniform));
+                    m_cached_meshes[name].add_texture(target->texture_path);
 
-                m_geometry_descriptor[name] = descriptor_set(1, material_layout);
-                std::array<vk_uniform_buffer, 1> material_uniforms = {
-                    m_cached_meshes[name].material_ubo()
-                };
-                m_geometry_descriptor[name].update(material_uniforms, m_cached_meshes[name].read_textures());
+                    m_geometry_descriptor[name] = descriptor_set(1, material_layout);
+                    std::array<vk_uniform_buffer, 1> material_uniforms = {
+                        m_cached_meshes[name].material_ubo()
+                    };
+                    m_geometry_descriptor[name].update(material_uniforms, m_cached_meshes[name].read_textures());
 
-                m_geometry_descriptor_layout.push_back(m_geometry_descriptor[name].get_layout());
+                    m_geometry_descriptor_layout.push_back(m_geometry_descriptor[name].get_layout());
+                }
             });
 
             console_log_trace("m_geometry_descriptor_layout.size() = {}", m_geometry_descriptor_layout.size());
@@ -319,14 +326,16 @@ namespace atlas::vk {
             };
 
             std::string entity_name = std::string(p_entity.name().c_str());
-            m_cached_meshes[entity_name].update_uniform(mesh_material_ubo);
+            if(m_cached_meshes[entity_name].loaded()) {
+                m_cached_meshes[entity_name].update_uniform(mesh_material_ubo);
 
-            // Bind global camera data here
-            m_global_descriptor.bind(m_current_command_buffer, m_current_frame, m_main_pipeline.get_layout());
+                // Bind global camera data here
+                m_global_descriptor.bind(m_current_command_buffer, m_current_frame, m_main_pipeline.get_layout());
 
-            // Bind mesh-entity specific properties here before initial draw call
-            m_geometry_descriptor[entity_name].bind(m_current_command_buffer, m_current_frame, m_main_pipeline.get_layout());
-            m_cached_meshes[entity_name].draw(m_current_command_buffer);
+                // Bind mesh-entity specific properties here before initial draw call
+                m_geometry_descriptor[entity_name].bind(m_current_command_buffer, m_current_frame, m_main_pipeline.get_layout());
+                m_cached_meshes[entity_name].draw(m_current_command_buffer);
+            }
             
         });
         

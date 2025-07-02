@@ -30,6 +30,8 @@ namespace atlas::vk {
                               p_filename.string().c_str())) {
             console_log_warn("Could not load model from path {}",
                              p_filename.string());
+            m_model_loaded = false;
+            return;
         }
 
         std::vector<vertex_input> vertices;
@@ -88,6 +90,7 @@ namespace atlas::vk {
 
         m_vbo = vk_vertex_buffer(vertices);
         m_ibo = vk_index_buffer(indices);
+        m_model_loaded = true;
     }
 
     void mesh::initialize_uniforms(uint32_t p_size_bytes_ubo) {

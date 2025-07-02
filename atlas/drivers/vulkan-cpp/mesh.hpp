@@ -50,10 +50,13 @@ namespace atlas::vk {
             return m_textures;
         }
 
+        [[nodiscard]] bool loaded() const { return m_model_loaded; }
+
     private:
         std::vector<texture> m_textures;
         vk_vertex_buffer m_vbo{};
         vk_index_buffer m_ibo{};
         vk_uniform_buffer m_geoemtry_ubo;
+        bool m_model_loaded=false;
     };
 };
