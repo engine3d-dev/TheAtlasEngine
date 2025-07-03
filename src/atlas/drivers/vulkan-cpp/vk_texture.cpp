@@ -4,8 +4,74 @@
 #include <drivers/vulkan-cpp/vk_context.hpp>
 #include <drivers/vulkan-cpp/helper_functions.hpp>
 #include <drivers/vulkan-cpp/utilties/utils.hpp>
+#include <array>
 
 namespace atlas::vk {
+
+    static vk_image create_texture_from_data(const VkDevice& p_driver, const texture_properties& p_properties, const void* p_data) {
+        // VkImageUsageFlagBits usage = (VkImageUsageFlagBits)(VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
+        // VkMemoryPropertyFlagBits property = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+
+        command_buffer_settings settings = {
+            0,
+            command_buffer_levels::primary,
+            VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
+        };
+
+        vk_command_buffer copy_command_buffer = vk_command_buffer(settings);
+
+        // 1. create image  object
+        vk_image texture_image = create_image2d(p_properties.width, p_properties.height, p_properties.format, p_properties.usage, p_properties.property);
+
+        // 2. update texture data
+        // update_texture(m_texture_image, p_width, p_height, p_format, p_data);
+
+        // 1. bytes per pixels
+        int bytes_per_pixels = bytes_per_texture_format(p_properties.format);
+
+        // 2. layer_size
+        uint32_t layer_size = p_properties.width * p_properties.height * bytes_per_pixels;
+        int layer_count = 1;
+        uint32_t image_size = layer_count * layer_size;
+
+
+        // 3. creating data for staging buffers
+        vk_buffer_info staging_info = {
+            .device_size = (uint32_t)image_size,
+            .usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+            .memory_property_flag = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_CACHED_BIT,
+        };
+
+        vk_buffer staging_buffer = create_buffer(staging_info);
+
+        // 4. maps the buffer data to that parameters
+        write(staging_buffer, p_data, image_size);
+
+        // 5. transition image layout
+        // copy_command_buffer.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+        transition_image_layout(texture_image.image,
+                                p_properties.format,
+                                VK_IMAGE_LAYOUT_UNDEFINED,
+                                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+
+        // // 6. Copy buffer to image
+        copy(copy_command_buffer, texture_image.image,
+                             staging_buffer.handler,
+                             p_properties.width,
+                             p_properties.height);
+
+        // // 7. transition image layout again
+        transition_image_layout(texture_image.image,
+                                p_properties.format,
+                                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+        copy_command_buffer.destroy();
+
+        free_buffer(p_driver, staging_buffer);
+
+        return texture_image;
+    }
 
     texture::texture(const texture_extent& p_extent) {
         m_driver = vk_context::driver_context();
@@ -16,8 +82,6 @@ namespace atlas::vk {
             VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
         };
 
-        m_copy_command_buffer = vk_command_buffer(settings);
-
         // 1.) Load in extent dimensions
         std::vector<std::vector<uint32_t>> image_white_texture(p_extent.width, std::vector<uint32_t>(p_extent.height));
 
@@ -27,14 +91,21 @@ namespace atlas::vk {
             }
         }
 
-        VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;
-        create_texture_from_data(p_extent.width, p_extent.height, image_white_texture.data(), format);
         m_width = p_extent.width;
         m_height = p_extent.height;
 
+        texture_properties properties = {
+            .width = m_width,
+            .height = m_height,
+            .usage = (VkImageUsageFlagBits)(VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT),
+            .property = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+            .format = VK_FORMAT_R8G8B8A8_UNORM,
+        };
+        m_texture_image = create_texture_from_data(m_driver, properties, image_white_texture.data());
+
         // 3.) Create Image View
         VkImageAspectFlags aspect_flags = VK_IMAGE_ASPECT_COLOR_BIT;
-        m_texture_image.image_view = create_image_view(m_texture_image.image, format, aspect_flags);
+        m_texture_image.image_view = create_image_view(m_texture_image.image, properties.format, aspect_flags);
 
         vk_filter_range sampler_range = {
             .min = VK_FILTER_LINEAR,
@@ -50,14 +121,11 @@ namespace atlas::vk {
 
     texture::texture(const std::filesystem::path& p_filepath) {
         m_driver = vk_context::driver_context();
-
         command_buffer_settings settings = {
             0,
             command_buffer_levels::primary,
             VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
         };
-
-        m_copy_command_buffer = vk_command_buffer(settings);
 
         // 1. load from file
         int w, h;
@@ -72,16 +140,21 @@ namespace atlas::vk {
             m_is_image_loaded = false;
             return;
         }
+        texture_properties texture_settings = {
+            .width = m_width,
+            .height = m_height,
+            .usage = (VkImageUsageFlagBits)(VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT),
+            .property = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+            .format = VK_FORMAT_R8G8B8A8_UNORM,
+        };
+        m_texture_image = create_texture_from_data(m_driver, texture_settings, image_pixel_data);
 
-        // 2. Create Image Data
-        // 2.1 Updating Texture data
-        VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;
-        create_texture_from_data(w, h, image_pixel_data, format);
+
         stbi_image_free(image_pixel_data);
 
         // 3.) Create Image View
         VkImageAspectFlags aspect_flags = VK_IMAGE_ASPECT_COLOR_BIT;
-        m_texture_image.image_view = create_image_view(m_texture_image.image, format, aspect_flags);
+        m_texture_image.image_view = create_image_view(m_texture_image.image, texture_settings.format, aspect_flags);
 
         vk_filter_range sampler_range = {
             .min = VK_FILTER_LINEAR,
@@ -94,73 +167,13 @@ namespace atlas::vk {
         m_is_image_loaded = true;
     }
 
-    void texture::create_texture_from_data(uint32_t p_width, uint32_t p_height, const void* p_data, const VkFormat& p_format) {
-        VkImageUsageFlagBits usage = (VkImageUsageFlagBits)(VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
-        VkMemoryPropertyFlagBits property = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
-
-        // 1. create image  object
-        m_texture_image = create_image2d(p_width, p_height, p_format, usage, property);
-
-        // 2. update texture data
-        update_texture(m_texture_image, p_width, p_height, p_format, p_data);
-    }
-
-    void texture::update_texture(vk_image& p_image, uint32_t p_width, uint32_t p_height, VkFormat p_format, const  void* p_data) {
-        // 1. bytes per pixels
-        int bytes_per_pixels = bytes_per_texture_format(p_format);
-
-        // 2. layer_size
-        uint32_t layer_size = p_width * p_height * bytes_per_pixels;
-        int layer_count = 1;
-        uint32_t image_size = layer_count * layer_size;
-
-
-        // 3. creating data for staging buffers
-        // m_staging_buffer = create_buffer(image_size, usage, property);
-
-        vk_buffer_info staging_info = {
-            .device_size = (uint32_t)image_size,
-            .usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-            .memory_property_flag = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_CACHED_BIT,
-                                        //  VK_MEMORY_PROPERTY_HOST_COHERENT_BIT; // Is slower then HOST_CACHED_BIT, reminder comment to benchmark in milliseconds.
-        };
-
-        m_staging_buffer = create_buffer(staging_info);
-
-        // 4. maps the buffer data to that parameters
-        write(m_staging_buffer, p_data, image_size);
-
-        // 5. transition image layout
-        transition_image_layout(p_image.image,
-                                p_format,
-                                VK_IMAGE_LAYOUT_UNDEFINED,
-                                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-
-        // // 6. Copy buffer to image
-        copy(m_copy_command_buffer, p_image.image,
-                             m_staging_buffer.handler,
-                             p_width,
-                             p_height);
-
-        // // 7. transition image layout again
-        transition_image_layout(p_image.image,
-                                p_format,
-                                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-    }
-
     void texture::destroy() {
-        vkDestroyImageView(m_driver, m_texture_image.image_view, nullptr);
-        vkDestroyImage(m_driver, m_texture_image.image, nullptr);
-        vkDestroySampler(m_driver, m_texture_image.sampler, nullptr);
+        // vkDestroyImageView(m_driver, m_texture_image.image_view, nullptr);
+        // vkDestroyImage(m_driver, m_texture_image.image, nullptr);
+        // vkDestroySampler(m_driver, m_texture_image.sampler, nullptr);
 
-        vkFreeMemory(m_driver, m_texture_image.device_memory, nullptr);
+        // vkFreeMemory(m_driver, m_texture_image.device_memory, nullptr);
+        free_image(m_driver, m_texture_image);
 
-        vkDestroyBuffer(m_driver, m_staging_buffer.handler, nullptr);
-        vkFreeMemory(m_driver, m_staging_buffer.device_memory, nullptr);
-
-        if(m_copy_command_buffer.is_valid()) {
-            m_copy_command_buffer.destroy();
-        }
     }
 };

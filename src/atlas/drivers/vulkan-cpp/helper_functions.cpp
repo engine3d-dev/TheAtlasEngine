@@ -354,6 +354,18 @@ namespace atlas::vk {
         return semaphore;
     }
 
+    void free_buffer(const VkDevice& p_driver, vk_buffer& p_buffer) {
+        vkDestroyBuffer(p_driver, p_buffer.handler, nullptr);
+        vkFreeMemory(p_driver, p_buffer.device_memory, nullptr);
+    }
+
+    void free_image(const VkDevice& p_driver, vk_image& p_image) {
+        vkDestroyImageView(p_driver, p_image.image_view, nullptr);
+        vkDestroyImage(p_driver, p_image.image, nullptr);
+        vkDestroySampler(p_driver, p_image.sampler, nullptr);
+        vkFreeMemory(p_driver, p_image.device_memory, nullptr);
+    }
+
     std::string vk_present_mode_to_string(VkPresentModeKHR p_present_mode) {
         switch (p_present_mode) {
             case VK_PRESENT_MODE_IMMEDIATE_KHR:

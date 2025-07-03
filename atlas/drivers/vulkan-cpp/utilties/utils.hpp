@@ -70,6 +70,29 @@ namespace atlas::vk {
                                  VkFormat p_format,
                                  VkImageLayout p_old,
                                  VkImageLayout p_new);
+    
+     /**
+     * @name transition_image_layout
+     * @param VkImage is the image we want to transition to
+     * @param VkFormat specifying the format in which are image has been set to
+     * @param p_old is a VkImageLayout that is the old layout image was
+     * previously
+     * @param p_new is VkImageLayout that is the new layout the image will be
+     * transitioning to
+     *
+     * @brief Records and executes vkCmdCopyBufferToImage vulkan function
+     * @brief Used for transitioning between a given set of image layouts into a
+     * completely different layout
+     * @brief Helpful for ensuring the pixel data the image contains
+     * @brief This function creates a copy command buffer
+     * @brief Meaning it should accept a created command buffer from the user
+     * rather than constructing one itself
+     */
+    void transition_image_layout(VkCommandBuffer& p_command_buffer,
+                                 VkImage& p_image,
+                                 VkFormat p_format,
+                                 VkImageLayout p_old,
+                                 VkImageLayout p_new);
 
     /**
      * @name image_memory_barrier
@@ -96,5 +119,8 @@ namespace atlas::vk {
                               VkFormat p_format,
                               VkImageLayout p_old,
                               VkImageLayout p_new);
+    //
 
+
+    void queue_submit(const VkQueue& p_queue_handle, const std::span<VkCommandBuffer>& p_commands);
 };

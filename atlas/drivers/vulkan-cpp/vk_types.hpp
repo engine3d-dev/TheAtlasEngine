@@ -124,6 +124,14 @@ namespace atlas::vk {
         VkMemoryPropertyFlags memory_property_flag;
     };
 
+    struct texture_properties {
+        uint32_t width;
+        uint32_t height;
+        VkImageUsageFlagBits usage;
+        VkMemoryPropertyFlagBits property;
+        VkFormat format;
+    };
+
     /**
      * @param allocate_count
      * @brief count of descriptor set layouts to allocate for this descriptor set

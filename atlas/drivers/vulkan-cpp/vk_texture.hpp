@@ -3,6 +3,7 @@
 #include <vulkan/vulkan.h>
 #include <drivers/vulkan-cpp/vk_types.hpp>
 #include <drivers/vulkan-cpp/vk_command_buffer.hpp>
+#include <drivers/vulkan-cpp/vk_graphics_queue.hpp>
 
 namespace atlas::vk {
     struct texture_extent {
@@ -18,6 +19,7 @@ namespace atlas::vk {
         texture(const texture_extent& p_extent);
         texture(const std::filesystem::path& p_filepath);
 
+        void create(const std::filesystem::path& p_path);
 
         [[nodiscard]] bool loaded() const { return m_is_image_loaded; }
 
@@ -29,8 +31,6 @@ namespace atlas::vk {
 
         [[nodiscard]] VkSampler sampler() const { return m_texture_image.sampler; }
 
-        void update_texture(vk_image& p_image, uint32_t p_width, uint32_t p_height, VkFormat p_format, const  void* p_data);
-
         void destroy();
 
         [[nodiscard]] uint32_t width() const;
@@ -38,14 +38,10 @@ namespace atlas::vk {
         [[nodiscard]] uint32_t height() const;
 
     private:
-        void create_texture_from_data(uint32_t p_width, uint32_t p_height, const void* p_data, const VkFormat& p_format);
-
-    private:
-        VkDevice m_driver=nullptr;
+        VkDevice m_driver={};
         bool m_is_image_loaded=false;
-        vk_buffer m_staging_buffer{};
         vk_image m_texture_image{};
-        vk_command_buffer m_copy_command_buffer{};
+
         uint32_t m_width=0;
         uint32_t m_height=0;
     };

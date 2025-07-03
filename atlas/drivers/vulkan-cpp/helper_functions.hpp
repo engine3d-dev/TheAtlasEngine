@@ -57,6 +57,11 @@ namespace atlas::vk {
 
     VkSampler create_sampler(const vk_filter_range& p_range,
                              VkSamplerAddressMode p_address_mode);
+	
+
+	void free_buffer(const VkDevice& p_driver, vk_buffer& p_buffer);
+
+	void free_image(const VkDevice& p_driver, vk_image& p_image);
 
     VkShaderStageFlags to_vk_shader_stage(const shader_stage& p_stage);
 
