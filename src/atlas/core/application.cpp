@@ -2,17 +2,13 @@
 #include <core/engine_logger.hpp>
 #include <core/event/event.hpp>
 #include <imgui.h>
-#include <physics/jolt-cpp/jolt-imports.hpp>
-#include <physics/jolt-cpp/jolt_api.hpp>
 #include <string>
-
-#include <drivers/ui/imgui_backend.hpp>
 
 #include <core/update_handlers/sync_update.hpp>
 #include <drivers/vulkan-cpp/vk_swapchain.hpp>
 
 namespace atlas {
-    static std::string g_tag = "engine3d";
+    static std::string g_tag = "TheAtlasEngine";
     application* application::s_instance = nullptr;
     static api g_graphics_backend_api = api::vulkan;
     static float g_delta_time = 0.f;
@@ -29,17 +25,9 @@ namespace atlas {
         };
         m_window = create_window(settings);
 
-        // renderer::initialize();
         m_renderer = create_scope<renderer>(m_window->current_swapchain(), "Renderer");
         m_renderer->set_background_color({1.f, 0.5f, 0.5f, 1.f});
-        // if(m_renderer == nullptr) {
-        //     console_log_trace("Renderer == NULLPTR!");
-        // }
-        // else {
-        //     console_log_trace("Renderer != NULLPTR!");
-        // }
-        // // renderer
-        // imgui_backend::initialize();
+
         m_ui_context = vk::imgui_context(*m_window, m_window->current_swapchain(), m_window->current_swapchain().swapchain_renderpass());
         s_instance = this;
     }
