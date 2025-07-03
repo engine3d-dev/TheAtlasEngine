@@ -12,16 +12,11 @@ set(
     ${SRC_DIR}/core/application.cpp
     ${SRC_DIR}/core/event/event.cpp
 
-    # ${SRC_DIR}/thread_utils/thread_utils.cpp
     ${SRC_DIR}/core/image/stb_image.cpp
 
     ${SRC_DIR}/core/engine_logger.cpp
     ${SRC_DIR}/core/window.cpp
-    # ${SRC_DIR}/core/update_handlers/thread_manager.cpp
-    # ${SRC_DIR}/core/update_handlers/global_update.cpp
     ${SRC_DIR}/core/update_handlers/sync_update.cpp
-    # ${SRC_DIR}/core/update_handlers/timer.cpp
-    # ${SRC_DIR}/core/timer.cpp
 
     ${SRC_DIR}/core/platforms/main.cpp
     ${SRC_DIR}/core/platforms/win32.cpp
@@ -54,9 +49,6 @@ set(
     # Scene stuff
     ${SRC_DIR}/core/scene/world.cpp
     ${SRC_DIR}/core/scene/entity.cpp
-
-    # Geometry-stuff
-    # ${SRC_DIR}/core/geometry/mesh.cpp
 
     # Renderer-stuff
     ${SRC_DIR}/renderer/renderer.cpp

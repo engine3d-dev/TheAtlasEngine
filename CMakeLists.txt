@@ -2,21 +2,11 @@ cmake_minimum_required(VERSION 3.27)
 project(atlas C CXX)
 set(ENGINE_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/atlas)
 
-if(${TESTS_ONLY})
-  message("===================> TESTS ONLY ENABLED <=====================")
-  set(DIRECTORIES src)
-else()
-  set(DIRECTORIES src Editor)
-endif()
-
-# TODO: Enable toggling custom conan arguments for specifying which build to use
-
-
 build_core_library(
-    DIRECTORIES ${DIRECTORIES}
+    DIRECTORIES src
 
     # This is to enable us to control if we want to run test cases or not
-    ENABLE_TESTS ${TESTS_ONLY}
+    ENABLE_TESTS ON
 
     UNIT_TEST_SOURCES
 
@@ -32,9 +22,13 @@ build_core_library(
 
     PACKAGES
     tinyobjloader
+    shaderc
+    watcher
 
     LINK_PACKAGES
     tinyobjloader::tinyobjloader
+    shaderc::shaderc
+    watcher::watcher
 )
 
 install(TARGETS ${PROJECT_NAME})
