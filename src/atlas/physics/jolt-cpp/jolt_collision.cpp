@@ -2,6 +2,9 @@
 #include <physics/jolt-cpp/jolt_collision_manager.hpp>
 #include <physics/jolt-cpp/jolt_collision.hpp>
 
+#include <core/scene/world.hpp>
+#include <core/system_framework/system_registry.hpp>
+
 namespace atlas::physics {
 
     jolt_collision::jolt_collision() {
