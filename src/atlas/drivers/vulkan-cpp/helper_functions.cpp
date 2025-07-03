@@ -256,7 +256,8 @@ namespace atlas::vk {
 
         return image;
     }
-
+    
+    /*
     VkCommandPool create_single_command_pool() {
         VkDevice driver = vk_context::driver_context();
         vk_physical_driver physical = vk_context::physical_driver();
@@ -278,7 +279,9 @@ namespace atlas::vk {
 
         return command_pool;
     }
+    */
 
+    /*
     VkCommandBuffer create_single_command_buffer(
       const VkCommandPool& p_command_pool) {
         VkDevice driver = vk_context::driver_context();
@@ -301,7 +304,9 @@ namespace atlas::vk {
 
         return command_buffer;
     }
+    */
 
+    /*
     void begin_command_buffer(const VkCommandBuffer& p_command_buffer,
                               VkCommandBufferUsageFlags p_usage_flags) {
         VkCommandBufferBeginInfo command_buffer_begin_info = {
@@ -322,6 +327,7 @@ namespace atlas::vk {
     void end_command_buffer(const VkCommandBuffer& p_command_buffer) {
         vkEndCommandBuffer(p_command_buffer);
     }
+    */
 
     VkSampler create_sampler(const vk_filter_range& p_range,
                              VkSamplerAddressMode p_address_mode) {
@@ -355,7 +361,8 @@ namespace atlas::vk {
 
         return sampler;
     }
-
+    
+    /*
     void write(const vk_buffer& p_buffer,
                const std::span<vertex_input>& p_in_buffer) {
         VkDeviceSize buffer_size =
@@ -388,41 +395,14 @@ namespace atlas::vk {
         memcpy(mapped, p_in_buffer.data(), buffer_size);
         vkUnmapMemory(driver, p_buffer.device_memory);
     }
-
-    void copy(const vk_buffer& p_src,
-              const vk_buffer& p_dst,
-              size_t p_size_of_bytes) {
-        VkDevice driver = vk_context::driver_context();
-        VkQueue graphics_queue = vk_context::driver_context().graphics_queue();
-        VkCommandPool command_pool = create_single_command_pool();
-        VkCommandBuffer copy_cmd_buffer =
-          create_single_command_buffer(command_pool);
-
-        begin_command_buffer(copy_cmd_buffer,
-                             VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
-
-        VkBufferCopy copy_region = { .size = p_size_of_bytes };
-
-        vkCmdCopyBuffer(
-          copy_cmd_buffer, p_src.handler, p_dst.handler, 1, &copy_region);
-        end_command_buffer(copy_cmd_buffer);
-
-        VkSubmitInfo submit_info{};
-        submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-        submit_info.commandBufferCount = 1;
-        submit_info.pCommandBuffers = &copy_cmd_buffer;
-        vkQueueSubmit(graphics_queue, 1, &submit_info, nullptr);
-        vkQueueWaitIdle(graphics_queue);
-
-        vkFreeCommandBuffers(driver, command_pool, 1, &copy_cmd_buffer);
-        vkDestroyCommandPool(driver, command_pool, nullptr);
-    }
+    */
 
     bool has_stencil_attachment(VkFormat p_format) {
         return ((p_format == VK_FORMAT_D32_SFLOAT_S8_UINT) ||
                 (p_format == VK_FORMAT_D24_UNORM_S8_UINT));
     }
 
+    /*
     void copy(vk_command_buffer& p_command_buffer,
               VkImage& p_image,
               VkBuffer& p_buffer,
@@ -463,7 +443,9 @@ namespace atlas::vk {
         vkQueueSubmit(graphics_queue, 1, &submit_info, nullptr);
         vkQueueWaitIdle(graphics_queue);
     }
+    */
 
+    /*
     void image_memory_barrier(VkCommandBuffer& p_command_buffer,
                               VkImage& p_image,
                               VkFormat p_format,
@@ -619,7 +601,9 @@ namespace atlas::vk {
                              1,
                              &image_memory_barrier);
     }
+    */
 
+    /*
     void transition_image_layout(VkImage& p_image,
                                  VkFormat p_format,
                                  VkImageLayout p_old,
@@ -657,7 +641,40 @@ namespace atlas::vk {
 
         temp_copy_command_buffer.destroy();
     }
+    */
 
+    /*
+    void copy(const vk_buffer& p_src,
+              const vk_buffer& p_dst,
+              size_t p_size_of_bytes) {
+        VkDevice driver = vk_context::driver_context();
+        VkQueue graphics_queue = vk_context::driver_context().graphics_queue();
+        VkCommandPool command_pool = create_single_command_pool();
+        VkCommandBuffer copy_cmd_buffer =
+          create_single_command_buffer(command_pool);
+
+        begin_command_buffer(copy_cmd_buffer,
+                             VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+
+        VkBufferCopy copy_region = { .size = p_size_of_bytes };
+
+        vkCmdCopyBuffer(
+          copy_cmd_buffer, p_src.handler, p_dst.handler, 1, &copy_region);
+        end_command_buffer(copy_cmd_buffer);
+
+        VkSubmitInfo submit_info{};
+        submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        submit_info.commandBufferCount = 1;
+        submit_info.pCommandBuffers = &copy_cmd_buffer;
+        vkQueueSubmit(graphics_queue, 1, &submit_info, nullptr);
+        vkQueueWaitIdle(graphics_queue);
+
+        vkFreeCommandBuffers(driver, command_pool, 1, &copy_cmd_buffer);
+        vkDestroyCommandPool(driver, command_pool, nullptr);
+    }
+    */
+
+    /*
     void copy(const vk_buffer& p_src,
               const vk_buffer& p_dst,
               uint32_t p_size_of_bytes) {
@@ -686,7 +703,9 @@ namespace atlas::vk {
         vkFreeCommandBuffers(driver, command_pool, 1, &copy_cmd_buffer);
         vkDestroyCommandPool(driver, command_pool, nullptr);
     }
+    */
 
+    /*
     void write(const vk_buffer& p_buffer,
                const void* p_data,
                size_t p_size_in_bytes) {
@@ -702,6 +721,7 @@ namespace atlas::vk {
         memcpy(mapped, p_data, p_size_in_bytes);
         vkUnmapMemory(driver, p_buffer.device_memory);
     }
+    */
 
     void vk_check_format(VkFormat p_format,
                          const char* p_function_name,

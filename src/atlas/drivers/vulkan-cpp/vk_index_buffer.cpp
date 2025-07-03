@@ -1,7 +1,7 @@
 #include <drivers/vulkan-cpp/vk_index_buffer.hpp>
 #include <drivers/vulkan-cpp/vk_context.hpp>
 #include <drivers/vulkan-cpp/helper_functions.hpp>
-#include <core/engine_logger.hpp>
+#include <drivers/vulkan-cpp/utilties/utils.hpp>
 
 namespace atlas::vk {
     vk_index_buffer::vk_index_buffer(const std::span<uint32_t>& p_indices) {
