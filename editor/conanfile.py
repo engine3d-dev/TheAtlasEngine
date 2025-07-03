@@ -18,13 +18,7 @@ class GameDemo(ConanFile):
     # To build engine3d/1.0 locally do the following:
     # conan create . --name=engine3d --version=0.1.0 --user=local --channel=12345
     def requirements(self):
-        self.requires("flecs/4.0.0")
-        self.requires("tinyobjloader/2.0.0-rc10")
-        self.requires("stb/cci.20230920")
-        self.requires("imguidocking/2.0")
-        self.requires("engine3d/1.0@local/2.0")
-
-        # measuring vtable and how do you do thta.
+        self.requires("atlas/0.1")
 
     def build(self):
         cmake = CMake(self)

@@ -1,12 +1,12 @@
 #include "editor_world.hpp"
 #include <core/engine_logger.hpp>
+#include <core/system_framework/system_registry.hpp>
 
 editor_world::editor_world() {
     console_log_fatal("Instantiate Default editor_world!");
 }
 
-editor_world::editor_world(const std::string& p_tag) {
-    // m_main_world = atlas::world_scope(p_tag);
+editor_world::editor_world([[maybe_unused]] const std::string& p_tag) {
     m_main_world = atlas::system_registry::create_world(p_tag);
 
     console_log_trace("m_main_world->get_tag() = {}", m_main_world->get_tag());
