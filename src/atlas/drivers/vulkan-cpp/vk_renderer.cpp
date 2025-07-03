@@ -8,8 +8,6 @@
 #include <core/scene/world.hpp>
 #include <drivers/vulkan-cpp/vk_types.hpp>
 
-#include <future>
-
 namespace atlas::vk {
 
 

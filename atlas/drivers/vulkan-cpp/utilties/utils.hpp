@@ -1,10 +1,8 @@
 #pragma once
-#include <string>
 #include <span>
 #include <vulkan/vulkan_core.h>
 #include <drivers/vulkan-cpp/vk_types.hpp>
 #include <drivers/vulkan-cpp/vk_command_buffer.hpp>
-#include <vector>
 
 namespace atlas::vk {
 
@@ -15,8 +13,8 @@ namespace atlas::vk {
 
     VkCommandPool create_single_command_pool();
 
-    VkCommandBuffer create_single_command_buffer(const VkCommandPool& p_command_pool);
-
+    VkCommandBuffer create_single_command_buffer(
+      const VkCommandPool& p_command_pool);
 
     void copy(vk_command_buffer& p_command_buffer,
               VkImage& p_image,
@@ -31,21 +29,23 @@ namespace atlas::vk {
               size_t p_size_of_bytes);
 
     /**
-	 * @brief maps the current buffer handler to some block of memory and the byte size for that chunk
-	*/
+     * @brief maps the current buffer handler to some block of memory and the
+     * byte size for that chunk
+     */
     void write(const vk_buffer& p_buffer,
                const void* p_data,
                size_t p_size_in_bytes);
 
     /**
-	 * @brief Maps buffer handler to chunk of data of type, that is std::span<uint32_t>.
-	*/
+     * @brief Maps buffer handler to chunk of data of type, that is
+     * std::span<uint32_t>.
+     */
     void write(const vk_buffer& p_buffer,
                const std::span<uint32_t>& p_in_buffer);
 
-	/**
-	 * @brief Maps buffer handler to data chunks that contain vertices
-	*/
+    /**
+     * @brief Maps buffer handler to data chunks that contain vertices
+     */
     void write(const vk_buffer& p_buffer,
                const std::span<vertex_input>& p_in_buffer);
 
@@ -65,23 +65,21 @@ namespace atlas::vk {
      * @brief This function creates a copy command buffer
      * @brief Meaning it should accept a created command buffer from the user
      * rather than constructing one itself
-	*/
+     */
     void transition_image_layout(VkImage& p_image,
                                  VkFormat p_format,
                                  VkImageLayout p_old,
                                  VkImageLayout p_new);
-    
-
 
     /**
      * @name image_memory_barrier
      * @brief pipeline barriers are generally used to synchronize access to
      * resources.
-	 * 
+     *
      * Ensuring that writing to a buffer completes before reading from
      * it, but also used when transitioning image layouts and transfer queue's
      * family ownership when VK_SHARING_MODE_EXCLUSIVE is used.
-	 * 
+     *
      * @param VkCommandBuffer is the command buffer we are executing after
      * recording this operation
      * @param VkImage is the image that will use our image we are transitioning
@@ -92,13 +90,11 @@ namespace atlas::vk {
      * @brief This function creates a copy command buffer
      * @brief Meaning it should accept a created command buffer from the user
      * rather than constructing one itself
-	*/
+     */
     void image_memory_barrier(VkCommandBuffer& p_command_buffer,
                               VkImage& p_image,
                               VkFormat p_format,
                               VkImageLayout p_old,
                               VkImageLayout p_new);
-
-    //
 
 };
