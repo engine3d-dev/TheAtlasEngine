@@ -68,15 +68,21 @@ set(
     
     ${SRC_DIR}/core/ui/widgets.cpp
 
+    # imgui stuff
+    ${VULKAN_SRC_DIR}/vk_imgui.cpp
+
     ## Vulkan Driver stuff
     ${VULKAN_SRC_DIR}/vk_window.cpp
     # ${VULKAN_SRC_DIR}/vulkan_core.cpp
     ${VULKAN_SRC_DIR}/helper_functions.cpp
+    # ${VULKAN_SRC_DIR}/utilities/utils.cpp
+    ${VULKAN_SRC_DIR}/utilities/utils.cpp
     ${VULKAN_SRC_DIR}/vk_context.cpp
     ${VULKAN_SRC_DIR}/vk_physical_driver.cpp
     ${VULKAN_SRC_DIR}/vk_driver.cpp
     ${VULKAN_SRC_DIR}/vk_command_buffer.cpp
     ${VULKAN_SRC_DIR}/vk_swapchain.cpp
+    ${VULKAN_SRC_DIR}/vk_graphics_queue.cpp
     ${VULKAN_SRC_DIR}/vk_present_queue.cpp
     ${VULKAN_SRC_DIR}/vk_renderpass.cpp
     ${VULKAN_SRC_DIR}/vk_shader_group.cpp
