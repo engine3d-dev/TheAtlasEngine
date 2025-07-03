@@ -267,7 +267,6 @@ namespace atlas::vk {
 		m_driver, m_swapchain_framebuffers[i], nullptr);
 		}
 
-		// vkDestroyRenderPass(m_driver, m_swapchain_renderpass, nullptr);
 		m_swapchain_main_renderpass.destroy();
 
 		m_present_to_queue.destroy();
@@ -277,14 +276,7 @@ namespace atlas::vk {
 		}
 
 		for (uint32_t i = 0; i < m_swapchain_depth_images.size(); i++) {
-			vkDestroyImageView(
-		m_driver, m_swapchain_depth_images[i].image_view, nullptr);
-
-			vkDestroyImage(
-		m_driver, m_swapchain_depth_images[i].image, nullptr);
-
-			vkFreeMemory(
-		m_driver, m_swapchain_depth_images[i].device_memory, nullptr);
+			free_image(m_driver, m_swapchain_depth_images[i]);
 		}
 
 		for (uint32_t i = 0; i < m_swapchain_images.size(); i++) {

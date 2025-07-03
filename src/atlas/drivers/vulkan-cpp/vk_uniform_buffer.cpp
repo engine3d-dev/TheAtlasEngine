@@ -30,7 +30,6 @@ namespace atlas::vk {
     }
 
     void vk_uniform_buffer::destroy() {
-        vkFreeMemory(m_driver, m_uniform_buffer_data.device_memory, nullptr);
-        vkDestroyBuffer(m_driver, m_uniform_buffer_data.handler, nullptr);
+        free_buffer(m_driver, m_uniform_buffer_data);
     }
 };

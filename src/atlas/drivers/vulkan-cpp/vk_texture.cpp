@@ -4,13 +4,10 @@
 #include <drivers/vulkan-cpp/vk_context.hpp>
 #include <drivers/vulkan-cpp/helper_functions.hpp>
 #include <drivers/vulkan-cpp/utilties/utils.hpp>
-#include <array>
 
 namespace atlas::vk {
 
     static vk_image create_texture_from_data(const VkDevice& p_driver, const texture_properties& p_properties, const void* p_data) {
-        // VkImageUsageFlagBits usage = (VkImageUsageFlagBits)(VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
-        // VkMemoryPropertyFlagBits property = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
 
         command_buffer_settings settings = {
             0,
@@ -20,22 +17,20 @@ namespace atlas::vk {
 
         vk_command_buffer copy_command_buffer = vk_command_buffer(settings);
 
-        // 1. create image  object
+        // 1. create image object
         vk_image texture_image = create_image2d(p_properties.width, p_properties.height, p_properties.format, p_properties.usage, p_properties.property);
 
         // 2. update texture data
-        // update_texture(m_texture_image, p_width, p_height, p_format, p_data);
-
-        // 1. bytes per pixels
+        // bytes per pixels
         int bytes_per_pixels = bytes_per_texture_format(p_properties.format);
 
-        // 2. layer_size
+        // 2.2 layer_size
         uint32_t layer_size = p_properties.width * p_properties.height * bytes_per_pixels;
         int layer_count = 1;
         uint32_t image_size = layer_count * layer_size;
 
 
-        // 3. creating data for staging buffers
+        // 2.3 transfer data from staging buffer
         vk_buffer_info staging_info = {
             .device_size = (uint32_t)image_size,
             .usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
@@ -140,6 +135,7 @@ namespace atlas::vk {
             m_is_image_loaded = false;
             return;
         }
+
         texture_properties texture_settings = {
             .width = m_width,
             .height = m_height,
@@ -168,12 +164,6 @@ namespace atlas::vk {
     }
 
     void texture::destroy() {
-        // vkDestroyImageView(m_driver, m_texture_image.image_view, nullptr);
-        // vkDestroyImage(m_driver, m_texture_image.image, nullptr);
-        // vkDestroySampler(m_driver, m_texture_image.sampler, nullptr);
-
-        // vkFreeMemory(m_driver, m_texture_image.device_memory, nullptr);
         free_image(m_driver, m_texture_image);
-
     }
 };

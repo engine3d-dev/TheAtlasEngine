@@ -60,15 +60,6 @@ namespace atlas::vk {
     }
 
     void vk_vertex_buffer::destroy() {
-        if (m_vertex_handler.device_memory != nullptr) {
-            vkFreeMemory(m_driver, m_vertex_handler.device_memory, nullptr);
-        }
-
-        if (m_vertex_handler.handler != nullptr) {
-            vkDestroyBuffer(m_driver, m_vertex_handler.handler, nullptr);
-        }
-
-        m_vertex_handler.allocation_size = 0;
-        // m_vertex_handler = {};
+        free_buffer(m_driver, m_vertex_handler);
     }
 };

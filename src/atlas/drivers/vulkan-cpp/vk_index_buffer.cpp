@@ -30,13 +30,6 @@ namespace atlas::vk {
     }
 
     void vk_index_buffer::destroy() {
-        if (m_index_buffer_handler.device_memory != nullptr) {
-            vkFreeMemory(
-              m_driver, m_index_buffer_handler.device_memory, nullptr);
-        }
-
-        if (m_index_buffer_handler.handler != nullptr) {
-            vkDestroyBuffer(m_driver, m_index_buffer_handler.handler, nullptr);
-        }
+        free_buffer(m_driver, m_index_buffer_handler);
     }
 };

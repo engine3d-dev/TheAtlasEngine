@@ -355,15 +355,30 @@ namespace atlas::vk {
     }
 
     void free_buffer(const VkDevice& p_driver, vk_buffer& p_buffer) {
-        vkDestroyBuffer(p_driver, p_buffer.handler, nullptr);
-        vkFreeMemory(p_driver, p_buffer.device_memory, nullptr);
+        if(p_buffer.handler != nullptr) {
+            vkDestroyBuffer(p_driver, p_buffer.handler, nullptr);
+        }
+        
+        if(p_buffer.device_memory != nullptr) {
+            vkFreeMemory(p_driver, p_buffer.device_memory, nullptr);
+        }
     }
 
     void free_image(const VkDevice& p_driver, vk_image& p_image) {
-        vkDestroyImageView(p_driver, p_image.image_view, nullptr);
-        vkDestroyImage(p_driver, p_image.image, nullptr);
-        vkDestroySampler(p_driver, p_image.sampler, nullptr);
-        vkFreeMemory(p_driver, p_image.device_memory, nullptr);
+        if(p_image.image_view != nullptr) {
+            vkDestroyImageView(p_driver, p_image.image_view, nullptr);
+        }
+
+        if(p_image.image != nullptr) {
+            vkDestroyImage(p_driver, p_image.image, nullptr);
+        }
+        if(p_image.sampler != nullptr) {
+            vkDestroySampler(p_driver, p_image.sampler, nullptr);
+        }
+
+        if(p_image.device_memory != nullptr) {
+            vkFreeMemory(p_driver, p_image.device_memory, nullptr);
+        }
     }
 
     std::string vk_present_mode_to_string(VkPresentModeKHR p_present_mode) {
