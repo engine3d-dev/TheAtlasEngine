@@ -51,7 +51,6 @@ namespace atlas {
 
     private:
         ref<window> m_window;
-        bool m_is_application_running=true;
         scope<renderer> m_renderer = nullptr; 
         uint32_t m_current_frame_index=-1;
         vk::imgui_context m_ui_context;
