@@ -187,7 +187,6 @@ namespace atlas::vk {
                 // std::future<mesh> launch_mesh_loading = std::async(std::launch::async, [target](){ return mesh(target->model_path); } );
                 // mesh new_mesh = launch_mesh_loading.get();
                 mesh new_mesh(std::filesystem::path(target->model_path));
-                console_log_error("loaded = {}", new_mesh.loaded());
                 if(new_mesh.loaded()) {
                     m_cached_meshes.emplace(name, new_mesh);
 
@@ -205,8 +204,6 @@ namespace atlas::vk {
                     m_geometry_descriptor_layout.push_back(m_geometry_descriptor[name].get_layout());
                 }
             });
-
-            console_log_trace("m_geometry_descriptor_layout.size() = {}", m_geometry_descriptor_layout.size());
 
             m_main_pipeline = vk_pipeline(m_main_swapchain.swapchain_renderpass(), m_shader_group, m_geometry_descriptor_layout);
             m_begin_initialize = false; 
