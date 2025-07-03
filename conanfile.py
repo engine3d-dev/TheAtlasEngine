@@ -27,6 +27,7 @@ class AtlasRecipe(ConanFile):
         self.tool_requires("engine3d-cmake-utils/4.0")
 
     def requirements(self):
+        self.requires("glslang/1.3.261.1");
         self.requires("joltphysics/5.2.0")
         self.requires("shaderc/2024.1")
         self.requires("imguidocking/2.0")
