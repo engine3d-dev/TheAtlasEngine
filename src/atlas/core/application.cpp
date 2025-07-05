@@ -21,14 +21,18 @@ namespace atlas {
         window_settings settings = {
             .width = p_settings.Width,
             .height = p_settings.Height,
-            .name = p_settings.Name
+            .name = p_settings.Name,
         };
         m_window = create_window(settings);
 
-        m_renderer = create_scope<renderer>(m_window->current_swapchain(), "Renderer");
-        m_renderer->set_background_color({1.f, 0.5f, 0.5f, 1.f});
+        m_renderer =
+          create_scope<renderer>(m_window->current_swapchain(), "Renderer");
+        m_renderer->set_background_color({ 1.f, 0.5f, 0.5f, 1.f });
 
-        m_ui_context = vk::imgui_context(*m_window, m_window->current_swapchain(), m_window->current_swapchain().swapchain_renderpass());
+        m_ui_context = vk::imgui_context(
+          *m_window,
+          m_window->current_swapchain(),
+          m_window->current_swapchain().swapchain_renderpass());
         s_instance = this;
     }
 
@@ -68,23 +72,27 @@ namespace atlas {
     void application::execute() {
         float previous_time = 0.f;
         console_log_info("Executing mainloop!");
-        // uint32_t currently_active_frame=0; // command buffers to process commands
+        // uint32_t currently_active_frame=0; // command buffers to process
+        // commands
 
-        
         while (m_window->available()) {
             float current_time = (float)glfwGetTime();
             g_delta_time = (current_time - previous_time);
             previous_time = current_time;
-            
+
             m_current_frame_index = m_window->acquired_next_frame();
-            
+
             // Current commands that are going to be iterated through
-            // Prevents things like stalling so the CPU doesnt have to wait for the GPU to fully complete before starting on the next frame
-            // Command buffer uses this to track the frames to process its commands
-            // currently_active_frame = (m_current_frame_index + 1) % m_window->current_swapchain().settings().frames_in_flight;
+            // Prevents things like stalling so the CPU doesnt have to wait for
+            // the GPU to fully complete before starting on the next frame
+            // Command buffer uses this to track the frames to process its
+            // commands currently_active_frame = (m_current_frame_index + 1) %
+            // m_window->current_swapchain().settings().frames_in_flight;
             // TODO: Going to need to figure out where to put this
-            // Added this here because to ensure the handlers being used by the renderer is in sync when swapchain is resized 
-            vk::vk_command_buffer currently_active = m_window->active_command_buffer(m_current_frame_index);
+            // Added this here because to ensure the handlers being used by the
+            // renderer is in sync when swapchain is resized
+            vk::vk_command_buffer currently_active =
+              m_window->active_command_buffer(m_current_frame_index);
 
             event::update_events();
 
@@ -92,14 +100,17 @@ namespace atlas {
 
             sync_update::on_physics_update();
 
-            // TODO: Introduce scene renderer that will make use of the begin/end semantics for setting up tasks during pre-frame operations
+            // TODO: Introduce scene renderer that will make use of the
+            // begin/end semantics for setting up tasks during pre-frame
+            // operations
             m_renderer->begin(currently_active, m_window->current_swapchain());
-            
-            // TODO: UI will have its own renderpass, command buffers, and framebuffers specifically for UI-widgets
+
+            // TODO: UI will have its own renderpass, command buffers, and
+            // framebuffers specifically for UI-widgets
             m_ui_context.begin(currently_active, m_current_frame_index);
 
             sync_update::on_ui_update();
-            
+
             m_ui_context.end();
 
             m_renderer->end();

@@ -43,7 +43,7 @@ namespace atlas {
 
         static uint32_t current_frame();
 
-        //! @brief Returns uint32_t the size of images the swapchain accepts 
+        //! @brief Returns uint32_t the size of images the swapchain accepts
         static uint32_t image_size();
 
     private:
@@ -51,8 +51,8 @@ namespace atlas {
 
     private:
         ref<window> m_window;
-        scope<renderer> m_renderer = nullptr; 
-        uint32_t m_current_frame_index=-1;
+        scope<renderer> m_renderer = nullptr;
+        uint32_t m_current_frame_index = -1;
         vk::imgui_context m_ui_context;
         static application* s_instance;
     };

@@ -5,28 +5,19 @@
 #include <filesystem>
 
 namespace atlas::vk {
-    // void vk_check(VkResult result,
-    //               const char* p_tag,
-    //               const char* p_filepath,
-    //               uint32_t p_line,
-    //               const char* p_function_name) {
-    //     if (result != VK_SUCCESS) {
-    //         console_log_info_tagged("vulkan",
-    //                                 "VkResult failed taking in {0} file: {1} "
-    //                                 "--- Line: {2} --- In Function: {3}",
-    //                                 p_tag,
-    //                                 p_filepath,
-    //                                 p_line,
-    //                                 p_function_name);
-    //         console_log_info_tagged(
-    //           "vulkan", "VkResult returned: {}", (int)result);
-    //     }
-    // }
 
-    void vk_check(const VkResult& p_result, const std::string& p_name, const std::source_location& p_source) {
+    void vk_check(const VkResult& p_result,
+                  const std::string& p_name,
+                  const std::source_location& p_source) {
         if (p_result != VK_SUCCESS) {
-            console_log_error_tagged("vulkan", "File {} on line {} failed VkResult check", std::filesystem::relative(p_source.file_name()).string(), p_source.line());
-            console_log_error_tagged("vulkan", "Current Function Location = {}", p_source.function_name());
+            console_log_error_tagged(
+              "vulkan",
+              "File {} on line {} failed VkResult check",
+              std::filesystem::relative(p_source.file_name()).string(),
+              p_source.line());
+            console_log_error_tagged("vulkan",
+                                     "Current Function Location = {}",
+                                     p_source.function_name());
             console_log_error_tagged(
               "vulkan", "{} VkResult returned: {}", p_name, (int)p_result);
         }
@@ -264,7 +255,8 @@ namespace atlas::vk {
             case command_buffer_levels::max_enum:
                 return VK_COMMAND_BUFFER_LEVEL_MAX_ENUM;
         }
-        console_log_fatal("Failed to return command buffer level {}", (int)p_level);
+        console_log_fatal("Failed to return command buffer level {}",
+                          (int)p_level);
         assert(false);
     }
 
@@ -341,28 +333,28 @@ namespace atlas::vk {
     }
 
     void free_buffer(const VkDevice& p_driver, vk_buffer& p_buffer) {
-        if(p_buffer.handler != nullptr) {
+        if (p_buffer.handler != nullptr) {
             vkDestroyBuffer(p_driver, p_buffer.handler, nullptr);
         }
-        
-        if(p_buffer.device_memory != nullptr) {
+
+        if (p_buffer.device_memory != nullptr) {
             vkFreeMemory(p_driver, p_buffer.device_memory, nullptr);
         }
     }
 
     void free_image(const VkDevice& p_driver, vk_image& p_image) {
-        if(p_image.image_view != nullptr) {
+        if (p_image.image_view != nullptr) {
             vkDestroyImageView(p_driver, p_image.image_view, nullptr);
         }
 
-        if(p_image.image != nullptr) {
+        if (p_image.image != nullptr) {
             vkDestroyImage(p_driver, p_image.image, nullptr);
         }
-        if(p_image.sampler != nullptr) {
+        if (p_image.sampler != nullptr) {
             vkDestroySampler(p_driver, p_image.sampler, nullptr);
         }
 
-        if(p_image.device_memory != nullptr) {
+        if (p_image.device_memory != nullptr) {
             vkFreeMemory(p_driver, p_image.device_memory, nullptr);
         }
     }
@@ -898,13 +890,13 @@ namespace atlas::vk {
     }
 
     VkFormat to_vk_format(const format& p_format) {
-        switch (p_format){
-        case format::rg32_sfloat:
-            return VK_FORMAT_R32G32_SFLOAT;
-        case format::rgb32_sfloat:
-            return VK_FORMAT_R32G32B32A32_SFLOAT;
-        default:
-            return VK_FORMAT_UNDEFINED;
+        switch (p_format) {
+            case format::rg32_sfloat:
+                return VK_FORMAT_R32G32_SFLOAT;
+            case format::rgb32_sfloat:
+                return VK_FORMAT_R32G32B32A32_SFLOAT;
+            default:
+                return VK_FORMAT_UNDEFINED;
         }
     }
 
@@ -938,6 +930,8 @@ namespace atlas::vk {
                 return 4 * sizeof(uint16_t);
             case VK_FORMAT_R32G32B32A32_SFLOAT:
                 return 4 * sizeof(float);
+            case VK_FORMAT_R8G8B8A8_SRGB:
+                return 4 * sizeof(uint8_t);
             default:
                 console_log_fatal("Error unknown format!!!");
                 return 0;
@@ -974,105 +968,109 @@ namespace atlas::vk {
         return final_image_count;
     }
 
-    VkPipelineBindPoint to_vk_pipeline_bind_point(const pipeline_bind_point& p_bind_point) {
-        switch (p_bind_point){
-        case pipeline_bind_point::graphics:
-            return VK_PIPELINE_BIND_POINT_GRAPHICS;
-        case pipeline_bind_point::compute:
-            return VK_PIPELINE_BIND_POINT_COMPUTE;
-        case pipeline_bind_point::ray_tracing_khr:
-            return VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR;
-        case pipeline_bind_point::subpass_shading_hauwei:
-            return VK_PIPELINE_BIND_POINT_SUBPASS_SHADING_HUAWEI;
-        case pipeline_bind_point::ray_tracing_nv:
-            return VK_PIPELINE_BIND_POINT_RAY_TRACING_NV;
-        case pipeline_bind_point::max_enum:
-            return VK_PIPELINE_BIND_POINT_MAX_ENUM;
-        default:
-            break;
+    VkPipelineBindPoint to_vk_pipeline_bind_point(
+      const pipeline_bind_point& p_bind_point) {
+        switch (p_bind_point) {
+            case pipeline_bind_point::graphics:
+                return VK_PIPELINE_BIND_POINT_GRAPHICS;
+            case pipeline_bind_point::compute:
+                return VK_PIPELINE_BIND_POINT_COMPUTE;
+            case pipeline_bind_point::ray_tracing_khr:
+                return VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR;
+            case pipeline_bind_point::subpass_shading_hauwei:
+                return VK_PIPELINE_BIND_POINT_SUBPASS_SHADING_HUAWEI;
+            case pipeline_bind_point::ray_tracing_nv:
+                return VK_PIPELINE_BIND_POINT_RAY_TRACING_NV;
+            case pipeline_bind_point::max_enum:
+                return VK_PIPELINE_BIND_POINT_MAX_ENUM;
+            default:
+                break;
         }
     }
 
-    VkAttachmentLoadOp to_vk_attachment_load(attachment_load p_attachment_type) {
-        switch (p_attachment_type){
-        case attachment_load::load:
-            return VK_ATTACHMENT_LOAD_OP_LOAD ;
-        case attachment_load::clear:
-            return VK_ATTACHMENT_LOAD_OP_CLEAR;
-        case attachment_load::dont_care:
-            return VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-        case attachment_load::none_khr:
-            return VK_ATTACHMENT_LOAD_OP_NONE_KHR;
-        case attachment_load::none_ext:
-            return VK_ATTACHMENT_LOAD_OP_NONE_EXT;
-        case attachment_load::max_enum:
-            return VK_ATTACHMENT_LOAD_OP_MAX_ENUM;
+    VkAttachmentLoadOp to_vk_attachment_load(
+      attachment_load p_attachment_type) {
+        switch (p_attachment_type) {
+            case attachment_load::load:
+                return VK_ATTACHMENT_LOAD_OP_LOAD;
+            case attachment_load::clear:
+                return VK_ATTACHMENT_LOAD_OP_CLEAR;
+            case attachment_load::dont_care:
+                return VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+            case attachment_load::none_khr:
+                return VK_ATTACHMENT_LOAD_OP_NONE_KHR;
+            case attachment_load::none_ext:
+                return VK_ATTACHMENT_LOAD_OP_NONE_EXT;
+            case attachment_load::max_enum:
+                return VK_ATTACHMENT_LOAD_OP_MAX_ENUM;
         }
     }
 
-    VkAttachmentStoreOp to_vk_attachment_store(const attachment_store& p_attachment_type) {
-        switch (p_attachment_type){
-        case attachment_store::store:
-            return VK_ATTACHMENT_STORE_OP_STORE;
-        case attachment_store::dont_care:
-            return VK_ATTACHMENT_STORE_OP_DONT_CARE;
-        case attachment_store::none_khr:
-            return VK_ATTACHMENT_STORE_OP_NONE_KHR;
-        case attachment_store::none_qcom:
-            return VK_ATTACHMENT_STORE_OP_NONE_QCOM;
-        case attachment_store::none_ext:
-            return VK_ATTACHMENT_STORE_OP_NONE_EXT;
-        case attachment_store::max_enum:
-            return VK_ATTACHMENT_STORE_OP_MAX_ENUM;
-        default:
-            break;
+    VkAttachmentStoreOp to_vk_attachment_store(
+      const attachment_store& p_attachment_type) {
+        switch (p_attachment_type) {
+            case attachment_store::store:
+                return VK_ATTACHMENT_STORE_OP_STORE;
+            case attachment_store::dont_care:
+                return VK_ATTACHMENT_STORE_OP_DONT_CARE;
+            case attachment_store::none_khr:
+                return VK_ATTACHMENT_STORE_OP_NONE_KHR;
+            case attachment_store::none_qcom:
+                return VK_ATTACHMENT_STORE_OP_NONE_QCOM;
+            case attachment_store::none_ext:
+                return VK_ATTACHMENT_STORE_OP_NONE_EXT;
+            case attachment_store::max_enum:
+                return VK_ATTACHMENT_STORE_OP_MAX_ENUM;
+            default:
+                break;
         }
     }
 
-    VkSampleCountFlagBits to_vk_sample_count_bits(const sample_bit& p_sample_count_bit) {
-        switch (p_sample_count_bit){
-        case sample_bit::count_1:
-            return VK_SAMPLE_COUNT_1_BIT;
-        case sample_bit::count_2:
-            return VK_SAMPLE_COUNT_2_BIT;
-        case sample_bit::count_4:
-            return VK_SAMPLE_COUNT_4_BIT;
-        case sample_bit::count_8:
-            return VK_SAMPLE_COUNT_8_BIT;
-        case sample_bit::count_16:
-            return VK_SAMPLE_COUNT_16_BIT;
-        case sample_bit::count_32:
-            return VK_SAMPLE_COUNT_32_BIT;
-        case sample_bit::count_64:
-            return VK_SAMPLE_COUNT_64_BIT;
-        case sample_bit::max_enum:
-            return VK_SAMPLE_COUNT_FLAG_BITS_MAX_ENUM;
+    VkSampleCountFlagBits to_vk_sample_count_bits(
+      const sample_bit& p_sample_count_bit) {
+        switch (p_sample_count_bit) {
+            case sample_bit::count_1:
+                return VK_SAMPLE_COUNT_1_BIT;
+            case sample_bit::count_2:
+                return VK_SAMPLE_COUNT_2_BIT;
+            case sample_bit::count_4:
+                return VK_SAMPLE_COUNT_4_BIT;
+            case sample_bit::count_8:
+                return VK_SAMPLE_COUNT_8_BIT;
+            case sample_bit::count_16:
+                return VK_SAMPLE_COUNT_16_BIT;
+            case sample_bit::count_32:
+                return VK_SAMPLE_COUNT_32_BIT;
+            case sample_bit::count_64:
+                return VK_SAMPLE_COUNT_64_BIT;
+            case sample_bit::max_enum:
+                return VK_SAMPLE_COUNT_FLAG_BITS_MAX_ENUM;
         }
     }
 
     VkImageLayout to_vk_image_layout(const image_layout& p_layout) {
-        switch (p_layout){
-        case image_layout::undefined:
-            return VK_IMAGE_LAYOUT_UNDEFINED;
-        case image_layout::general:
-            return VK_IMAGE_LAYOUT_GENERAL;
-        case image_layout::color_optimal:
-            return VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-        case image_layout::depth_stencil_optimal:
-            return VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-        case image_layout::depth_stencil_read_only_optimal:
-            return VK_IMAGE_LAYOUT_DEPTH_READ_ONLY_STENCIL_ATTACHMENT_OPTIMAL;
+        switch (p_layout) {
+            case image_layout::undefined:
+                return VK_IMAGE_LAYOUT_UNDEFINED;
+            case image_layout::general:
+                return VK_IMAGE_LAYOUT_GENERAL;
+            case image_layout::color_optimal:
+                return VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+            case image_layout::depth_stencil_optimal:
+                return VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+            case image_layout::depth_stencil_read_only_optimal:
+                return VK_IMAGE_LAYOUT_DEPTH_READ_ONLY_STENCIL_ATTACHMENT_OPTIMAL;
         }
     }
 
     VkVertexInputRate to_vk_input_rate(const input_rate& p_input_rate) {
-        switch (p_input_rate){
-        case input_rate::vertex:
-            return VK_VERTEX_INPUT_RATE_VERTEX;
-        case input_rate::instance:
-            return VK_VERTEX_INPUT_RATE_INSTANCE;
-        default:
-            return VK_VERTEX_INPUT_RATE_MAX_ENUM;
+        switch (p_input_rate) {
+            case input_rate::vertex:
+                return VK_VERTEX_INPUT_RATE_VERTEX;
+            case input_rate::instance:
+                return VK_VERTEX_INPUT_RATE_INSTANCE;
+            default:
+                return VK_VERTEX_INPUT_RATE_MAX_ENUM;
         }
     }
 };

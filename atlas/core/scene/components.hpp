@@ -66,10 +66,10 @@ namespace atlas {
      * @brief This is because we can have multiple things that could be reloaded
      * @brief Such as the single texture and the mesh .obj 3d model as well
      * @brief
-    */
+     */
     struct reload {
-        bool on_reload=false;
-        bool on_texture_reload=false;
+        bool on_reload = false;
+        bool on_texture_reload = false;
     };
 
     //! @note Contains our render target as the mesh
@@ -79,17 +79,19 @@ namespace atlas {
     // struct rendertarget3d {
     //     std::string model_path; // used to load in a model
     //     std::string Filepath; // used for texture
-    //     // bool is_model_dirty=false; // checks if the model is needing to reload
-    //     bool is_texture_dirty=false; // checking if texture is needing to reload
+    //     // bool is_model_dirty=false; // checks if the model is needing to
+    //     reload bool is_texture_dirty=false; // checking if texture is needing
+    //     to reload
     // };
 
     struct material {
-        glm::vec4 color{1.f};
-        std::string model_path="";
-        std::string texture_path=""; // This just contains the path to load the texture
+        glm::vec4 color{ 1.f };
+        std::string model_path = "";
+        std::string texture_path =
+          ""; // This just contains the path to load the texture
         std::vector<std::string> texture_filepaths;
-        bool model_reload=false;
-        bool texture_reload=false;
+        bool model_reload = false;
+        bool texture_reload = false;
     };
 
     // An abstract camera class that processes input and calculates the
@@ -114,7 +116,8 @@ namespace atlas {
     public:
         camera() = default;
         // constructor with vectors
-        camera(float p_aspect_ratio, glm::vec3 position = glm::vec3(0.0f, 1.50f, 0.0f),
+        camera(float p_aspect_ratio,
+               glm::vec3 position = glm::vec3(0.0f, 1.50f, 0.0f),
                glm::vec3 up = glm::vec3(0.0f, -1.0f, 0.0f),
                float yaw = -90.0f,
                float pitch = 0.0f)
