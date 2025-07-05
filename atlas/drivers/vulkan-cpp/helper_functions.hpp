@@ -4,21 +4,29 @@
 #include <vulkan/vulkan_core.h>
 #include <drivers/vulkan-cpp/vk_types.hpp>
 #include <drivers/vulkan-cpp/vk_command_buffer.hpp>
+#include <source_location>
 
 namespace atlas::vk {
 
-    //! @brief Checks for valid `VkResult` was successful
-    void vk_check(VkResult p_result,
-                  const char* p_tag,
-                  const char* p_filepath,
-                  uint32_t p_line,
-                  const char* p_function_name);
+    /**
+     * @param p_result checks if the result of a vulkan handler was created
+     * correctly
+     * @param p_name used for debugging of which handler failed
+     * @param p_source is the location of the call-site that invoked vk_check
+     */
+    void vk_check(
+      const VkResult& p_result,
+      const std::string& p_name,
+      const std::source_location& p_source = std::source_location::current());
 
     //! @brief Checks for valid `VkFormat` specified.
     void vk_check_format(VkFormat p_format,
                          const char* p_filepath,
                          uint32_t p_line,
                          const char* p_function_name);
+	
+	//! @brief converts high-level specifications of format to VkFormat
+    VkFormat to_vk_format(const format& p_format);
 
     /**
      * @param p_image is the image handler to create a view handler from
@@ -57,11 +65,19 @@ namespace atlas::vk {
 
     VkSampler create_sampler(const vk_filter_range& p_range,
                              VkSamplerAddressMode p_address_mode);
-	
 
-	void free_buffer(const VkDevice& p_driver, vk_buffer& p_buffer);
+    /**
+     * @param p_driver current logical device to associate this image creation
+     * to
+     * @param p_extent image extent of properties required for creating the
+     * image
+     */
+    vk_image_handle create_image2d(const VkDevice& p_driver,
+                                   const image_extent& p_extent);
 
-	void free_image(const VkDevice& p_driver, vk_image& p_image);
+    void free_buffer(const VkDevice& p_driver, vk_buffer& p_buffer);
+
+    void free_image(const VkDevice& p_driver, vk_image& p_image);
 
     VkShaderStageFlags to_vk_shader_stage(const shader_stage& p_stage);
 
@@ -110,4 +126,19 @@ namespace atlas::vk {
     //! `VkSurfaceKHR` that is supported
     uint32_t select_images_size(
       const VkSurfaceCapabilitiesKHR& p_surface_capabilities);
+
+    VkPipelineBindPoint to_vk_pipeline_bind_point(
+      const pipeline_bind_point& p_bind_point);
+
+    VkAttachmentLoadOp to_vk_attachment_load(attachment_load p_attachment_type);
+
+    VkAttachmentStoreOp to_vk_attachment_store(
+      const attachment_store& p_attachment_type);
+
+    VkSampleCountFlagBits to_vk_sample_count_bits(
+      const sample_bit& p_sample_count_bit);
+
+    VkImageLayout to_vk_image_layout(const image_layout& p_layout);
+
+    VkVertexInputRate to_vk_input_rate(const input_rate& p_input_rate);
 };

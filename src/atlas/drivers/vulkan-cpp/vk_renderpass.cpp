@@ -13,6 +13,71 @@ namespace atlas::vk {
         configure(m_renderpass_options);
     }
 
+    /*
+    vk_renderpass::vk_renderpass(const renderpass_options&
+    p_renderpass_configuration) { m_driver = vk_context::driver_context();
+
+            configure(p_renderpass_configuration);
+    }
+    */
+
+    /*
+    void vk_renderpass::configure([[maybe_unused]] const renderpass_options&
+    p_renderpass_options) { std::vector<VkAttachmentDescription>
+    attachments(p_renderpass_options.color_attachments.size());
+            std::vector<VkAttachmentReference>
+    color_attachment_references(p_renderpass_options.color_attachments.size());
+            std::vector<VkAttachmentReference>
+    depth_attachment_references(p_renderpass_options.color_attachments.size());
+
+            for(uint32_t i = 0; i <
+    p_renderpass_options.color_attachments.size(); i++) { renderpass_attachment
+    attachment = p_renderpass_options.color_attachments[i]; attachments[i] = {
+                            .flags = 0,
+                            .format = to_vk_format(attachment.format),
+                            .samples =
+    to_vk_sample_count_bits(attachment.sample_count), .loadOp =
+    to_vk_attachment_load(attachment.load), .storeOp =
+    to_vk_attachment_store(attachment.store), .stencilLoadOp =
+    to_vk_attachment_load(attachment.stencil_load), .stencilStoreOp =
+    to_vk_attachment_store(attachment.stencil_store), .initialLayout =
+    to_vk_image_layout(attachment.initial), .finalLayout =
+    to_vk_image_layout(attachment.finalize)
+                    };
+
+                    if(attachment.type == renderpass_type::color) {
+                            color_attachment_references[i] = {
+                                    .attachment = i,
+                                    .layout =
+    to_vk_image_layout(attachment.layout)
+                            };
+                    }
+                    else if(attachment.type == renderpass_type::depth) {
+                            depth_attachment_references[i] = {
+                                    .attachment = i,
+                                    .layout =
+    to_vk_image_layout(attachment.layout)
+                            };
+                    }
+            }
+            VkSubpassDescription subpass_description = {
+                    .flags = 0,
+        .pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
+        .inputAttachmentCount = 0,
+        .pInputAttachments = nullptr,
+        .colorAttachmentCount =
+    static_cast<uint32_t>(color_attachment_references.size()),
+        .pColorAttachments = color_attachment_references.data(),
+        .pResolveAttachments = nullptr,
+        .pDepthStencilAttachment = depth_attachment_references.data(), // enable
+    depth buffering .preserveAttachmentCount = 0, .pPreserveAttachments =
+    nullptr
+            };
+
+
+    }
+    */
+
     void vk_renderpass::configure(
       const vk_renderpass_options& p_renderpass_options) {
         // We reconfigure this swapchain to use the following set renderpass
@@ -42,7 +107,7 @@ namespace atlas::vk {
         VkResult res = vkCreateRenderPass(
           m_driver, &renderpass_ci, nullptr, &m_renderpass_handler);
 
-        vk_check(res, "vkCreateRenderPass", __FILE__, __LINE__, __FUNCTION__);
+        vk_check(res, "vkCreateRenderPass");
     }
 
     void vk_renderpass::destroy() {

@@ -2,23 +2,33 @@
 #include <vulkan/vulkan_core.h>
 #include <drivers/vulkan-cpp/vk_context.hpp>
 #include <core/engine_logger.hpp>
+#include <filesystem>
 
 namespace atlas::vk {
-    void vk_check(VkResult result,
-                  const char* p_tag,
-                  const char* p_filepath,
-                  uint32_t p_line,
-                  const char* p_function_name) {
-        if (result != VK_SUCCESS) {
-            console_log_info_tagged("vulkan",
-                                    "VkResult failed taking in {0} file: {1} "
-                                    "--- Line: {2} --- In Function: {3}",
-                                    p_tag,
-                                    p_filepath,
-                                    p_line,
-                                    p_function_name);
-            console_log_info_tagged(
-              "vulkan", "VkResult returned: {}", (int)result);
+    // void vk_check(VkResult result,
+    //               const char* p_tag,
+    //               const char* p_filepath,
+    //               uint32_t p_line,
+    //               const char* p_function_name) {
+    //     if (result != VK_SUCCESS) {
+    //         console_log_info_tagged("vulkan",
+    //                                 "VkResult failed taking in {0} file: {1} "
+    //                                 "--- Line: {2} --- In Function: {3}",
+    //                                 p_tag,
+    //                                 p_filepath,
+    //                                 p_line,
+    //                                 p_function_name);
+    //         console_log_info_tagged(
+    //           "vulkan", "VkResult returned: {}", (int)result);
+    //     }
+    // }
+
+    void vk_check(const VkResult& p_result, const std::string& p_name, const std::source_location& p_source) {
+        if (p_result != VK_SUCCESS) {
+            console_log_error_tagged("vulkan", "File {} on line {} failed VkResult check", std::filesystem::relative(p_source.file_name()).string(), p_source.line());
+            console_log_error_tagged("vulkan", "Current Function Location = {}", p_source.function_name());
+            console_log_error_tagged(
+              "vulkan", "{} VkResult returned: {}", p_name, (int)p_result);
         }
     }
 
@@ -56,10 +66,7 @@ namespace atlas::vk {
         // 1. creating our buffer
         vk_check(
           vkCreateBuffer(driver, &buffer_ci, nullptr, &new_buffer.handler),
-          "vkCreateBuffer",
-          __FILE__,
-          __LINE__,
-          __FUNCTION__);
+          "vkCreateBuffer");
 
         // 2.  getting buffer memory requirements
         VkMemoryRequirements memory_requirements = {};
@@ -84,18 +91,12 @@ namespace atlas::vk {
         vk_check(
           vkAllocateMemory(
             driver, &memory_alloc_info, nullptr, &new_buffer.device_memory),
-          "vkAllocateMemory",
-          __FILE__,
-          __LINE__,
-          __FUNCTION__);
+          "vkAllocateMemory");
 
         // 5. bind memory
         vk_check(vkBindBufferMemory(
                    driver, new_buffer.handler, new_buffer.device_memory, 0),
-                 "vkBindBufferMemory",
-                 __FILE__,
-                 __LINE__,
-                 __FUNCTION__);
+                 "vkBindBufferMemory");
 
         return new_buffer;
     }
@@ -125,7 +126,7 @@ namespace atlas::vk {
         VkImageView image_view = nullptr;
         VkResult res =
           vkCreateImageView(driver, &view_info, nullptr, &image_view);
-        vk_check(res, "vkCreateImageView", __FILE__, __LINE__, __FUNCTION__);
+        vk_check(res, "vkCreateImageView");
         return image_view;
     }
 
@@ -157,10 +158,7 @@ namespace atlas::vk {
         VkImageView image_view;
         vk_check(
           vkCreateImageView(p_driver, &image_view_ci, nullptr, &image_view),
-          "vkCreateImageView",
-          __FILE__,
-          __LINE__,
-          __FUNCTION__);
+          "vkCreateImageView");
 
         return image_view;
     }
@@ -194,10 +192,7 @@ namespace atlas::vk {
         vk_image image;
 
         vk_check(vkCreateImage(driver, &image_ci, nullptr, &image.image),
-                 "vkCreateImage",
-                 __FILE__,
-                 __LINE__,
-                 __FUNCTION__);
+                 "vkCreateImage");
 
         // 2. get buffer memory requirements
         VkMemoryRequirements memory_requirements;
@@ -217,17 +212,11 @@ namespace atlas::vk {
 
         vk_check(vkAllocateMemory(
                    driver, &memory_alloc_info, nullptr, &image.device_memory),
-                 "vkAllocateMemory",
-                 __FILE__,
-                 __LINE__,
-                 __FUNCTION__);
+                 "vkAllocateMemory");
 
         // 5. bind image memory
         vk_check(vkBindImageMemory(driver, image.image, image.device_memory, 0),
-                 "vkBindImageMemory",
-                 __FILE__,
-                 __LINE__,
-                 __FUNCTION__);
+                 "vkBindImageMemory");
 
         return image;
     }
@@ -260,14 +249,14 @@ namespace atlas::vk {
         VkSampler sampler;
         VkResult res =
           vkCreateSampler(driver, &sampler_info, VK_NULL_HANDLE, &sampler);
-        vk_check(res, "vkCreateSampler", __FILE__, __LINE__, __FUNCTION__);
+        vk_check(res, "vkCreateSampler");
 
         return sampler;
     }
 
     VkCommandBufferLevel to_vk_command_buffer_level(
-      const command_buffer_levels& p_levels) {
-        switch (p_levels) {
+      const command_buffer_levels& p_level) {
+        switch (p_level) {
             case command_buffer_levels::primary:
                 return VK_COMMAND_BUFFER_LEVEL_PRIMARY;
             case command_buffer_levels::secondary:
@@ -275,8 +264,8 @@ namespace atlas::vk {
             case command_buffer_levels::max_enum:
                 return VK_COMMAND_BUFFER_LEVEL_MAX_ENUM;
         }
-
-        console_log_error("command_buffer_levels was invalid!!!");
+        console_log_fatal("Failed to return command buffer level {}", (int)p_level);
+        assert(false);
     }
 
     VkShaderStageFlags to_vk_shader_stage(const shader_stage& p_stage) {
@@ -347,10 +336,7 @@ namespace atlas::vk {
         VkSemaphore semaphore;
         vk_check(
           vkCreateSemaphore(p_driver, &semaphore_ci, nullptr, &semaphore),
-          "vkCreateSemaphore",
-          __FILE__,
-          __LINE__,
-          __FUNCTION__);
+          "vkCreateSemaphore");
         return semaphore;
     }
 
@@ -911,6 +897,17 @@ namespace atlas::vk {
         }
     }
 
+    VkFormat to_vk_format(const format& p_format) {
+        switch (p_format){
+        case format::rg32_sfloat:
+            return VK_FORMAT_R32G32_SFLOAT;
+        case format::rgb32_sfloat:
+            return VK_FORMAT_R32G32B32A32_SFLOAT;
+        default:
+            return VK_FORMAT_UNDEFINED;
+        }
+    }
+
     VkDescriptorType to_vk_descriptor_type(const buffer& p_type) {
         switch (p_type) {
             case buffer::storage:
@@ -975,5 +972,107 @@ namespace atlas::vk {
         }
 
         return final_image_count;
+    }
+
+    VkPipelineBindPoint to_vk_pipeline_bind_point(const pipeline_bind_point& p_bind_point) {
+        switch (p_bind_point){
+        case pipeline_bind_point::graphics:
+            return VK_PIPELINE_BIND_POINT_GRAPHICS;
+        case pipeline_bind_point::compute:
+            return VK_PIPELINE_BIND_POINT_COMPUTE;
+        case pipeline_bind_point::ray_tracing_khr:
+            return VK_PIPELINE_BIND_POINT_RAY_TRACING_KHR;
+        case pipeline_bind_point::subpass_shading_hauwei:
+            return VK_PIPELINE_BIND_POINT_SUBPASS_SHADING_HUAWEI;
+        case pipeline_bind_point::ray_tracing_nv:
+            return VK_PIPELINE_BIND_POINT_RAY_TRACING_NV;
+        case pipeline_bind_point::max_enum:
+            return VK_PIPELINE_BIND_POINT_MAX_ENUM;
+        default:
+            break;
+        }
+    }
+
+    VkAttachmentLoadOp to_vk_attachment_load(attachment_load p_attachment_type) {
+        switch (p_attachment_type){
+        case attachment_load::load:
+            return VK_ATTACHMENT_LOAD_OP_LOAD ;
+        case attachment_load::clear:
+            return VK_ATTACHMENT_LOAD_OP_CLEAR;
+        case attachment_load::dont_care:
+            return VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        case attachment_load::none_khr:
+            return VK_ATTACHMENT_LOAD_OP_NONE_KHR;
+        case attachment_load::none_ext:
+            return VK_ATTACHMENT_LOAD_OP_NONE_EXT;
+        case attachment_load::max_enum:
+            return VK_ATTACHMENT_LOAD_OP_MAX_ENUM;
+        }
+    }
+
+    VkAttachmentStoreOp to_vk_attachment_store(const attachment_store& p_attachment_type) {
+        switch (p_attachment_type){
+        case attachment_store::store:
+            return VK_ATTACHMENT_STORE_OP_STORE;
+        case attachment_store::dont_care:
+            return VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        case attachment_store::none_khr:
+            return VK_ATTACHMENT_STORE_OP_NONE_KHR;
+        case attachment_store::none_qcom:
+            return VK_ATTACHMENT_STORE_OP_NONE_QCOM;
+        case attachment_store::none_ext:
+            return VK_ATTACHMENT_STORE_OP_NONE_EXT;
+        case attachment_store::max_enum:
+            return VK_ATTACHMENT_STORE_OP_MAX_ENUM;
+        default:
+            break;
+        }
+    }
+
+    VkSampleCountFlagBits to_vk_sample_count_bits(const sample_bit& p_sample_count_bit) {
+        switch (p_sample_count_bit){
+        case sample_bit::count_1:
+            return VK_SAMPLE_COUNT_1_BIT;
+        case sample_bit::count_2:
+            return VK_SAMPLE_COUNT_2_BIT;
+        case sample_bit::count_4:
+            return VK_SAMPLE_COUNT_4_BIT;
+        case sample_bit::count_8:
+            return VK_SAMPLE_COUNT_8_BIT;
+        case sample_bit::count_16:
+            return VK_SAMPLE_COUNT_16_BIT;
+        case sample_bit::count_32:
+            return VK_SAMPLE_COUNT_32_BIT;
+        case sample_bit::count_64:
+            return VK_SAMPLE_COUNT_64_BIT;
+        case sample_bit::max_enum:
+            return VK_SAMPLE_COUNT_FLAG_BITS_MAX_ENUM;
+        }
+    }
+
+    VkImageLayout to_vk_image_layout(const image_layout& p_layout) {
+        switch (p_layout){
+        case image_layout::undefined:
+            return VK_IMAGE_LAYOUT_UNDEFINED;
+        case image_layout::general:
+            return VK_IMAGE_LAYOUT_GENERAL;
+        case image_layout::color_optimal:
+            return VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        case image_layout::depth_stencil_optimal:
+            return VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+        case image_layout::depth_stencil_read_only_optimal:
+            return VK_IMAGE_LAYOUT_DEPTH_READ_ONLY_STENCIL_ATTACHMENT_OPTIMAL;
+        }
+    }
+
+    VkVertexInputRate to_vk_input_rate(const input_rate& p_input_rate) {
+        switch (p_input_rate){
+        case input_rate::vertex:
+            return VK_VERTEX_INPUT_RATE_VERTEX;
+        case input_rate::instance:
+            return VK_VERTEX_INPUT_RATE_INSTANCE;
+        default:
+            return VK_VERTEX_INPUT_RATE_MAX_ENUM;
+        }
     }
 };
