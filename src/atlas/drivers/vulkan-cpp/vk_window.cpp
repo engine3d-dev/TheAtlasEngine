@@ -5,7 +5,7 @@
 #include <drivers/vulkan-cpp/helper_functions.hpp>
 
 namespace atlas::vk {
-	vk_window* vk_window::s_instance = nullptr;
+    vk_window* vk_window::s_instance = nullptr;
     vk_window::vk_window(const window_settings& p_settings)
       : m_settings(p_settings) {
 
@@ -30,30 +30,27 @@ namespace atlas::vk {
         vk_check(
           glfwCreateWindowSurface(
             m_instance_handler, m_window_handler, nullptr, &m_window_surface),
-          "glfwCreateWindowSurface",
-          __FILE__,
-          __LINE__,
-          __FUNCTION__);
+          "glfwCreateWindowSurface");
 
         center_window();
 
         m_swapchain = vk_swapchain(m_window_surface, m_settings);
 
-        vk_context::submit_resource_free([this](){
-			console_log_fatal("vk_window submit freed resources!!!");
-			m_swapchain.destroy();
+        vk_context::submit_resource_free([this]() {
+            console_log_fatal("vk_window submit freed resources!!!");
+            m_swapchain.destroy();
         });
 
         glfwSetWindowUserPointer(m_window_handler, this);
 
-		s_instance = this;
+        s_instance = this;
     }
 
-	vk_window::~vk_window() {
-		vkDestroySurfaceKHR(m_instance_handler, m_window_surface, nullptr);
-		vkDestroyInstance(m_instance_handler, nullptr);
-		glfwDestroyWindow(m_window_handler);
-	}
+    vk_window::~vk_window() {
+        vkDestroySurfaceKHR(m_instance_handler, m_window_surface, nullptr);
+        vkDestroyInstance(m_instance_handler, nullptr);
+        glfwDestroyWindow(m_window_handler);
+    }
 
     void vk_window::center_window() {
         GLFWmonitor* monitor = glfwGetPrimaryMonitor();
@@ -63,9 +60,9 @@ namespace atlas::vk {
         glfwSetWindowPos(m_window_handler, (int)width, (int)height);
     }
 
-	void vk_window::presentation_process(const uint32_t& p_current_frame) {
-		m_swapchain.present(p_current_frame);
-	}
+    void vk_window::presentation_process(const uint32_t& p_current_frame) {
+        m_swapchain.present(p_current_frame);
+    }
 
     window_settings vk_window::settings() const {
         return m_settings;

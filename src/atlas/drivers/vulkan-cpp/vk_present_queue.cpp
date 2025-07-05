@@ -36,7 +36,7 @@ namespace atlas::vk {
 
         VkResult res =
           vkQueueSubmit(m_present_queue_handler, 1, &submit_info, nullptr);
-        vk_check(res, "vkQueueSubmit", __FILE__, __LINE__, __FUNCTION__);
+        vk_check(res, "vkQueueSubmit");
     }
 
     void vk_present_queue::submit_immediate_sync(
@@ -55,7 +55,7 @@ namespace atlas::vk {
 
         VkResult res =
           vkQueueSubmit(m_present_queue_handler, 1, &submit_info, nullptr);
-        vk_check(res, "vkQueueSubmit", __FILE__, __LINE__, __FUNCTION__);
+        vk_check(res, "vkQueueSubmit");
     }
 
     void vk_present_queue::present_frame(const uint32_t& p_current_frame) {
@@ -71,7 +71,7 @@ namespace atlas::vk {
 
         VkResult res =
           vkQueuePresentKHR(m_present_queue_handler, &present_info);
-        vk_check(res, "vkQueuePresentKHR", __FILE__, __LINE__, __FUNCTION__);
+        vk_check(res, "vkQueuePresentKHR");
         // if(m_resize_requested
         if (res == VK_ERROR_OUT_OF_DATE_KHR || res == VK_SUBOPTIMAL_KHR) {
             console_log_trace("Swapchain out of date!!!");
@@ -94,11 +94,7 @@ namespace atlas::vk {
             m_resize_requested = true;
         }
 
-        vk_check(acquired_next_image_result,
-                 "vkAcquireNextImageKHR",
-                 __FILE__,
-                 __LINE__,
-                 __FUNCTION__);
+        vk_check(acquired_next_image_result, "vkAcquireNextImageKHR");
 
         return image_acquired;
     }

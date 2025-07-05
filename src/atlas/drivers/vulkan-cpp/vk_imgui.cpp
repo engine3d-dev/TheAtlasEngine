@@ -43,7 +43,10 @@ namespace atlas::vk {
           ImVec4{ 0.1f, 0.150f, 0.951f, 1.0f };
     }
 
-    imgui_context::imgui_context(GLFWwindow* p_window_handler, const vk_swapchain& p_current_swapchain_handler, const VkRenderPass& p_current_renderpass) {
+    imgui_context::imgui_context(
+      GLFWwindow* p_window_handler,
+      const vk_swapchain& p_current_swapchain_handler,
+      const VkRenderPass& p_current_renderpass) {
         m_instance = vk_context::handler();
         m_physical = vk_context::physical_driver();
         m_driver = vk_context::driver_context();
@@ -54,7 +57,7 @@ namespace atlas::vk {
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGuiIO& io = ImGui::GetIO();
-        
+
         io.ConfigFlags |=
           ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
         // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable
@@ -63,7 +66,7 @@ namespace atlas::vk {
         io.ConfigFlags |=
           ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport / Platform
                                             // Windows
-        
+
         // io.ConfigViewportsNoAutoMerge = true;
         // io.ConfigViewportsNoAutoMerge = true;
         // io.ConfigViewportsNoTaskBarIcon = true;
@@ -79,7 +82,7 @@ namespace atlas::vk {
             style.Colors[ImGuiCol_WindowBg].w = 1.0f;
         }
 
-         // 1: create descriptor pool for IMGUI
+        // 1: create descriptor pool for IMGUI
         //  the size of the pool is very oversize, but it's copied from imgui
         //  demo itself.
         VkDescriptorPoolSize pool_sizes[] = {
@@ -107,18 +110,18 @@ namespace atlas::vk {
         };
 
         // VkDescriptorPool imgui_pool;
-        vk::vk_check(
-          vkCreateDescriptorPool(
-            m_driver, &desc_pool_create_info, nullptr, &m_desc_pool),
-          "vkCreateDescriptorPool",
-          __FILE__,
-          __LINE__,
-          __FUNCTION__);
-        
-        recreate(p_window_handler, p_current_swapchain_handler.image_size(), p_current_renderpass);
+        vk::vk_check(vkCreateDescriptorPool(
+                       m_driver, &desc_pool_create_info, nullptr, &m_desc_pool),
+                     "vkCreateDescriptorPool");
+
+        recreate(p_window_handler,
+                 p_current_swapchain_handler.image_size(),
+                 p_current_renderpass);
     }
 
-    void imgui_context::recreate(GLFWwindow* p_window_handler, const uint32_t& p_image_size, const VkRenderPass& p_current_renderpass) {
+    void imgui_context::recreate(GLFWwindow* p_window_handler,
+                                 const uint32_t& p_image_size,
+                                 const VkRenderPass& p_current_renderpass) {
         ImGui_ImplGlfw_InitForVulkan(p_window_handler, true);
         ImGui_ImplVulkan_InitInfo init_info = {};
         init_info.Instance = m_instance;
@@ -134,25 +137,27 @@ namespace atlas::vk {
         init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
         ImGui_ImplVulkan_Init(&init_info);
 
-        vk_context::submit_resource_free([](){
-            //! @note This will probably be submitted at construction to be destructed when the application shutsdown
+        vk_context::submit_resource_free([]() {
+            //! @note This will probably be submitted at construction to be
+            //! destructed when the application shutsdown
             ImGui_ImplVulkan_Shutdown();
             // vkDestroyDescriptorPool(m_driver, m_desc_pool, nullptr);
             // vkDestroyDescriptorPool(m_driver, m_desc_pool, nullptr);
             // vkDestroyRenderPass(m_driver, m_re, nullptr);
             // vkDestroyCommandPool(m_driver, m_imgui_command_pool, nullptr);
-
         });
     }
 
-    void imgui_context::begin(const VkCommandBuffer& p_current, [[maybe_unused]] const uint32_t& p_current_frame_idx) {
+    void imgui_context::begin(
+      const VkCommandBuffer& p_current,
+      [[maybe_unused]] const uint32_t& p_current_frame_idx) {
         ImGui_ImplVulkan_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
         m_current_command = p_current;
     }
-    
+
     void imgui_context::end() {
         ImGui::Render();
 
@@ -166,74 +171,104 @@ namespace atlas::vk {
         }
     }
 
-    void imgui_context::draw_hud(const hud_data& p_hud_data, const window_settings& p_settings) {
+    void imgui_context::draw_hud(const hud_data& p_hud_data,
+                                 const window_settings& p_settings) {
         ImGuiIO& io = ImGui::GetIO();
 
         // --- Top-Left HUD (FPS and Weapon) ---
-        ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_Always); // Fixed position
-        ImGui::SetNextWindowBgAlpha(0.0f); // Transparent background
+        ImGui::SetNextWindowPos(ImVec2(10, 10),
+                                ImGuiCond_Always); // Fixed position
+        ImGui::SetNextWindowBgAlpha(0.0f);         // Transparent background
 
         ImGuiWindowFlags hud_flags =
-            ImGuiWindowFlags_NoDecoration | // No title bar, borders, etc.
-            ImGuiWindowFlags_NoMove |       // Cannot be moved by user
-            ImGuiWindowFlags_NoResize |     // Cannot be resized by user
-            ImGuiWindowFlags_NoSavedSettings | // Don't save position/size to .ini
-            ImGuiWindowFlags_NoInputs;      // Does not block mouse/keyboard input
+          ImGuiWindowFlags_NoDecoration |    // No title bar, borders, etc.
+          ImGuiWindowFlags_NoMove |          // Cannot be moved by user
+          ImGuiWindowFlags_NoResize |        // Cannot be resized by user
+          ImGuiWindowFlags_NoSavedSettings | // Don't save position/size to .ini
+          ImGuiWindowFlags_NoInputs; // Does not block mouse/keyboard input
 
         if (ImGui::Begin("TopLeftHUD", nullptr, hud_flags)) {
             ImGui::Text("FPS: %.1f", p_hud_data.fps);
             ImGui::Text("Weapon: %s", p_hud_data.currentWeapon.c_str());
             // ImGui::Text("Health:");
             // Use a progress bar for health
-            // ImGui::ProgressBar(p_hud_data.playerHealth / 100.0f, ImVec2(-1, 0), "#Health"); // -1 width fills available space
+            // ImGui::ProgressBar(p_hud_data.playerHealth / 100.0f, ImVec2(-1,
+            // 0), "#Health"); // -1 width fills available space
             ImGui::Text("Health: %.1f", p_hud_data.playerHealth);
-            ImGui::ProgressBar(p_hud_data.playerHealth / 100.0f, ImVec2(-1, 0)); // No overlay text here
+            ImGui::ProgressBar(p_hud_data.playerHealth / 100.0f,
+                               ImVec2(-1, 0)); // No overlay text here
         }
         ImGui::End();
 
         // --- Health Bar (Bottom-Left) ---
-        ImGui::SetNextWindowPos(ImVec2(10, (float)p_settings.width - 50), ImGuiCond_Always);
-        ImGui::SetNextWindowSize(ImVec2(200, 40), ImGuiCond_Always); // Fixed size
+        ImGui::SetNextWindowPos(ImVec2(10, (float)p_settings.width - 50),
+                                ImGuiCond_Always);
+        ImGui::SetNextWindowSize(ImVec2(200, 40),
+                                 ImGuiCond_Always); // Fixed size
         ImGui::SetNextWindowBgAlpha(0.0f);
 
         // if (ImGui::Begin("HealthBar", nullptr, hud_flags)) {
         //     ImGui::Text("Health:");
         //     // Use a progress bar for health
-        //     ImGui::ProgressBar(p_hud_data.playerHealth / 100.0f, ImVec2(-1, 0), "HP"); // -1 width fills available space
+        //     ImGui::ProgressBar(p_hud_data.playerHealth / 100.0f, ImVec2(-1,
+        //     0), "HP"); // -1 width fills available space
         // }
         // ImGui::End();
 
         // --- Score (Top-Right) ---
         // Position it relative to the right edge
-        ImGui::SetNextWindowPos(ImVec2((float)p_settings.width - 150, 10), ImGuiCond_Always);
-        ImGui::SetNextWindowSize(ImVec2(140, 0), ImGuiCond_Always); // 0 height means auto-size vertically
+        ImGui::SetNextWindowPos(ImVec2((float)p_settings.width - 150, 10),
+                                ImGuiCond_Always);
+        ImGui::SetNextWindowSize(
+          ImVec2(140, 0),
+          ImGuiCond_Always); // 0 height means auto-size vertically
         ImGui::SetNextWindowBgAlpha(0.0f);
 
         if (ImGui::Begin("ScoreDisplay", nullptr, hud_flags)) {
-            ImGui::SetCursorPosX(ImGui::GetWindowSize().x - ImGui::CalcTextSize(std::to_string(p_hud_data.playerScore).c_str()).x - ImGui::GetStyle().WindowPadding.x);
+            ImGui::SetCursorPosX(
+              ImGui::GetWindowSize().x -
+              ImGui::CalcTextSize(
+                std::to_string(p_hud_data.playerScore).c_str())
+                .x -
+              ImGui::GetStyle().WindowPadding.x);
             ImGui::Text("Score: %d", p_hud_data.playerScore);
         }
         ImGui::End();
 
         // --- Crosshair (Custom Drawing - Optional) ---
         // If you want a more custom crosshair, you might use ImDrawList.
-        // This is more advanced and often handled by your game's rendering pipeline directly,
-        // but ImGui can draw simple shapes.
-        // To draw on the main viewport, you can get the foreground draw list of the main viewport.
-        ImDrawList* draw_list = ImGui::GetBackgroundDrawList(); // Or ImGui::GetForegroundDrawList()
+        // This is more advanced and often handled by your game's rendering
+        // pipeline directly, but ImGui can draw simple shapes. To draw on the
+        // main viewport, you can get the foreground draw list of the main
+        // viewport.
+        ImDrawList* draw_list =
+          ImGui::GetBackgroundDrawList(); // Or ImGui::GetForegroundDrawList()
         if (draw_list) {
-            ImVec2 center = ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f);
+            ImVec2 center =
+              ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f);
             float crosshair_size = 10.0f;
             float gap = 2.0f;
             ImU32 crosshair_color = IM_COL32(255, 255, 255, 255); // White
 
             // Horizontal lines
-            draw_list->AddLine(ImVec2(center.x - crosshair_size - gap, center.y), ImVec2(center.x - gap, center.y), crosshair_color);
-            draw_list->AddLine(ImVec2(center.x + gap, center.y), ImVec2(center.x + crosshair_size + gap, center.y), crosshair_color);
+            draw_list->AddLine(
+              ImVec2(center.x - crosshair_size - gap, center.y),
+              ImVec2(center.x - gap, center.y),
+              crosshair_color);
+            draw_list->AddLine(
+              ImVec2(center.x + gap, center.y),
+              ImVec2(center.x + crosshair_size + gap, center.y),
+              crosshair_color);
 
             // Vertical lines
-            draw_list->AddLine(ImVec2(center.x, center.y - crosshair_size - gap), ImVec2(center.x, center.y - gap), crosshair_color);
-            draw_list->AddLine(ImVec2(center.x, center.y + gap), ImVec2(center.x, center.y + crosshair_size + gap), crosshair_color);
+            draw_list->AddLine(
+              ImVec2(center.x, center.y - crosshair_size - gap),
+              ImVec2(center.x, center.y - gap),
+              crosshair_color);
+            draw_list->AddLine(
+              ImVec2(center.x, center.y + gap),
+              ImVec2(center.x, center.y + crosshair_size + gap),
+              crosshair_color);
         }
     }
 };

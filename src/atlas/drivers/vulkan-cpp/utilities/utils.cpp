@@ -18,10 +18,7 @@ namespace atlas::vk {
 
         VkCommandPool command_pool = nullptr;
         vk_check(vkCreateCommandPool(driver, &pool_ci, nullptr, &command_pool),
-                 "vkCreateCommandPool",
-                 __FILE__,
-                 __LINE__,
-                 __FUNCTION__);
+                 "vkCreateCommandPool");
 
         return command_pool;
     }
@@ -41,10 +38,7 @@ namespace atlas::vk {
         VkCommandBuffer command_buffer = nullptr;
         vk_check(vkAllocateCommandBuffers(
                    driver, &command_buffer_alloc_info, &command_buffer),
-                 "vkAllocateCommandBuffers",
-                 __FILE__,
-                 __LINE__,
-                 __FUNCTION__);
+                 "vkAllocateCommandBuffers");
 
         return command_buffer;
     }
@@ -60,10 +54,7 @@ namespace atlas::vk {
 
         vk_check(
           vkBeginCommandBuffer(p_command_buffer, &command_buffer_begin_info),
-          "vkBeginCommandBuffer",
-          __FILE__,
-          __LINE__,
-          __FUNCTION__);
+          "vkBeginCommandBuffer");
     }
 
     void end_command_buffer(const VkCommandBuffer& p_command_buffer) {
@@ -177,10 +168,8 @@ namespace atlas::vk {
         vk_check(
           vkMapMemory(
             driver, p_buffer.device_memory, 0, p_size_in_bytes, 0, &mapped),
-          "vkMapMemory",
-          __FILE__,
-          __LINE__,
-          __FUNCTION__);
+          "vkMapMemory");
+
         memcpy(mapped, p_data, p_size_in_bytes);
         vkUnmapMemory(driver, p_buffer.device_memory);
     }
@@ -196,10 +185,7 @@ namespace atlas::vk {
         void* mapped = nullptr;
         vk_check(vkMapMemory(
                    driver, p_buffer.device_memory, 0, buffer_size, 0, &mapped),
-                 "vkMapMemory",
-                 __FILE__,
-                 __LINE__,
-                 __FUNCTION__);
+                 "vkMapMemory");
         memcpy(mapped, p_in_buffer.data(), buffer_size);
         vkUnmapMemory(driver, p_buffer.device_memory);
     }
@@ -211,10 +197,7 @@ namespace atlas::vk {
         void* mapped = nullptr;
         vk_check(vkMapMemory(
                    driver, p_buffer.device_memory, 0, buffer_size, 0, &mapped),
-                 "vkMapMemory",
-                 __FILE__,
-                 __LINE__,
-                 __FUNCTION__);
+                 "vkMapMemory");
         memcpy(mapped, p_in_buffer.data(), buffer_size);
         vkUnmapMemory(driver, p_buffer.device_memory);
     }
@@ -257,15 +240,14 @@ namespace atlas::vk {
         temp_copy_command_buffer.destroy();
     }
 
-	void transition_image_layout(VkCommandBuffer& p_command_buffer,
+    void transition_image_layout(VkCommandBuffer& p_command_buffer,
                                  VkImage& p_image,
                                  VkFormat p_format,
                                  VkImageLayout p_old,
                                  VkImageLayout p_new) {
 
         image_memory_barrier(p_command_buffer, p_image, p_format, p_old, p_new);
-
-	}
+    }
 
     void image_memory_barrier(VkCommandBuffer& p_command_buffer,
                               VkImage& p_image,
@@ -423,9 +405,9 @@ namespace atlas::vk {
                              &image_memory_barrier);
     }
 
-
-	void queue_submit(const VkQueue& p_queue_handle, const std::span<VkCommandBuffer>& p_commands) {
-		VkSubmitInfo submit_info = {
+    void queue_submit(const VkQueue& p_queue_handle,
+                      const std::span<VkCommandBuffer>& p_commands) {
+        VkSubmitInfo submit_info = {
             .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
             .commandBufferCount = static_cast<uint32_t>(p_commands.size()),
             .pCommandBuffers = p_commands.data(),
@@ -433,5 +415,5 @@ namespace atlas::vk {
 
         vkQueueSubmit(p_queue_handle, 1, &submit_info, nullptr);
         vkQueueWaitIdle(p_queue_handle);
-	}
+    }
 };

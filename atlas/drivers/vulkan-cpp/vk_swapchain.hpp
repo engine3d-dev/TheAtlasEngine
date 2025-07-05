@@ -83,7 +83,7 @@ namespace atlas::vk {
         std::vector<VkFramebuffer> m_swapchain_framebuffers{};
 
         //! @brief setting up images
-        std::vector<vk_image_handler> m_swapchain_images{};
+        std::vector<vk_image_handle> m_swapchain_images{};
         std::vector<vk_image> m_swapchain_depth_images{};
     
         //! @brief Main swapchain renderpass

@@ -10,16 +10,17 @@ namespace atlas::vk {
     vk_swapchain::vk_swapchain(const VkSurfaceKHR& p_surface,
                                const window_settings& p_settings)
       : m_current_surface_handler(p_surface)
-      , m_window_settings(p_settings),
-	  m_current_surface(p_surface) {
+      , m_window_settings(p_settings)
+      , m_current_surface(p_surface) {
         m_physical = vk_context::physical_driver();
         m_driver = vk_context::driver_context();
-		m_surface_properties = m_physical.get_surface_properties(m_current_surface);
+        m_surface_properties =
+          m_physical.get_surface_properties(m_current_surface);
 
-		on_create();
+        on_create();
     }
 
-	void vk_swapchain::on_create() {
+    void vk_swapchain::on_create() {
 
         //! @note Setting up presentation stuff
         // request what our minimum image count is
@@ -58,10 +59,7 @@ namespace atlas::vk {
 
         vk_check(vkCreateSwapchainKHR(
                    m_driver, &swapchain_ci, nullptr, &m_swapchain_handler),
-                 "vkCreateSwapchainKHR",
-                 __FILE__,
-                 __LINE__,
-                 __FUNCTION__);
+                 "vkCreateSwapchainKHR");
 
         //!@brief querying images available
         uint32_t image_count = 0;
@@ -77,7 +75,7 @@ namespace atlas::vk {
 
         // Creating Images
         m_swapchain_images.resize(image_count);
-		m_image_size = image_count;
+        m_image_size = image_count;
         m_swapchain_depth_images.resize(image_count);
 
         VkFormat depth_format = m_driver.depth_format();
@@ -128,8 +126,8 @@ namespace atlas::vk {
 
         // m_swapchain_renderpass = create_simple_renderpass(
         //   m_driver, m_surface_properties.surface_format);
-		// m_swapchain_main_renderpass.configure(m_renderpass_options);
-		VkAttachmentDescription color_attachment  = {
+        // m_swapchain_main_renderpass.configure(m_renderpass_options);
+        VkAttachmentDescription color_attachment = {
             .flags = 0,
             .format = m_surface_properties.surface_format.format,
             .samples = VK_SAMPLE_COUNT_1_BIT,
@@ -141,8 +139,8 @@ namespace atlas::vk {
             .finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
         };
 
-		VkAttachmentDescription depth_attachment = {
-			.flags = 0,
+        VkAttachmentDescription depth_attachment = {
+            .flags = 0,
             .format = m_driver.depth_format(),
             .samples = VK_SAMPLE_COUNT_1_BIT,
             .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
@@ -151,14 +149,13 @@ namespace atlas::vk {
             .stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
             .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
             .finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
-		};
+        };
 
-		std::array<VkAttachmentDescription, 2> attachments = {
-			color_attachment,
-			depth_attachment
-		};
+        std::array<VkAttachmentDescription, 2> attachments = {
+            color_attachment, depth_attachment
+        };
 
-		VkAttachmentReference color_attachment_ref = {
+        VkAttachmentReference color_attachment_ref = {
             .attachment = 0, .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
         };
 
@@ -181,16 +178,15 @@ namespace atlas::vk {
             .pPreserveAttachments = nullptr
         };
 
-		std::array<VkSubpassDescription, 1> subpass_desc = {
-			subpass_description
-		};
+        std::array<VkSubpassDescription, 1> subpass_desc = {
+            subpass_description
+        };
 
-		vk_renderpass_options renderpass_options = {
-			.attachments = attachments,
-			.subpass_descriptions = subpass_desc
-		};
+        vk_renderpass_options renderpass_options = { .attachments = attachments,
+                                                     .subpass_descriptions =
+                                                       subpass_desc };
 
-		m_swapchain_main_renderpass = vk_renderpass(renderpass_options);
+        m_swapchain_main_renderpass = vk_renderpass(renderpass_options);
 
         // creating framebuffers
         m_swapchain_framebuffers.resize(m_swapchain_images.size());
@@ -220,70 +216,66 @@ namespace atlas::vk {
                                          &framebuffer_ci,
                                          nullptr,
                                          &m_swapchain_framebuffers[i]),
-                     "vkCreateFramebuffer",
-                     __FILE__,
-                     __LINE__,
-                     __FUNCTION__);
-		}
+                     "vkCreateFramebuffer");
+        }
 
-		vk_queue_options options = {
-			.family_index = 0, // using defauly queue family
-			.queue_index = 0 // using defauly presentation queue available
-		};
-		m_present_to_queue = vk_present_queue(m_swapchain_handler, options);
+        vk_queue_options options = {
+            .family_index = 0, // using defauly queue family
+            .queue_index = 0   // using defauly presentation queue available
+        };
+        m_present_to_queue = vk_present_queue(m_swapchain_handler, options);
+    }
 
-	}
+    void vk_swapchain::recreate() {
+        destroy();
+        on_create();
+    }
 
-	void vk_swapchain::recreate() {
-		destroy();
-		on_create();
-	}
+    uint32_t vk_swapchain::read_acquired_image() {
+        m_present_to_queue.wait_idle();
 
-	uint32_t vk_swapchain::read_acquired_image() {
-		m_present_to_queue.wait_idle();
+        if (m_present_to_queue.resize_requested()) {
+            recreate();
+            m_present_to_queue.set_resize_status(false);
+        }
 
-		if(m_present_to_queue.resize_requested()) {
-			recreate();
-			m_present_to_queue.set_resize_status(false);
-		}
+        uint32_t frame_idx = m_present_to_queue.acquired_frame();
+        return frame_idx;
+    }
 
-		uint32_t frame_idx = m_present_to_queue.acquired_frame();
-		return frame_idx;
-	}
+    void vk_swapchain::present(const uint32_t& p_current_frame) {
+        m_present_to_queue.present_frame(p_current_frame);
+    }
 
-	void vk_swapchain::present(const uint32_t& p_current_frame) {
-		m_present_to_queue.present_frame(p_current_frame);
-	}
+    void vk_swapchain::submit(const VkCommandBuffer& p_command) {
+        m_present_to_queue.submit_immediate_async(p_command);
+    }
 
-	void vk_swapchain::submit(const VkCommandBuffer& p_command) {
-		m_present_to_queue.submit_immediate_async(p_command);
-	}
+    void vk_swapchain::destroy() {
+        vkDeviceWaitIdle(m_driver);
 
-	void vk_swapchain::destroy() {
-		vkDeviceWaitIdle(m_driver);
+        for (size_t i = 0; i < m_swapchain_framebuffers.size(); i++) {
+            vkDestroyFramebuffer(
+              m_driver, m_swapchain_framebuffers[i], nullptr);
+        }
 
-		for (size_t i = 0; i < m_swapchain_framebuffers.size(); i++) {
-			vkDestroyFramebuffer(
-		m_driver, m_swapchain_framebuffers[i], nullptr);
-		}
+        m_swapchain_main_renderpass.destroy();
 
-		m_swapchain_main_renderpass.destroy();
+        m_present_to_queue.destroy();
 
-		m_present_to_queue.destroy();
+        for (size_t i = 0; i < m_swapchain_command_buffers.size(); i++) {
+            m_swapchain_command_buffers[i].destroy();
+        }
 
-		for (size_t i = 0; i < m_swapchain_command_buffers.size(); i++) {
-			m_swapchain_command_buffers[i].destroy();
-		}
+        for (uint32_t i = 0; i < m_swapchain_depth_images.size(); i++) {
+            free_image(m_driver, m_swapchain_depth_images[i]);
+        }
 
-		for (uint32_t i = 0; i < m_swapchain_depth_images.size(); i++) {
-			free_image(m_driver, m_swapchain_depth_images[i]);
-		}
+        for (uint32_t i = 0; i < m_swapchain_images.size(); i++) {
+            vkDestroyImageView(
+              m_driver, m_swapchain_images[i].image_view, nullptr);
+        }
 
-		for (uint32_t i = 0; i < m_swapchain_images.size(); i++) {
-			vkDestroyImageView(
-		m_driver, m_swapchain_images[i].image_view, nullptr);
-		}
-
-		vkDestroySwapchainKHR(m_driver, m_swapchain_handler, nullptr);
-	}
+        vkDestroySwapchainKHR(m_driver, m_swapchain_handler, nullptr);
+    }
 };

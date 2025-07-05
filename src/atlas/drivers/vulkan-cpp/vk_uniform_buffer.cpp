@@ -21,10 +21,7 @@ namespace atlas::vk {
                              m_size_bytes,
                              0,
                              &mapped),
-                 "vkMapMemory",
-                 __FILE__,
-                 __LINE__,
-                 __FUNCTION__);
+                 "vkMapMemory");
         memcpy(mapped, p_data, m_size_bytes);
         vkUnmapMemory(m_driver, m_uniform_buffer_data.device_memory);
     }

@@ -56,28 +56,19 @@ namespace atlas::vk {
                    m_physical_driver,
                    p_surface,
                    &m_surface_properties.surface_capabilities),
-                 "vkGetPhysicalDeviceSurfaceCapabilitiesKHR",
-                 __FILE__,
-                 __LINE__,
-                 __FUNCTION__);
+                 "vkGetPhysicalDeviceSurfaceCapabilitiesKHR");
 
         uint32_t format_count = 0;
         std::vector<VkSurfaceFormatKHR> formats;
         vk_check(vkGetPhysicalDeviceSurfaceFormatsKHR(
                    m_physical_driver, p_surface, &format_count, nullptr),
-                 "vkGetPhysicalDeviceSurfaceFormatsKHR",
-                 __FILE__,
-                 __LINE__,
-                 __FUNCTION__);
+                 "vkGetPhysicalDeviceSurfaceFormatsKHR");
 
         formats.resize(format_count);
 
         vk_check(vkGetPhysicalDeviceSurfaceFormatsKHR(
                    m_physical_driver, p_surface, &format_count, formats.data()),
-                 "vkGetPhysicalDeviceSurfaceFormatsKHR",
-                 __FILE__,
-                 __LINE__,
-                 __FUNCTION__);
+                 "vkGetPhysicalDeviceSurfaceFormatsKHR");
 
         for (const auto& format : formats) {
             if (format.format == VK_FORMAT_B8G8R8A8_SRGB &&
@@ -119,10 +110,7 @@ namespace atlas::vk {
             if (queue_family.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
                 vk_check(vkGetPhysicalDeviceSurfaceSupportKHR(
                            m_physical_driver, i, p_surface, &compatible),
-                         "vkGetPhysicalDeviceSurfaceSupportKHR",
-                         __FILE__,
-                         __LINE__,
-                         __FUNCTION__);
+                         "vkGetPhysicalDeviceSurfaceSupportKHR");
 
                 if (compatible) {
                     presentation_index = i;

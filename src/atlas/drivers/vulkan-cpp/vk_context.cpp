@@ -51,7 +51,7 @@ namespace atlas::vk {
       [[maybe_unused]] VkDebugUtilsMessageTypeFlagsEXT p_message_type,
       const VkDebugUtilsMessengerCallbackDataEXT* p_callback_data,
       [[maybe_unused]] void* p_user_data) {
-        console_log_trace("validation layer:\t\t{}",  p_callback_data->pMessage);
+        console_log_trace("validation layer:\t\t{}", p_callback_data->pMessage);
         return false;
     }
 #endif
@@ -99,7 +99,7 @@ namespace atlas::vk {
         available_validation_layers.resize(layer_count);
         vkEnumerateInstanceLayerProperties(&layer_count,
                                            available_validation_layers.data());
-        
+
         console_log_trace("================================================");
         console_log_trace("\tValidation Layers Available");
         console_log_trace("================================================");
@@ -129,12 +129,9 @@ namespace atlas::vk {
         create_info.enabledLayerCount = 0;
         create_info.ppEnabledLayerNames = nullptr;
         create_info.pNext = nullptr;
-#endif        
+#endif
         vk_check(vkCreateInstance(&create_info, nullptr, &m_instance_handler),
-                 "vkCreateInstance",
-                 __FILE__,
-                 __LINE__,
-                 __FUNCTION__);
+                 "vkCreateInstance");
 
         s_instance = this;
 
@@ -155,7 +152,7 @@ namespace atlas::vk {
     }
 
     void vk_context::destroy_context() {
-        for(auto& callback : m_resources_free) {
+        for (auto& callback : m_resources_free) {
             callback();
         }
 

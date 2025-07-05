@@ -17,10 +17,7 @@ namespace atlas::vk {
 
         vk_check(
           vkCreateCommandPool(m_driver, &pool_ci, nullptr, &m_command_pool),
-          "vkCreateCommandPool",
-          __FILE__,
-          __LINE__,
-          __FUNCTION__);
+          "vkCreateCommandPool");
 
         VkCommandBufferAllocateInfo command_buffer_alloc_info = {
             .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
@@ -33,10 +30,7 @@ namespace atlas::vk {
         vk_check(vkAllocateCommandBuffers(m_driver,
                                           &command_buffer_alloc_info,
                                           &m_command_buffer_handler),
-                 "vkAllocateCommandBuffers",
-                 __FILE__,
-                 __LINE__,
-                 __FUNCTION__);
+                 "vkAllocateCommandBuffers");
     }
 
     void vk_command_buffer::begin(
@@ -49,10 +43,7 @@ namespace atlas::vk {
         };
         vk_check(
           vkBeginCommandBuffer(m_command_buffer_handler, &command_begin_info),
-          "vkBeginCommandBuffer",
-          __FILE__,
-          __LINE__,
-          __FUNCTION__);
+          "vkBeginCommandBuffer");
     }
 
     void vk_command_buffer::end() {

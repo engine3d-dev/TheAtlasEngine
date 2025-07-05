@@ -32,8 +32,7 @@ namespace atlas::vk {
         return format;
     }
 
-    static VkFormat search_depth_format(
-      const VkPhysicalDevice& p_physical) {
+    static VkFormat search_depth_format(const VkPhysicalDevice& p_physical) {
         std::vector<VkFormat> candidate_formats = {
             VK_FORMAT_D32_SFLOAT,
             VK_FORMAT_D32_SFLOAT_S8_UINT,
@@ -91,10 +90,7 @@ namespace atlas::vk {
         create_info.pEnabledFeatures = &features;
 
         vk_check(vkCreateDevice(m_physical, &create_info, nullptr, &m_driver),
-                 "vkCreateDevice",
-                 __FILE__,
-                 __LINE__,
-                 __FUNCTION__);
+                 "vkCreateDevice");
 
         vkGetDeviceQueue(
           m_driver, graphics_index, 0, &m_device_queues.graphics_queue);
@@ -135,7 +131,7 @@ namespace atlas::vk {
     }
 
     void vk_driver::destroy() {
-      vkDeviceWaitIdle(m_driver);
-      vkDestroyDevice(m_driver, nullptr);
+        vkDeviceWaitIdle(m_driver);
+        vkDestroyDevice(m_driver, nullptr);
     }
 };

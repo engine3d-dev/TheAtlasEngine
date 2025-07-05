@@ -7,7 +7,10 @@
 
 namespace atlas::vk {
 
-    static vk_image create_texture_from_data(const VkDevice& p_driver, const texture_properties& p_properties, const void* p_data) {
+    static vk_image create_texture_from_data(
+      const VkDevice& p_driver,
+      const texture_properties& p_properties,
+      const void* p_data) {
 
         command_buffer_settings settings = {
             0,
@@ -18,23 +21,28 @@ namespace atlas::vk {
         vk_command_buffer copy_command_buffer = vk_command_buffer(settings);
 
         // 1. create image object
-        vk_image texture_image = create_image2d(p_properties.width, p_properties.height, p_properties.format, p_properties.usage, p_properties.property);
+        vk_image texture_image = create_image2d(p_properties.width,
+                                                p_properties.height,
+                                                p_properties.format,
+                                                p_properties.usage,
+                                                p_properties.property);
 
         // 2. update texture data
         // bytes per pixels
         int bytes_per_pixels = bytes_per_texture_format(p_properties.format);
 
         // 2.2 layer_size
-        uint32_t layer_size = p_properties.width * p_properties.height * bytes_per_pixels;
+        uint32_t layer_size =
+          p_properties.width * p_properties.height * bytes_per_pixels;
         int layer_count = 1;
         uint32_t image_size = layer_count * layer_size;
-
 
         // 2.3 transfer data from staging buffer
         vk_buffer_info staging_info = {
             .device_size = (uint32_t)image_size,
             .usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-            .memory_property_flag = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_CACHED_BIT,
+            .memory_property_flag = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                                    VK_MEMORY_PROPERTY_HOST_CACHED_BIT,
         };
 
         vk_buffer staging_buffer = create_buffer(staging_info);
@@ -50,10 +58,11 @@ namespace atlas::vk {
                                 VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
         // // 6. Copy buffer to image
-        copy(copy_command_buffer, texture_image.image,
-                             staging_buffer.handler,
-                             p_properties.width,
-                             p_properties.height);
+        copy(copy_command_buffer,
+             texture_image.image,
+             staging_buffer.handler,
+             p_properties.width,
+             p_properties.height);
 
         // // 7. transition image layout again
         transition_image_layout(texture_image.image,
@@ -78,10 +87,11 @@ namespace atlas::vk {
         };
 
         // 1.) Load in extent dimensions
-        std::vector<std::vector<uint32_t>> image_white_texture(p_extent.width, std::vector<uint32_t>(p_extent.height));
+        std::vector<std::vector<uint32_t>> image_white_texture(
+          p_extent.width, std::vector<uint32_t>(p_extent.height));
 
-        for(size_t i = 0; i < image_white_texture.size(); i++) {
-            for(size_t j = 0; j < image_white_texture[0].size(); j++) {
+        for (size_t i = 0; i < image_white_texture.size(); i++) {
+            for (size_t j = 0; j < image_white_texture[0].size(); j++) {
                 image_white_texture[i][j] = 0xffffffff;
             }
         }
@@ -92,26 +102,26 @@ namespace atlas::vk {
         texture_properties properties = {
             .width = m_width,
             .height = m_height,
-            .usage = (VkImageUsageFlagBits)(VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT),
+            .usage = (VkImageUsageFlagBits)(VK_IMAGE_USAGE_TRANSFER_DST_BIT |
+                                            VK_IMAGE_USAGE_SAMPLED_BIT),
             .property = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
             .format = VK_FORMAT_R8G8B8A8_UNORM,
         };
-        m_texture_image = create_texture_from_data(m_driver, properties, image_white_texture.data());
+        m_texture_image = create_texture_from_data(
+          m_driver, properties, image_white_texture.data());
 
         // 3.) Create Image View
         VkImageAspectFlags aspect_flags = VK_IMAGE_ASPECT_COLOR_BIT;
-        m_texture_image.image_view = create_image_view(m_texture_image.image, properties.format, aspect_flags);
+        m_texture_image.image_view = create_image_view(
+          m_texture_image.image, properties.format, aspect_flags);
 
-        vk_filter_range sampler_range = {
-            .min = VK_FILTER_LINEAR,
-            .max = VK_FILTER_LINEAR
-        };
+        vk_filter_range sampler_range = { .min = VK_FILTER_LINEAR,
+                                          .max = VK_FILTER_LINEAR };
 
         VkSamplerAddressMode addr_mode = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 
         m_texture_image.sampler = create_sampler(sampler_range, addr_mode);
         m_is_image_loaded = true;
-
     }
 
     texture::texture(const std::filesystem::path& p_filepath) {
@@ -125,13 +135,15 @@ namespace atlas::vk {
         // 1. load from file
         int w, h;
         int channels;
-        stbi_uc* image_pixel_data = stbi_load(p_filepath.string().c_str(), &w, &h, &channels, STBI_rgb_alpha);
+        stbi_uc* image_pixel_data = stbi_load(
+          p_filepath.string().c_str(), &w, &h, &channels, STBI_rgb_alpha);
 
         m_width = w;
         m_height = h;
 
-        if(!image_pixel_data) {
-            console_log_error("Could not load filepath {}", p_filepath.string());
+        if (!image_pixel_data) {
+            console_log_error("Could not load filepath {}",
+                              p_filepath.string());
             m_is_image_loaded = false;
             return;
         }
@@ -139,23 +151,23 @@ namespace atlas::vk {
         texture_properties texture_settings = {
             .width = m_width,
             .height = m_height,
-            .usage = (VkImageUsageFlagBits)(VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT),
+            .usage = (VkImageUsageFlagBits)(VK_IMAGE_USAGE_TRANSFER_DST_BIT |
+                                            VK_IMAGE_USAGE_SAMPLED_BIT),
             .property = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
             .format = VK_FORMAT_R8G8B8A8_UNORM,
         };
-        m_texture_image = create_texture_from_data(m_driver, texture_settings, image_pixel_data);
-
+        m_texture_image = create_texture_from_data(
+          m_driver, texture_settings, image_pixel_data);
 
         stbi_image_free(image_pixel_data);
 
         // 3.) Create Image View
         VkImageAspectFlags aspect_flags = VK_IMAGE_ASPECT_COLOR_BIT;
-        m_texture_image.image_view = create_image_view(m_texture_image.image, texture_settings.format, aspect_flags);
+        m_texture_image.image_view = create_image_view(
+          m_texture_image.image, texture_settings.format, aspect_flags);
 
-        vk_filter_range sampler_range = {
-            .min = VK_FILTER_LINEAR,
-            .max = VK_FILTER_LINEAR
-        };
+        vk_filter_range sampler_range = { .min = VK_FILTER_LINEAR,
+                                          .max = VK_FILTER_LINEAR };
 
         VkSamplerAddressMode addr_mode = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 
