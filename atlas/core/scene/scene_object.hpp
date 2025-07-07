@@ -18,20 +18,11 @@ namespace atlas {
      */
     class scene_object {
     public:
-        scene_object() = default;
-        scene_object(flecs::world* p_registry, const std::string& p_tag)
-          : m_entity(p_registry, p_tag) {
-            m_model = glm::mat4(1.0f);
-        }
-
-        scene_object(const flecs::entity& p_entity)
-          : m_entity(p_entity) {}
+        scene_object(flecs::world* p_registry, const std::string& p_name);
 
         ~scene_object() {
-            console_log_fatal("Scene Object Tag = {} HAS DESTRUCTED!!!",
-                              m_entity.get<tag>()->TagMetadata);
             if (m_entity.is_alive()) {
-                m_entity.on_destruction();
+                m_entity.destruct();
             }
         }
 
@@ -56,7 +47,7 @@ namespace atlas {
             using tuple_variadic = std::tuple<Args...>;
             std::variant<tuple_variadic> conditions;
             std::visit(
-              [&]([[maybe_unused]] const auto& p_component) {
+              [&](const auto& p_component) {
                   std::apply(
                     [&](auto&... p_placeholder) {
                         (m_entity.add<std::decay_t<decltype(p_placeholder)>>(),
@@ -98,36 +89,11 @@ namespace atlas {
             return m_entity.remove<UComponent>();
         }
 
-        [[nodiscard]] glm::mat4 get_model() {
-            const transform* transform_component = get<transform>();
-            m_model = glm::mat4(1.f);
-
-            //! @note Anything vec3 has to be vec4
-            m_model = glm::translate(m_model, transform_component->Position);
-            m_model = glm::scale(m_model, transform_component->Scale);
-
-            //! @note These are just notes from discussions about mathematical
-            //! conversion
-            //! TODO: The caveaut of this implicit conversion is, mathematically
-            //! un-optimized
-            //! @note Unoptimized meaning we are squaring quaternions from mat3
-            //! to mat4.
-            //! @note Squaring a matrix is n^3 operation. slighly faster because
-            //! of laser method.
-            auto rotation_mat4 =
-              glm::mat4(glm::quat(transform_component->Rotation));
-            m_model *= rotation_mat4;
-
-            return m_model;
-        }
-
         operator flecs::entity() const { return m_entity; }
 
         operator flecs::entity() { return m_entity; }
 
     private:
-        entity_t m_entity;
-        glm::mat4 m_model;
-        float m_angle = glm::radians(90.0f);
+        flecs::entity m_entity;
     };
 }; // namespace atlas
