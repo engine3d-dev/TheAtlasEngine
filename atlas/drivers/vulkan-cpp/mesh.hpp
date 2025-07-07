@@ -29,6 +29,9 @@ namespace atlas::vk {
         mesh(const std::span<vertex_input>& p_vertices, const std::span<uint32_t>& p_indices);
         mesh(const std::filesystem::path& p_filename);
 
+        //! @brief Reload mesh vertices and indices when requested
+        void reload_mesh(const std::filesystem::path& p_path);
+
         void initialize_uniforms(uint32_t p_size_bytes_ubo);
 
         void update_uniform(const material_uniform& p_material_ubo);
@@ -39,18 +42,19 @@ namespace atlas::vk {
 
         void destroy();
 
-        [[nodiscard]] vk_vertex_buffer get_vertex() const { return m_vbo; }
-
-        [[nodiscard]] vk_index_buffer get_index() const { return m_ibo; }
-
-        //! @brief Loading texture with specified filepath
+        //! @brief Loading single texture with specified std::filesystem::path
         void add_texture(const std::filesystem::path& p_path);
 
         [[nodiscard]] std::span<texture> read_textures() {
             return m_textures;
         }
 
+        //! @return true if mesh geometry model loaded succesfully
         [[nodiscard]] bool loaded() const { return m_model_loaded; }
+
+    private:
+        void load_obj(const std::filesystem::path& p_filename);
+        void load_gltf(const std::filesystem::path& p_filename);
 
     private:
         std::vector<texture> m_textures;
