@@ -24,8 +24,8 @@ namespace atlas::vk {
                          const char* p_filepath,
                          uint32_t p_line,
                          const char* p_function_name);
-	
-	//! @brief converts high-level specifications of format to VkFormat
+
+    //! @brief converts high-level specifications of format to VkFormat
     VkFormat to_vk_format(const format& p_format);
 
     /**

@@ -18,7 +18,9 @@ namespace atlas::vk {
 
         [[nodiscard]] size_t size() const { return m_vertices_count; }
 
-        [[nodiscard]] size_t size_bytes() const { return m_vertices_byte_size_count; }
+        [[nodiscard]] size_t size_bytes() const {
+            return m_vertices_byte_size_count;
+        }
 
         void destroy();
 
@@ -27,9 +29,9 @@ namespace atlas::vk {
         operator VkBuffer() const { return m_vertex_handler.handler; }
 
     private:
-        VkDevice m_driver=nullptr;
-        uint32_t m_vertices_count=0;
-        uint32_t m_vertices_byte_size_count=0;
+        VkDevice m_driver = nullptr;
+        uint32_t m_vertices_count = 0;
+        uint32_t m_vertices_byte_size_count = 0;
         vk_buffer m_vertex_handler{};
     };
 };

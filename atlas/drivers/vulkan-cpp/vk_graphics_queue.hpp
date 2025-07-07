@@ -4,14 +4,17 @@
 
 namespace atlas::vk {
     /**
-     * @brief graphics queue mainly used for submitting to the graphics family specific queue
-     * 
-     * Graphic Queues are used for submitting commands via rendering commands directly or indirectly to the GPU
-     * 
-     * Single graphics queue can only perform compute and transfer operations as well
-     * 
+     * @brief graphics queue mainly used for submitting to the graphics family
+     * specific queue
+     *
+     * Graphic Queues are used for submitting commands via rendering commands
+     * directly or indirectly to the GPU
+     *
+     * Single graphics queue can only perform compute and transfer operations as
+     * well
+     *
      * Primarily used for rendeirng logic commands processing
-    */
+     */
     class vk_graphics_queue {
     public:
         vk_graphics_queue() = default;
@@ -20,7 +23,7 @@ namespace atlas::vk {
 
         void immediate_submit_sync(const VkCommandBuffer& p_command_buffer);
 
-        void immediate_submit_async(const VkCommandBuffer& p_command_buffer); 
+        void immediate_submit_async(const VkCommandBuffer& p_command_buffer);
 
         void wait_idle();
 
@@ -33,9 +36,9 @@ namespace atlas::vk {
     private:
         vk_physical_driver m_physical{};
         vk_driver m_driver{};
-        VkQueue m_graphics_queue_handler=nullptr;
+        VkQueue m_graphics_queue_handler = nullptr;
 
-        VkSemaphore m_render_completed_semaphore=nullptr;
-        VkSemaphore m_present_completed_semaphore=nullptr;
+        VkSemaphore m_render_completed_semaphore = nullptr;
+        VkSemaphore m_present_completed_semaphore = nullptr;
     };
 };

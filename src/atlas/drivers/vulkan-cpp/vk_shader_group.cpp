@@ -3,7 +3,8 @@
 #include <core/engine_logger.hpp>
 #include <drivers/vulkan-cpp/vk_context.hpp>
 #include <drivers/vulkan-cpp/helper_functions.hpp>
-// TODO: Remove these #ifdef directives once shaderc in github workflows is fixed
+// TODO: Remove these #ifdef directives once shaderc in github workflows is
+// fixed
 #ifdef USE_SHADERC
 #include <shaderc/shaderc.hpp>
 #endif
@@ -11,7 +12,8 @@
 
 namespace atlas::vk {
 
-    //! @brief Returns raw string text that'll get compiled down by shaderc (when enabled)
+    //! @brief Returns raw string text that'll get compiled down by shaderc
+    //! (when enabled)
     [[maybe_unused]] static std::string read_file(const std::string& p_file) {
         std::ifstream ins(p_file, std::ios::ate | std::ios::binary);
 
@@ -28,9 +30,10 @@ namespace atlas::vk {
         return output;
     }
 
-    //! @brief Loading from a file and returning the binary blob that is the text
-	[[maybe_unused]] static std::vector<char> read(const std::string& p_file) {
-		std::vector<char> out_buffer;
+    //! @brief Loading from a file and returning the binary blob that is the
+    //! text
+    [[maybe_unused]] static std::vector<char> read(const std::string& p_file) {
+        std::vector<char> out_buffer;
         std::ifstream ins(p_file, std::ios::ate | std::ios::binary);
 
         if (!ins) {
@@ -85,22 +88,23 @@ namespace atlas::vk {
         return shader_module;
     }
 
-	static std::vector<char> compile_binary_shader_source(const shader_info& p_shader_source) {
-		std::vector<char> binary_blob{};
+    static std::vector<char> compile_binary_shader_source(
+      const shader_info& p_shader_source) {
+        std::vector<char> binary_blob{};
 
-		if(std::filesystem::is_regular_file(p_shader_source.source)) {
-			// std::string raw_source = read_file(p_shader_source.source);
-			binary_blob = read(p_shader_source.source);
+        if (std::filesystem::is_regular_file(p_shader_source.source)) {
+            // std::string raw_source = read_file(p_shader_source.source);
+            binary_blob = read(p_shader_source.source);
             console_log_fatal("binary_blob.size() = {}", binary_blob.size());
+        }
 
-		}
-
-		return binary_blob;
-	}
+        return binary_blob;
+    }
 
     static std::vector<uint32_t> compile_shader_source(
       const shader_info& p_shader_source) {
-        // TODO: Remove these #ifdef directives once shaderc in github workflows is fixed
+        // TODO: Remove these #ifdef directives once shaderc in github workflows
+        // is fixed
 #ifdef USE_SHADERC
         std::vector<uint32_t> binary_blob{};
 
@@ -176,10 +180,12 @@ namespace atlas::vk {
         }
 
         return binary_blob;
-    #else
-		console_log_fatal("Cannot load in path {} because it needs to be compiled to .spv", p_shader_source.source);
-    #endif
-		return {};
+#else
+        console_log_fatal(
+          "Cannot load in path {} because it needs to be compiled to .spv",
+          p_shader_source.source);
+#endif
+        return {};
     }
 
     vk_shader_group::vk_shader_group(
@@ -197,24 +203,25 @@ namespace atlas::vk {
     }
 
     void vk_shader_group::compile() {
-		std::map<std::string, std::string> extensions;
-		std::string vert = ".vert";
-		std::string frag = ".frag";
-		extensions.emplace(vert, vert);
-		extensions.emplace(frag, frag);
+        std::map<std::string, std::string> extensions;
+        std::string vert = ".vert";
+        std::string frag = ".frag";
+        extensions.emplace(vert, vert);
+        extensions.emplace(frag, frag);
 
         for (const shader_info& info : m_shader_sources) {
             std::vector<uint32_t> source_blobs;
-			std::vector<char> binary_blobs;
-			std::string extension = std::filesystem::path(info.source).extension().string();
-			if(extensions.contains(extension)) {
+            std::vector<char> binary_blobs;
+            std::string extension =
+              std::filesystem::path(info.source).extension().string();
+            if (extensions.contains(extension)) {
                 console_log_fatal("non-spv extension {} loaded!!!", extension);
-				source_blobs = compile_shader_source(info);
-			}
-			else if(extension == ".spv") {
-				console_log_fatal("Loading .spv files!!!");
-				binary_blobs = compile_binary_shader_source(info);
-			}
+                source_blobs = compile_shader_source(info);
+            }
+            else if (extension == ".spv") {
+                console_log_fatal("Loading .spv files!!!");
+                binary_blobs = compile_binary_shader_source(info);
+            }
 
             if (!source_blobs.empty()) {
                 vk_shader_module module_info = {

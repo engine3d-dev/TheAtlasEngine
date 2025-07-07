@@ -23,7 +23,7 @@ namespace atlas::vk {
                          shader_stage::fragment }
         };
 #else
-		std::array<shader_info, 2> shader_sources = {
+        std::array<shader_info, 2> shader_sources = {
             shader_info{ "experimental-shaders/test_vert.spv",
                          shader_stage::vertex },
             shader_info{ "experimental-shaders/test_frag.spv",

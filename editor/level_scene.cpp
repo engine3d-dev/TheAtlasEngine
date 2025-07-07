@@ -14,7 +14,7 @@ level_scene::level_scene(const std::string& p_tag)
 
     float aspect_ratio = atlas::application::aspect_ratio();
     atlas::camera camera_comp = atlas::camera(aspect_ratio);
-    camera_comp.Position = {-1.1f, 6.53f, 23.32f};
+    camera_comp.Position = { -1.1f, 6.53f, 23.32f };
     camera_comp.IsMainCamera = true;
 
     m_camera->set<atlas::camera>(camera_comp);
@@ -23,58 +23,49 @@ level_scene::level_scene(const std::string& p_tag)
     m_viking_room = this->create_new_object("Viking Room Object");
     atlas::transform sphere_transform = {
         // .Position{0.f, 0.f, 1.60f},
-        .Position = {-2.70f, 2.70, -8.30f},
-        .Rotation = {2.30f, 95.90f, 91.80f},
-        .Scale{1.f},
+        .Position = { -2.70f, 2.70, -8.30f },
+        .Rotation = { 2.30f, 95.90f, 91.80f },
+        .Scale{ 1.f },
     };
     m_viking_room->set<atlas::transform>(sphere_transform);
-    m_viking_room->set<atlas::material>({
-        .color = {1.f, 1.f, 1.f, 1.f},
+    m_viking_room->set<atlas::material>(
+      { .color = { 1.f, 1.f, 1.f, 1.f },
         .model_path = "assets/models/viking_room.obj",
-        .texture_path = "assets/models/viking_room.png"
-    });
-
+        .texture_path = "assets/models/viking_room.png" });
 
     m_cube = create_new_object("Cube");
 
     atlas::transform cube_transform = {
         // .Position = {-2.70, 0.f, 0.f},
-        .Position = {0.f, 2.10f, -7.30f},
-        .Scale = {0.9f, 0.9f, 0.9f},
+        .Position = { 0.f, 2.10f, -7.30f },
+        .Scale = { 0.9f, 0.9f, 0.9f },
     };
     m_cube->set<atlas::transform>(cube_transform);
 
-    m_cube->set<atlas::material>({
-        .color = {1.f, 1.f, 1.f, 1.f},
+    m_cube->set<atlas::material>(
+      { .color = { 1.f, 1.f, 1.f, 1.f },
         .model_path = "assets/models/E 45 Aircraft_obj.obj",
-        .texture_path = "assets/models/E-45-steel detail_2_col.jpg"
-    });
+        .texture_path = "assets/models/E-45-steel detail_2_col.jpg" });
 
     m_robot_model = create_new_object("object 1");
     m_robot_model->set<atlas::transform>({
-        .Position = {0.f, 0.f, -20.f},
-        .Scale = {0.9f, 0.9f, 0.9f},
+      .Position = { 0.f, 0.f, -20.f },
+      .Scale = { 0.9f, 0.9f, 0.9f },
     });
 
-    m_robot_model->set<atlas::material>({
-        .color = {1.f, 1.f, 1.f, 1.f},
+    m_robot_model->set<atlas::material>(
+      { .color = { 1.f, 1.f, 1.f, 1.f },
         .model_path = "assets/models/robot.obj",
-        .texture_path = "assets/models/container_diffuse.png"
-    });
+        .texture_path = "assets/models/container_diffuse.png" });
 
     m_platform = create_new_object("platform");
-    m_platform->set<atlas::transform>({
-        // .Position = { 0.f, 1.40f, -7.4f },
-        // .Scale = { 2.80f, -0.08f, 3.50f },
-        .Scale = {15.f, -0.30f, 10.0f}
-    });
+    m_platform->set<atlas::transform>({ // .Position = { 0.f, 1.40f, -7.4f },
+                                        // .Scale = { 2.80f, -0.08f, 3.50f },
+                                        .Scale = { 15.f, -0.30f, 10.0f } });
 
-    m_platform->set<atlas::material>({
-        .model_path = "assets/models/cube.obj",
-        .texture_path = "assets/models/wood.png"
-    });
-
-
+    m_platform->set<atlas::material>(
+      { .model_path = "assets/models/cube.obj",
+        .texture_path = "assets/models/wood.png" });
 
     sync(this, &level_scene::on_update);
     sync_physics(this, &level_scene::on_physics_update);
@@ -83,15 +74,17 @@ level_scene::level_scene(const std::string& p_tag)
 
 void
 level_scene::on_ui_update() {
-    atlas::transform* viking_transform = m_viking_room->get_mut<atlas::transform>();
-    atlas::transform* robot_transform = m_robot_model->get_mut<atlas::transform>();
-    atlas::transform* platform_transform = m_platform->get_mut<atlas::transform>();
+    atlas::transform* viking_transform =
+      m_viking_room->get_mut<atlas::transform>();
+    atlas::transform* robot_transform =
+      m_robot_model->get_mut<atlas::transform>();
+    atlas::transform* platform_transform =
+      m_platform->get_mut<atlas::transform>();
     atlas::transform* cube_transform = m_cube->get_mut<atlas::transform>();
     atlas::camera* camera_transform = m_camera->get_mut<atlas::camera>();
 
     atlas::material* viking_room_material =
       m_viking_room->get_mut<atlas::material>();
-
 
     if (ImGui::Begin("Viewport")) {
         glm::vec2 viewport_panel_size =
@@ -100,7 +93,6 @@ level_scene::on_ui_update() {
 
         ImGui::End();
     }
-
 
     if (ImGui::Begin("Scene Heirarchy")) {
         // @note right click on blank space
@@ -115,7 +107,6 @@ level_scene::on_ui_update() {
         }
         ImGui::End();
     }
-
 
     if (ImGui::Begin("Properties Panel")) {
 
@@ -146,35 +137,41 @@ level_scene::on_ui_update() {
             }
         });
 
-        atlas::ui::draw_panel_component<atlas::material>("Robot", [&](){
+        atlas::ui::draw_panel_component<atlas::material>("Robot", [&]() {
             atlas::ui::draw_vec3("position", robot_transform->Position);
             atlas::ui::draw_vec3("rob scale", robot_transform->Scale);
         });
 
-        atlas::ui::draw_panel_component<atlas::material>("Cube", [&](){
+        atlas::ui::draw_panel_component<atlas::material>("Cube", [&]() {
             atlas::ui::draw_vec3("cube pos", cube_transform->Position);
         });
 
-        atlas::ui::draw_panel_component<atlas::material>("platform", [&platform_transform](){
-            atlas::ui::draw_vec3("platform pos", platform_transform->Position);
-            atlas::ui::draw_vec3("platform scale", platform_transform->Scale);
-            atlas::ui::draw_vec3("platform rot", platform_transform->Rotation);
-        });
+        atlas::ui::draw_panel_component<atlas::material>(
+          "platform", [&platform_transform]() {
+              atlas::ui::draw_vec3("platform pos",
+                                   platform_transform->Position);
+              atlas::ui::draw_vec3("platform scale", platform_transform->Scale);
+              atlas::ui::draw_vec3("platform rot",
+                                   platform_transform->Rotation);
+          });
 
-        // atlas::ui::draw_panel_component<atlas::rendertarget3d>("test object", [&]() {
+        // atlas::ui::draw_panel_component<atlas::rendertarget3d>("test object",
+        // [&]() {
         //     std::string sphere_filepath = "";
         //     atlas::ui::draw_vec3("position", test_transform->Position);
         //     atlas::ui::draw_vec3("scale", test_transform->Scale);
         //     atlas::ui::draw_vec3("rotate", test_transform->Rotation);
         //     atlas::ui::draw_vec4("color", test_transform->Color);
         //     // atlas::ui::draw_vec3("Light Pos", g_light_position);
-        //     atlas::ui::button_open_file_dialog("Load Mesh 1", sphere_filepath);
+        //     atlas::ui::button_open_file_dialog("Load Mesh 1",
+        //     sphere_filepath);
 
         //     if (sphere_filepath != "") {
         //         std::filesystem::path relative_path =
         //           std::filesystem::relative(sphere_filepath, "./");
         //         console_log_trace("Sphere Filepath = {}", sphere_filepath);
-        //         sphere_render_object->model_path = { relative_path.string() };
+        //         sphere_render_object->model_path = { relative_path.string()
+        //         };
         //         //! TODO: Empty String again to reset the filepath set
         //         sphere_filepath = "";
         //     }
@@ -211,7 +208,7 @@ level_scene::on_update() {
     }
     if (atlas::event::is_key_pressed(key_d)) {
         camera->process_keyboard(atlas::right, delta_time);
-    } 
+    }
     if (atlas::event::is_key_pressed(key_q)) {
         camera->process_keyboard(atlas::up, delta_time);
     }
@@ -256,6 +253,4 @@ level_scene::on_update() {
 }
 
 void
-level_scene::on_physics_update() {
-}
-
+level_scene::on_physics_update() {}

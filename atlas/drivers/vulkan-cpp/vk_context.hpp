@@ -9,12 +9,14 @@ namespace atlas::vk {
     public:
         vk_context(const std::string& p_tag);
 
-
         static void submit_resource_free(std::function<void()>&& p_resource);
 
         static VkInstance handler();
 
-        static vk_physical_driver physical_driver() { return s_instance->m_physical; }
+        static vk_physical_driver physical_driver() {
+            return s_instance->m_physical;
+        }
+
         static vk_driver driver_context() { return s_instance->m_driver; }
 
     private:
@@ -25,7 +27,7 @@ namespace atlas::vk {
 
     private:
         static vk_context* s_instance;
-        VkInstance m_instance_handler=nullptr;
+        VkInstance m_instance_handler = nullptr;
         vk_physical_driver m_physical{};
         vk_driver m_driver{};
         std::deque<std::function<void()>> m_resources_free{};

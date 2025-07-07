@@ -41,7 +41,9 @@ namespace atlas {
             return window_swapchain();
         }
 
-        vk::vk_command_buffer active_command_buffer(uint32_t p_frame_idx) { return current_active_command_buffer(p_frame_idx); }
+        vk::vk_command_buffer active_command_buffer(uint32_t p_frame_idx) {
+            return current_active_command_buffer(p_frame_idx);
+        }
 
         operator GLFWwindow*() const { return native_window(); }
 
@@ -53,8 +55,9 @@ namespace atlas {
         void close();
 
         /**
-         * @param p_current_frame_idx is the current frame index for the next available image
-        */
+         * @param p_current_frame_idx is the current frame index for the next
+         * available image
+         */
         void present(const uint32_t& p_current_frame_idx);
 
     private:
@@ -62,7 +65,8 @@ namespace atlas {
         [[nodiscard]] virtual GLFWwindow* native_window() const = 0;
         [[nodiscard]] virtual uint32_t read_acquired_next_frame() = 0;
         [[nodiscard]] virtual vk::vk_swapchain window_swapchain() const = 0;
-        [[nodiscard]] virtual vk::vk_command_buffer current_active_command_buffer(const uint32_t& p_frame_idx) = 0;
+        [[nodiscard]] virtual vk::vk_command_buffer
+        current_active_command_buffer(const uint32_t& p_frame_idx) = 0;
         virtual void presentation_process(const uint32_t& p_current_frame) = 0;
     };
 

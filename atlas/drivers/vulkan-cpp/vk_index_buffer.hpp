@@ -18,8 +18,8 @@ namespace atlas::vk {
         [[nodiscard]] size_t size() const { return m_indices_count; }
 
     private:
-        VkDevice m_driver=nullptr;
-        uint32_t m_indices_count=0;
+        VkDevice m_driver = nullptr;
+        uint32_t m_indices_count = 0;
         vk_buffer m_index_buffer_handler{};
     };
 };

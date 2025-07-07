@@ -8,10 +8,11 @@ namespace atlas::vk {
     class vk_uniform_buffer {
     public:
         vk_uniform_buffer() = default;
-        
+
         vk_uniform_buffer(uint32_t p_size_in_bytes);
 
-        //! @return bytes of the uniform data stored with this uniform buffer handler
+        //! @return bytes of the uniform data stored with this uniform buffer
+        //! handler
         [[nodiscard]] uint32_t size_bytes() const { return m_size_bytes; }
 
         void update(const void* p_data);
@@ -23,8 +24,8 @@ namespace atlas::vk {
         void destroy();
 
     private:
-        VkDevice m_driver=nullptr;
-        uint32_t m_size_bytes=0;
+        VkDevice m_driver = nullptr;
+        uint32_t m_size_bytes = 0;
         vk_buffer m_uniform_buffer_data{};
     };
 };

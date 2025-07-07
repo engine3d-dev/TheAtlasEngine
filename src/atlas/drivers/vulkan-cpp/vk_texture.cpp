@@ -88,9 +88,10 @@ namespace atlas::vk {
         };
 
         // 1.) Load in extent dimensions
-		// Loading in raw white pixels for our texture.
-		// TODO: Take in a std::span<uint8_t> for pixels that will then be written to the texture
-		std::array<uint8_t, 4> white_color = {0xFF, 0xFF, 0xFF, 0xFF};
+        // Loading in raw white pixels for our texture.
+        // TODO: Take in a std::span<uint8_t> for pixels that will then be
+        // written to the texture
+        std::array<uint8_t, 4> white_color = { 0xFF, 0xFF, 0xFF, 0xFF };
 
         m_width = p_extent.width;
         m_height = p_extent.height;
@@ -102,11 +103,11 @@ namespace atlas::vk {
                                             VK_IMAGE_USAGE_SAMPLED_BIT),
             .property = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
             // .format = VK_FORMAT_R8G8B8A8_UNORM,
-			.format = VK_FORMAT_R8G8B8A8_SRGB
-			// .format = VK_FORMAT_R64G64B64A64_SFLOAT
+            .format = VK_FORMAT_R8G8B8A8_SRGB
+            // .format = VK_FORMAT_R64G64B64A64_SFLOAT
         };
-        m_texture_image = create_texture_from_data(
-          m_driver, properties, white_color.data());
+        m_texture_image =
+          create_texture_from_data(m_driver, properties, white_color.data());
 
         // 3.) Create Image View
         VkImageAspectFlags aspect_flags = VK_IMAGE_ASPECT_COLOR_BIT;

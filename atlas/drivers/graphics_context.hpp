@@ -5,7 +5,7 @@ namespace atlas {
     class graphics_context {
     public:
         virtual ~graphics_context() = default;
-        
+
         void destroy() { return destroy_context(); }
 
     private:
@@ -13,5 +13,5 @@ namespace atlas {
     };
 
     ref<graphics_context> initialize_context(const std::string& p_tag);
-    
+
 };

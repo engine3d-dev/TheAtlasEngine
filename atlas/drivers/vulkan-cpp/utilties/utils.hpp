@@ -70,8 +70,8 @@ namespace atlas::vk {
                                  VkFormat p_format,
                                  VkImageLayout p_old,
                                  VkImageLayout p_new);
-    
-     /**
+
+    /**
      * @name transition_image_layout
      * @param VkImage is the image we want to transition to
      * @param VkFormat specifying the format in which are image has been set to
@@ -121,6 +121,6 @@ namespace atlas::vk {
                               VkImageLayout p_new);
     //
 
-
-    void queue_submit(const VkQueue& p_queue_handle, const std::span<VkCommandBuffer>& p_commands);
+    void queue_submit(const VkQueue& p_queue_handle,
+                      const std::span<VkCommandBuffer>& p_commands);
 };

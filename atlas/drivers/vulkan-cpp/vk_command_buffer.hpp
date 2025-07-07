@@ -24,14 +24,18 @@ namespace atlas::vk {
         //! @brief Constructs new command buffer
         vk_command_buffer(const command_buffer_settings& p_settings);
 
-        //! @brief Indication when for this command buffer to start recording (writing) commands to this command buffer
+        //! @brief Indication when for this command buffer to start recording
+        //! (writing) commands to this command buffer
         void begin(const VkCommandBufferUsageFlags& p_usage_flags);
 
-        //! @brief Indication when the command buffer to stop recording (write) commands to this buffer.
+        //! @brief Indication when the command buffer to stop recording (write)
+        //! commands to this buffer.
         void end();
 
         //! @brief Enable to check for command buffers if they are valid
-        [[nodiscard]] bool is_valid() const { return (m_command_buffer_handler != nullptr); }
+        [[nodiscard]] bool is_valid() const {
+            return (m_command_buffer_handler != nullptr);
+        }
 
         //! @brief API for explicitly invoking cleanup on the command buffer
         void destroy();

@@ -35,7 +35,7 @@ private:
     atlas::ref<atlas::scene_object> m_viking_room;
     atlas::ref<atlas::scene_object> m_cube;
     atlas::ref<atlas::scene_object> m_robot_model;
-    atlas::ref<atlas::scene_object> m_platform=nullptr;
+    atlas::ref<atlas::scene_object> m_platform = nullptr;
 
     bool m_is_simulation_enabled = false;
     atlas::ref<atlas::scene_object> m_camera;
