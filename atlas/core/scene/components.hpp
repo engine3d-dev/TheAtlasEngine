@@ -20,18 +20,17 @@ namespace atlas {
         glm::highp_vec4 QuaternionRotation{ 0.f, 0, 0, 1 };
         glm::highp_vec3 Rotation{ 0.f };
         glm::highp_vec3 Scale{ 1.f };
-        glm::highp_vec4 Color{ 1.f };
     };
 
     //! @note Our interpretation of the RigidBody3D
     struct rigidbody3d {
         rigidbody3d() = default;
 
-        enum class BodyType { STATIC = 0, DYNAMIC = 1, KINEMATIC = 2 };
+        enum class body_type { e_static = 0, e_dynamic = 1, e_kinematic = 2 };
 
-        BodyType Type = BodyType::STATIC;
-        bool HasFixation = false;
-        void* BodyAtRuntime =
+        body_type type = body_type::e_static;
+        bool hax_fixation = false;
+        void* body_at_runtime =
           nullptr; // for storing the actual data of the body
     };
 
@@ -52,7 +51,7 @@ namespace atlas {
 
     // Defines several possible options for camera movement. Used as abstraction
     // to stay away from window-system specific input methods
-    enum CameraMovement { Forward, Backward, Left, Right, Up, Down };
+    enum CameraMovement { forward, backward, left, right, up, down };
 
     // An abstract camera class that processes input and calculates the
     // corresponding Euler Angles, Vectors and Matrices for use in OpenGL
@@ -62,19 +61,37 @@ namespace atlas {
         glm::vec3 Position{ 1.f };
     };
 
+    /**
+     * @brief Actually might do a query for this along with rendertarget3d
+     * @brief This is because we can have multiple things that could be reloaded
+     * @brief Such as the single texture and the mesh .obj 3d model as well
+     * @brief
+     */
+    struct reload {
+        bool on_reload = false;
+        bool on_texture_reload = false;
+    };
+
     //! @note Contains our render target as the mesh
     //! TODO: IMPORTANT: NEED TO CHANGE HOW THIS WORKSS!!
     //! IMPORTANT: flecs gives you a lifetime issue if it doesnt have a default
     //! constructor implictly added to a struct/class
-    struct rendertarget3d {
-        rendertarget3d() = default;
-        rendertarget3d(const std::string& p_filepath)
-          : Filepath(p_filepath)
-          , MeshMetaData(p_filepath) {}
+    // struct rendertarget3d {
+    //     std::string model_path; // used to load in a model
+    //     std::string Filepath; // used for texture
+    //     // bool is_model_dirty=false; // checks if the model is needing to
+    //     reload bool is_texture_dirty=false; // checking if texture is needing
+    //     to reload
+    // };
 
-        std::string Filepath;
-        mesh MeshMetaData{};
-        glm::mat4 Model{ 1.f };
+    struct material {
+        glm::vec4 color{ 1.f };
+        std::string model_path = "";
+        std::string texture_path =
+          ""; // This just contains the path to load the texture
+        std::vector<std::string> texture_filepaths;
+        bool model_reload = false;
+        bool texture_reload = false;
     };
 
     // An abstract camera class that processes input and calculates the
@@ -97,8 +114,10 @@ namespace atlas {
         // const float PITCH = 0.0f;
         // const float ZOOM = 45.0f;
     public:
+        camera() = default;
         // constructor with vectors
-        camera(glm::vec3 position = glm::vec3(0.0f, 1.50f, 0.0f),
+        camera(float p_aspect_ratio,
+               glm::vec3 position = glm::vec3(0.0f, 1.50f, 0.0f),
                glm::vec3 up = glm::vec3(0.0f, -1.0f, 0.0f),
                float yaw = -90.0f,
                float pitch = 0.0f)
@@ -109,7 +128,7 @@ namespace atlas {
             Position = position;
             WorldUp = up;
             EulerRotation = { yaw, pitch, 1.f };
-            AspectRatio = (float)application::get_aspect_ratio();
+            AspectRatio = p_aspect_ratio;
             update_camera();
         }
 
@@ -124,20 +143,20 @@ namespace atlas {
         void process_keyboard(CameraMovement p_direction, float p_delta_time) {
             float velocity = MovementSpeed * p_delta_time;
 
-            if (p_direction == CameraMovement::Forward)
+            if (p_direction == CameraMovement::forward)
                 Position += get_front() * velocity;
-            if (p_direction == CameraMovement::Backward)
+            if (p_direction == CameraMovement::backward)
                 Position -= get_front() * velocity;
-            if (p_direction == CameraMovement::Left)
+            if (p_direction == CameraMovement::left)
                 Position -= Right * velocity;
-            if (p_direction == CameraMovement::Right)
+            if (p_direction == CameraMovement::right)
                 Position += Right * velocity;
 
-            if (p_direction == CameraMovement::Up) {
+            if (p_direction == CameraMovement::up) {
                 Position += Up * velocity;
             }
 
-            if (p_direction == CameraMovement::Down) {
+            if (p_direction == CameraMovement::down) {
                 Position -= Up * velocity;
             }
         }

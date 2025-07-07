@@ -1,5 +1,6 @@
 #pragma once
 #include "level_scene.hpp"
+#include <core/scene/world.hpp>
 
 class editor_world {
 public:

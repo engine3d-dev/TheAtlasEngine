@@ -1,5 +1,4 @@
 #pragma once
-// #define ATLAS_DEBUG_BUILD
 #include <core/core.hpp>
 #include <core/scene/scene.hpp>
 #include <core/scene/scene_object.hpp>
@@ -26,25 +25,17 @@ public:
         console_log_error("LevelScene::~LevelScene Destructed!!!");
     }
 
-    //! @note Remove these from being overridden
-    //! TODO: We should have an indication on what functions are update phased
-    //! functions
     void on_update();
 
     void on_ui_update();
 
-    //! TODO: Remove this and integrate a few functions into LevelScene such as
-    //! on_runtime_start/on_runtime_stop
     void on_physics_update();
 
-    void on_runtime_start();
-    void on_runtime_stop();
-
 private:
-    atlas::ref<atlas::scene_object> m_sphere;
-    atlas::ref<atlas::scene_object> m_platform;
-    atlas::ref<atlas::scene_object> m_light_object;
-    // atlas::ref<atlas::scene_object> m_test_object = nullptr;
+    atlas::ref<atlas::scene_object> m_viking_room;
+    atlas::ref<atlas::scene_object> m_cube;
+    atlas::ref<atlas::scene_object> m_robot_model;
+    atlas::ref<atlas::scene_object> m_platform = nullptr;
 
     bool m_is_simulation_enabled = false;
     atlas::ref<atlas::scene_object> m_camera;

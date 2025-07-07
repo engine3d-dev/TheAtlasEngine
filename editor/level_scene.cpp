@@ -1,71 +1,71 @@
 #include "level_scene.hpp"
-#include <drivers/vulkan/helper_functions.hpp>
-#include <drivers/vulkan/vulkan_context.hpp>
-#include <drivers/vulkan/vulkan_swapchain.hpp>
-
-#include <core/event/event.hpp>
 #include <core/update_handlers/sync_update.hpp>
-
-#include <core/serialize/serializer.hpp>
+#include <core/event/event.hpp>
 #include <core/ui/widgets.hpp>
-#include <glm/ext/matrix_transform.hpp>
-#include <glm/ext/quaternion_common.hpp>
-#include <physics/jolt-cpp/helper_functions.hpp>
-#include <physics/jolt-cpp/jolt_api.hpp>
-#include <renderer/renderer.hpp>
-
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/compatibility.hpp>
-#include <span>
+#include <core/serialize/serializer.hpp>
 
 static float sensitivity = 0.f;
-
-// static CameraData camera_data;
-static std::string s_scene_filepath = "";
-static glm::vec3 g_light_position = glm::vec3(0.0f, 0.0f, 1.0f);
-
-namespace ui {}; // namespace ui
-
-//! @brief These structs were just for testing add_query<UComponent...>()
-struct component1 {};
-
-struct component2 {};
-
-struct component3 {};
-
-struct component4 {};
 
 level_scene::level_scene(const std::string& p_tag)
   : atlas::scene_scope(p_tag) {
     console_log_info("scene_scope::scene_scope with Tag = {} called!", p_tag);
 
-    //! @note Creating our objects from our scene
-    m_sphere = this->create_new_object("sphere");
-
-    m_sphere->set<atlas::rendertarget3d>(
-      atlas::rendertarget3d("assets/models/colored_cube.obj"));
-
-    m_sphere->set<atlas::transform>({ .Position = { 0.f, 2.10f, -7.30f },
-                                      .Scale = { .20f, .20f, .20f },
-                                      .Color = { 1.0f, 1.f, 1.f, 1.f } });
-
-    m_sphere->add<atlas::rigidbody3d>();
-    m_sphere->add<atlas::light>();
-
-    m_platform = this->create_new_object("mesh1");
-    m_platform->set<atlas::transform>({
-      .Position = { 0.f, 1.40f, -7.4f },
-      .Scale = { 2.80f, -0.08f, 3.50f },
-    });
-
-    m_platform->set<atlas::rendertarget3d>({ "assets/models/cube.obj" });
-
     m_camera = this->create_new_object("camera");
 
-    // camera_data.Position = { 0.0f, 1.50f, 0.0f };
-    // camera_data.Front = glm::vec3(-0.0f, 0.0f, -1.0f);
-    m_camera->add<atlas::camera>();
-    sensitivity = m_camera->get<atlas::camera>()->MovementSpeed;
+    float aspect_ratio = atlas::application::aspect_ratio();
+    atlas::camera camera_comp = atlas::camera(aspect_ratio);
+    camera_comp.Position = { -1.1f, 6.53f, 23.32f };
+    camera_comp.IsMainCamera = true;
+
+    m_camera->set<atlas::camera>(camera_comp);
+    sensitivity = camera_comp.MovementSpeed;
+
+    m_viking_room = this->create_new_object("Viking Room Object");
+    atlas::transform sphere_transform = {
+        // .Position{0.f, 0.f, 1.60f},
+        .Position = { -2.70f, 2.70, -8.30f },
+        .Rotation = { 2.30f, 95.90f, 91.80f },
+        .Scale{ 1.f },
+    };
+    m_viking_room->set<atlas::transform>(sphere_transform);
+    m_viking_room->set<atlas::material>(
+      { .color = { 1.f, 1.f, 1.f, 1.f },
+        .model_path = "assets/models/viking_room.obj",
+        .texture_path = "assets/models/viking_room.png" });
+
+    m_cube = create_new_object("Cube");
+
+    atlas::transform cube_transform = {
+        // .Position = {-2.70, 0.f, 0.f},
+        .Position = { 0.f, 2.10f, -7.30f },
+        .Scale = { 0.9f, 0.9f, 0.9f },
+    };
+    m_cube->set<atlas::transform>(cube_transform);
+
+    m_cube->set<atlas::material>(
+      { .color = { 1.f, 1.f, 1.f, 1.f },
+        .model_path = "assets/models/E 45 Aircraft_obj.obj",
+        .texture_path = "assets/models/E-45-steel detail_2_col.jpg" });
+
+    m_robot_model = create_new_object("object 1");
+    m_robot_model->set<atlas::transform>({
+      .Position = { 0.f, 0.f, -20.f },
+      .Scale = { 0.9f, 0.9f, 0.9f },
+    });
+
+    m_robot_model->set<atlas::material>(
+      { .color = { 1.f, 1.f, 1.f, 1.f },
+        .model_path = "assets/models/robot.obj",
+        .texture_path = "assets/models/container_diffuse.png" });
+
+    m_platform = create_new_object("platform");
+    m_platform->set<atlas::transform>({ // .Position = { 0.f, 1.40f, -7.4f },
+                                        // .Scale = { 2.80f, -0.08f, 3.50f },
+                                        .Scale = { 15.f, -0.30f, 10.0f } });
+
+    m_platform->set<atlas::material>(
+      { .model_path = "assets/models/cube.obj",
+        .texture_path = "assets/models/wood.png" });
 
     sync(this, &level_scene::on_update);
     sync_physics(this, &level_scene::on_physics_update);
@@ -74,29 +74,23 @@ level_scene::level_scene(const std::string& p_tag)
 
 void
 level_scene::on_ui_update() {
-    atlas::transform* sphere_transform = m_sphere->get_mut<atlas::transform>();
-
-    atlas::rendertarget3d* sphere_render_object =
-      m_sphere->get_mut<atlas::rendertarget3d>();
-
-    atlas::rendertarget3d* platform_render_target =
-      m_platform->get_mut<atlas::rendertarget3d>();
-
+    atlas::transform* viking_transform =
+      m_viking_room->get_mut<atlas::transform>();
+    atlas::transform* robot_transform =
+      m_robot_model->get_mut<atlas::transform>();
     atlas::transform* platform_transform =
       m_platform->get_mut<atlas::transform>();
+    atlas::transform* cube_transform = m_cube->get_mut<atlas::transform>();
+    atlas::camera* camera_transform = m_camera->get_mut<atlas::camera>();
+
+    atlas::material* viking_room_material =
+      m_viking_room->get_mut<atlas::material>();
 
     if (ImGui::Begin("Viewport")) {
         glm::vec2 viewport_panel_size =
-          glm::vec2{ atlas::application::get_window().get_width(),
-                     atlas::application::get_window().get_height() };
+          glm::vec2{ atlas::application::get_window().width(),
+                     atlas::application::get_window().height() };
 
-        if (ImGui::Begin("Image")) {
-            ImGui::End();
-        }
-        ImGui::End();
-    }
-
-    if (ImGui::Begin("Settings")) {
         ImGui::End();
     }
 
@@ -114,10 +108,6 @@ level_scene::on_ui_update() {
         ImGui::End();
     }
 
-    if (ImGui::Begin("Content Browser")) {
-        ImGui::End();
-    }
-
     if (ImGui::Begin("Properties Panel")) {
 
         //! @note THERE IS AN ERROR. Where if the imgui docking window is
@@ -127,100 +117,103 @@ level_scene::on_ui_update() {
         //! TODO: Assign widgets in this lambda to correspond to panel's as
         //! groups
         //! @note Or else there will be conflict in naming ID's
-        atlas::ui::draw_panel_component<atlas::rendertarget3d>("Sphere", [&]() {
+        atlas::ui::draw_panel_component<atlas::material>("Sphere", [&]() {
             std::string sphere_filepath = "";
-            atlas::ui::draw_vec3("pos 1", sphere_transform->Position);
-            atlas::ui::draw_vec3("scale 1", sphere_transform->Scale);
-            atlas::ui::draw_vec3("rotate 1", sphere_transform->Rotation);
-            atlas::ui::draw_vec4("color 1", sphere_transform->Color);
-            atlas::ui::draw_vec3("Light Pos", g_light_position);
+            atlas::ui::draw_vec3("pos 1", viking_transform->Position);
+            atlas::ui::draw_vec3("scale 1", viking_transform->Scale);
+            atlas::ui::draw_vec3("rotate 1", viking_transform->Rotation);
+            atlas::ui::draw_vec4("color 1", viking_room_material->color);
+            // atlas::ui::draw_vec3("Light Pos", g_light_position);
             atlas::ui::button_open_file_dialog("Load Mesh 1", sphere_filepath);
+            atlas::ui::draw_vec3("camera pos", camera_transform->Position);
 
             if (sphere_filepath != "") {
                 std::filesystem::path relative_path =
                   std::filesystem::relative(sphere_filepath, "./");
                 console_log_trace("Sphere Filepath = {}", sphere_filepath);
-                sphere_render_object->MeshMetaData = { relative_path.string() };
+                viking_room_material->model_path = { relative_path.string() };
                 //! TODO: Empty String again to reset the filepath set
                 sphere_filepath = "";
             }
         });
 
-        atlas::ui::draw_panel_component<atlas::rendertarget3d>(
-          "Platform", [&]() {
-              std::string platform_filepath = "";
-              atlas::ui::draw_vec3("Position 2", platform_transform->Position);
-              atlas::ui::draw_vec3("Scale 2", platform_transform->Scale);
-              atlas::ui::draw_vec3("Rotation 2", platform_transform->Rotation);
-              atlas::ui::draw_vec4("Color 2", platform_transform->Color);
-              atlas::ui::draw_float("Mouse Sensitivity", sensitivity);
-              atlas::ui::button_open_file_dialog("Load Mesh 2",
-                                                 platform_filepath);
-              if (platform_filepath != "") {
-                  std::filesystem::path relative_path =
-                    std::filesystem::relative(platform_filepath, "./");
-                  console_log_trace("Platform Filepath = {}",
-                                    platform_filepath);
-                  platform_render_target->MeshMetaData = {
-                      relative_path.string()
-                  };
-                  //! TODO: Empty String again to reset the filepath set
-                  platform_filepath = "";
-              }
+        atlas::ui::draw_panel_component<atlas::material>("Robot", [&]() {
+            atlas::ui::draw_vec3("position", robot_transform->Position);
+            atlas::ui::draw_vec3("rob scale", robot_transform->Scale);
+        });
+
+        atlas::ui::draw_panel_component<atlas::material>("Cube", [&]() {
+            atlas::ui::draw_vec3("cube pos", cube_transform->Position);
+        });
+
+        atlas::ui::draw_panel_component<atlas::material>(
+          "platform", [&platform_transform]() {
+              atlas::ui::draw_vec3("platform pos",
+                                   platform_transform->Position);
+              atlas::ui::draw_vec3("platform scale", platform_transform->Scale);
+              atlas::ui::draw_vec3("platform rot",
+                                   platform_transform->Rotation);
           });
 
-        if (ImGui::Button("Save As")) {
-            std::string output_path = atlas::filesystem::save_to_file("");
-            atlas::serializer serializer(this);
-            serializer.save_as(output_path);
-        }
+        // atlas::ui::draw_panel_component<atlas::rendertarget3d>("test object",
+        // [&]() {
+        //     std::string sphere_filepath = "";
+        //     atlas::ui::draw_vec3("position", test_transform->Position);
+        //     atlas::ui::draw_vec3("scale", test_transform->Scale);
+        //     atlas::ui::draw_vec3("rotate", test_transform->Rotation);
+        //     atlas::ui::draw_vec4("color", test_transform->Color);
+        //     // atlas::ui::draw_vec3("Light Pos", g_light_position);
+        //     atlas::ui::button_open_file_dialog("Load Mesh 1",
+        //     sphere_filepath);
+
+        //     if (sphere_filepath != "") {
+        //         std::filesystem::path relative_path =
+        //           std::filesystem::relative(sphere_filepath, "./");
+        //         console_log_trace("Sphere Filepath = {}", sphere_filepath);
+        //         sphere_render_object->model_path = { relative_path.string()
+        //         };
+        //         //! TODO: Empty String again to reset the filepath set
+        //         sphere_filepath = "";
+        //     }
+        // });
+
+        // if (ImGui::Button("Save As")) {
+        //     std::string output_path = atlas::filesystem::save_to_file("");
+        //     atlas::serializer serializer(this);
+        //     serializer.save_as(output_path);
+        // }
 
         ImGui::End();
     }
 }
 
-//! TODO: Separate between on_update tasks and OnRender-like tasks
 void
 level_scene::on_update() {
-    // auto camera_comp = *m_camera->get<atlas::Camera>();
     atlas::camera* camera = m_camera->get_mut<atlas::camera>();
 
-    //! TODO: Move DeltaTime out of global update
-    //! TODO: global_update just uses delta timer for frame-rate stuff, and we
-    //! should move that in timer namespace
-    //! TODO: Add a reset() function simply for resetting the fps, or anything
-    //! time related
-    //! TODO: By either doing timer::reset(dt) or doing timer::reset()
-    //! @note Where reset that takes a parameter resets the delta time
-    //! specified.
-    //! @note And timer::reset with no params resets our timer automatically
-    //! (though would effect the entire timing variables though unless we
-    //! separate them some way)
     float delta_time = atlas::application::delta_time();
-    // float physics_step = atlas::timer::physcs_step();
 
     if (atlas::event::is_key_pressed(key_escape)) {
         atlas::application::get_window().close();
     }
 
     if (atlas::event::is_key_pressed(key_w)) {
-        // console_log_trace(""
-        camera->process_keyboard(atlas::Forward, delta_time);
+        camera->process_keyboard(atlas::forward, delta_time);
     }
     if (atlas::event::is_key_pressed(key_s)) {
-        camera->process_keyboard(atlas::Backward, delta_time);
+        camera->process_keyboard(atlas::backward, delta_time);
     }
     if (atlas::event::is_key_pressed(key_a)) {
-        camera->process_keyboard(atlas::Left, delta_time);
+        camera->process_keyboard(atlas::left, delta_time);
     }
     if (atlas::event::is_key_pressed(key_d)) {
-        camera->process_keyboard(atlas::Right, delta_time);
+        camera->process_keyboard(atlas::right, delta_time);
     }
     if (atlas::event::is_key_pressed(key_q)) {
-        camera->process_keyboard(atlas::Up, delta_time);
+        camera->process_keyboard(atlas::up, delta_time);
     }
     if (atlas::event::is_key_pressed(key_e)) {
-        camera->process_keyboard(atlas::Down, delta_time);
+        camera->process_keyboard(atlas::down, delta_time);
     }
 
     //! @note Press shift key to move using the mouse to rotate around
@@ -257,58 +250,7 @@ level_scene::on_update() {
 
     camera->MovementSpeed = sensitivity;
     camera->update_proj_view();
-    camera->IsMainCamera = true;
 }
 
 void
-level_scene::on_physics_update() {
-    // console_log_trace("on_physics_update Called!!!");
-
-    //! @note For now this will be used to simulate the physics system
-    //! @note This would be replaced with the play button. Once we get textures
-    //! into the mix (after getting the viewport settled)
-    if (atlas::event::is_key_pressed(key_l)) {
-        m_is_simulation_enabled = true;
-    }
-
-    if (atlas::event::is_key_pressed(key_k)) {
-        m_is_simulation_enabled = false;
-    }
-
-    if (m_is_simulation_enabled) {
-        on_runtime_start();
-    }
-    else {
-        on_runtime_stop();
-    }
-
-    // retreives us the timer frequency specifically for physics
-    // float steps = atlas::time::physcs_step();
-
-    if (m_is_simulation_enabled) {
-        // m_physics_scene.on_runtime_update(steps);
-    }
-}
-
-void
-level_scene::on_runtime_start() {
-    /*
-        Physics Utilizing RigidBody3D Component
-
-        Assume m_entity->add<RigidBody3D>();
-
-        we would set our physics body in the physics scene below
-
-        // Every time the transforms get modified then these will also be
-       modified as well m_physics_scene.add_entity(m_sphere);
-        m_physics_scene.add_entity(m_Floor);
-    */
-    // m_physics_scene = atlas::physics::physics_scene(this);
-
-    // m_physics_scene.on_runtime_start();
-}
-
-void
-level_scene::on_runtime_stop() {
-    // m_physics_scene.on_runtime_stop();
-}
+level_scene::on_physics_update() {}

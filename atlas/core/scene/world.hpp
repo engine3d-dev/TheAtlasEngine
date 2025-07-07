@@ -1,9 +1,8 @@
 #pragma once
 #include <core/core.hpp>
-#include <deque>
-#include <map>
 #include <flecs.h>
 #include <string>
+#include <core/scene/scene.hpp>
 
 namespace atlas {
 
@@ -64,7 +63,6 @@ namespace atlas {
      * @note Something to consider
      * @note When implementing the Editor we can a
      */
-    class scene_scope;
     // enable_shared_from cppreference link:
     // https://en.cppreference.com/w/cpp/memory/enable_shared_from_this
     /**

@@ -4,7 +4,6 @@
 
 namespace atlas {
     system_registry* system_registry::s_instance = nullptr;
-    static std::deque<world_scope> g_initial_worlds;
 
     system_registry::system_registry(const std::string& p_tag)
       : m_tag(p_tag) {

@@ -4,6 +4,7 @@
 #include <glm/fwd.hpp>
 #include <yaml-cpp/emitter.h>
 #include <yaml-cpp/yaml.h>
+#include <core/system_framework/system_registry.hpp>
 
 namespace YAML {
     template<>
@@ -106,11 +107,12 @@ namespace atlas {
         return out;
     }
 
-    static YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec4& v) {
-        out << YAML::Flow;
-        out << YAML::BeginSeq << v.x << v.y << v.z << v.w << YAML::EndSeq;
-        return out;
-    }
+    // static YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec4& v)
+    // {
+    //     out << YAML::Flow;
+    //     out << YAML::BeginSeq << v.x << v.y << v.z << v.w << YAML::EndSeq;
+    //     return out;
+    // }
 
     // actual serialization with yaml-cpp
     [[maybe_unused]] static void serialize_entity(
@@ -132,8 +134,6 @@ namespace atlas {
                    << entity_transform->Scale;
             output << YAML::Key << "Rotation" << YAML::Value
                    << entity_transform->Rotation;
-            output << YAML::Key << "Color" << YAML::Value
-                   << entity_transform->Color;
             output << YAML::EndMap;
         }
 
@@ -166,20 +166,6 @@ namespace atlas {
                    << perspective_camera->MouseSensitivity;
             output << YAML::Key << "Zoom" << YAML::Value
                    << perspective_camera->Zoom;
-
-            output << YAML::EndMap;
-        }
-
-        if (p_entity.has<rendertarget3d>()) {
-            output << YAML::Key << "Mesh Component";
-            // output << YAML::Key << "Mesh" << YAML::Value;
-
-            auto mesh_component = p_entity.get<rendertarget3d>();
-
-            output << YAML::BeginMap;
-
-            output << YAML::Key << "Filepath" << YAML::Value
-                   << mesh_component->Filepath;
 
             output << YAML::EndMap;
         }

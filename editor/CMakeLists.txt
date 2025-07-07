@@ -10,7 +10,7 @@ build_application(
 
     level_scene.hpp
     level_scene.cpp
-    
+
     LINK_PACKAGES
     atlas
 )

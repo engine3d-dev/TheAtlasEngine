@@ -1,6 +1,5 @@
 #pragma once
 #include <string>
-#include <core/scene/world.hpp>
 #include <flecs.h>
 
 namespace atlas {
