@@ -2,6 +2,15 @@ cmake_minimum_required(VERSION 3.27)
 project(atlas C CXX)
 set(ENGINE_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/atlas)
 
+# TODO: Remove this once shaderc in the github CI is fixed
+option(USE_SHADERC "[ENGINE] Enabling unit testing" OFF)
+if (USE_SHADERC)
+    add_compile_definitions(USE_SHADERC)
+    message(STATUS "USE_SHADERC macro enabled.")
+else()
+    message(STATUS "USE_SHADERC macro NOT enabled.")
+endif()
+
 build_core_library(
     DIRECTORIES src
 
@@ -22,12 +31,14 @@ build_core_library(
 
     PACKAGES
     tinyobjloader
-    shaderc
+    TinyGLTF
+    # shaderc # uncomment to use shaderc
     watcher
 
     LINK_PACKAGES
     tinyobjloader::tinyobjloader
-    shaderc::shaderc
+    TinyGLTF::TinyGLTF
+    # shaderc::shaderc # uncomment to use shaderc
     watcher::watcher
 )
 

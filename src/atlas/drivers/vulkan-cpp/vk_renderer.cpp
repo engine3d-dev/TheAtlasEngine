@@ -15,40 +15,56 @@ namespace atlas::vk {
         console_log_manager::create_new_logger(p_tag);
         m_main_swapchain = p_swapchain;
         m_image_count = p_swapchain.image_size();
-
+#ifdef USE_SHADERC
         std::array<shader_info, 2> shader_sources = {
             shader_info{ "experimental-shaders/test.vert",
                          shader_stage::vertex },
             shader_info{ "experimental-shaders/test.frag",
                          shader_stage::fragment }
         };
+#else
+		std::array<shader_info, 2> shader_sources = {
+            shader_info{ "experimental-shaders/test_vert.spv",
+                         shader_stage::vertex },
+            shader_info{ "experimental-shaders/test_frag.spv",
+                         shader_stage::fragment }
+        };
+#endif
 
         m_shader_group = vk_shader_group(shader_sources);
 
         std::array<vertex_attribute_entry, 4> attribute_entries = {
-            vertex_attribute_entry{ .location = 0,
-                                    .format = format::rgb32_sfloat,
-                                    .stride =
-                                      offsetof(vk::vertex_input, position) },
-            vertex_attribute_entry{ .location = 1,
-                                    .format = format::rgb32_sfloat,
-                                    .stride =
-                                      offsetof(vk::vertex_input, color) },
-            vertex_attribute_entry{ .location = 2,
-                                    .format = format::rgb32_sfloat,
-                                    .stride =
-                                      offsetof(vk::vertex_input, normals) },
-            vertex_attribute_entry{ .location = 3,
-                                    .format = format::rg32_sfloat,
-                                    .stride = offsetof(vk::vertex_input, uv) }
+            vertex_attribute_entry{
+              .location = 0,
+              .format = format::rgb32_sfloat,
+              .stride = offsetof(vk::vertex_input, position),
+            },
+            vertex_attribute_entry{
+              .location = 1,
+              .format = format::rgb32_sfloat,
+              .stride = offsetof(vk::vertex_input, color),
+            },
+            vertex_attribute_entry{
+              .location = 2,
+              .format = format::rgb32_sfloat,
+              .stride = offsetof(vk::vertex_input, normals),
+            },
+            vertex_attribute_entry{
+              .location = 3,
+              .format = format::rg32_sfloat,
+              .stride = offsetof(vk::vertex_input, uv),
+            }
         };
 
-        std::array<vertex_attribute, 1> attribute = { vertex_attribute{
-          // layout (set = 0, binding = 0)
-          .binding = 0,
-          .entries = attribute_entries,
-          .stride = sizeof(vk::vertex_input),
-          .input_rate = input_rate::vertex } };
+        std::array<vertex_attribute, 1> attribute = {
+            vertex_attribute{
+              // layout (set = 0, binding = 0)
+              .binding = 0,
+              .entries = attribute_entries,
+              .stride = sizeof(vk::vertex_input),
+              .input_rate = input_rate::vertex,
+            },
+        };
 
         m_shader_group.vertex_attributes(attribute);
 
@@ -110,16 +126,23 @@ namespace atlas::vk {
                 m_global_uniforms[i].destroy();
             }
 
+            //! @brief Ensures all meshes that are cached are also destroyed
             for (auto [key, value] : m_cached_meshes) {
-                console_log_fatal("Entity {} Destroyed in vk_renderer!!!", key);
+                console_log_trace("Entity \"{}\" Destroyed in vk_renderer!!!",
+                                  key);
                 // To ensure that the mesh we are destroying are valid
                 if (value.loaded()) {
                     value.destroy();
                 }
             }
 
-            for (auto [key, value] : m_geometry_descriptor) {
-                value.destroy();
+            //! @brief This iterates through all of the meshes resources
+            //! (descriptors) and make sure that any of the valid resources are
+            //! cleaned up
+            for (auto& [key, value] : m_mesh_descriptors) {
+                for (auto [key2, value2] : value) {
+                    value2.destroy();
+                }
             }
         });
     }
@@ -164,20 +187,22 @@ namespace atlas::vk {
         if (m_begin_initialize) {
 
             std::vector<descriptor_binding_entry> material_set1_entries = {
+				// entry for layout (set = 1, binding = 0)
                 descriptor_binding_entry{
-                  // entry for layout (set = 1, binding = 0)
                   .type = vk::buffer::uniform,
                   .binding_point = { .binding = 0,
-                                     .stage = shader_stage::vertex },
-                  .descriptor_count = 1 },
+                                     .stage = shader_stage::vertex, },
+                  .descriptor_count = 1,
+                },
+				// entry for layout (set = 1, binding = 1),
                 descriptor_binding_entry{
-                  // entry for layout (set = 1, binding = 1)
                   .type = vk::buffer::combined_image_sampler,
                   .binding_point = { .binding = 1,
-                                     .stage = shader_stage::fragment },
-                  .descriptor_count = 1 },
-                // descriptor_binding_entry{ // entry for layout (set = 1,
-                // binding = 2)
+                                     .stage = shader_stage::fragment, },
+                  .descriptor_count = 1,
+                },
+				// entry for layout (set = 1, binding = 1)
+                // descriptor_binding_entry{
                 //     .type = vk::buffer::combined_image_sampler,
                 //     .binding_point = {
                 //         .binding = 1,
@@ -222,7 +247,9 @@ namespace atlas::vk {
                       sizeof(material_uniform));
                     m_cached_meshes[name].add_texture(target->texture_path);
 
-                    m_geometry_descriptor[name] =
+                    // m_geometry_descriptor[name] =
+                    //   descriptor_set(1, material_layout);
+                    m_mesh_descriptors[name]["materials"] =
                       descriptor_set(1, material_layout);
 
                     // Apply mesh-specific uniforms to the mesh-specific
@@ -230,11 +257,18 @@ namespace atlas::vk {
                     std::array<vk_uniform_buffer, 1> material_uniforms = {
                         m_cached_meshes[name].material_ubo()
                     };
-                    m_geometry_descriptor[name].update(
+                    // m_geometry_descriptor[name].update(
+                    //   material_uniforms,
+                    //   m_cached_meshes[name].read_textures());
+
+                    m_mesh_descriptors[name]["materials"].update(
                       material_uniforms, m_cached_meshes[name].read_textures());
 
+                    // m_geometry_descriptor_layout.push_back(
+                    //   m_geometry_descriptor[name].get_layout());
+                    // m_mesh_descriptors[name]["materials"]
                     m_geometry_descriptor_layout.push_back(
-                      m_geometry_descriptor[name].get_layout());
+                      m_mesh_descriptors[name]["materials"].get_layout());
                 }
             });
 
@@ -356,7 +390,11 @@ namespace atlas::vk {
 
                 // Bind mesh-entity specific properties here before initial draw
                 // call
-                m_geometry_descriptor[entity_name].bind(
+                // m_geometry_descriptor[entity_name].bind(
+                //   m_current_command_buffer,
+                //   m_current_frame,
+                //   m_main_pipeline.get_layout());
+                m_mesh_descriptors[entity_name]["materials"].bind(
                   m_current_command_buffer,
                   m_current_frame,
                   m_main_pipeline.get_layout());

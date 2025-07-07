@@ -22,6 +22,7 @@ set(
     ${SRC_DIR}/core/platforms/win32.cpp
 
     # System-related stuff
+    ${SRC_DIR}/core/scene/scene_object.cpp
     ${SRC_DIR}/core/system_framework/system_registry.cpp
 
     # Filesystem stuff

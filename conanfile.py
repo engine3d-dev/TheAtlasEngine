@@ -7,7 +7,7 @@ import shutil
 
 class AtlasRecipe(ConanFile):
     name = "atlas"
-    version = "0.1"
+    version = "0.2"
     package_type = "library"
     license = "Apache-2.0"
     homepage = "https://github.com/engine3d-dev/TheAtlasEngine"
@@ -41,6 +41,7 @@ class AtlasRecipe(ConanFile):
         # Vulkan-related headers and includes packages
         self.requires("vulkan-headers/1.3.290.0", transitive_headers=True)
         self.requires("tinyobjloader/2.0.0-rc10")
+        self.requires("tinygltf/2.9.0")
         self.requires("stb/cci.20230920")
 
         self.requires("nfd/1.0")
@@ -75,6 +76,8 @@ class AtlasRecipe(ConanFile):
         deps.generate()
         tc = CMakeToolchain(self)
         tc.variables["TESTS_ONLY"] = "on"
+        # TODO: Remove this once fixing shaderc issue in the CI
+        tc.variables["USE_SHADERC"] = "off"
         tc.generate()
 
     def build(self):
