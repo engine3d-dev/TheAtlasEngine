@@ -17,12 +17,14 @@ namespace atlas {
     class renderer {
     public:
         renderer() = default;
-        renderer(const vk::vk_swapchain& p_swapchain, const std::string& p_tag = "Renderer");
+        renderer(const vk::vk_swapchain& p_swapchain,
+                 const std::string& p_tag = "Renderer");
         /**
          * @brief Indicates to the renderer is at the start of the next frame to
          * prepare workloads before next frame is processeed
          */
-        void begin(const vk::vk_command_buffer& p_current, const vk::vk_swapchain& p_current_rp);
+        void begin(const vk::vk_command_buffer& p_current,
+                   const vk::vk_swapchain& p_current_rp);
 
         /**
          * @brief Indications when the renderer has reached the end of the frame
