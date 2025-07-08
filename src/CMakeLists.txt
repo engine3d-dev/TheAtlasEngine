@@ -4,9 +4,6 @@ set(SRC_DIR atlas)
 set(VULKAN_INCLUDE_DIR ${INCLUDE_DIR}/drivers/vulkan-cpp)
 set(VULKAN_SRC_DIR ${SRC_DIR}/drivers/vulkan-cpp)
 
-set(VULKAN_SHADERS_INCLUDE_DIR ${VULKAN_INCLUDE_DIR}/Shaders)
-set(VULKAN_SHADERS_SRC_DIR ${VULKAN_SRC_DIR}/Shaders)
-
 set(
     all_src
     ${SRC_DIR}/core/application.cpp
@@ -16,7 +13,7 @@ set(
 
     ${SRC_DIR}/core/engine_logger.cpp
     ${SRC_DIR}/core/window.cpp
-    ${SRC_DIR}/core/update_handlers/sync_update.cpp
+    ${SRC_DIR}/core/utilities/state.cpp
 
     ${SRC_DIR}/core/platforms/main.cpp
     ${SRC_DIR}/core/platforms/win32.cpp
@@ -49,16 +46,12 @@ set(
 
     # Scene stuff
     ${SRC_DIR}/core/scene/world.cpp
-    ${SRC_DIR}/core/scene/entity.cpp
 
     # Renderer-stuff
     ${SRC_DIR}/renderer/renderer.cpp
     ${SRC_DIR}/drivers/render_context.cpp
     ${SRC_DIR}/drivers/graphics_context.cpp
 
-    ## ui-stuff backend
-    # ${SRC_DIR}/drivers/ui/imgui_backend.cpp
-    
     ${SRC_DIR}/core/ui/widgets.cpp
 
     # imgui stuff
@@ -66,9 +59,7 @@ set(
 
     ## Vulkan Driver stuff
     ${VULKAN_SRC_DIR}/vk_window.cpp
-    # ${VULKAN_SRC_DIR}/vulkan_core.cpp
     ${VULKAN_SRC_DIR}/helper_functions.cpp
-    # ${VULKAN_SRC_DIR}/utilities/utils.cpp
     ${VULKAN_SRC_DIR}/utilities/utils.cpp
     ${VULKAN_SRC_DIR}/vk_context.cpp
     ${VULKAN_SRC_DIR}/vk_physical_driver.cpp
@@ -86,13 +77,6 @@ set(
     ${VULKAN_SRC_DIR}/vk_texture.cpp
     ${VULKAN_SRC_DIR}/vk_descriptor_set.cpp
     ${VULKAN_SRC_DIR}/mesh.cpp
-    # ${OLD_VULKAN_SRC_DIR}/vulkan_vertex_buffer.cpp
-    # ${OLD_VULKAN_SRC_DIR}/vulkan_index_buffer.cpp
-    # ${VULKAN_SRC_DIR}/buffer_tutorial.cpp
-    # ${VULKAN_SRC_DIR}/vulkan_uniform_buffer.cpp
-    # ${VULKAN_SRC_DIR}/descriptor_tutorial.cpp
-    # ${VULKAN_SRC_DIR}/vulkan_uniform_buffer.cpp
-    # ${VULKAN_SRC_DIR}/shaders/vulkan_shader.cpp
     ${VULKAN_SRC_DIR}/vk_renderer.cpp
 )
 

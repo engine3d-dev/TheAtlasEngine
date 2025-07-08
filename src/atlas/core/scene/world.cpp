@@ -4,36 +4,23 @@
 
 namespace atlas {
 
-    world_scope::world_scope(const std::string& p_tag) {
+    world_scope::world_scope(const std::string& p_name) : m_name(p_name) {
         console_log_info("world_scope::world_scope(std::string p_tag) = {}",
-                         p_tag);
+                         m_name);
         console_log_fatal(
           "Just registered world using system_registry::register_to(this)");
-        m_tag = p_tag;
-        // m_world_shared_instance = create_ref<world_scope>(this);
-
-        //! @note This means that when someone instantiates a world scope that
-        //! gets registers immediately at initialization
-        //! @note What we could do is have this be registerd OnLoad(bool) where
-        //! the bool lets user define whether to register_to this world
-        // system_registry::register_to(shared_from_this());
     }
 
     world_scope::~world_scope() {
         console_log_trace("~world_scope called!!!");
     }
 
-    /*
-        Provides a way of passing scene context
-        This is just to test system_registry and how registering worlds/scenes
-       would work
-        @note Really, this would be providing a way of handling scenes in some
-       spatial data structure
+
+    /**
+     * @brief Currently how to pass in the scene context to the world
+     * TODO: Have a way of allowing creation and management of those created-scenes be done through world_scope
     */
     void world_scope::add_scene(const ref<scene_scope>& p_scene_context) {
-        // m_current_scene = p_scene_context;
-        // m_scene_manager_queue.push_back(m_current_scene);
-        m_scene_container.insert(
-          { p_scene_context->get_tag(), p_scene_context });
+        m_scene_container.emplace(p_scene_context->get_tag(), p_scene_context);
     }
 };

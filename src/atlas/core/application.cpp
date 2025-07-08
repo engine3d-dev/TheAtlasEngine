@@ -4,7 +4,7 @@
 #include <imgui.h>
 #include <string>
 
-#include <core/update_handlers/sync_update.hpp>
+#include <core/utilities/state.hpp>
 #include <drivers/vulkan-cpp/vk_swapchain.hpp>
 
 namespace atlas {
@@ -79,6 +79,7 @@ namespace atlas {
             float current_time = (float)glfwGetTime();
             g_delta_time = (current_time - previous_time);
             previous_time = current_time;
+            event::update_events();
 
             m_current_frame_index = m_window->acquired_next_frame();
 
@@ -94,11 +95,9 @@ namespace atlas {
             vk::vk_command_buffer currently_active =
               m_window->active_command_buffer(m_current_frame_index);
 
-            event::update_events();
+            detail::invoke_on_update();
 
-            sync_update::on_update();
-
-            sync_update::on_physics_update();
+            detail::invoke_physics_update();
 
             // TODO: Introduce scene renderer that will make use of the
             // begin/end semantics for setting up tasks during pre-frame
@@ -109,7 +108,7 @@ namespace atlas {
             // framebuffers specifically for UI-widgets
             m_ui_context.begin(currently_active, m_current_frame_index);
 
-            sync_update::on_ui_update();
+            detail::invoke_ui_update();
 
             m_ui_context.end();
 
