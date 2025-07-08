@@ -16,7 +16,7 @@ namespace atlas {
         void poll_defer_update(const std::function<void()>& p_callback) {
             s_defer_update.emplace_back(p_callback);
         }
-        
+
         void poll_physics_update(const std::function<void()>& p_callback) {
             s_physica_update.emplace_back(p_callback);
         }
