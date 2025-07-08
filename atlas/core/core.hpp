@@ -18,10 +18,14 @@ namespace atlas {
     template<typename T>
     using strong_ref = memory::strong_ptr<T>;
 
-    //! @return atlas::memory::make_strong_ptr<T> which constructs object of type T
+    //! @return atlas::memory::make_strong_ptr<T> which constructs object of
+    //! type T
     template<typename T, typename... Args>
-    constexpr strong_ref<T> create_strong_ref(std::pmr::polymorphic_allocator<> p_allocator, Args&&... args) {
-        return memory::make_strong_ptr<T>(p_allocator, std::forward<Args>(args)...);
+    strong_ref<T> create_strong_ref(
+      std::pmr::polymorphic_allocator<> p_allocator,
+      Args&&... args) {
+        return memory::make_strong_ptr<T>(p_allocator,
+                                          std::forward<Args>(args)...);
     }
 
     template<typename T>

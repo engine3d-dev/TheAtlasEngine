@@ -123,11 +123,9 @@ namespace atlas {
             // mock_velocity.position = { 2.f, 2.f, 0.f };
 
             // expect(transform.position == projectile.position());
-            
 
             // expect(mock_velocity.position ==
             //        entity.get<test_velocity>()->position);
         };
-
     };
 }; // namespace atlas
