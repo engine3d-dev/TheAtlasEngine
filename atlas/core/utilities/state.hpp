@@ -15,17 +15,15 @@ namespace atlas {
         void invoke_start();
 
         void poll_update(const std::function<void()>& p_callback);
+
         void poll_defer_update(const std::function<void()>& p_callback);
+
         void poll_physics_update(const std::function<void()>& p_callback);
+
         void poll_ui_update(const std::function<void()>& p_callback);
+		
         void poll_start(const std::function<void()>& p_callback);
 
-        template<typename T, typename = void>
-        struct has_member_fn : std::false_type {};
-
-        template<typename T>
-        struct has_member_fn<T, std::void_t<decltype(T::foo)>>
-          : std::true_type {};
     };
 
     template<typename UObject, typename UCallback>

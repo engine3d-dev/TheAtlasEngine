@@ -4,36 +4,8 @@
 #include <core/ui/widgets.hpp>
 #include <core/serialize/serializer.hpp>
 #include <drivers/vulkan-cpp/helper_functions.hpp>
-#include <source_location>
 #include <core/scene/components.hpp>
 #include <core/utilities/state.hpp>
-static float sensitivity = 0.f;
-
-/*
-
-
-control block
-
-* allocator
-* T
-* vtble_ptr
-* virtual functions
-
-
-shared_ptr<scene_object> obj();
-
-*/
-
-void
-print_current_location(const std::source_location& p_current_location) {
-    console_log_fatal("Current File = {}", p_current_location.file_name());
-    console_log_fatal("Current Line = {}", p_current_location.line());
-    console_log_fatal("Current Function = {}",
-                      p_current_location.function_name());
-}
-
-void
-some_example_function() {}
 
 level_scene::level_scene(const std::string& p_tag)
   : atlas::scene_scope(p_tag) {
@@ -47,7 +19,6 @@ level_scene::level_scene(const std::string& p_tag)
     camera_comp.IsMainCamera = true;
 
     m_camera->set<atlas::camera>(camera_comp);
-    sensitivity = camera_comp.MovementSpeed;
 
     m_viking_room = create_object("Viking Room Object");
     atlas::transform sphere_transform = {
@@ -101,9 +72,7 @@ level_scene::level_scene(const std::string& p_tag)
         .model_path = "assets/models/cube.obj",
         .texture_path = "assets/models/Tiles074_8K-JPG_Color.jpg" });
 
-    // atlas::register_update(this, some_example_function);
     atlas::register_update(this, &level_scene::on_update);
-    atlas::register_physics(this, &level_scene::on_physics_update);
     atlas::register_ui(this, &level_scene::on_ui_update);
 }
 
@@ -218,10 +187,6 @@ level_scene::on_update() {
 
     float delta_time = atlas::application::delta_time();
 
-    if (atlas::event::is_key_pressed(key_escape)) {
-        atlas::application::get_window().close();
-    }
-
     if (atlas::event::is_key_pressed(key_w)) {
         camera->process_keyboard(atlas::forward, delta_time);
     }
@@ -277,5 +242,3 @@ level_scene::on_update() {
     camera->update_proj_view();
 }
 
-void
-level_scene::on_physics_update() {}

@@ -27,8 +27,6 @@ public:
 
     void on_ui_update();
 
-    void on_physics_update();
-
 private:
     atlas::optional_ref<atlas::scene_object> m_viking_room;
     atlas::optional_ref<atlas::scene_object> m_cube;

@@ -7,13 +7,10 @@ namespace atlas {
 
     system_registry::system_registry(const std::string& p_tag)
       : m_tag(p_tag) {
-        console_log_manager::create_new_logger(p_tag);
         s_instance = this;
     }
 
-    system_registry::~system_registry() {
-        console_log_fatal("~system_registry called!!!");
-    }
+    system_registry::~system_registry() = default;
 
     ref<world_scope> system_registry::create_world(const std::string& p_tag) {
         return s_instance->append_world_scope(create_ref<world_scope>(p_tag));

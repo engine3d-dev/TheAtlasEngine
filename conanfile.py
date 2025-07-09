@@ -18,8 +18,9 @@ class AtlasRecipe(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
 
     # Specifying our build_type is only Debug and Release
-    options = {"shared": [True, False], "fPIC": [True, False]}
-    default_options = {"shared": False, "fPIC": True}
+    options = {"shared": [True, False], "fPIC": [True, False], "enable_tests_only": [True, False], "enable_shaderc": [True, False]}
+    default_options = {"shared": False, "fPIC": True, "enable_tests_only": True, "enable_shaderc": False}
+
 
     def build_requirements(self):
         self.tool_requires("make/4.4.1")
@@ -28,7 +29,8 @@ class AtlasRecipe(ConanFile):
 
     def requirements(self):
         self.requires("joltphysics/5.2.0")
-        # self.requires("shaderc/2024.1")
+        if self.options.enable_shaderc:
+            self.requires("shaderc/2024.1")
         self.requires("imguidocking/2.0")
         self.requires("flecs/4.0.4")
         self.requires("glfw/3.4", transitive_headers=True)
@@ -61,6 +63,7 @@ class AtlasRecipe(ConanFile):
             self.options.rm_safe("fPIC")
 
     def configure(self):
+        print(f"Current build_type = {self.settings.build_type}")
         if not self.settings.get_safe("build_type"):
             self.settings.build_type = "Debug"
         
@@ -74,9 +77,10 @@ class AtlasRecipe(ConanFile):
         deps = CMakeDeps(self)
         deps.generate()
         tc = CMakeToolchain(self)
-        tc.variables["TESTS_ONLY"] = "on"
-        # TODO: Remove this once fixing shaderc issue in the CI
-        tc.variables["USE_SHADERC"] = "off"
+        # TODO: Remove this once fixing shaderc issue in the CI is resolved
+        # These are options that can be enabled/disabled with the `-o` parameter when compiling with `conan` command
+        tc.variables["USE_SHADERC"] = self.options.enable_shaderc
+        tc.variables["ENABLE_TESTS_ONLY"] = self.options.enable_tests_only
         tc.generate()
 
     def build(self):

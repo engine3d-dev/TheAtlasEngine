@@ -57,7 +57,6 @@ namespace atlas {
     }
 
     void application::destroy() {
-        console_log_trace("application::destroy() called!!!");
         s_instance->get_window().close();
     }
 
@@ -71,9 +70,8 @@ namespace atlas {
 
     void application::execute() {
         float previous_time = 0.f;
-        console_log_info("Executing mainloop!");
-        // uint32_t currently_active_frame=0; // command buffers to process
-        // commands
+
+        detail::invoke_start();
 
         while (m_window->available()) {
             float current_time = (float)glfwGetTime();
@@ -95,9 +93,11 @@ namespace atlas {
             vk::vk_command_buffer currently_active =
               m_window->active_command_buffer(m_current_frame_index);
 
+            detail::invoke_physics_update();
+
             detail::invoke_on_update();
 
-            detail::invoke_physics_update();
+            detail::invoke_defer_update();
 
             // TODO: Introduce scene renderer that will make use of the
             // begin/end semantics for setting up tasks during pre-frame
@@ -116,7 +116,6 @@ namespace atlas {
 
             m_window->present(m_current_frame_index);
         }
-        console_log_warn("Leaving executed mainloop!");
     }
 
     void application::post_destroy() {
