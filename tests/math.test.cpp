@@ -21,22 +21,22 @@ namespace atlas {
         vector3() = default;
 
         vector3(const JPH::Vec3& p_other) {
-            value = { p_other.GetX(), p_other.GetY(), p_other.GetZ() };
+            m_value = { p_other.GetX(), p_other.GetY(), p_other.GetZ() };
         }
 
-        operator glm::vec3() { return value; }
+        operator glm::vec3() { return m_value; }
 
         glm::vec3 operator=(const JPH::Vec3& p_other) {
             return { p_other.GetX(), p_other.GetY(), p_other.GetZ() };
         }
 
         bool operator==(const glm::vec3& p_other) {
-            return (value.x == p_other.x and value.y == p_other.y and
-                    value.z == p_other.z);
+            return (m_value.x == p_other.x and m_value.y == p_other.y and
+                    m_value.z == p_other.z);
         }
 
     private:
-        glm::vec3 value;
+        glm::vec3 m_value;
     };
 }; // namespace atlas
 
@@ -63,7 +63,7 @@ class mock_test_projectile {
 public:
     mock_test_projectile() = default;
 
-    glm::vec3 get_position() const {
+    [[nodiscard]] glm::vec3 get_position() const {
         return atlas::vector3<JPH::Vec3>(m_position);
     }
 

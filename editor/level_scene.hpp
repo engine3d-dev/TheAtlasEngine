@@ -17,8 +17,6 @@
 
 class level_scene : public atlas::scene_scope {
 public:
-    level_scene() = default;
-
     level_scene(const std::string& p_tag);
 
     ~level_scene() override {
@@ -29,14 +27,12 @@ public:
 
     void on_ui_update();
 
-    void on_physics_update();
-
 private:
-    atlas::ref<atlas::scene_object> m_viking_room;
-    atlas::ref<atlas::scene_object> m_cube;
-    atlas::ref<atlas::scene_object> m_robot_model;
-    atlas::ref<atlas::scene_object> m_platform = nullptr;
+    atlas::optional_ref<atlas::scene_object> m_viking_room;
+    atlas::optional_ref<atlas::scene_object> m_cube;
+    atlas::optional_ref<atlas::scene_object> m_robot_model;
+    atlas::optional_ref<atlas::scene_object> m_platform;
 
     bool m_is_simulation_enabled = false;
-    atlas::ref<atlas::scene_object> m_camera;
+    atlas::optional_ref<atlas::scene_object> m_camera;
 };

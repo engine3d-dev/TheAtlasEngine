@@ -41,37 +41,52 @@ namespace atlas {
 //! that these will be written to.
 template<typename... T>
 inline void
-console_log_trace(spdlog::format_string_t<T...> fmt, T&&... args) {
+console_log_trace([[maybe_unused]] spdlog::format_string_t<T...> fmt,
+                  [[maybe_unused]] T&&... args) {
+#ifndef ENABLE_TESTS_ONLY
     atlas::console_log_manager::get("engine3d")
       ->trace(fmt, std::forward<T>(args)...);
+#endif
 }
 
 template<typename... T>
 inline void
-console_log_warn(spdlog::format_string_t<T...> fmt, T&&... args) {
+console_log_warn([[maybe_unused]] spdlog::format_string_t<T...> fmt,
+                 [[maybe_unused]] T&&... args) {
+#ifndef ENABLE_TESTS_ONLY
     atlas::console_log_manager::get("engine3d")
       ->warn(fmt, std::forward<T>(args)...);
+#endif
 }
 
 template<typename... T>
 inline void
-console_log_info(spdlog::format_string_t<T...> fmt, T&&... args) {
+console_log_info([[maybe_unused]] spdlog::format_string_t<T...> fmt,
+                 [[maybe_unused]] T&&... args) {
+#ifndef ENABLE_TESTS_ONLY
     atlas::console_log_manager::get("engine3d")
       ->info(fmt, std::forward<T>(args)...);
+#endif
 }
 
 template<typename... T>
 inline void
-console_log_error(spdlog::format_string_t<T...> fmt, T&&... args) {
+console_log_error([[maybe_unused]] spdlog::format_string_t<T...> fmt,
+                  [[maybe_unused]] T&&... args) {
+#ifndef ENABLE_TESTS_ONLY
     atlas::console_log_manager::get("engine3d")
       ->error(fmt, std::forward<T>(args)...);
+#endif
 }
 
 template<typename... T>
 inline void
-console_log_fatal(spdlog::format_string_t<T...> fmt, T&&... args) {
+console_log_fatal([[maybe_unused]] spdlog::format_string_t<T...> fmt,
+                  [[maybe_unused]] T&&... args) {
+#ifndef ENABLE_TESTS_ONLY
     atlas::console_log_manager::get("engine3d")
       ->critical(fmt, std::forward<T>(args)...);
+#endif
 }
 
 /////////////////////////////////////////
@@ -79,43 +94,51 @@ console_log_fatal(spdlog::format_string_t<T...> fmt, T&&... args) {
 /////////////////////////////////////////
 template<typename... T>
 inline void
-console_log_trace_tagged(const std::string& p_tag,
-                         spdlog::format_string_t<T...> fmt,
-                         T&&... args) {
+console_log_trace_tagged([[maybe_unused]] const std::string& p_tag,
+                         [[maybe_unused]] spdlog::format_string_t<T...> fmt,
+                         [[maybe_unused]] T&&... args) {
+#ifndef ENABLE_TESTS_ONLY
     atlas::console_log_manager::get(p_tag)->trace(fmt,
                                                   std::forward<T>(args)...);
+#endif
 }
 
 template<typename... T>
 inline void
-console_log_info_tagged(const std::string& p_tag,
-                        spdlog::format_string_t<T...> fmt,
-                        T&&... args) {
+console_log_info_tagged([[maybe_unused]] const std::string& p_tag,
+                        [[maybe_unused]] spdlog::format_string_t<T...> fmt,
+                        [[maybe_unused]] T&&... args) {
+#ifndef ENABLE_TESTS_ONLY
     atlas::console_log_manager::get(p_tag)->info(fmt, std::forward<T>(args)...);
+#endif
 }
 
 template<typename... T>
 inline void
-console_log_warn_tagged(const std::string& p_tag,
-                        spdlog::format_string_t<T...> fmt,
-                        T&&... args) {
+console_log_warn_tagged([[maybe_unused]] const std::string& p_tag,
+                        [[maybe_unused]] spdlog::format_string_t<T...> fmt,
+                        [[maybe_unused]] T&&... args) {
     atlas::console_log_manager::get(p_tag)->warn(fmt, std::forward<T>(args)...);
 }
 
 template<typename... T>
 inline void
-console_log_error_tagged(const std::string& p_tag,
-                         spdlog::format_string_t<T...> fmt,
-                         T&&... args) {
+console_log_error_tagged([[maybe_unused]] const std::string& p_tag,
+                         [[maybe_unused]] spdlog::format_string_t<T...> fmt,
+                         [[maybe_unused]] T&&... args) {
+#ifndef ENABLE_TESTS_ONLY
     atlas::console_log_manager::get(p_tag)->error(fmt,
                                                   std::forward<T>(args)...);
+#endif
 }
 
 template<typename... T>
 inline void
-console_log_fatal_tagged(const std::string& p_tag,
-                         spdlog::format_string_t<T...> fmt,
-                         T&&... args) {
+console_log_fatal_tagged([[maybe_unused]] const std::string& p_tag,
+                         [[maybe_unused]] spdlog::format_string_t<T...> fmt,
+                         [[maybe_unused]] T&&... args) {
+#ifndef ENABLE_TESTS_ONLY
     atlas::console_log_manager::get(p_tag)->critical(fmt,
                                                      std::forward<T>(args)...);
+#endif
 }

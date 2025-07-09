@@ -1,8 +1,9 @@
 #pragma once
-#include <core/engine_logger.hpp>
-#include <core/scene/components.hpp>
-#include <core/scene/entity.hpp>
+#include <core/core.hpp>
 #include <variant>
+#include <core/scene/components.hpp>
+#include <tuple>
+#include <flecs.h>
 
 namespace atlas {
     /**
@@ -20,27 +21,37 @@ namespace atlas {
     public:
         scene_object(flecs::world* p_registry, const std::string& p_name);
 
-        ~scene_object() {
-            if (m_entity.is_alive()) {
-                m_entity.destruct();
-            }
-        }
+        /**
+         * @param p_registry is a strong_ptr that is expected to be always valid
+         * and manages this entity when application closes
+         */
+        scene_object(strong_ref<flecs::world>& p_registry,
+                     const std::string& p_name);
 
+        ~scene_object();
+
+        //! @brief adds a component to the entity
         template<typename UComponent>
         void add() {
             m_entity.add<UComponent>();
         }
 
+        //! @brief adds a component with an assigned value to the entity
         template<typename UComponent>
         void add(UComponent& p_component_value) {
             m_entity.add<UComponent>(p_component_value);
         }
 
+        //! @brief checks for entity lifetime if alive return true
+        [[nodiscard]] bool is_alive() const { return m_entity.is_alive(); }
+
         /**
-         * @brief Specify groups of entity signatures to add to the entity
-         * @brief signatures being the components
+         * @brief Adds multiple components with no values assigned to them
          * EXPERIEMENTAL: Function to add multiple components but still in its
          * experiemental stages.
+         *
+         * Example:
+         * m_entity_example->add_query<atlas::transform, atlas::rigidbody>();
          */
         template<typename... Args>
         void add_query() {
@@ -58,16 +69,21 @@ namespace atlas {
               conditions);
         }
 
+        //! @return nullptr if entity is not found, otherwise return view of the
+        //! component
         template<typename UComponent>
         [[nodiscard]] const UComponent* get() const {
             return m_entity.get<UComponent>();
         }
 
+        //! @return nullptr if entity is not found, otherwise return mutable
+        //! component
         template<typename UComponent>
         [[nodiscard]] UComponent* get_mut() {
             return m_entity.get_mut<UComponent>();
         }
 
+        //! @brief is true if component stored in this entity
         template<typename UComponent>
         bool has() {
             return m_entity.has<UComponent>();
@@ -76,12 +92,6 @@ namespace atlas {
         template<typename UComponent>
         void set(const UComponent& p_component) {
             m_entity.set<UComponent>(p_component);
-        }
-
-        template<typename UComponent, typename UComponent2>
-        void set(const UComponent& p_component,
-                 const UComponent2& p_component2) {
-            m_entity.set<UComponent>(p_component, p_component2);
         }
 
         template<typename UComponent>

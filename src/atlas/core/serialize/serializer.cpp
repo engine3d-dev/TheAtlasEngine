@@ -1,4 +1,5 @@
 #include <core/serialize/serializer.hpp>
+#include <core/scene/components.hpp>
 #include <flecs/addons/cpp/entity.hpp>
 #include <fstream>
 #include <glm/fwd.hpp>

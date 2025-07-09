@@ -1,44 +1,37 @@
 #pragma once
+#include <core/core.hpp>
 #include <core/engine_logger.hpp>
 #include <core/scene/scene_object.hpp>
 #include <string>
 
 namespace atlas {
+
     /**
-     * @name scene_scope
-     * @note Self-contained scope that is defining a scene
-     * @note flecs::world is instantiate within our world_scope structure, using
-     * that class to manage multiple scene
-     * @note We utilize system_registry::get_world() to create our scene objects
-     * and associating our scene objects with those scenes
-     * @note The way we set this is up may change to actually do the following
-     * later.....
-     * \example
+     * @brief scene for defining part of a world_scope a group of scene object
+     * correspond to that scene
      *
-     * Example New Implementation Alternative #1
-     * // This takes in the scene that associates with our world
-     * // Because flecs::world is managing our entities, it makes sense to
-     * rather managing groups of those scene obejcts with the world, you'd have
-     * the world manage those entities and when they transition to multiple
-     * scene
-     * // We may utilize the hash_id (UUID) to tell where this scene belongs to
-     * and what scene this object at creation is associating with itself to auto
-     * new_object_sphere = create_new_object(system_registry::Get(this),
-     * Tag.c_str()); new_object_sphere.add<PhysicsBody>();
-     *
-     * @brief scene_scope is defining a scope of a scene
-     * @brief Scenes are part of the world; where the world contains sets of
-     * scenes per world
+     * scenes are chunks where scene objects are contained but managed lifetimes
+     * by world_scope. This is to differentiate different areas of scene objects
+     * and where they are located within the scope of the world
      */
     class scene_scope {
     public:
-        scene_scope()
-          : m_tag("Undefined") {}
+        scene_scope() = default;
         scene_scope(const std::string& p_tag)
           : m_tag(p_tag) {}
 
-        ref<scene_object> create_new_object(const std::string& p_tag) {
-            return create_ref<scene_object>(&m_registry, p_tag);
+        strong_ref<scene_object> create_object(const std::string& p_tag) {
+            return create_strong_ref<scene_object>(
+              m_object_allocator, &m_registry, p_tag);
+        }
+
+        template<typename T>
+        strong_ref<scene_object> create_custom_object(
+          const std::string& p_tag) {
+            static_assert(std::is_base_of_v<scene_scope, T>,
+                          "invalid scene_object not inherited with base class "
+                          "being scene_object");
+            return create_strong_ref<T>(m_object_allocator, p_tag);
         }
 
         template<typename... Comps, typename... Args>
@@ -52,9 +45,11 @@ namespace atlas {
         std::string get_tag() { return m_tag; }
 
         operator flecs::world() const { return m_registry; }
+
         operator flecs::world() { return m_registry; }
 
     private:
+        std::pmr::polymorphic_allocator<> m_object_allocator;
         flecs::world m_registry;
         std::string m_tag = "Undefined Tag";
     };

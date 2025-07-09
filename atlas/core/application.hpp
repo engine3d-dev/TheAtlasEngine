@@ -16,6 +16,7 @@ namespace atlas {
     class application {
     public:
         application(const application_settings& p_settings);
+
         ~application();
 
         static float delta_time();
