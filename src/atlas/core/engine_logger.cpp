@@ -33,7 +33,8 @@ namespace atlas {
         s_loggers["assert"]->set_pattern(pattern);
     }
 
-    void console_log_manager::create_new_logger([[maybe_unused]] const std::string& p_tag) {
+    void console_log_manager::create_new_logger(
+      [[maybe_unused]] const std::string& p_tag) {
 #ifndef ENABLE_TESTS_ONLY
         s_loggers[p_tag] = spdlog::stdout_color_mt(p_tag);
         s_loggers[p_tag]->set_level(spdlog::level::trace);
@@ -41,7 +42,8 @@ namespace atlas {
 #endif
     }
 
-    void console_log_manager::set_current_logger([[maybe_unused]] const std::string& p_tag) {
+    void console_log_manager::set_current_logger(
+      [[maybe_unused]] const std::string& p_tag) {
 #ifndef ENABLE_TESTS_ONLY
         //! @note Setting up logs for different log stdout's
         //! @note Logs for p_tag is logs specific to the game

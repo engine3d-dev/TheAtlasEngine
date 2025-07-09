@@ -21,7 +21,7 @@ namespace atlas {
         void poll_physics_update(const std::function<void()>& p_callback);
 
         void poll_ui_update(const std::function<void()>& p_callback);
-		
+
         void poll_start(const std::function<void()>& p_callback);
 
     };

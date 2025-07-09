@@ -238,7 +238,6 @@ level_scene::on_update() {
         }
     }
 
-    camera->MovementSpeed = sensitivity;
+    // camera->MovementSpeed = camera->MovementSpeed;
     camera->update_proj_view();
 }
-
