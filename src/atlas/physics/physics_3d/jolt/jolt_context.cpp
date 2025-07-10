@@ -271,8 +271,9 @@ namespace atlas::physics {
         // Step the simulation
 
         if (!m_settings.use_fixed_timestep) {
+            int physics_step = 1 + (int)(60 * application::delta_time());
             m_physics_system->Update(application::delta_time(),
-                                     (int)application::physics_step(),
+                                     physics_step,
                                      m_temp_allocator.get(),
                                      m_thread_system.get());
         }

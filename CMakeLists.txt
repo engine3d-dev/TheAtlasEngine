@@ -41,6 +41,8 @@ build_core_library(
     tests/entity_component_system.test.cpp
     tests/math.test.cpp
     tests/scene.test.cpp
+    tests/jolt_type_conversion.test.cpp
+    tests/jolt_engine.test.cpp
     # tests/object.test.cpp
 
     PACKAGES

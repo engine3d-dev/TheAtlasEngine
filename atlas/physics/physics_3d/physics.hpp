@@ -11,7 +11,7 @@ namespace atlas::physics {
      * to engine and gives them to the user api.
      *
      */
-    enum physics_backend : uint8_t { JoltBackend };
+    enum physics_backend : uint8_t { jolt_backend };
 
     /**
      * @brief Creates the engine and all three api - collision, user, and engine
@@ -21,8 +21,9 @@ namespace atlas::physics {
      * @param p_registery
      * @return ref<physics_engine>
      */
-    ref<physics_engine> initialize_engine(
-      const ref<scene_object>& p_physics_object,
+    strong_ref<physics_engine> initialize_engine(
+      std::pmr::polymorphic_allocator<>& p_object_allocator,
+      const strong_ref<scene_object>& p_physics_object,
       flecs::world& p_registery);
 
     /**
