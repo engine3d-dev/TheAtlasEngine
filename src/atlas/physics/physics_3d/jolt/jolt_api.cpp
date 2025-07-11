@@ -31,12 +31,12 @@ namespace atlas::physics {
                                   const collider_body& collider_body) {
             const JPH::BodyID id = JPH::BodyID(collider_body.body_id);
 
-            JPH::Vec3 pos = to_jph(transform.Position);
+            JPH::Vec3 pos = to_jph(transform.position);
 
-            JPH::Quat rot(transform.QuaternionRotation.x,
-                          transform.QuaternionRotation.y,
-                          transform.QuaternionRotation.z,
-                          transform.QuaternionRotation.w);
+            JPH::Quat rot(transform.quaternion.x,
+                          transform.quaternion.y,
+                          transform.quaternion.z,
+                          transform.quaternion.w);
 
             interface.SetPositionAndRotation(
               id, pos, rot, JPH::EActivation::Activate);
@@ -99,11 +99,11 @@ namespace atlas::physics {
               JPH::Quat rot = interface.GetRotation(id);
               JPH::Vec3 rot_euler = rot.GetEulerAngles();
 
-              transform.Position =
+              transform.position =
                 glm::vec3(pos.GetX(), pos.GetY(), pos.GetZ());
-              transform.QuaternionRotation =
+              transform.quaternion =
                 glm::vec4(rot.GetX(), rot.GetY(), rot.GetZ(), rot.GetW());
-              transform.Rotation =
+              transform.rotation =
                 glm::vec3(rot_euler.GetX(), rot_euler.GetY(), rot_euler.GetZ());
           });
 

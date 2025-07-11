@@ -367,10 +367,10 @@ namespace atlas::vk {
             const transform* transform_component = p_entity.get<transform>();
             const material* material_component = p_entity.get<material>();
             m_model = glm::mat4(1.f);
-            m_model = glm::translate(m_model, transform_component->Position);
-            m_model = glm::scale(m_model, transform_component->Scale);
+            m_model = glm::translate(m_model, transform_component->position);
+            m_model = glm::scale(m_model, transform_component->scale);
             glm::mat4 rotation_mat4 =
-              glm::mat4(glm::quat(transform_component->Rotation));
+              glm::mat4(glm::quat(transform_component->rotation));
 
             m_model *= rotation_mat4;
 
