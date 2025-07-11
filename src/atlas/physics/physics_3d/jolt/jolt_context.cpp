@@ -143,12 +143,11 @@ namespace atlas::physics {
             layer_type = body_opt->body_layer_type;
         }
 
-        JPH::BodyCreationSettings body_settings(
-          shape,
-          to_jph(location.position),
-          to_jph(location.quaternion),
-          motion_type,
-          layer_type);
+        JPH::BodyCreationSettings body_settings(shape,
+                                                to_jph(location.position),
+                                                to_jph(location.quaternion),
+                                                motion_type,
+                                                layer_type);
 
         // Gives bodies thier assocaited flecs entity
         body_settings.mUserData = static_cast<uint64_t>(e.id());
@@ -176,11 +175,11 @@ namespace atlas::physics {
             return;
         }
 
-        scene->query_builder<physics_body, collider_body, transform>()
-          .each([&](flecs::entity e,
-                    const physics_body& phys,
-                    const collider_body& col,
-                    const transform& loc) {
+        scene->query_builder<physics_body, collider_body, transform>().each(
+          [&](flecs::entity e,
+              const physics_body& phys,
+              const collider_body& col,
+              const transform& loc) {
               add_body(e, &phys, col, loc, settings_list, entity_list);
           });
 

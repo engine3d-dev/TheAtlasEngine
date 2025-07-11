@@ -68,7 +68,7 @@ level_scene::level_scene(const std::string& p_tag)
                                         .scale = { 15.f, -0.30f, 10.0f } });
 
     m_platform->set<atlas::material>({
-    //   .color = { 0.f, 1.f, 0.f, 1.f },
+      //   .color = { 0.f, 1.f, 0.f, 1.f },
       .model_path = "assets/models/cube.obj",
       .texture_path = "assets/models/wood.png",
       // .texture_path = "assets/models/Tiles074_8K-JPG_Color.jpg",
