@@ -16,10 +16,10 @@ namespace atlas {
     };
 
     struct transform {
-        glm::highp_vec3 Position{ 0.f };
-        glm::highp_vec4 QuaternionRotation{ 0.f, 0, 0, 1 };
-        glm::highp_vec3 Rotation{ 0.f };
-        glm::highp_vec3 Scale{ 1.f };
+        glm::highp_vec3 position{ 0.f };
+        glm::highp_vec4 quaternion{ 0.f, 0, 0, 1 };
+        glm::highp_vec3 rotation{ 0.f };
+        glm::highp_vec3 scale{ 1.f };
     };
 
     //! @note Our interpretation of the RigidBody3D
@@ -117,7 +117,7 @@ namespace atlas {
         camera() = default;
         // constructor with vectors
         camera(float p_aspect_ratio,
-               glm::vec3 position = glm::vec3(0.0f, 1.50f, 0.0f),
+               glm::vec3 p_position = glm::vec3(0.0f, 1.50f, 0.0f),
                glm::vec3 up = glm::vec3(0.0f, -1.0f, 0.0f),
                float yaw = -90.0f,
                float pitch = 0.0f)
@@ -125,7 +125,7 @@ namespace atlas {
           , MouseSensitivity(0.1f)
           , Zoom(45.0f)
           , camera_mouse_sensitivity(0.1f) {
-            Position = position;
+            Position = p_position;
             WorldUp = up;
             EulerRotation = { yaw, pitch, 1.f };
             AspectRatio = p_aspect_ratio;

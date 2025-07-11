@@ -5,7 +5,6 @@
 
 #include <physics/physics_3d/physics_context.hpp>
 #include <physics/jolt-cpp/jolt_components.hpp>
-#include <components/transform.hpp>
 #include <physics/physics_3d/jolt/interface/jolt_broad_phase.hpp>
 
 namespace atlas::physics {
@@ -111,7 +110,7 @@ namespace atlas::physics {
         void add_body(flecs::entity e,
                       const physics_body* body_opt,
                       const collider_body& collider,
-                      const transform_physics& location,
+                      const transform& location,
                       std::vector<JPH::BodyCreationSettings>& settings_list,
                       std::vector<flecs::entity>& entity_list);
 

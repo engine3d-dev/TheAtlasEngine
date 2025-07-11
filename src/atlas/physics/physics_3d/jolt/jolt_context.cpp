@@ -127,7 +127,7 @@ namespace atlas::physics {
       flecs::entity e,
       const physics_body* body_opt,
       const collider_body& collider,
-      const transform_physics& location,
+      const transform& location,
       std::vector<JPH::BodyCreationSettings>& out_settings_list,
       std::vector<flecs::entity>& out_entity_list) {
         auto shape = create_shape_from_collider(e, collider);
@@ -146,7 +146,7 @@ namespace atlas::physics {
         JPH::BodyCreationSettings body_settings(
           shape,
           to_jph(location.position),
-          to_jph(location.quaterion_rotation),
+          to_jph(location.quaternion),
           motion_type,
           layer_type);
 
@@ -176,19 +176,19 @@ namespace atlas::physics {
             return;
         }
 
-        scene->query_builder<physics_body, collider_body, transform_physics>()
+        scene->query_builder<physics_body, collider_body, transform>()
           .each([&](flecs::entity e,
                     const physics_body& phys,
                     const collider_body& col,
-                    const transform_physics& loc) {
+                    const transform& loc) {
               add_body(e, &phys, col, loc, settings_list, entity_list);
           });
 
-        scene->query_builder<collider_body, transform_physics>()
+        scene->query_builder<collider_body, transform>()
           .without<physics_body>()
           .each([&](flecs::entity e,
                     const collider_body& col,
-                    const transform_physics& loc) {
+                    const transform& loc) {
               add_body(e, nullptr, col, loc, settings_list, entity_list);
           });
 

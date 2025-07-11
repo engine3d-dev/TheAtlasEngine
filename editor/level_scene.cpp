@@ -22,10 +22,10 @@ level_scene::level_scene(const std::string& p_tag)
 
     m_viking_room = create_object("Viking Room Object");
     atlas::transform sphere_transform = {
-        // .Position{0.f, 0.f, 1.60f},
-        .Position = { -2.70f, 2.70, -8.30f },
-        .Rotation = { 2.30f, 95.90f, 91.80f },
-        .Scale{ 1.f },
+        // .position{0.f, 0.f, 1.60f},
+        .position = { -2.70f, 2.70, -8.30f },
+        .rotation = { 2.30f, 95.90f, 91.80f },
+        .scale{ 1.f },
     };
     m_viking_room->set<atlas::transform>(sphere_transform);
     m_viking_room->set<atlas::material>(
@@ -36,9 +36,9 @@ level_scene::level_scene(const std::string& p_tag)
     m_cube = create_object("Cube");
 
     atlas::transform cube_transform = {
-        // .Position = {-2.70, 0.f, 0.f},
-        .Position = { 0.f, 2.10f, -7.30f },
-        .Scale = { 0.9f, 0.9f, 0.9f },
+        // .position = {-2.70, 0.f, 0.f},
+        .position = { 0.f, 2.10f, -7.30f },
+        .scale = { 0.9f, 0.9f, 0.9f },
     };
     m_cube->set<atlas::transform>(cube_transform);
 
@@ -49,8 +49,8 @@ level_scene::level_scene(const std::string& p_tag)
 
     m_robot_model = create_object("object 1");
     m_robot_model->set<atlas::transform>({
-      .Position = { 0.f, 0.f, -20.f },
-      .Scale = { 1.f, 1.f, 1.f },
+      .position = { 0.f, 0.f, -20.f },
+      .scale = { 1.f, 1.f, 1.f },
     });
 
     m_robot_model->set<atlas::material>({
@@ -63,14 +63,16 @@ level_scene::level_scene(const std::string& p_tag)
 
     m_platform = create_object("Platform");
 
-    m_platform->set<atlas::transform>({ // .Position = { 0.f, 1.40f, -7.4f },
-                                        // .Scale = { 2.80f, -0.08f, 3.50f },
-                                        .Scale = { 15.f, -0.30f, 10.0f } });
+    m_platform->set<atlas::transform>({ // .position = { 0.f, 1.40f, -7.4f },
+                                        // .scale = { 2.80f, -0.08f, 3.50f },
+                                        .scale = { 15.f, -0.30f, 10.0f } });
 
-    m_platform->set<atlas::material>(
-      { .color = { 0.f, 1.f, 0.f, 1.f },
-        .model_path = "assets/models/cube.obj",
-        .texture_path = "assets/models/Tiles074_8K-JPG_Color.jpg" });
+    m_platform->set<atlas::material>({
+    //   .color = { 0.f, 1.f, 0.f, 1.f },
+      .model_path = "assets/models/cube.obj",
+      .texture_path = "assets/models/wood.png",
+      // .texture_path = "assets/models/Tiles074_8K-JPG_Color.jpg",
+    });
 
     atlas::register_update(this, &level_scene::on_update);
     atlas::register_ui(this, &level_scene::on_ui_update);
@@ -132,9 +134,9 @@ level_scene::on_ui_update() {
         //! @note Or else there will be conflict in naming ID's
         atlas::ui::draw_panel_component<atlas::material>("Sphere", [&]() {
             std::string sphere_filepath = "";
-            atlas::ui::draw_vec3("pos 1", viking_transform->Position);
-            atlas::ui::draw_vec3("scale 1", viking_transform->Scale);
-            atlas::ui::draw_vec3("rotate 1", viking_transform->Rotation);
+            atlas::ui::draw_vec3("pos 1", viking_transform->position);
+            atlas::ui::draw_vec3("scale 1", viking_transform->scale);
+            atlas::ui::draw_vec3("rotate 1", viking_transform->rotation);
             atlas::ui::draw_vec4("color 1", viking_room_material->color);
             // atlas::ui::draw_vec3("Light Pos", g_light_position);
             atlas::ui::button_open_file_dialog("Load Mesh 1", sphere_filepath);
@@ -151,29 +153,29 @@ level_scene::on_ui_update() {
         });
 
         atlas::ui::draw_panel_component<atlas::material>("Robot", [&]() {
-            atlas::ui::draw_vec3("position", robot_transform->Position);
-            atlas::ui::draw_vec3("rob scale", robot_transform->Scale);
+            atlas::ui::draw_vec3("position", robot_transform->position);
+            atlas::ui::draw_vec3("rob scale", robot_transform->scale);
         });
 
         atlas::ui::draw_panel_component<atlas::material>("Cube", [&]() {
-            atlas::ui::draw_vec3("cube pos", cube_transform->Position);
+            atlas::ui::draw_vec3("cube pos", cube_transform->position);
         });
 
         // atlas::ui::draw_panel_component<atlas::material>("platform",
         // [&platform_transform](){
         //     atlas::ui::draw_vec3("platform pos",
-        //     platform_transform->Position); atlas::ui::draw_vec3("platform
-        //     scale", platform_transform->Scale);
+        //     platform_transform->position); atlas::ui::draw_vec3("platform
+        //     scale", platform_transform->scale);
         //     atlas::ui::draw_vec3("platform rot",
-        //     platform_transform->Rotation);
+        //     platform_transform->rotation);
         // });
         atlas::ui::draw_panel_component<atlas::material>(
           "platform", [&platform_transform, &platform_material]() {
               atlas::ui::draw_vec3("platform pos",
-                                   platform_transform->Position);
-              atlas::ui::draw_vec3("platform scale", platform_transform->Scale);
+                                   platform_transform->position);
+              atlas::ui::draw_vec3("platform scale", platform_transform->scale);
               atlas::ui::draw_vec3("platform rot",
-                                   platform_transform->Rotation);
+                                   platform_transform->rotation);
               atlas::ui::draw_vec4("platform rgb", platform_material->color);
           });
 
