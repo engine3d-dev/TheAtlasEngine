@@ -20,7 +20,7 @@ set(
 
     # System-related stuff
     ${SRC_DIR}/core/scene/scene_object.cpp
-    ${SRC_DIR}/core/system_framework/system_registry.cpp
+    ${SRC_DIR}/core/system/registry.cpp
 
     # Filesystem stuff
     ${SRC_DIR}/core/filesystem/file_dialog.cpp
@@ -46,9 +46,6 @@ set(
 
     # Scene stuff
     ${SRC_DIR}/core/scene/world.cpp
-
-    # camera system
-    ${SRC_DIR}/core/system/camera.cpp
 
     # Renderer-stuff
     ${SRC_DIR}/renderer/renderer.cpp

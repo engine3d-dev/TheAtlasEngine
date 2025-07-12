@@ -4,7 +4,7 @@
 #include <drivers/vulkan-cpp/vk_context.hpp>
 #include <core/application.hpp>
 
-#include <core/system_framework/system_registry.hpp>
+#include <core/system/registry.hpp>
 #include <core/scene/world.hpp>
 #include <drivers/vulkan-cpp/vk_types.hpp>
 

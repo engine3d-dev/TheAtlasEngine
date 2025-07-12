@@ -5,7 +5,7 @@
 #include <glm/fwd.hpp>
 #include <yaml-cpp/emitter.h>
 #include <yaml-cpp/yaml.h>
-#include <core/system_framework/system_registry.hpp>
+#include <core/system/registry.hpp>
 
 namespace YAML {
     template<>

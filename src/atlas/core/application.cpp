@@ -7,8 +7,7 @@
 #include <core/utilities/state.hpp>
 #include <drivers/vulkan-cpp/vk_swapchain.hpp>
 
-#include <core/system_framework/system_registry.hpp>
-#include <core/system/camera.hpp>
+#include <core/system/registry.hpp>
 
 namespace atlas {
     static std::string g_tag = "TheAtlasEngine";
@@ -76,25 +75,9 @@ namespace atlas {
 
         detail::invoke_start();
 
-        float aspect_ratio = application::aspect_ratio();
         ref<world_scope> current_world =
           system_registry::get_world("Editor World");
         ref<scene_scope> current_scene = current_world->get_scene("LevelScene");
-
-        // This query is for scheduling what viewports the cameras are
-        // associated with This means that if we had multiple viewports support,
-        // we could assign a camera to those specific viewports and vice versa
-        // Assigning one camera to single viewport
-        // TODO: Centralizing the responsibility of `camera_system` and this
-        // query_builder to contain a centralized operation for both transform
-        // of camera updates and scheduling the cameras
-        /*
-        m_query_camera_objects =
-          current_scene
-            ->query_builder<projection_view,
-                            perspective_camera>().with<flecs::pair<atlas::tag_redo::editor,
-        atlas::projection_view>>() .build();
-        */
 
         flecs::world current_world_scope = *current_scene;
 
@@ -102,30 +85,38 @@ namespace atlas {
         // of data in this case the projection/view matrices are onyl being
         // changed when flecs::world::progress(g_delta_time) is being invoked
         // within the mainloop
-        current_world_scope.system<projection_view, transform, perspective_camera>()
-          .each([&, aspect_ratio](projection_view& p_proj_view, transform p_transform, const perspective_camera& p_camera) {
+        // current_world_scope.system<projection_view, transform,
+        // perspective_camera>()
+        current_world_scope
+          .system<flecs::pair<tag_redo::editor, projection_view>,
+                  transform,
+                  perspective_camera>()
+          .each([&](flecs::pair<tag_redo::editor, projection_view> p_pair,
+                    transform p_transform,
+                    perspective_camera& p_camera) {
+              float aspect_ratio = application::aspect_ratio();
               if (!p_camera.is_active) {
                   return;
               }
 
-              p_proj_view.projection = glm::mat4(1.f);
+              p_pair->projection = glm::mat4(1.f);
 
-              p_proj_view.projection =
+              p_pair->projection =
                 glm::perspective(glm::radians(p_camera.field_of_view),
                                  aspect_ratio,
                                  p_camera.plane.x,
                                  p_camera.plane.y);
-
-              p_proj_view.view = glm::mat4(1.f);
+              p_pair->projection[1][1] *= -1;
+              p_pair->view = glm::mat4(1.f);
               glm::quat quaternion = glm::quat({ p_transform.quaternion.w,
                                                  p_transform.quaternion.x,
                                                  p_transform.quaternion.y,
                                                  p_transform.quaternion.z });
-              p_proj_view.view =
-                glm::translate(p_proj_view.view, p_transform.position) *
-                glm::mat4_cast(quaternion); // glm::mat4_cast(quaternion);
+              p_pair->view =
+                glm::translate(p_pair->view, p_transform.position) *
+                glm::mat4_cast(quaternion);
 
-              p_proj_view.view = glm::inverse(p_proj_view.view);
+              p_pair->view = glm::inverse(p_pair->view);
           });
 
         // This is querying
@@ -171,13 +162,17 @@ namespace atlas {
             // This queries all camera objects within the camera system
             // Update -- going to be removing camera system in replacement of
             // just simply using flecs::system to keep it simple for the time
-            // being m_main_camera_system.query_camera_entities();
-
-            query_camera_objects.each([&](flecs::entity, flecs::pair<tag_redo::editor, projection_view> p_pair, perspective_camera& p_camera) {
+            query_camera_objects.each(
+              [&](flecs::entity,
+                  flecs::pair<tag_redo::editor, projection_view> p_pair,
+                  perspective_camera& p_camera) {
                   if (!p_camera.is_active) {
                       return;
                   }
 
+                  // TODO: This is going to change when we have multi-viewport
+                  // This is going to be replaced when we have a viewport
+                  // manager implementation
                   if (p_camera.target == screen) {
                       m_proj_view = p_pair->projection * p_pair->view;
                   }

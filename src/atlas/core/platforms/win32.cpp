@@ -1,5 +1,5 @@
 #include <core/application.hpp>
-#include <core/system_framework/system_registry.hpp>
+#include <core/system/registry.hpp>
 #include <drivers/graphics_context.hpp>
 #include <core/engine_logger.hpp>
 extern atlas::ref<atlas::application> atlas::initialize_application();
