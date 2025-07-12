@@ -13,8 +13,7 @@ level_scene::level_scene(const std::string& p_tag)
     console_log_info("scene_scope::scene_scope with Tag = {} called!", p_tag);
 
     m_camera = create_object("editor camera");
-    m_camera
-      ->add<flecs::pair<atlas::tag_redo::editor, atlas::projection_view>>();
+    m_camera->add<flecs::pair<atlas::tag::editor, atlas::projection_view>>();
     m_camera->set<atlas::transform>(
       { .position = { 3.50f, 4.90f, 36.40f }, .scale{ 1.f } });
     m_camera->set<atlas::perspective_camera>({
@@ -26,7 +25,7 @@ level_scene::level_scene(const std::string& p_tag)
     });
 
     // m_camera2 = create_object("game camera");
-    // m_camera2->add<flecs::pair<atlas::tag_redo::editor,
+    // m_camera2->add<flecs::pair<atlas::tag::editor,
     // atlas::projection_view>>(); m_camera2->set<atlas::transform>({ .position
     // = {-2.70f, 2.70, -8.30f}, 	.scale{1.f}
     // });

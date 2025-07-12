@@ -88,10 +88,10 @@ namespace atlas {
         // current_world_scope.system<projection_view, transform,
         // perspective_camera>()
         current_world_scope
-          .system<flecs::pair<tag_redo::editor, projection_view>,
+          .system<flecs::pair<tag::editor, projection_view>,
                   transform,
                   perspective_camera>()
-          .each([&](flecs::pair<tag_redo::editor, projection_view> p_pair,
+          .each([&](flecs::pair<tag::editor, projection_view> p_pair,
                     transform p_transform,
                     perspective_camera& p_camera) {
               float aspect_ratio = application::aspect_ratio();
@@ -122,7 +122,7 @@ namespace atlas {
         // This is querying
         auto query_camera_objects =
           current_scene
-            ->query_builder<flecs::pair<tag_redo::editor, projection_view>,
+            ->query_builder<flecs::pair<tag::editor, projection_view>,
                             perspective_camera>()
             .build();
 
@@ -164,7 +164,7 @@ namespace atlas {
             // just simply using flecs::system to keep it simple for the time
             query_camera_objects.each(
               [&](flecs::entity,
-                  flecs::pair<tag_redo::editor, projection_view> p_pair,
+                  flecs::pair<tag::editor, projection_view> p_pair,
                   perspective_camera& p_camera) {
                   if (!p_camera.is_active) {
                       return;

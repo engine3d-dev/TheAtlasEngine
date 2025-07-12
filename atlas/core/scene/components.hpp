@@ -14,9 +14,9 @@
 #include <vector>
 
 namespace atlas {
-    struct tag {
-        std::string TagMetadata = "";
-    };
+    // struct tag {
+    //     std::string TagMetadata = "";
+    // };
 
     struct transform {
         glm::highp_vec3 position{ 0.f };
@@ -75,18 +75,10 @@ namespace atlas {
         bool on_texture_reload = false;
     };
 
-    //! @note Contains our render target as the mesh
-    //! TODO: IMPORTANT: NEED TO CHANGE HOW THIS WORKSS!!
-    //! IMPORTANT: flecs gives you a lifetime issue if it doesnt have a default
-    //! constructor implictly added to a struct/class
-    // struct rendertarget3d {
-    //     std::string model_path; // used to load in a model
-    //     std::string Filepath; // used for texture
-    //     // bool is_model_dirty=false; // checks if the model is needing to
-    //     reload bool is_texture_dirty=false; // checking if texture is needing
-    //     to reload
-    // };
-
+    /**
+     * @brief material component for specifying a specific type of material for
+     * a scene object
+     */
     struct material {
         glm::vec4 color{ 1.f };
         std::string model_path = "";
@@ -126,7 +118,7 @@ namespace atlas {
 
     // add<tag::editor>
     // TODO: remove tag component from components.hpp
-    namespace tag_redo {
+    namespace tag {
         // TODO: Probably need some renaming
         struct editor {};
     };

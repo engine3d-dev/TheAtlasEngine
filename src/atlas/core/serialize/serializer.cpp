@@ -121,8 +121,7 @@ namespace atlas {
       const flecs::entity& p_entity) {
         output << YAML::BeginMap;
 
-        output << YAML::Key << "Entity" << YAML::Value
-               << p_entity.get<tag>()->TagMetadata;
+        output << YAML::Key << "Entity" << YAML::Value << p_entity.name();
 
         if (p_entity.has<transform>()) {
             output << YAML::Key << "Transform";
@@ -159,7 +158,7 @@ namespace atlas {
         ref<scene_scope> current_scene = world_object->get_scene("LevelScene");
 
         flecs::query<> q =
-          current_scene->query_builder().with<atlas::tag>().build();
+          current_scene->query_builder().with<atlas::transform>().build();
 
         q.each([&output](flecs::entity p_entity_id) {
             serialize_entity(output, p_entity_id);
