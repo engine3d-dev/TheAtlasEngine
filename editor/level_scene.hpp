@@ -35,4 +35,5 @@ private:
     std::pmr::polymorphic_allocator<> m_allocator;
     bool m_is_simulation_enabled = false;
     atlas::optional_ref<atlas::scene_object> m_camera;
+    atlas::optional_ref<atlas::scene_object> m_camera2;
 };

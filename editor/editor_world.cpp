@@ -1,6 +1,6 @@
 #include "editor_world.hpp"
 #include <core/engine_logger.hpp>
-#include <core/system_framework/system_registry.hpp>
+#include <core/system/registry.hpp>
 
 editor_world::editor_world() {
     console_log_fatal("Instantiate Default editor_world!");
