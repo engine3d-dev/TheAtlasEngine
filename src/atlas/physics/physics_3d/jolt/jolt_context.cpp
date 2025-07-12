@@ -7,6 +7,7 @@
 #include <physics/physics_3d/jolt/jolt_helper.hpp>
 #include <core/scene/world.hpp>
 #include <core/system_framework/system_registry.hpp>
+#include <core/application.hpp>
 
 namespace atlas::physics {
 

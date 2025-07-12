@@ -47,6 +47,9 @@ set(
     # Scene stuff
     ${SRC_DIR}/core/scene/world.cpp
 
+    # camera system
+    ${SRC_DIR}/core/system/camera.cpp
+
     # Renderer-stuff
     ${SRC_DIR}/renderer/renderer.cpp
     ${SRC_DIR}/drivers/render_context.cpp

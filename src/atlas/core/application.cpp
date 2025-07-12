@@ -102,11 +102,8 @@ namespace atlas {
         // of data in this case the projection/view matrices are onyl being
         // changed when flecs::world::progress(g_delta_time) is being invoked
         // within the mainloop
-        current_world_scope
-          .system<projection_view, transform, perspective_camera>()
-          .each([&, aspect_ratio](projection_view& p_proj_view,
-                                  transform p_transform,
-                                  const perspective_camera& p_camera) {
+        current_world_scope.system<projection_view, transform, perspective_camera>()
+          .each([&, aspect_ratio](projection_view& p_proj_view, transform p_transform, const perspective_camera& p_camera) {
               if (!p_camera.is_active) {
                   return;
               }
@@ -126,7 +123,8 @@ namespace atlas {
                                                  p_transform.quaternion.z });
               p_proj_view.view =
                 glm::translate(p_proj_view.view, p_transform.position) *
-                glm::toMat4(quaternion);
+                glm::mat4_cast(quaternion); // glm::mat4_cast(quaternion);
+
               p_proj_view.view = glm::inverse(p_proj_view.view);
           });
 
@@ -175,10 +173,7 @@ namespace atlas {
             // just simply using flecs::system to keep it simple for the time
             // being m_main_camera_system.query_camera_entities();
 
-            query_camera_objects.each(
-              [&](flecs::entity,
-                  flecs::pair<tag_redo::editor, projection_view> p_pair,
-                  perspective_camera& p_camera) {
+            query_camera_objects.each([&](flecs::entity, flecs::pair<tag_redo::editor, projection_view> p_pair, perspective_camera& p_camera) {
                   if (!p_camera.is_active) {
                       return;
                   }
@@ -186,7 +181,7 @@ namespace atlas {
                   if (p_camera.target == screen) {
                       m_proj_view = p_pair->projection * p_pair->view;
                   }
-            });
+              });
 
             // TODO: Introduce scene renderer that will make use of the
             // begin/end semantics for setting up tasks during pre-frame

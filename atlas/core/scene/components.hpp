@@ -1,5 +1,4 @@
 #pragma once
-#include <core/application.hpp>
 #include <core/geometry/mesh.hpp>
 #include <glm/ext/quaternion_transform.hpp>
 
@@ -9,6 +8,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
+
+#include <flecs.h>
+#include <core/engine_logger.hpp>
+#include <vector>
 
 namespace atlas {
     struct tag {
@@ -94,6 +97,46 @@ namespace atlas {
         bool texture_reload = false;
     };
 
+    // TEMPORARY: Port is just a way to handle setting up main active cameras
+    // Also use for texture camera (so minimap-like view)
+    // This will be replaced with specifying rendertargets rather then the
+    // screens and when we get viewport enabled screen = render to the screen
+    enum viewport {
+        none,
+        screen, // rendered to the screen
+    };
+
+    //! @brief Component for setting up perspective camera
+    struct perspective_camera {
+        std::string name = "";
+        // This doesnt need to be called in camera because it'll already be
+        // calculated in scene manager because it'll give you the aspect ratio.
+        // float aspect_ratio = application::aspect_ratio();
+        // glm::vec2 represented as {near: x, far: y}
+        glm::vec2 plane{ 0.f };
+
+        // Indicates if this camera is the main activated camera
+        bool is_active = false;
+
+        float field_of_view = glm::radians(45.f);
+
+        // rendertarget specifically for camera (TEMP)
+        viewport target = viewport::none;
+    };
+
+    // add<tag::editor>
+    // TODO: remove tag component from components.hpp
+    namespace tag_redo {
+        // TODO: Probably need some renaming
+        struct editor {};
+    };
+
+    // #include <core/system/camera.hpp>
+    struct projection_view {
+        glm::mat4 projection;
+        glm::mat4 view;
+    };
+
     // An abstract camera class that processes input and calculates the
     // corresponding Euler Angles, Vectors and Matrices for use in OpenGL
 
@@ -108,6 +151,7 @@ namespace atlas {
 
 
     */
+    /*
     class camera {
         // Default camera values
         // const float yaw = -90.0f;
@@ -286,4 +330,5 @@ namespace atlas {
         // toggling between cameras and checking if our current
         bool IsMainCamera = false;
     };
+    */
 }; // namespace atlas

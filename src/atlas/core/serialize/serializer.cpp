@@ -138,39 +138,6 @@ namespace atlas {
             output << YAML::EndMap;
         }
 
-        if (p_entity.has<camera>()) {
-            output << YAML::Key << "Perspective Camera";
-            // output << YAML::Key << "Camera" << YAML::Value;
-
-            auto perspective_camera = p_entity.get<camera>();
-
-            output << YAML::BeginMap;
-            output << YAML::Key << "Position" << YAML::Value
-                   << perspective_camera->Position;
-            // output << YAML::Key << "Front" << YAML::Value
-            //        << perspective_camera->Front;
-            output << YAML::Key << "Up" << YAML::Value
-                   << perspective_camera->Up;
-            output << YAML::Key << "Down" << YAML::Value
-                   << perspective_camera->Down;
-            output << YAML::Key << "Right" << YAML::Value
-                   << perspective_camera->Right;
-            output << YAML::Key << "Left" << YAML::Value
-                   << perspective_camera->Left;
-            output << YAML::Key << "Euler"
-                   << YAML::Value
-                   //    << perspective_camera->EulerRotation;
-                   << perspective_camera->EulerRotation;
-            output << YAML::Key << "MovementSpeed" << YAML::Value
-                   << perspective_camera->MovementSpeed;
-            output << YAML::Key << "MouseSensitivity" << YAML::Value
-                   << perspective_camera->MouseSensitivity;
-            output << YAML::Key << "Zoom" << YAML::Value
-                   << perspective_camera->Zoom;
-
-            output << YAML::EndMap;
-        }
-
         output << YAML::EndMap; // Entity
     }
 
