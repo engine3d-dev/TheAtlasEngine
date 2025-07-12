@@ -44,8 +44,8 @@ namespace atlas {
 
         std::string get_tag() { return m_tag; }
 
-		// It's required that the flecs::world is returned by reference
-		// This prevents corruption onto the flecs::world object
+        // It's required that the flecs::world is returned by reference
+        // This prevents corruption onto the flecs::world object
         operator flecs::world&() { return m_registry; }
 
     private:

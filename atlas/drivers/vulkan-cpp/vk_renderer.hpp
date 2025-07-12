@@ -46,7 +46,8 @@ namespace atlas::vk {
 
     private:
         void start_frame(const vk_command_buffer& p_current,
-                         const vk_swapchain& p_swapchain_handler, const glm::mat4& p_proj_view) override;
+                         const vk_swapchain& p_swapchain_handler,
+                         const glm::mat4& p_proj_view) override;
         void post_frame() override;
         void background_color(const std::array<float, 4>& p_color) override;
 

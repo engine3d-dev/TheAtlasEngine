@@ -27,7 +27,7 @@ level_scene::level_scene(const std::string& p_tag)
 
     // m_camera2 = create_object("game camera");
     // m_camera2->add<flecs::pair<atlas::tag_redo::editor,
-    // atlas::projection_view>>(); m_camera2->set<atlas::transform>({ 	.position
+    // atlas::projection_view>>(); m_camera2->set<atlas::transform>({ .position
     // = {-2.70f, 2.70, -8.30f}, 	.scale{1.f}
     // });
     // m_camera2->set<atlas::perspective_camera>({
