@@ -4,6 +4,7 @@
 #include <drivers/vulkan-cpp/helper_functions.hpp>
 #include <drivers/vulkan-cpp/vk_types.hpp>
 #include <array>
+#include <iostream>
 
 namespace atlas::vk {
 
@@ -18,6 +19,15 @@ namespace atlas::vk {
           m_physical.get_surface_properties(m_current_surface);
 
         on_create();
+    }
+
+    void vk_swapchain::on_recreate() {
+        m_surface_properties =
+          m_physical.get_surface_properties(m_current_surface);
+        m_window_settings.width =
+          m_surface_properties.surface_capabilities.currentExtent.width;
+        m_window_settings.height =
+          m_surface_properties.surface_capabilities.currentExtent.height;
     }
 
     void vk_swapchain::on_create() {
@@ -228,6 +238,7 @@ namespace atlas::vk {
 
     void vk_swapchain::recreate() {
         destroy();
+        on_recreate();
         on_create();
     }
 
@@ -244,10 +255,17 @@ namespace atlas::vk {
     }
 
     void vk_swapchain::present(const uint32_t& p_current_frame) {
-        m_present_to_queue.present_frame(p_current_frame);
+        VkResult present_result =
+          m_present_to_queue.present_frame(p_current_frame);
+
+        if (present_result == VK_ERROR_OUT_OF_DATE_KHR ||
+            present_result == VK_SUBOPTIMAL_KHR) {
+            std::cout << "Recreating swapchain\n";
+            recreate();
+        }
     }
 
-    void vk_swapchain::submit(const VkCommandBuffer& p_command) {
+    void vk_swapchain::submit(const VkCommandBuffer& p_command) const {
         m_present_to_queue.submit_immediate_async(p_command);
     }
 

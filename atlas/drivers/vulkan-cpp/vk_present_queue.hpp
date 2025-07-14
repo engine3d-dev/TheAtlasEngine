@@ -27,10 +27,10 @@ namespace atlas::vk {
                          const vk_queue_options& p_queue_options);
 
         //! @brief Submitting current command buffer with async enabled
-        void submit_immediate_async(const VkCommandBuffer& p_command);
+        void submit_immediate_async(const VkCommandBuffer& p_command) const;
 
         //! @brief Submitting current command buffer with async disabled
-        void submit_immediate_sync(const VkCommandBuffer& p_command);
+        void submit_immediate_sync(const VkCommandBuffer& p_command) const;
 
         // These are ??? atm because the idea is we submit commands to the
         // presentation queue's then flush them at once
@@ -41,7 +41,7 @@ namespace atlas::vk {
 
         //! @param p_current_frame current frame of image presentable to the
         //! swapchain
-        void present_frame(const uint32_t& p_current_frame);
+        VkResult present_frame(const uint32_t& p_current_frame);
 
         //! @brief Ensures that operations finished within this queue before
         //! processing new frames

@@ -64,7 +64,7 @@ namespace atlas::vk {
 
         void destroy();
 
-        void submit(const VkCommandBuffer& p_command);
+        void submit(const VkCommandBuffer& p_command) const;
 
         operator VkSwapchainKHR() const { return m_swapchain_handler; }
 
@@ -75,6 +75,11 @@ namespace atlas::vk {
     private:
         void recreate();
         void on_create();
+        
+        //!@brief operations that only need to happen when the swapchain
+        // is recreated again -- examples include getting the new extent
+        // upon a window resize
+        void on_recreate();
 
     private:
         vk_physical_driver m_physical{};
