@@ -48,11 +48,10 @@ namespace atlas::vk {
     private:
         void start_frame(const vk_command_buffer& p_current,
                          const vk_swapchain& p_swapchain_handler) override;
-        void post_frame() override;
+        void post_frame(const vk_swapchain& p_swapchain_handler) override;
         void background_color(const std::array<float, 4>& p_color) override;
 
     private:
-        vk_swapchain m_main_swapchain{};
         vk_command_buffer m_current_command_buffer{};
         VkClearColorValue m_color;
 

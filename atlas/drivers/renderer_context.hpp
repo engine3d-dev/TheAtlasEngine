@@ -2,7 +2,6 @@
 #include <string>
 #include <core/core.hpp>
 #include <drivers/vulkan-cpp/vk_swapchain.hpp>
-#include <span>
 #include <drivers/vulkan-cpp/vk_command_buffer.hpp>
 
 /**
@@ -37,7 +36,9 @@ namespace atlas {
             return start_frame(p_current, p_swapchain_handler);
         }
 
-        void end_frame() { return post_frame(); }
+        void end_frame(const vk::vk_swapchain& p_swapchain_handler) {
+            return post_frame(p_swapchain_handler);
+        }
 
         void set_background_color(const std::array<float, 4>& p_color) {
             return background_color(p_color);
@@ -47,7 +48,7 @@ namespace atlas {
         virtual void start_frame(
           const vk::vk_command_buffer& p_current,
           const vk::vk_swapchain& p_swapchain_handler) = 0;
-        virtual void post_frame() = 0;
+        virtual void post_frame(const vk::vk_swapchain& p_swapchain_handler) = 0;
 
         virtual void background_color(const std::array<float, 4>& p_color) = 0;
     };

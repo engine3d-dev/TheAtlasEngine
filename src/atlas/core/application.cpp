@@ -111,8 +111,8 @@ namespace atlas {
             detail::invoke_ui_update();
 
             m_ui_context.end();
-
-            m_renderer->end();
+            
+            m_renderer->end(m_window->current_swapchain());
 
             m_window->present(m_current_frame_index);
         }

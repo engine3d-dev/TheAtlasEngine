@@ -29,7 +29,7 @@ namespace atlas {
         /**
          * @brief Indications when the renderer has reached the end of the frame
          */
-        void end();
+        void end(const vk::vk_swapchain& p_swapchain_handler);
 
         void set_background_color(const std::array<float, 4>& p_color);
 

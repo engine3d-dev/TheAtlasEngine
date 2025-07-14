@@ -20,8 +20,8 @@ namespace atlas {
         return m_render_context->begin_frame(p_current, p_current_rp);
     }
 
-    void renderer::end() {
-        return m_render_context->end_frame();
+    void renderer::end(const vk::vk_swapchain& p_swapchain_handler) {
+        return m_render_context->end_frame(p_swapchain_handler);
     }
 
     void renderer::set_background_color(const std::array<float, 4>& p_color) {
