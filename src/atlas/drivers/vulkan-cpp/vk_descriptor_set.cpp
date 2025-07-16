@@ -46,7 +46,7 @@ namespace atlas::vk {
             std::string type_str = descriptor_set_type_to_string(type);
             pool_sizes[i] = { .type = type,
                               .descriptorCount = static_cast<uint32_t>(
-                                p_layout.entry[i].descriptor_count) };
+                                p_layout.max_sets) };
         }
 
         for (size_t i = 0; i < descriptor_set_layout_bindings.size(); i++) {
@@ -62,7 +62,7 @@ namespace atlas::vk {
                   to_vk_shader_stage(p_layout.entry[i].binding_point.stage),
             };
         }
-
+        
         VkDescriptorPoolCreateInfo pool_ci = {
             .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
             .pNext = nullptr,
