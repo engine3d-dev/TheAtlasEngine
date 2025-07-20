@@ -3,13 +3,14 @@
 #include <core/scene/scene.hpp>
 #include <core/scene/scene_object.hpp>
 
- /**
-  * @name level_scene
-  * 
-  * @brief Implementation of our own customized scene
-  * 
-  * level_scene acts as a group that represents an area where a group of objects are associated with.
-*/
+/**
+ * @name level_scene
+ *
+ * @brief Implementation of our own customized scene
+ *
+ * level_scene acts as a group that represents an area where a group of objects
+ * are associated with.
+ */
 
 class level_scene : public atlas::scene_scope {
 public:
