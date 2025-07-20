@@ -1,13 +1,6 @@
 #include <core/application.hpp>
-#include <core/engine_logger.hpp>
-#include <core/event/event.hpp>
-#include <imgui.h>
-#include <string>
-
-#include <core/utilities/state.hpp>
+#include <core/common.hpp>
 #include <drivers/vulkan-cpp/vk_swapchain.hpp>
-
-#include <core/system/registry.hpp>
 
 namespace atlas {
     static std::string g_tag = "TheAtlasEngine";
@@ -81,12 +74,18 @@ namespace atlas {
 
         flecs::world current_world_scope = *current_scene;
 
-        // flecs::system is how your able to schedule changes for given portions
-        // of data in this case the projection/view matrices are onyl being
-        // changed when flecs::world::progress(g_delta_time) is being invoked
-        // within the mainloop
-        // current_world_scope.system<projection_view, transform,
-        // perspective_camera>()
+        /*
+            - flecs::system is how your able to schedule changes for given
+            portions of data in this case the projection/view matrices are only
+            being changed when flecs::world::progress(g_delta_time) is being
+            invoked within the mainloop
+            current_world_scope.system<projection_view, transform,
+            perspective_camera>()
+
+            - When users do object->add<flecs::pair<tag::editor,
+            projection_view>>(), this automatically gets invoked by the
+           .system<...> that gets invoked by the mainloop.
+        */
         current_world_scope
           .system<flecs::pair<tag::editor, projection_view>,
                   transform,
@@ -108,6 +107,8 @@ namespace atlas {
                                  p_camera.plane.y);
               p_pair->projection[1][1] *= -1;
               p_pair->view = glm::mat4(1.f);
+
+              // This is converting a glm::highp_vec4 to a glm::quat (quaternion)
               glm::quat quaternion = glm::quat({ p_transform.quaternion.w,
                                                  p_transform.quaternion.x,
                                                  p_transform.quaternion.y,
@@ -119,7 +120,14 @@ namespace atlas {
               p_pair->view = glm::inverse(p_pair->view);
           });
 
-        // This is querying
+        /*
+            - Currently how this works is we query with anything that has a
+           flecs::pair<tag::editor, projection_view>
+            - This tells the ecs flecs what to do query for in regards to
+           specific objects that are a camera
+            - in the tag:: namespace, this is to imply components that are empty
+           and just represent tags, to specify their uses.
+        */
         auto query_camera_objects =
           current_scene
             ->query_builder<flecs::pair<tag::editor, projection_view>,
@@ -170,12 +178,11 @@ namespace atlas {
                       return;
                   }
 
-                  // TODO: This is going to change when we have multi-viewport
-                  // This is going to be replaced when we have a viewport
-                  // manager implementation
-                  if (p_camera.target == screen) {
-                      m_proj_view = p_pair->projection * p_pair->view;
-                  }
+                  // Removing this because not needed for now, we can assume the
+                  // single viewport is going to be if (p_camera.target ==
+                  // screen) {
+                  m_proj_view = p_pair->projection * p_pair->view;
+                  // }
               });
 
             // TODO: Introduce scene renderer that will make use of the
@@ -201,8 +208,6 @@ namespace atlas {
 
             m_window->present(m_current_frame_index);
         }
-
-        // m_query_camera_objects.destruct();
     }
 
     void application::post_destroy() {
