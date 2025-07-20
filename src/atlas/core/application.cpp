@@ -108,7 +108,8 @@ namespace atlas {
               p_pair->projection[1][1] *= -1;
               p_pair->view = glm::mat4(1.f);
 
-              // This is converting a glm::highp_vec4 to a glm::quat (quaternion)
+              // This is converting a glm::highp_vec4 to a glm::quat
+              // (quaternion)
               glm::quat quaternion = glm::quat({ p_transform.quaternion.w,
                                                  p_transform.quaternion.x,
                                                  p_transform.quaternion.y,
