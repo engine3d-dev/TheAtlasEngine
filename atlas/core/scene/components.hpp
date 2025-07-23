@@ -70,15 +70,6 @@ namespace atlas {
         bool texture_reload = false;
     };
 
-    // TEMPORARY: Port is just a way to handle setting up main active cameras
-    // Also use for texture camera (so minimap-like view)
-    // This will be replaced with specifying rendertargets rather then the
-    // screens and when we get viewport enabled screen = render to the screen
-    enum viewport {
-        none,
-        screen, // rendered to the screen
-    };
-
     //! @brief Component for setting up perspective camera
     struct perspective_camera {
         // glm::vec2 represented as {near: x, far: y}
