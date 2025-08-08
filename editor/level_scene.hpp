@@ -4,15 +4,12 @@
 #include <core/scene/scene_object.hpp>
 
 /**
- * @name LevelScene
- * @note Implementation of our scene
- * @note Meaning this is just the first iteration of how we can look at these
- * scenes and how they can be defined
- * @note Each scene is a type of scene scope, this means that when a player
- * leaves the outer scope of a scene, the player transitions into a different
- * scene
- * @note Either the player transitions into a different scene or hits a
- * invisible wall preventing leaving the scope
+ * @name level_scene
+ *
+ * @brief Implementation of our own customized scene
+ *
+ * level_scene acts as a group that represents an area where a group of objects
+ * are associated with.
  */
 
 class level_scene : public atlas::scene_scope {

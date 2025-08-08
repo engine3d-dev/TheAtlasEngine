@@ -5,7 +5,7 @@
 #include <glm/fwd.hpp>
 #include <yaml-cpp/emitter.h>
 #include <yaml-cpp/yaml.h>
-#include <core/system_framework/system_registry.hpp>
+#include <core/system/registry.hpp>
 
 namespace YAML {
     template<>
@@ -121,8 +121,7 @@ namespace atlas {
       const flecs::entity& p_entity) {
         output << YAML::BeginMap;
 
-        output << YAML::Key << "Entity" << YAML::Value
-               << p_entity.get<tag>()->TagMetadata;
+        output << YAML::Key << "Entity" << YAML::Value << p_entity.name();
 
         if (p_entity.has<transform>()) {
             output << YAML::Key << "Transform";
@@ -135,39 +134,6 @@ namespace atlas {
                    << entity_transform->scale;
             output << YAML::Key << "Rotation" << YAML::Value
                    << entity_transform->rotation;
-            output << YAML::EndMap;
-        }
-
-        if (p_entity.has<camera>()) {
-            output << YAML::Key << "Perspective Camera";
-            // output << YAML::Key << "Camera" << YAML::Value;
-
-            auto perspective_camera = p_entity.get<camera>();
-
-            output << YAML::BeginMap;
-            output << YAML::Key << "Position" << YAML::Value
-                   << perspective_camera->Position;
-            // output << YAML::Key << "Front" << YAML::Value
-            //        << perspective_camera->Front;
-            output << YAML::Key << "Up" << YAML::Value
-                   << perspective_camera->Up;
-            output << YAML::Key << "Down" << YAML::Value
-                   << perspective_camera->Down;
-            output << YAML::Key << "Right" << YAML::Value
-                   << perspective_camera->Right;
-            output << YAML::Key << "Left" << YAML::Value
-                   << perspective_camera->Left;
-            output << YAML::Key << "Euler"
-                   << YAML::Value
-                   //    << perspective_camera->EulerRotation;
-                   << perspective_camera->EulerRotation;
-            output << YAML::Key << "MovementSpeed" << YAML::Value
-                   << perspective_camera->MovementSpeed;
-            output << YAML::Key << "MouseSensitivity" << YAML::Value
-                   << perspective_camera->MouseSensitivity;
-            output << YAML::Key << "Zoom" << YAML::Value
-                   << perspective_camera->Zoom;
-
             output << YAML::EndMap;
         }
 
@@ -192,7 +158,7 @@ namespace atlas {
         ref<scene_scope> current_scene = world_object->get_scene("LevelScene");
 
         flecs::query<> q =
-          current_scene->query_builder().with<atlas::tag>().build();
+          current_scene->query_builder().with<atlas::transform>().build();
 
         q.each([&output](flecs::entity p_entity_id) {
             serialize_entity(output, p_entity_id);

@@ -24,7 +24,8 @@ namespace atlas {
          * prepare workloads before next frame is processeed
          */
         void begin(const vk::vk_command_buffer& p_current,
-                   const vk::vk_swapchain& p_current_rp);
+                   const vk::vk_swapchain& p_current_rp,
+                   const glm::mat4& p_proj_view);
 
         /**
          * @brief Indications when the renderer has reached the end of the frame

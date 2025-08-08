@@ -10,7 +10,6 @@
 #include <drivers/vulkan-cpp/vk_uniform_buffer.hpp>
 #include <vector>
 #include <map>
-#include <core/scene/components.hpp>
 
 namespace atlas::vk {
     /**
@@ -47,11 +46,13 @@ namespace atlas::vk {
 
     private:
         void start_frame(const vk_command_buffer& p_current,
-                         const vk_swapchain& p_swapchain_handler) override;
+                         const vk_swapchain& p_swapchain_handler,
+                         const glm::mat4& p_proj_view) override;
         void post_frame() override;
         void background_color(const std::array<float, 4>& p_color) override;
 
     private:
+        glm::mat4 m_proj_view;
         vk_swapchain m_main_swapchain{};
         vk_command_buffer m_current_command_buffer{};
         VkClearColorValue m_color;
@@ -95,7 +96,6 @@ namespace atlas::vk {
 
         bool m_begin_initialize = true;
         uint32_t m_current_frame = 0;
-        camera m_camera;
         glm::mat4 m_model = { 1.f };
     };
 };

@@ -44,9 +44,9 @@ namespace atlas {
 
         std::string get_tag() { return m_tag; }
 
-        operator flecs::world() const { return m_registry; }
-
-        operator flecs::world() { return m_registry; }
+        // It's required that the flecs::world is returned by reference
+        // This prevents corruption onto the flecs::world object
+        operator flecs::world&() { return m_registry; }
 
     private:
         std::pmr::polymorphic_allocator<> m_object_allocator;

@@ -1,10 +1,5 @@
 #include <core/application.hpp>
-#include <core/engine_logger.hpp>
-#include <core/event/event.hpp>
-#include <imgui.h>
-#include <string>
-
-#include <core/utilities/state.hpp>
+#include <core/common.hpp>
 #include <drivers/vulkan-cpp/vk_swapchain.hpp>
 
 namespace atlas {
@@ -73,11 +68,84 @@ namespace atlas {
 
         detail::invoke_start();
 
+        ref<world_scope> current_world =
+          system_registry::get_world("Editor World");
+        ref<scene_scope> current_scene = current_world->get_scene("LevelScene");
+
+        flecs::world current_world_scope = *current_scene;
+
+        /*
+            - flecs::system is how your able to schedule changes for given
+            portions of data in this case the projection/view matrices are only
+            being changed when flecs::world::progress(g_delta_time) is being
+            invoked within the mainloop
+            current_world_scope.system<projection_view, transform,
+            perspective_camera>()
+
+            - When users do object->add<flecs::pair<tag::editor,
+            projection_view>>(), this automatically gets invoked by the
+           .system<...> that gets invoked by the mainloop.
+        */
+        current_world_scope
+          .system<flecs::pair<tag::editor, projection_view>,
+                  transform,
+                  perspective_camera>()
+          .each([&](flecs::pair<tag::editor, projection_view> p_pair,
+                    transform p_transform,
+                    perspective_camera& p_camera) {
+              float aspect_ratio = application::aspect_ratio();
+              if (!p_camera.is_active) {
+                  return;
+              }
+
+              p_pair->projection = glm::mat4(1.f);
+
+              p_pair->projection =
+                glm::perspective(glm::radians(p_camera.field_of_view),
+                                 aspect_ratio,
+                                 p_camera.plane.x,
+                                 p_camera.plane.y);
+              p_pair->projection[1][1] *= -1;
+              p_pair->view = glm::mat4(1.f);
+
+              // This is converting a glm::highp_vec4 to a glm::quat
+              // (quaternion)
+              glm::quat quaternion = glm::quat({ p_transform.quaternion.w,
+                                                 p_transform.quaternion.x,
+                                                 p_transform.quaternion.y,
+                                                 p_transform.quaternion.z });
+              p_pair->view =
+                glm::translate(p_pair->view, p_transform.position) *
+                glm::mat4_cast(quaternion);
+
+              p_pair->view = glm::inverse(p_pair->view);
+          });
+
+        /*
+            - Currently how this works is we query with anything that has a
+           flecs::pair<tag::editor, projection_view>
+            - This tells the ecs flecs what to do query for in regards to
+           specific objects that are a camera
+            - in the tag:: namespace, this is to imply components that are empty
+           and just represent tags, to specify their uses.
+        */
+        auto query_camera_objects =
+          current_scene
+            ->query_builder<flecs::pair<tag::editor, projection_view>,
+                            perspective_camera>()
+            .build();
+
         while (m_window->available()) {
             float current_time = (float)glfwGetTime();
             g_delta_time = (current_time - previous_time);
             previous_time = current_time;
             event::update_events();
+
+            // Progresses the flecs::world by one tick (or replaced with using
+            // the delta time)
+            // This also invokes the following system<T...> call  before the
+            // mainloop
+            current_world_scope.progress(g_delta_time);
 
             m_current_frame_index = m_window->acquired_next_frame();
 
@@ -99,10 +167,35 @@ namespace atlas {
 
             detail::invoke_defer_update();
 
+            // We want this to be called after late update
+            // This queries all camera objects within the camera system
+            // Update -- going to be removing camera system in replacement of
+            // just simply using flecs::system to keep it simple for the time
+            query_camera_objects.each(
+              [&](flecs::entity,
+                  flecs::pair<tag::editor, projection_view> p_pair,
+                  perspective_camera& p_camera) {
+                  if (!p_camera.is_active) {
+                      return;
+                  }
+
+                  // Removing this because not needed for now, we can assume the
+                  // single viewport is going to be if (p_camera.target ==
+                  // screen) {
+                  m_proj_view = p_pair->projection * p_pair->view;
+                  // }
+              });
+
             // TODO: Introduce scene renderer that will make use of the
             // begin/end semantics for setting up tasks during pre-frame
             // operations
-            m_renderer->begin(currently_active, m_window->current_swapchain());
+            // renderer begin to indicate when a start of the frame to start
+            // processing specific tasks that either need to be computed or
+            // pre-defined before the renderer does something with it.
+            // TODO: Add scene_manager to assist on what things to be processing
+            // before the frame preparation
+            m_renderer->begin(
+              currently_active, m_window->current_swapchain(), m_proj_view);
 
             // TODO: UI will have its own renderpass, command buffers, and
             // framebuffers specifically for UI-widgets
