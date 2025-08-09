@@ -32,23 +32,22 @@ namespace atlas {
         virtual ~render_context() = default;
 
         void begin_frame(const vk::vk_command_buffer& p_current,
-                         const vk::vk_swapchain& p_swapchain_handler) {
-            return start_frame(p_current, p_swapchain_handler);
+                         const vk::vk_swapchain& p_swapchain_handler,
+                         const glm::mat4& p_proj_view) {
+            return start_frame(p_current, p_swapchain_handler, p_proj_view);
         }
 
-        void end_frame(const vk::vk_swapchain& p_swapchain_handler) {
-            return post_frame(p_swapchain_handler);
-        }
+        void end_frame() { return post_frame(); }
 
         void set_background_color(const std::array<float, 4>& p_color) {
             return background_color(p_color);
         }
 
     private:
-        virtual void start_frame(
-          const vk::vk_command_buffer& p_current,
-          const vk::vk_swapchain& p_swapchain_handler) = 0;
-        virtual void post_frame(const vk::vk_swapchain& p_swapchain_handler) = 0;
+        virtual void start_frame(const vk::vk_command_buffer& p_current,
+                                 const vk::vk_swapchain& p_swapchain_handler,
+                                 const glm::mat4& p_proj_view) = 0;
+        virtual void post_frame() = 0;
 
         virtual void background_color(const std::array<float, 4>& p_color) = 0;
     };

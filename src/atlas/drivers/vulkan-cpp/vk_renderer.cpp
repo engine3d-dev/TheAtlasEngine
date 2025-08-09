@@ -4,7 +4,7 @@
 #include <drivers/vulkan-cpp/vk_context.hpp>
 #include <core/application.hpp>
 
-#include <core/system_framework/system_registry.hpp>
+#include <core/system/registry.hpp>
 #include <core/scene/world.hpp>
 #include <drivers/vulkan-cpp/vk_types.hpp>
 
@@ -158,7 +158,9 @@ namespace atlas::vk {
 
     void vk_renderer::start_frame(
       const vk_command_buffer& p_current,
-      const vk::vk_swapchain& p_swapchain_handler) {
+      [[maybe_unused]]const vk::vk_swapchain& p_swapchain_handler,
+      const glm::mat4& p_proj_view) {
+        m_proj_view = p_proj_view;
         // m_main_swapchain = p_swapchain_handler; // ?? This is here to do some
         // testing with swapchain validation
         m_current_frame = application::current_frame();
@@ -166,22 +168,8 @@ namespace atlas::vk {
         std::array<VkClearValue, 2> clear_values = {};
 
         clear_values[0].color = m_color;
-        clear_values[1].depthStencil = { 1.f, 0 };
+        clear_values[1].depthStencil = { .depth=1.f, .stencil=0 };
         window_settings settings = p_swapchain_handler.settings();
-
-        ref<world_scope> current_world =
-          system_registry::get_world("Editor World");
-        ref<scene_scope> current_scene = current_world->get_scene("LevelScene");
-
-        flecs::query<> query_camera =
-          current_scene->query_builder<camera>().build();
-
-        query_camera.each([&](const flecs::entity& p_entity) {
-            const camera* camera_component = p_entity.get<camera>();
-            if (camera_component->IsMainCamera) {
-                m_camera = *p_entity.get<camera>();
-            }
-        });
 
         //! TODO: This will need to be changed.
         //! @brief THis is used to initialize our meshes but also before we
@@ -227,6 +215,11 @@ namespace atlas::vk {
                 .entry = material_set1_entries // specifies pool sizes and
                                                // descriptor layout
             };
+
+            ref<world_scope> current_world =
+              system_registry::get_world("Editor World");
+            ref<scene_scope> current_scene =
+              current_world->get_scene("LevelScene");
 
             flecs::query<> caching =
               current_scene->query_builder<material>().build();
@@ -332,18 +325,18 @@ namespace atlas::vk {
                              VK_SUBPASS_CONTENTS_INLINE);
     }
 
-    void vk_renderer::post_frame(const vk_swapchain& p_swapchain_handler) {
+    void vk_renderer::post_frame() {
         // camera uniforms
 
-        camera_ubo ubo{};
-        ubo.view = m_camera.get_view();
-        ubo.projection = m_camera.get_projection();
+        // camera_ubo ubo{};
+        // ubo.view = m_camera.get_view();
+        // ubo.projection = m_camera.get_projection();
 
         // For now, using this. Will need to remove this before vulkan
         // integration merging into dev This is for testing and to hopefully
         // have a global_ubo for globalized uniforms
-        global_ubo global_frame_ubo = {
-            .mvp = ubo.projection * ubo.view,
+        global_ubo global_frame_ubo = { // .mvp = ubo.projection * ubo.view,
+                                        .mvp = m_proj_view
         };
 
         // glm::mat4 mvp = ubo.Projection * ubo.View * ubo.Model;
@@ -410,6 +403,6 @@ namespace atlas::vk {
         vkCmdEndRenderPass(m_current_command_buffer);
         m_current_command_buffer.end();
 
-        p_swapchain_handler.submit(m_current_command_buffer);
+        m_main_swapchain.submit(m_current_command_buffer);
     }
 };

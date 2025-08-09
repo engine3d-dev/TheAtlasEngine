@@ -53,6 +53,7 @@ namespace atlas {
     private:
         ref<window> m_window;
         scope<renderer> m_renderer = nullptr;
+        glm::mat4 m_proj_view;
         uint32_t m_current_frame_index = -1;
         vk::imgui_context m_ui_context;
         static application* s_instance;

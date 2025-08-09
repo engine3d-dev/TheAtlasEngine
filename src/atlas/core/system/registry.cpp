@@ -1,6 +1,6 @@
 #include <core/engine_logger.hpp>
 #include <core/scene/world.hpp>
-#include <core/system_framework/system_registry.hpp>
+#include <core/system/registry.hpp>
 
 namespace atlas {
     system_registry* system_registry::s_instance = nullptr;

@@ -233,6 +233,7 @@ namespace atlas::vk {
             .family_index = 0, // using defauly queue family
             .queue_index = 0   // using defauly presentation queue available
         };
+        std::cout << "Createing Queue\n";
         m_present_to_queue = vk_present_queue(m_swapchain_handler, options);
     }
 
@@ -266,6 +267,7 @@ namespace atlas::vk {
     }
 
     void vk_swapchain::submit(const VkCommandBuffer& p_command) const {
+        std::cout << "Trying to submit\n"; 
         m_present_to_queue.submit_immediate_async(p_command);
     }
 

@@ -1,6 +1,6 @@
 #include <core/engine_logger.hpp>
 
-#include <core/system_framework/system_registry.hpp>
+#include <core/system/registry.hpp>
 
 #include <boost/ut.hpp>
 #include <glm/glm.hpp>

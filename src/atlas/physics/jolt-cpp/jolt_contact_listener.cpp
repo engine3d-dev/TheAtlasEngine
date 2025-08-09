@@ -8,7 +8,7 @@
 #include <flecs.h>
 
 #include <core/scene/world.hpp>
-#include <core/system_framework/system_registry.hpp>
+#include <core/system/registry.hpp>
 
 namespace atlas::physics {
 

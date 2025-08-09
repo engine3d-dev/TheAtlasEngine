@@ -16,12 +16,14 @@ namespace atlas {
     }
 
     void renderer::begin(const vk::vk_command_buffer& p_current,
-                         const vk::vk_swapchain& p_current_rp) {
-        return m_render_context->begin_frame(p_current, p_current_rp);
+                         const vk::vk_swapchain& p_current_rp,
+                         const glm::mat4& p_proj_view) {
+        return m_render_context->begin_frame(
+          p_current, p_current_rp, p_proj_view);
     }
 
-    void renderer::end(const vk::vk_swapchain& p_swapchain_handler) {
-        return m_render_context->end_frame(p_swapchain_handler);
+    void renderer::end() {
+        return m_render_context->end_frame();
     }
 
     void renderer::set_background_color(const std::array<float, 4>& p_color) {
