@@ -26,7 +26,7 @@ else()
 endif()
 
 build_core_library(
-    DIRECTORIES src editor
+    DIRECTORIES src
 
     # This is to enable us to control if we want to run test cases or not
     ENABLE_TESTS ${ENABLE_TESTS_ONLY}
