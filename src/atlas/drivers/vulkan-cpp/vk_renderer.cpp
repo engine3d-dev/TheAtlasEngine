@@ -158,7 +158,7 @@ namespace atlas::vk {
 
     void vk_renderer::start_frame(
       const vk_command_buffer& p_current,
-      [[maybe_unused]]const vk::vk_swapchain& p_swapchain_handler,
+      [[maybe_unused]] const vk::vk_swapchain& p_swapchain_handler,
       const glm::mat4& p_proj_view) {
         m_proj_view = p_proj_view;
         // m_main_swapchain = p_swapchain_handler; // ?? This is here to do some
@@ -168,8 +168,8 @@ namespace atlas::vk {
         std::array<VkClearValue, 2> clear_values = {};
 
         clear_values[0].color = m_color;
-        clear_values[1].depthStencil = { .depth=1.f, .stencil=0 };
-        window_settings settings = p_swapchain_handler.settings();
+        clear_values[1].depthStencil = { 1.f, 0 };
+        window_settings settings = m_main_swapchain.settings();
 
         //! TODO: This will need to be changed.
         //! @brief THis is used to initialize our meshes but also before we
