@@ -17,7 +17,7 @@ namespace atlas {
     class renderer {
     public:
         renderer() = default;
-        renderer(const vk::vk_swapchain& p_swapchain,
+        renderer(const atlas::ref<vk::vk_swapchain>& p_swapchain,
                  const std::string& p_tag = "Renderer");
         /**
          * @brief Indicates to the renderer is at the start of the next frame to
@@ -31,6 +31,8 @@ namespace atlas {
          * @brief Indications when the renderer has reached the end of the frame
          */
         void end();
+
+        void present(uint32_t p_frame_index);
 
         void set_background_color(const std::array<float, 4>& p_color);
 
