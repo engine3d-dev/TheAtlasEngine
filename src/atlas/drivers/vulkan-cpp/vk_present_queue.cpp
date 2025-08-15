@@ -93,7 +93,6 @@ namespace atlas::vk {
 
         if (acquired_next_image_result == VK_ERROR_OUT_OF_DATE_KHR) {
             console_log_trace("acquired next image out of date!!!");
-            std::cout << "Swapchaind dead! -- upon acquiring frame\n";
             m_resize_requested = true;
         }
 

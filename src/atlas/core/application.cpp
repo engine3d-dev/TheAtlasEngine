@@ -1,6 +1,7 @@
 #include <core/application.hpp>
 #include <core/common.hpp>
 #include <drivers/vulkan-cpp/vk_swapchain.hpp>
+#include <iostream>
 
 namespace atlas {
     static std::string g_tag = "TheAtlasEngine";

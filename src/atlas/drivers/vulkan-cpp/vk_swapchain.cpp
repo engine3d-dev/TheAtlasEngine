@@ -4,7 +4,6 @@
 #include <drivers/vulkan-cpp/helper_functions.hpp>
 #include <drivers/vulkan-cpp/vk_types.hpp>
 #include <array>
-#include <iostream>
 
 namespace atlas::vk {
 
@@ -240,9 +239,7 @@ namespace atlas::vk {
             .family_index = 0, // using defauly queue family
             .queue_index = 0   // using defauly presentation queue available
         };
-        std::cout << "Createing Queue\n";
         m_present_to_queue = vk_present_queue(m_swapchain_handler, options);
-        std::cout << "swapchain handle: " << std::hex << static_cast<void*>(m_swapchain_handler) << "\n";
     }
 
     void vk_swapchain::recreate() {
@@ -256,12 +253,13 @@ namespace atlas::vk {
     uint32_t vk_swapchain::read_acquired_image() {
         m_present_to_queue.wait_idle();
 
+        uint32_t frame_idx = m_present_to_queue.acquired_frame();
         if (m_present_to_queue.resize_requested()) {
             recreate();
             m_present_to_queue.set_resize_status(false);
+            frame_idx = m_present_to_queue.acquired_frame();
         }
 
-        uint32_t frame_idx = m_present_to_queue.acquired_frame();
         return frame_idx;
     }
 
@@ -274,7 +272,6 @@ namespace atlas::vk {
     }
 
     void vk_swapchain::submit(const VkCommandBuffer& p_command) const {
-        std::cout << "Trying to submit\n"; 
         m_present_to_queue.submit_immediate_async(p_command);
     }
 
