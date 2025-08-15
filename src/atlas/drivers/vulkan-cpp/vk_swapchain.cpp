@@ -247,7 +247,6 @@ namespace atlas::vk {
         destroy();
         on_recreate();
         on_create();
-        
     }
 
     uint32_t vk_swapchain::read_acquired_image() {

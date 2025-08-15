@@ -7,7 +7,7 @@ namespace atlas::physics {
                                    const ref<physics_api>& p_user_api)
       : m_settings(p_settings)
       , m_engine_api(p_engine)
-      , m_backend_api(p_user_api) {};
+      , m_backend_api(p_user_api){};
 
     void physics_engine::start_runtime() {
         m_engine_api->create_bodies();

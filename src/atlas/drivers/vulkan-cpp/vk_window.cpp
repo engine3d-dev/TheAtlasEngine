@@ -34,7 +34,8 @@ namespace atlas::vk {
 
         center_window();
 
-        m_swapchain = atlas::ref<vk_swapchain>(new vk_swapchain(m_window_surface, m_settings));
+        m_swapchain = atlas::ref<vk_swapchain>(
+          new vk_swapchain(m_window_surface, m_settings));
 
         vk_context::submit_resource_free([this]() {
             console_log_fatal("vk_window submit freed resources!!!");

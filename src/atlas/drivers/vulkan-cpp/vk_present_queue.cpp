@@ -79,7 +79,7 @@ namespace atlas::vk {
 
     // TODO: Way to return possible out of date status from function
     //-- This is because swapchain resizing needs to happen ASAP to prevent
-    //potentially invalid
+    // potentially invalid
     //  operations
     uint32_t vk_present_queue::acquired_frame() {
         uint32_t image_acquired;

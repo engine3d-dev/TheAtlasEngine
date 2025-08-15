@@ -293,8 +293,6 @@ namespace atlas::vk {
 			.pClearValues = clear_values.data()
         };
 
-
-
         m_current_command_buffer = p_current;
         m_current_command_buffer.begin(
           VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
