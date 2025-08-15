@@ -43,6 +43,8 @@ namespace atlas {
             return background_color(p_color);
         }
 
+        virtual void present(uint32_t p_frame_index) = 0;
+
     private:
         virtual void start_frame(const vk::vk_command_buffer& p_current,
                                  const vk::vk_swapchain& p_swapchain_handler,
@@ -53,6 +55,6 @@ namespace atlas {
     };
 
     scope<render_context> initialize_renderer(
-      const vk::vk_swapchain& p_swapchain,
+      const atlas::ref<vk::vk_swapchain>& p_swapchain,
       const std::string& p_tag);
 };

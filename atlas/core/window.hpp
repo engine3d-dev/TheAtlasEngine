@@ -37,7 +37,7 @@ namespace atlas {
         /**
          * @brief Returns the window's currently selected swapchain
          */
-        [[nodiscard]] vk::vk_swapchain current_swapchain() const {
+        [[nodiscard]] const atlas::ref<vk::vk_swapchain> current_swapchain() const {
             return window_swapchain();
         }
 
@@ -64,7 +64,7 @@ namespace atlas {
         [[nodiscard]] virtual window_settings settings() const = 0;
         [[nodiscard]] virtual GLFWwindow* native_window() const = 0;
         [[nodiscard]] virtual uint32_t read_acquired_next_frame() = 0;
-        [[nodiscard]] virtual vk::vk_swapchain window_swapchain() const = 0;
+        [[nodiscard]] virtual atlas::ref<vk::vk_swapchain> window_swapchain() const = 0;
         [[nodiscard]] virtual vk::vk_command_buffer
         current_active_command_buffer(const uint32_t& p_frame_idx) = 0;
         virtual void presentation_process(const uint32_t& p_current_frame) = 0;

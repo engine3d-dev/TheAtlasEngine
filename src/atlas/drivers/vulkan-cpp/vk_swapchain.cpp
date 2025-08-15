@@ -15,8 +15,6 @@ namespace atlas::vk {
       , m_current_surface(p_surface) {
         m_physical = vk_context::physical_driver();
         m_driver = vk_context::driver_context();
-        m_surface_properties =
-          m_physical.get_surface_properties(m_current_surface);
 
         on_create();
     }
@@ -31,6 +29,15 @@ namespace atlas::vk {
     }
 
     void vk_swapchain::on_create() {
+
+        // surface properties are always updated from the physical device
+        // so they are valid should the swapchain be recreated
+        m_surface_properties =
+          m_physical.get_surface_properties(m_current_surface);
+        m_window_settings.width =
+          m_surface_properties.surface_capabilities.currentExtent.width;
+        m_window_settings.height =
+          m_surface_properties.surface_capabilities.currentExtent.height;
 
         //! @note Setting up presentation stuff
         // request what our minimum image count is
@@ -235,12 +242,15 @@ namespace atlas::vk {
         };
         std::cout << "Createing Queue\n";
         m_present_to_queue = vk_present_queue(m_swapchain_handler, options);
+        std::cout << "swapchain handle: " << std::hex << static_cast<void*>(m_swapchain_handler) << "\n";
     }
 
     void vk_swapchain::recreate() {
+
         destroy();
         on_recreate();
         on_create();
+        
     }
 
     uint32_t vk_swapchain::read_acquired_image() {
@@ -256,13 +266,10 @@ namespace atlas::vk {
     }
 
     void vk_swapchain::present(const uint32_t& p_current_frame) {
-        VkResult present_result =
-          m_present_to_queue.present_frame(p_current_frame);
-
-        if (present_result == VK_ERROR_OUT_OF_DATE_KHR ||
-            present_result == VK_SUBOPTIMAL_KHR) {
-            std::cout << "Recreating swapchain\n";
+        m_present_to_queue.present_frame(p_current_frame);
+        if (m_present_to_queue.resize_requested()) {
             recreate();
+            m_present_to_queue.set_resize_status(false);
         }
     }
 

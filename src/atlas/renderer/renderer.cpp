@@ -10,7 +10,7 @@ namespace atlas {
     // scope<render_context> g_renderer_backend = nullptr;
     renderer* renderer::s_instance = nullptr;
 
-    renderer::renderer(const vk::vk_swapchain& p_swapchain,
+    renderer::renderer(const atlas::ref<vk::vk_swapchain>& p_swapchain,
                        const std::string& p_tag) {
         m_render_context = initialize_renderer(p_swapchain, p_tag);
     }
@@ -24,6 +24,10 @@ namespace atlas {
 
     void renderer::end() {
         return m_render_context->end_frame();
+    }
+
+    void renderer::present(uint32_t p_frame_index) {
+        m_render_context->present(p_frame_index);
     }
 
     void renderer::set_background_color(const std::array<float, 4>& p_color) {

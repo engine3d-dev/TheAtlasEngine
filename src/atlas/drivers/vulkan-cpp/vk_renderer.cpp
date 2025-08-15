@@ -10,14 +10,11 @@
 
 namespace atlas::vk {
 
-    vk_renderer::vk_renderer(const vk_swapchain& p_swapchain,
-                             const std::string& p_tag){
+    vk_renderer::vk_renderer(const atlas::ref<vk_swapchain>& p_swapchain,
+                             const std::string& p_tag) {
         console_log_manager::create_new_logger(p_tag);
-        
-        // this should not be By-value copied from the owner (probably the window which initializes it...
-        // otherwise updates to the actual swapchain aren't propogated resulting in dead renderpasses
-        // and framebuffers being used
-        m_image_count = p_swapchain.image_size();
+        m_main_swapchain = p_swapchain;
+        m_image_count = p_swapchain->image_size();
 #ifdef USE_SHADERC
         std::array<shader_info, 2> shader_sources = {
             shader_info{ "experimental-shaders/test.vert",
@@ -72,7 +69,7 @@ namespace atlas::vk {
         m_shader_group.vertex_attributes(attribute);
 
         m_global_uniforms =
-          std::vector<vk_uniform_buffer>(p_swapchain.image_size());
+          std::vector<vk_uniform_buffer>(p_swapchain->image_size());
 
         for (size_t i = 0; i < m_global_uniforms.size(); i++) {
             m_global_uniforms[i] = vk_uniform_buffer(sizeof(camera_ubo));
@@ -156,6 +153,10 @@ namespace atlas::vk {
         };
     }
 
+    void vk_renderer::present(uint32_t p_frame_index) {
+        m_main_swapchain->present(p_frame_index);
+    }
+
     void vk_renderer::start_frame(
       const vk_command_buffer& p_current,
       [[maybe_unused]] const vk::vk_swapchain& p_swapchain_handler,
@@ -169,7 +170,7 @@ namespace atlas::vk {
 
         clear_values[0].color = m_color;
         clear_values[1].depthStencil = { 1.f, 0 };
-        window_settings settings = m_main_swapchain.settings();
+        window_settings settings = m_main_swapchain->settings();
 
         //! TODO: This will need to be changed.
         //! @brief THis is used to initialize our meshes but also before we
@@ -269,16 +270,15 @@ namespace atlas::vk {
             });
 
             m_main_pipeline =
-              vk_pipeline(p_swapchain_handler.swapchain_renderpass(),
+              vk_pipeline(m_main_swapchain->swapchain_renderpass(),
                           m_shader_group,
                           m_geometry_descriptor_layout);
             m_begin_initialize = false;
         }
-
         VkRenderPassBeginInfo renderpass_begin_info = {
             .sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
 			.pNext = nullptr,
-			.renderPass = p_swapchain_handler.swapchain_renderpass(),
+			.renderPass = m_main_swapchain->swapchain_renderpass(),
 			.renderArea = {
 				.offset = {
 					.x = 0,
@@ -318,7 +318,7 @@ namespace atlas::vk {
         vkCmdSetScissor(m_current_command_buffer, 0, 1, &scissor);
 
         renderpass_begin_info.framebuffer =
-          p_swapchain_handler.active_framebuffer(m_current_frame);
+          m_main_swapchain->active_framebuffer(m_current_frame);
 
         vkCmdBeginRenderPass(m_current_command_buffer,
                              &renderpass_begin_info,
@@ -403,6 +403,6 @@ namespace atlas::vk {
         vkCmdEndRenderPass(m_current_command_buffer);
         m_current_command_buffer.end();
 
-        m_main_swapchain.submit(m_current_command_buffer);
+        m_main_swapchain->submit(m_current_command_buffer);
     }
 };

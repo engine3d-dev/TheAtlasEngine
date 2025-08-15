@@ -24,10 +24,12 @@ namespace atlas {
           create_scope<renderer>(m_window->current_swapchain(), "Renderer");
         m_renderer->set_background_color({ 1.f, 0.5f, 0.5f, 1.f });
 
+        //TODO: Imgui context will need to be refactored
+        //to use shared swapchain ref...
         m_ui_context = vk::imgui_context(
           *m_window,
-          m_window->current_swapchain(),
-          m_window->current_swapchain().swapchain_renderpass());
+          *m_window->current_swapchain().get(),
+          m_window->current_swapchain()->swapchain_renderpass());
         s_instance = this;
     }
 
@@ -42,9 +44,12 @@ namespace atlas {
     void application::set_current_api(api api) {
         g_graphics_backend_api = api;
     }
-
+    
+    //NOTE: only good for immediate usage, 
+    // this will not work for long-term storage due to the likelyhood 
+    // of the handle being invalidated
     VkSwapchainKHR application::get_current_swapchain() {
-        return get_window().current_swapchain();
+        return *get_window().current_swapchain().get();
     }
 
     api application::current_api() {
@@ -195,7 +200,7 @@ namespace atlas {
             // TODO: Add scene_manager to assist on what things to be processing
             // before the frame preparation
             m_renderer->begin(
-              currently_active, m_window->current_swapchain(), m_proj_view);
+              currently_active, *m_window->current_swapchain().get(), m_proj_view);
 
             // TODO: UI will have its own renderpass, command buffers, and
             // framebuffers specifically for UI-widgets
@@ -206,8 +211,12 @@ namespace atlas {
             m_ui_context.end();
             
             m_renderer->end();
-
-            m_window->present(m_current_frame_index);
+            
+            // renderer would need to share a reference with the windows swapchain
+            // otherwise invalidation detection on presenting doesn't get properly
+            // propogated to the renderer's swapchain
+            // m_window->present(m_current_frame_index);
+            m_renderer->present(m_current_frame_index);
         }
     }
 
@@ -220,6 +229,6 @@ namespace atlas {
     }
 
     uint32_t application::image_size() {
-        return s_instance->m_window->current_swapchain().image_size();
+        return s_instance->m_window->current_swapchain()->image_size();
     }
 };

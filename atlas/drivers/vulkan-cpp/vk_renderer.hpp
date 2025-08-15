@@ -40,9 +40,11 @@ namespace atlas::vk {
      */
     class vk_renderer : public render_context {
     public:
-        vk_renderer(const vk_swapchain& p_swapchain, const std::string& p_tag);
+        vk_renderer(const atlas::ref<vk_swapchain>& p_swapchain, const std::string& p_tag);
 
         ~vk_renderer() override = default;
+
+        void present(uint32_t p_frame_index) override;
 
     private:
         void start_frame(const vk_command_buffer& p_current,
@@ -53,8 +55,8 @@ namespace atlas::vk {
         void post_frame() override;
     private:
         glm::mat4 m_proj_view;
-        vk_swapchain m_main_swapchain{};
 
+        atlas::ref<vk_swapchain> m_main_swapchain{};
         vk_command_buffer m_current_command_buffer{};
         VkClearColorValue m_color;
 

@@ -14,7 +14,7 @@ namespace atlas::vk {
 
     private:
         [[nodiscard]] window_settings settings() const override;
-        [[nodiscard]] vk_swapchain window_swapchain() const override {
+        [[nodiscard]] atlas::ref<vk_swapchain> window_swapchain() const override {
             return m_swapchain;
         }
         [[nodiscard]] uint32_t read_acquired_next_frame() override;
@@ -22,7 +22,7 @@ namespace atlas::vk {
         void presentation_process(const uint32_t& p_current_frame) override;
         [[nodiscard]] vk::vk_command_buffer current_active_command_buffer(
           const uint32_t& p_frame_idx) override {
-            return m_swapchain.active_command_buffer(p_frame_idx);
+            return m_swapchain->active_command_buffer(p_frame_idx);
         }
 
     private:
@@ -31,7 +31,7 @@ namespace atlas::vk {
         VkSurfaceKHR m_window_surface = nullptr;
         window_settings m_settings{};
 
-        vk_swapchain m_swapchain{};
+        atlas::ref<vk_swapchain> m_swapchain{};
         static vk_window* s_instance;
     };
 };
