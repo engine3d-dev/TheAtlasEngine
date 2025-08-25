@@ -75,7 +75,7 @@ namespace atlas::vk {
     private:
         void recreate();
         void on_create();
-        
+
         //!@brief operations that only need to happen when the swapchain
         // is recreated again -- examples include getting the new extent
         // upon a window resize

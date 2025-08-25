@@ -26,10 +26,7 @@ namespace atlas {
 
         // TODO: Imgui context will need to be refactored
         // to use shared swapchain ref...
-        m_ui_context = vk::imgui_context(
-          *m_window,
-          *m_window->current_swapchain().get(),
-          m_window->current_swapchain()->swapchain_renderpass());
+        m_ui_context = vk::imgui_context(m_window);
         s_instance = this;
     }
 
@@ -49,7 +46,7 @@ namespace atlas {
     //  this will not work for long-term storage due to the likelyhood
     //  of the handle being invalidated
     VkSwapchainKHR application::get_current_swapchain() {
-        return *get_window().current_swapchain().get();
+        return m_window->current_swapchain();
     }
 
     api application::current_api() {
@@ -199,9 +196,8 @@ namespace atlas {
             // pre-defined before the renderer does something with it.
             // TODO: Add scene_manager to assist on what things to be processing
             // before the frame preparation
-            m_renderer->begin(currently_active,
-                              *m_window->current_swapchain().get(),
-                              m_proj_view);
+            m_renderer->begin(
+              currently_active, m_window->current_swapchain(), m_proj_view);
 
             // TODO: UI will have its own renderpass, command buffers, and
             // framebuffers specifically for UI-widgets
@@ -230,6 +226,6 @@ namespace atlas {
     }
 
     uint32_t application::image_size() {
-        return s_instance->m_window->current_swapchain()->image_size();
+        return s_instance->m_window->current_swapchain().image_size();
     }
 };

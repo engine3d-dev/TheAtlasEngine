@@ -10,7 +10,7 @@ namespace atlas {
     // scope<render_context> g_renderer_backend = nullptr;
     renderer* renderer::s_instance = nullptr;
 
-    renderer::renderer(const atlas::ref<vk::vk_swapchain>& p_swapchain,
+    renderer::renderer(const vk::vk_swapchain& p_swapchain,
                        const std::string& p_tag) {
         m_render_context = initialize_renderer(p_swapchain, p_tag);
     }

@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 #include <drivers/vulkan-cpp/vk_driver.hpp>
 #include <drivers/vulkan-cpp/vk_swapchain.hpp>
+#include <core/window.hpp>
 
 namespace atlas::vk {
     struct hud_data {
@@ -18,9 +19,10 @@ namespace atlas::vk {
     class imgui_context {
     public:
         imgui_context() = default;
-        imgui_context(GLFWwindow* p_window_handler,
-                      const vk_swapchain& p_current_swapchain_handler,
-                      const VkRenderPass& p_current_renderpass);
+        // imgui_context(GLFWwindow* p_window_handler,
+        //               const vk_swapchain& p_current_swapchain_handler,
+        //               const VkRenderPass& p_current_renderpass);
+        imgui_context(const ref<window>& p_window_ctx);
 
         void recreate(GLFWwindow* p_window_handler,
                       const uint32_t& p_image_size,

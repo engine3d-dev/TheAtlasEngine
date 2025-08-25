@@ -28,7 +28,7 @@ namespace atlas {
         class test_scene : public scene_scope {
         public:
             test_scene(const std::string& p_tag)
-              : scene_scope(p_tag){};
+              : scene_scope(p_tag) {};
 
             std::pmr::polymorphic_allocator<> m_object_allocator;
         };
@@ -36,7 +36,7 @@ namespace atlas {
         class editor_world : public world_scope {
         public:
             editor_world(const std::string& p_tag)
-              : world_scope(p_tag){};
+              : world_scope(p_tag) {};
         };
 
         "initialize_engine with physics_world and setup object"_test = [] {

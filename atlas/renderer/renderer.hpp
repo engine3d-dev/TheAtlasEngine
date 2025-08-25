@@ -17,7 +17,7 @@ namespace atlas {
     class renderer {
     public:
         renderer() = default;
-        renderer(const atlas::ref<vk::vk_swapchain>& p_swapchain,
+        renderer(const vk::vk_swapchain& p_swapchain,
                  const std::string& p_tag = "Renderer");
         /**
          * @brief Indicates to the renderer is at the start of the next frame to

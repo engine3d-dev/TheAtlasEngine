@@ -34,12 +34,11 @@ namespace atlas::vk {
 
         center_window();
 
-        m_swapchain = atlas::ref<vk_swapchain>(
-          new vk_swapchain(m_window_surface, m_settings));
+        m_swapchain = vk_swapchain(m_window_surface, m_settings);
 
         vk_context::submit_resource_free([this]() {
             console_log_fatal("vk_window submit freed resources!!!");
-            m_swapchain->destroy();
+            m_swapchain.destroy();
         });
 
         glfwSetWindowUserPointer(m_window_handler, this);
@@ -62,7 +61,7 @@ namespace atlas::vk {
     }
 
     void vk_window::presentation_process(const uint32_t& p_current_frame) {
-        m_swapchain->present(p_current_frame);
+        m_swapchain.present(p_current_frame);
     }
 
     window_settings vk_window::settings() const {
@@ -70,7 +69,7 @@ namespace atlas::vk {
     }
 
     uint32_t vk_window::read_acquired_next_frame() {
-        return m_swapchain->read_acquired_image();
+        return m_swapchain.read_acquired_image();
     }
 
     GLFWwindow* vk_window::native_window() const {

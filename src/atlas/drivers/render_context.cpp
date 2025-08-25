@@ -6,7 +6,7 @@
 namespace atlas {
 
     scope<render_context> initialize_renderer(
-      const atlas::ref<vk::vk_swapchain>& p_swapchain,
+      const vk::vk_swapchain& p_swapchain,
       const std::string& p_tag) {
         switch (application::current_api()) {
             case api::vulkan:
