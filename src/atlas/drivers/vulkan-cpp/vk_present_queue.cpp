@@ -19,7 +19,7 @@ namespace atlas::vk {
     }
 
     void vk_present_queue::submit_immediate_async(
-      const VkCommandBuffer& p_command) {
+      const VkCommandBuffer& p_command) const {
         VkPipelineStageFlags wait_flags =
           VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
         VkSubmitInfo submit_info = {
@@ -40,7 +40,7 @@ namespace atlas::vk {
     }
 
     void vk_present_queue::submit_immediate_sync(
-      const VkCommandBuffer& p_command) {
+      const VkCommandBuffer& p_command) const {
         VkSubmitInfo submit_info = {
             .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
             .pNext = nullptr,
@@ -58,7 +58,7 @@ namespace atlas::vk {
         vk_check(res, "vkQueueSubmit");
     }
 
-    void vk_present_queue::present_frame(const uint32_t& p_current_frame) {
+    VkResult vk_present_queue::present_frame(const uint32_t& p_current_frame) {
         VkPresentInfoKHR present_info = {
             .sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
             .pNext = nullptr,
@@ -72,13 +72,14 @@ namespace atlas::vk {
         VkResult res =
           vkQueuePresentKHR(m_present_queue_handler, &present_info);
         vk_check(res, "vkQueuePresentKHR");
-        // if(m_resize_requested
-        if (res == VK_ERROR_OUT_OF_DATE_KHR || res == VK_SUBOPTIMAL_KHR) {
-            console_log_trace("Swapchain out of date!!!");
-            m_resize_requested = true;
-        }
+
+        return res;
     }
 
+    // TODO: Way to return possible out of date status from function
+    //-- This is because swapchain resizing needs to happen ASAP to prevent
+    // potentially invalid
+    //  operations
     uint32_t vk_present_queue::acquired_frame() {
         uint32_t image_acquired;
         VkResult acquired_next_image_result =

@@ -43,15 +43,16 @@ namespace atlas::vk {
           ImVec4{ 0.1f, 0.150f, 0.951f, 1.0f };
     }
 
-    imgui_context::imgui_context(
-      GLFWwindow* p_window_handler,
-      const vk_swapchain& p_current_swapchain_handler,
-      const VkRenderPass& p_current_renderpass) {
+    // imgui_context::imgui_context(
+    //   GLFWwindow* p_window_handler,
+    //   const vk_swapchain& p_current_swapchain_handler,
+    //   const VkRenderPass& p_current_renderpass) {
+    imgui_context::imgui_context(const ref<window>& p_window_ctx) {
         m_instance = vk_context::handler();
         m_physical = vk_context::physical_driver();
         m_driver = vk_context::driver_context();
 
-        m_current_swapchain_handler = p_current_swapchain_handler;
+        m_current_swapchain_handler = p_window_ctx->current_swapchain();
 
         // Setting up imgui
         IMGUI_CHECKVERSION();
@@ -114,9 +115,9 @@ namespace atlas::vk {
                        m_driver, &desc_pool_create_info, nullptr, &m_desc_pool),
                      "vkCreateDescriptorPool");
 
-        recreate(p_window_handler,
-                 p_current_swapchain_handler.image_size(),
-                 p_current_renderpass);
+        recreate(*p_window_ctx,
+                 p_window_ctx->current_swapchain().image_size(),
+                 p_window_ctx->current_swapchain().swapchain_renderpass());
     }
 
     void imgui_context::recreate(GLFWwindow* p_window_handler,

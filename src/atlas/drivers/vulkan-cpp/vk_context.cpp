@@ -1,7 +1,6 @@
 #include <drivers/vulkan-cpp/vulkan-imports.hpp>
 #include <drivers/vulkan-cpp/vk_context.hpp>
 #include <core/engine_logger.hpp>
-#include <iostream>
 #include <drivers/vulkan-cpp/helper_functions.hpp>
 
 namespace atlas::vk {

@@ -153,12 +153,15 @@ namespace atlas::vk {
         };
     }
 
-    void vk_renderer::start_frame(
-      const vk_command_buffer& p_current,
-      [[maybe_unused]] const vk::vk_swapchain& p_swapchain_handler,
-      const glm::mat4& p_proj_view) {
+    void vk_renderer::present(uint32_t p_frame_index) {
+        m_main_swapchain.present(p_frame_index);
+    }
+
+    void vk_renderer::start_frame(const vk_command_buffer& p_current,
+                                  const vk::vk_swapchain& p_swapchain_handler,
+                                  const glm::mat4& p_proj_view) {
         m_proj_view = p_proj_view;
-        // m_main_swapchain = p_swapchain_handler; // ?? This is here to do some
+        m_main_swapchain = p_swapchain_handler; // ?? This is here to do some
         // testing with swapchain validation
         m_current_frame = application::current_frame();
 
@@ -271,7 +274,6 @@ namespace atlas::vk {
                           m_geometry_descriptor_layout);
             m_begin_initialize = false;
         }
-
         VkRenderPassBeginInfo renderpass_begin_info = {
             .sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
 			.pNext = nullptr,

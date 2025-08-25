@@ -24,10 +24,9 @@ namespace atlas {
           create_scope<renderer>(m_window->current_swapchain(), "Renderer");
         m_renderer->set_background_color({ 1.f, 0.5f, 0.5f, 1.f });
 
-        m_ui_context = vk::imgui_context(
-          *m_window,
-          m_window->current_swapchain(),
-          m_window->current_swapchain().swapchain_renderpass());
+        // TODO: Imgui context will need to be refactored
+        // to use shared swapchain ref...
+        m_ui_context = vk::imgui_context(m_window);
         s_instance = this;
     }
 
@@ -43,8 +42,11 @@ namespace atlas {
         g_graphics_backend_api = api;
     }
 
+    // NOTE: only good for immediate usage,
+    //  this will not work for long-term storage due to the likelyhood
+    //  of the handle being invalidated
     VkSwapchainKHR application::get_current_swapchain() {
-        return get_window().current_swapchain();
+        return m_window->current_swapchain();
     }
 
     api application::current_api() {
@@ -207,7 +209,11 @@ namespace atlas {
 
             m_renderer->end();
 
-            m_window->present(m_current_frame_index);
+            // renderer would need to share a reference with the windows
+            // swapchain otherwise invalidation detection on presenting doesn't
+            // get properly propogated to the renderer's swapchain
+            // m_window->present(m_current_frame_index);
+            m_renderer->present(m_current_frame_index);
         }
     }
 

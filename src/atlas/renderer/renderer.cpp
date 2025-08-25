@@ -26,6 +26,10 @@ namespace atlas {
         return m_render_context->end_frame();
     }
 
+    void renderer::present(uint32_t p_frame_index) {
+        m_render_context->present(p_frame_index);
+    }
+
     void renderer::set_background_color(const std::array<float, 4>& p_color) {
         m_render_context->set_background_color(p_color);
     }

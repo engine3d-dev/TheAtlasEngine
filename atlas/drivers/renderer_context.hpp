@@ -2,7 +2,6 @@
 #include <string>
 #include <core/core.hpp>
 #include <drivers/vulkan-cpp/vk_swapchain.hpp>
-#include <span>
 #include <drivers/vulkan-cpp/vk_command_buffer.hpp>
 
 /**
@@ -43,6 +42,8 @@ namespace atlas {
         void set_background_color(const std::array<float, 4>& p_color) {
             return background_color(p_color);
         }
+
+        virtual void present(uint32_t p_frame_index) = 0;
 
     private:
         virtual void start_frame(const vk::vk_command_buffer& p_current,

@@ -14,13 +14,29 @@ namespace atlas::vk {
       , m_current_surface(p_surface) {
         m_physical = vk_context::physical_driver();
         m_driver = vk_context::driver_context();
-        m_surface_properties =
-          m_physical.get_surface_properties(m_current_surface);
 
         on_create();
     }
 
+    void vk_swapchain::on_recreate() {
+        m_surface_properties =
+          m_physical.get_surface_properties(m_current_surface);
+        m_window_settings.width =
+          m_surface_properties.surface_capabilities.currentExtent.width;
+        m_window_settings.height =
+          m_surface_properties.surface_capabilities.currentExtent.height;
+    }
+
     void vk_swapchain::on_create() {
+
+        // surface properties are always updated from the physical device
+        // so they are valid should the swapchain be recreated
+        m_surface_properties =
+          m_physical.get_surface_properties(m_current_surface);
+        m_window_settings.width =
+          m_surface_properties.surface_capabilities.currentExtent.width;
+        m_window_settings.height =
+          m_surface_properties.surface_capabilities.currentExtent.height;
 
         //! @note Setting up presentation stuff
         // request what our minimum image count is
@@ -227,27 +243,34 @@ namespace atlas::vk {
     }
 
     void vk_swapchain::recreate() {
+
         destroy();
+        on_recreate();
         on_create();
     }
 
     uint32_t vk_swapchain::read_acquired_image() {
         m_present_to_queue.wait_idle();
 
+        uint32_t frame_idx = m_present_to_queue.acquired_frame();
         if (m_present_to_queue.resize_requested()) {
             recreate();
             m_present_to_queue.set_resize_status(false);
+            frame_idx = m_present_to_queue.acquired_frame();
         }
 
-        uint32_t frame_idx = m_present_to_queue.acquired_frame();
         return frame_idx;
     }
 
     void vk_swapchain::present(const uint32_t& p_current_frame) {
         m_present_to_queue.present_frame(p_current_frame);
+        if (m_present_to_queue.resize_requested()) {
+            recreate();
+            m_present_to_queue.set_resize_status(false);
+        }
     }
 
-    void vk_swapchain::submit(const VkCommandBuffer& p_command) {
+    void vk_swapchain::submit(const VkCommandBuffer& p_command) const {
         m_present_to_queue.submit_immediate_async(p_command);
     }
 
