@@ -40,8 +40,7 @@ namespace atlas::vk {
      */
     class vk_renderer : public render_context {
     public:
-        vk_renderer(const vk_swapchain& p_swapchain,
-                    const std::string& p_tag);
+        vk_renderer(const vk_swapchain& p_swapchain, const std::string& p_tag);
 
         ~vk_renderer() override = default;
 
