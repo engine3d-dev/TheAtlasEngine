@@ -15,9 +15,9 @@ private:
 namespace atlas {
     ref<application> initialize_application() {
         application_settings settings = {
-            .Name = "Editor",
-            .Width = 1200,
-            .Height = 800,
+            .name = "Editor",
+            .width = 1200,
+            .height = 800,
         };
 
         return create_ref<editor_application>(settings);

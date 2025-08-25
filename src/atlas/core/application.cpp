@@ -3,20 +3,16 @@
 #include <drivers/vulkan-cpp/vk_swapchain.hpp>
 
 namespace atlas {
-    static std::string g_tag = "TheAtlasEngine";
     application* application::s_instance = nullptr;
     static api g_graphics_backend_api = api::vulkan;
-    static float g_delta_time = 0.f;
-    static float g_physics_step = 0.f; // collision step
 
     application::application(const application_settings& p_settings) {
-        g_tag = p_settings.Name;
-        console_log_manager::set_current_logger(g_tag);
+        console_log_manager::set_current_logger(p_settings.name);
         set_current_api(api::vulkan);
         window_settings settings = {
-            .width = p_settings.Width,
-            .height = p_settings.Height,
-            .name = p_settings.Name,
+            .width = p_settings.width,
+            .height = p_settings.height,
+            .name = p_settings.name,
         };
         m_window = create_window(settings);
 
@@ -58,15 +54,16 @@ namespace atlas {
     }
 
     float application::delta_time() {
-        return g_delta_time;
+        return s_instance->m_delta_time;
     }
 
     float application::physics_step() {
-        return g_physics_step;
+        // return g_physics_step;
+        return 0.f;
     }
 
     void application::execute() {
-        float previous_time = 0.f;
+        auto start_time = std::chrono::high_resolution_clock::now();
 
         detail::invoke_start();
 
@@ -138,16 +135,16 @@ namespace atlas {
             .build();
 
         while (m_window->available()) {
-            float current_time = (float)glfwGetTime();
-            g_delta_time = (current_time - previous_time);
-            previous_time = current_time;
+            auto current_time = std::chrono::high_resolution_clock::now();
+            m_delta_time = std::chrono::duration<float, std::chrono::seconds::period>(current_time - start_time).count();
+            start_time = current_time;
             event::update_events();
 
             // Progresses the flecs::world by one tick (or replaced with using
             // the delta time)
             // This also invokes the following system<T...> call  before the
             // mainloop
-            current_world_scope.progress(g_delta_time);
+            current_world_scope.progress(m_delta_time);
 
             m_current_frame_index = m_window->acquired_next_frame();
 

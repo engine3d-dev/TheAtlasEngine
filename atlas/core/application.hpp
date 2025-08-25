@@ -8,9 +8,9 @@
 namespace atlas {
 
     struct application_settings {
-        std::string Name = "Undefined";
-        uint32_t Width = 0;
-        uint32_t Height = 0;
+        std::string name = "Undefined";
+        uint32_t width = 0;
+        uint32_t height = 0;
     };
 
     class application {
@@ -51,6 +51,7 @@ namespace atlas {
         void set_current_api(api api);
 
     private:
+        float m_delta_time=0.f;
         ref<window> m_window;
         scope<renderer> m_renderer = nullptr;
         glm::mat4 m_proj_view;
