@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include <flecs.h>
 #include <vector>
+#include <core/math/utilities.hpp>
 
 namespace atlas {
 
@@ -11,6 +12,12 @@ namespace atlas {
         glm::highp_vec4 quaternion{ 0.f, 0, 0, 1 };
         glm::highp_vec3 rotation{ 0.f };
         glm::highp_vec3 scale{ 1.f };
+
+        //! @brief sets rotation and automatically converts rotation glm::vec3 to quaternion
+        void set_rotation(const glm::highp_vec3& p_value) {
+            rotation = p_value;
+            quaternion = from_quat(rotation);
+        }
     };
 
     //! @note Our interpretation of the RigidBody3D

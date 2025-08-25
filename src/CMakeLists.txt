@@ -22,6 +22,9 @@ set(
     ${SRC_DIR}/core/scene/scene_object.cpp
     ${SRC_DIR}/core/system/registry.cpp
 
+    # math sources
+    ${SRC_DIR}/core/math/utilities.cpp
+
     # Filesystem stuff
     ${SRC_DIR}/core/filesystem/file_dialog.cpp
 
