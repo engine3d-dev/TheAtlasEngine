@@ -1,0 +1,36 @@
+Scene: LevelScene
+Entities:
+  - Entity: mesh1
+    Transform:
+      Position: [0, 1.39999998, -7.4000001]
+      Scale: [2.79999995, -0.0799999982, 3.5]
+      Rotation: [0, 0, 0]
+      Color: [1, 1, 1, 1]
+    Mesh Component:
+      Filepath: 3d_models/tutorial/cube.obj
+  - Entity: sphere
+    Transform:
+      Position: [0, 2.0999999, -7.30000019]
+      Scale: [0.200000003, 0.200000003, 0.200000003]
+      Rotation: [0, 0, 0]
+      Color: [1, 1, 1, 1]
+    Mesh Component:
+      Filepath: 3d_models/tutorial/colored_cube.obj
+  - Entity: camera
+    Transform:
+      Position: [0, 0, 0]
+      Scale: [1, 1, 1]
+      Rotation: [0, 0, 0]
+      Color: [1, 1, 1, 1]
+    Perspective Camera:
+      Position: [0, 1.5, 0]
+      Front: [-4.37113883e-08, 0, -1]
+      Up: [-0, -1, 0]
+      Down: [-4.37113883e-08, -0, -1]
+      Right: [-1, 0, 4.37113883e-08]
+      Left: [1, 0, -4.37113883e-08]
+      Yaw: -90
+      Pitch: 0
+      MovementSpeed: 5
+      MouseSensitivity: 0.100000001
+      Zoom: 45

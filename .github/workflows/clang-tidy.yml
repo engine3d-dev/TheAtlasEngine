@@ -1,0 +1,25 @@
+name: C++ Linter
+
+on: [pull_request]
+
+jobs:
+    linux-build:
+        name: "Linter"
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: cpp-linter/cpp-linter-action@main
+              id: linter
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  style: '.clang-format'  # Use .clang-format config file
+                  version: 19 # Using clang-tidy19
+                  tidy-checks: '.clang-tidy' # Use .clang-tidy config file
+                  # only 'update' a single comment in a pull request thread.
+                  thread-comments: ${{ github.event_name == 'pull_request' && 'update' }}
+
+            - name: Fail fast?!
+              if: steps.linter.outputs.checks-failed > 0
+              run: exit 1
