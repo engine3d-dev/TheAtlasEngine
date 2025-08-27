@@ -6,20 +6,34 @@
 #include <flecs.h>
 
 namespace atlas {
+
     /**
-     * @name Scene Object
-     * @note Defines our object in a given Scene
-     * @note Utilizes our wrapper entity_t that wraps around the flecs API
+     * @brief scene_object represents a game object that is associated to a
+     * given scene
      *
-     * @note Provides same API as the entity_t
-     * @note While also providing additional API's on how engine3d may define
-     * scene objects
-     * @note These are just user-defined entities that will be the
-     * game-high-level specifics to interact with the ecs framework
+     * Wraps around flecs::entity that provides additional API's to use with the
+     * scene object
+     *
+     * Creating game objects are returned as atlas::strong_ptr to reduce memory
+     * unsafe situation with lifetime access violation and nullable objects
      */
     class scene_object {
     public:
+        /***
+         * @param p_registry is the address to the ecs registry
+         * @param p_name is the name supplied to the entity
+         */
         scene_object(flecs::world* p_registry, const std::string& p_name);
+
+        /***
+         * @param p_registry is the address to the ecs registry
+         * @param p_name is the name supplied to the entity
+         * @param p_lookup is the tag to indicate lookup for alread-existing
+         * entity in flecs::world
+         */
+        scene_object(flecs::world* p_registry,
+                     const std::string& p_name,
+                     bool p_lookup);
 
         /**
          * @param p_registry is a strong_ptr that is expected to be always valid
@@ -38,12 +52,32 @@ namespace atlas {
 
         //! @brief adds a component with an assigned value to the entity
         template<typename UComponent>
-        void add(UComponent& p_component_value) {
+        void add(UComponent p_component_value) const {
             m_entity.add<UComponent>(p_component_value);
         }
 
-        //! @brief checks for entity lifetime if alive return true
+        //! @brief sets the scene object to correspond to a specified parent
+        void child_of(strong_ref<scene_object>& p_parent) {
+            flecs::entity e = *p_parent;
+            m_entity.add(flecs::ChildOf, e);
+        }
+
+        //! @brief iterates the entity children entities
+        template<typename UFunction>
+        void children(UFunction&& p_callback) {
+            m_entity.children(p_callback);
+        }
+
+        /**
+         * @return uint32_t
+         *
+         * The entity ID
+         */
+        [[nodiscard]] uint32_t id() const { return m_entity.id(); }
+
         [[nodiscard]] bool is_alive() const { return m_entity.is_alive(); }
+
+        [[nodiscard]] bool is_valid() const { return m_entity.is_valid(); }
 
         /**
          * @brief Adds multiple components with no values assigned to them
@@ -98,6 +132,9 @@ namespace atlas {
         void remove() {
             return m_entity.remove<UComponent>();
         }
+
+        //! @brief Explicitly deleting the entity
+        void destruct() const { m_entity.destruct(); }
 
         operator flecs::entity() const { return m_entity; }
 

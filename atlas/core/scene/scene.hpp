@@ -40,6 +40,11 @@ namespace atlas {
                                                   std::forward(args)...);
         }
 
+        strong_ref<scene_object> search_entity(const std::string& p_name) {
+            return memory::make_strong_ptr<scene_object>(
+              m_object_allocator, &m_registry, p_name, false);
+        }
+
         virtual ~scene_scope() = default;
 
         std::string get_tag() { return m_tag; }
