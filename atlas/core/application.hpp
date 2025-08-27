@@ -11,6 +11,7 @@ namespace atlas {
         std::string name = "Undefined";
         uint32_t width = 0;
         uint32_t height = 0;
+        glm::vec4 background_color={1.f, 0.5f, 0.5f, 1.f};
     };
 
     class application {

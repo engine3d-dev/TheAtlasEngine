@@ -4,12 +4,11 @@
 #include <core/scene/scene_object.hpp>
 
 /**
- * @name level_scene
+ * @brief Implementation of a custom scene
  *
- * @brief Implementation of our own customized scene
+ * Represent a scene with an associated game objects that correspond to this
+ * game object.
  *
- * level_scene acts as a group that represents an area where a group of objects
- * are associated with.
  */
 
 class level_scene : public atlas::scene_scope {

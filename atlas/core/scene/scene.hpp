@@ -17,8 +17,8 @@ namespace atlas {
     class scene_scope {
     public:
         scene_scope() = default;
-        scene_scope(const std::string& p_tag)
-          : m_tag(p_tag) {}
+        scene_scope(const std::string& p_name)
+          : m_name(p_name) {}
 
         strong_ref<scene_object> create_object(const std::string& p_tag) {
             return create_strong_ref<scene_object>(
@@ -51,7 +51,7 @@ namespace atlas {
 
         virtual ~scene_scope() = default;
 
-        std::string get_tag() { return m_tag; }
+        [[nodiscard]] std::string name() const { return m_name; }
 
         // It's required that the flecs::world is returned by reference
         // This prevents corruption onto the flecs::world object
@@ -60,6 +60,6 @@ namespace atlas {
     private:
         std::pmr::polymorphic_allocator<> m_allocator;
         flecs::world m_registry;
-        std::string m_tag = "Undefined Tag";
+		std::string m_name;
     };
 }; // namespace atlas

@@ -148,7 +148,7 @@ namespace atlas {
         YAML::Emitter output;
         output << YAML::BeginMap;
         output << YAML::Key << "Scene" << YAML::Value
-               << m_current_scene_ctx->get_tag();
+               << m_current_scene_ctx->name();
         output << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
 
         //! @note Queries in flecs the ecs framework are how we can query all

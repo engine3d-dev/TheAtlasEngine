@@ -2,9 +2,8 @@
 #include <core/common.hpp>
 #include <core/application.hpp>
 
-level_scene::level_scene(const std::string& p_tag)
-  : atlas::scene_scope(p_tag) {
-    console_log_info("scene_scope::scene_scope with Tag = {} called!", p_tag);
+level_scene::level_scene(const std::string& p_name)
+  : atlas::scene_scope(p_name) {
 
     m_camera = create_object("editor camera");
     m_camera->add<flecs::pair<atlas::tag::editor, atlas::projection_view>>();
@@ -17,13 +16,11 @@ level_scene::level_scene(const std::string& p_tag)
     });
 
     m_viking_room = create_object("Viking Room Object");
-    atlas::transform sphere_transform = {
-        // .position{0.f, 0.f, 1.60f},
-        .position = { -2.70f, 2.70, -8.30f },
+    m_viking_room->set<atlas::transform>({
+		.position = { -2.70f, 2.70, -8.30f },
         .rotation = { 2.30f, 95.90f, 91.80f },
         .scale{ 1.f },
-    };
-    m_viking_room->set<atlas::transform>(sphere_transform);
+	});
     m_viking_room->set<atlas::material>(
       { .color = { 1.f, 1.f, 1.f, 1.f },
         .model_path = "assets/models/viking_room.obj",
@@ -31,12 +28,10 @@ level_scene::level_scene(const std::string& p_tag)
 
     m_cube = create_object("Cube");
 
-    atlas::transform cube_transform = {
-        // .position = {-2.70, 0.f, 0.f},
-        .position = { 0.f, 2.10f, -7.30f },
+    m_cube->set<atlas::transform>({
+		.position = { 0.f, 2.10f, -7.30f },
         .scale = { 0.9f, 0.9f, 0.9f },
-    };
-    m_cube->set<atlas::transform>(cube_transform);
+	});
 
     m_cube->set<atlas::material>(
       { .color = { 1.f, 1.f, 1.f, 1.f },
@@ -50,24 +45,20 @@ level_scene::level_scene(const std::string& p_tag)
     });
 
     m_robot_model->set<atlas::material>({
-      .color = { 1.f, 1.f, 1.f, 1.f },
-      .model_path = "assets/models/robot.obj",
-      // .model_path = "assets/models/Box.gltf",
-      .texture_path = "assets/models/container_diffuse.png"
-      // .texture_path = "assets/models/Tiles083_8K-JPG_AmbientOcclusion.jpg"
-    });
+		.color = { 1.f, 1.f, 1.f, 1.f },
+        .model_path = "assets/models/robot.obj",
+        .texture_path = "assets/models/container_diffuse.png",
+	});
 
     m_platform = create_object("Platform");
 
-    m_platform->set<atlas::transform>({ // .position = { 0.f, 1.40f, -7.4f },
-                                        // .scale = { 2.80f, -0.08f, 3.50f },
-                                        .scale = { 15.f, -0.30f, 10.0f } });
+    m_platform->set<atlas::transform>({
+      .scale = { 15.f, -0.30f, 10.0f },
+    });
 
     m_platform->set<atlas::material>({
-      //   .color = { 0.f, 1.f, 0.f, 1.f },
       .model_path = "assets/models/cube.obj",
       .texture_path = "assets/models/wood.png",
-      // .texture_path = "assets/models/Tiles074_8K-JPG_Color.jpg",
     });
 
     atlas::register_update(this, &level_scene::on_update);

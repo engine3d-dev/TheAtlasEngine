@@ -18,7 +18,7 @@ namespace atlas {
 
         m_renderer =
           create_scope<renderer>(m_window->current_swapchain(), "Renderer");
-        m_renderer->set_background_color({ 1.f, 0.5f, 0.5f, 1.f });
+        m_renderer->set_background_color({ p_settings.background_color.x, p_settings.background_color.y, p_settings.background_color.z, p_settings.background_color.w });
 
         // TODO: Imgui context will need to be refactored
         // to use shared swapchain ref...
