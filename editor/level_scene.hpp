@@ -2,6 +2,7 @@
 #include <core/core.hpp>
 #include <core/scene/scene.hpp>
 #include <core/scene/scene_object.hpp>
+#include <core/serialize/serializer.hpp>
 
 /**
  * @brief Implementation of a custom scene
@@ -19,11 +20,14 @@ public:
         console_log_error("LevelScene::~LevelScene Destructed!!!");
     }
 
+    void start();
+
     void on_update();
 
     void on_ui_update();
 
 private:
+    atlas::serializer m_deserializer_test;
     atlas::optional_ref<atlas::scene_object> m_viking_room;
     atlas::optional_ref<atlas::scene_object> m_cube;
     atlas::optional_ref<atlas::scene_object> m_robot_model;

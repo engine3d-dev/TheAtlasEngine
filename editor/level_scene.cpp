@@ -16,6 +16,7 @@ level_scene::level_scene(const std::string& p_name)
     });
 
     m_viking_room = create_object("Viking Room Object");
+	m_viking_room->add<atlas::tag::serialize>();
     m_viking_room->set<atlas::transform>({
 		.position = { -2.70f, 2.70, -8.30f },
         .rotation = { 2.30f, 95.90f, 91.80f },
@@ -24,7 +25,8 @@ level_scene::level_scene(const std::string& p_name)
     m_viking_room->set<atlas::material>(
       { .color = { 1.f, 1.f, 1.f, 1.f },
         .model_path = "assets/models/viking_room.obj",
-        .texture_path = "assets/models/viking_room.png" });
+        .texture_path = "assets/models/viking_room.png",
+	});
 
     m_cube = create_object("Cube");
 
@@ -36,9 +38,11 @@ level_scene::level_scene(const std::string& p_name)
     m_cube->set<atlas::material>(
       { .color = { 1.f, 1.f, 1.f, 1.f },
         .model_path = "assets/models/E 45 Aircraft_obj.obj",
-        .texture_path = "assets/models/E-45-steel detail_2_col.jpg" });
+        .texture_path = "assets/models/E-45-steel detail_2_col.jpg",
+	});
 
     m_robot_model = create_object("object 1");
+	m_robot_model->add<atlas::tag::serialize>();
     m_robot_model->set<atlas::transform>({
       .position = { 0.f, 0.f, -20.f },
       .scale = { 1.f, 1.f, 1.f },
@@ -61,6 +65,7 @@ level_scene::level_scene(const std::string& p_name)
       .texture_path = "assets/models/wood.png",
     });
 
+	atlas::register_start(this, &level_scene::start);
     atlas::register_update(this, &level_scene::on_update);
     atlas::register_ui(this, &level_scene::on_ui_update);
 }
@@ -157,6 +162,14 @@ level_scene::on_ui_update() {
     }
 }
 
+void level_scene::start() {
+	m_deserializer_test = atlas::serializer();
+
+	if(!m_deserializer_test.load("LevelScene", *this)) {
+		console_log_error("Could not load yaml file LevelScene!!!");
+	}
+}
+
 void
 level_scene::on_update() {
     atlas::transform* camera_transform = m_camera->get_mut<atlas::transform>();
@@ -166,10 +179,7 @@ level_scene::on_update() {
     float velocity = movement_speed * dt;
     float rotation_velocity = rotation_speed * dt;
 
-    glm::quat to_quaternion = glm::quat({ camera_transform->quaternion.w,
-                                          camera_transform->quaternion.x,
-                                          camera_transform->quaternion.y,
-                                          camera_transform->quaternion.z });
+	glm::quat to_quaternion = atlas::to_quat(camera_transform->quaternion);
 
     glm::vec3 up = glm::rotate(to_quaternion, glm::vec3(0.f, 1.f, 0.f));
     glm::vec3 forward = glm::rotate(to_quaternion, glm::vec3(0.f, 0.f, -1.f));
@@ -206,7 +216,5 @@ level_scene::on_update() {
         camera_transform->rotation.y -= rotation_velocity;
     }
 
-    auto quaternion = glm::quat(camera_transform->rotation);
-    camera_transform->quaternion =
-      glm::vec4({ quaternion.x, quaternion.y, quaternion.z, quaternion.w });
+	camera_transform->set_rotation(camera_transform->rotation);
 }

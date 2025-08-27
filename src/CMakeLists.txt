@@ -30,6 +30,7 @@ set(
 
     # serializer stuff
     ${SRC_DIR}/core/serialize/serializer.cpp
+    ${SRC_DIR}/core/serialize/types.cpp
 
     # jolt
     ${SRC_DIR}/physics/physics_3d/jolt/jolt_api.cpp

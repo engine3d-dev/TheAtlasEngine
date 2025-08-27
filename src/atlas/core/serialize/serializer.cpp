@@ -1,150 +1,81 @@
 #include <core/serialize/serializer.hpp>
 #include <core/scene/components.hpp>
-#include <flecs/addons/cpp/entity.hpp>
 #include <fstream>
-#include <glm/fwd.hpp>
 #include <yaml-cpp/emitter.h>
-#include <yaml-cpp/yaml.h>
 #include <core/system/registry.hpp>
-
-namespace YAML {
-    template<>
-    struct convert<glm::vec2> {
-        static Node encode(const glm::vec2& rhs) {
-            Node node;
-            node.push_back(rhs.x);
-            node.push_back(rhs.y);
-
-            return node;
-        }
-
-        static bool decode(const Node& node, glm::vec2& rhs) {
-            if (!node.IsSequence() || node.size() != 2)
-                return false;
-
-            rhs.x = node[0].as<float>();
-            rhs.y = node[1].as<float>();
-
-            return true;
-        }
-    };
-
-    template<>
-    struct convert<glm::vec3> {
-        static Node encode(const glm::vec3& rhs) {
-            Node node;
-            node.push_back(rhs.x);
-            node.push_back(rhs.y);
-            node.push_back(rhs.z);
-
-            return node;
-        }
-
-        static bool decode(const Node& node, glm::vec3& rhs) {
-            if (!node.IsSequence() || node.size() != 2)
-                return false;
-
-            rhs.x = node[0].as<float>();
-            rhs.y = node[1].as<float>();
-            rhs.z = node[2].as<float>();
-
-            return true;
-        }
-    };
-
-    template<>
-    struct convert<glm::vec4> {
-
-        static Node encode(const glm::vec4& rhs) {
-            Node node;
-            node.push_back(rhs.x);
-            node.push_back(rhs.y);
-            node.push_back(rhs.z);
-            node.push_back(rhs.w);
-
-            return node;
-        }
-
-        static bool decode(const Node& node, glm::vec4& rhs) {
-            if (!node.IsSequence() || node.size() != 4)
-                return false;
-
-            rhs.x = node[0].as<float>();
-            rhs.y = node[1].as<float>();
-            rhs.z = node[2].as<float>();
-            rhs.w = node[3].as<float>();
-            return true;
-        }
-    };
-};
+#include <core/serialize/types.hpp>
 
 namespace atlas {
-    // static YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec2& v){
-    // 	out << YAML::Flow;
-    // 	out << YAML::BeginSeq << v.x << v.y << YAML::EndSeq;
-    // 	return out;
-    // }
 
-    /**
-     * NativeScriptComponent
-     * - Allows to bind user-native scripts to be binded to this component
-     * - Allows for entities to do:
-     * PropellerController propeller_data = { // do stuff... };
-     *
-     * m_SceneObject->add<NativeScriptComponent>(&propeller_data);
-     * const PropellerComponent*
-     * static_cast<Data>(m_SceneObject->get<NativeScriptComponent>()->Data);
-     *
-     */
-
-    static YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec3& v) {
-
-        // m_SceneObject->add<NativeScriptComponent>(&propeller_data);
-        // const PropellerComponent* =
-        // static_cast<PropellerController>(m_SceneObject->get<NativeScriptComponent>()->Data);
-
-        out << YAML::Flow;
-        out << YAML::BeginSeq << v.x << v.y << v.z << YAML::EndSeq;
-        return out;
-    }
-
-    // static YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec4& v)
-    // {
-    //     out << YAML::Flow;
-    //     out << YAML::BeginSeq << v.x << v.y << v.z << v.w << YAML::EndSeq;
-    //     return out;
-    // }
-
-    // actual serialization with yaml-cpp
-    [[maybe_unused]] static void serialize_entity(
-      YAML::Emitter& output,
-      const flecs::entity& p_entity) {
+    // used to serialize entities
+    // TODO -- expand on this to stream_reader and stream_writer
+    static void serialize_entity(YAML::Emitter& output,
+                                 const flecs::entity& p_entity) {
         output << YAML::BeginMap;
 
         output << YAML::Key << "Entity" << YAML::Value << p_entity.name();
 
         if (p_entity.has<transform>()) {
-            output << YAML::Key << "Transform";
-
-            output << YAML::BeginMap;
-            auto entity_transform = p_entity.get<transform>();
-            output << YAML::Key << "Position" << YAML::Value
-                   << entity_transform->position;
-            output << YAML::Key << "Scale" << YAML::Value
-                   << entity_transform->scale;
-            output << YAML::Key << "Rotation" << YAML::Value
-                   << entity_transform->rotation;
-            output << YAML::EndMap;
+            output << p_entity.get<transform>();
         }
 
-        output << YAML::EndMap; // Entity
+        if (p_entity.has<perspective_camera>()) {
+            output << p_entity.get<perspective_camera>();
+        }
+
+        if (p_entity.has<material>()) {
+            output << p_entity.get<material>();
+        }
+
+        // serialize entity childrens -- TODO
+        // output << YAML::Key << "Children" << YAML::Value << YAML::BeginSeq;
+        // p_entity.children([&](flecs::entity p_child_entity){
+        // 	serialize_entity(output, p_child_entity);
+        // });
+
+        output << YAML::EndMap;
     }
 
-    serializer::serializer([[maybe_unused]] const scene_scope* p_scene_ctx) {
-        m_current_scene_ctx = create_ref<scene_scope>(*p_scene_ctx);
+    static void deserialize_entity(YAML::iterator::value_type p_entity_value,
+                                   flecs::entity& p_deserialize_to_object) {
+        if (p_entity_value["Transform"]) {
+            auto transform_data = p_entity_value["Transform"];
+            p_deserialize_to_object.set<transform>({
+              .position = transform_data["Position"].as<glm::vec3>(),
+              .quaternion = transform_data["Quaternion"].as<glm::highp_vec4>(),
+              .rotation = transform_data["Rotation"].as<glm::vec3>(),
+              .scale = transform_data["Scale"].as<glm::vec3>(),
+            });
+        }
+
+        // Deserialize atlas::perspective_camera component
+        if (p_entity_value["PerspectiveCamera"]) {
+            auto perspective_camera_data = p_entity_value["PerspectiveCamera"];
+            p_deserialize_to_object.set<perspective_camera>({
+              .plane = perspective_camera_data["Plane"].as<glm::vec2>(),
+              .is_active = perspective_camera_data["Active"].as<bool>(),
+              .field_of_view =
+                perspective_camera_data["Field of View"].as<float>(),
+            });
+        }
+
+        // Deserialize atlas::material component
+        if (p_entity_value["Material"]) {
+            console_log_fatal("Trying to load material!!!");
+            auto perspective_camera_data = p_entity_value["Material"];
+            p_deserialize_to_object.set<material>({
+              .model_path =
+                perspective_camera_data["Model Path"].as<std::string>(),
+              .texture_path =
+                perspective_camera_data["Texture Path"].as<std::string>(),
+            });
+        }
     }
 
-    void serializer::save_as(const std::string& p_filepath) {
+    serializer::serializer(const ref<scene_scope>& p_scene_ctx)
+      : m_current_scene_ctx(p_scene_ctx) {}
+
+    void serializer::save(const std::filesystem::path& p_filepath) {
         YAML::Emitter output;
         output << YAML::BeginMap;
         output << YAML::Key << "Scene" << YAML::Value
@@ -153,18 +84,54 @@ namespace atlas {
 
         //! @note Queries in flecs the ecs framework are how we can query all
         //! entities that the engine (user creates through our API)
-        ref<world_scope> world_object =
-          system_registry::get_world("Editor World");
-        ref<scene_scope> current_scene = world_object->get_scene("LevelScene");
+        // ref<world_scope> world_object =
+        //   system_registry::get_world("Editor World");
+        // ref<scene_scope> current_scene =
+        // world_object->get_scene("LevelScene");
 
-        flecs::query<> q =
-          current_scene->query_builder().with<atlas::transform>().build();
+        // flecs::query<> q =
+        //   current_scene->query_builder().with<atlas::transform>().build();
+
+        // query all entities with a serialized tag specified
+        // while specifying to not query entities that also have the tag::editor specified
+        flecs::query<> q = m_current_scene_ctx->query_builder()
+                             .with<tag::serialize>()
+                             .without<tag::editor>()
+                             .build();
 
         q.each([&output](flecs::entity p_entity_id) {
             serialize_entity(output, p_entity_id);
         });
 
-        std::ofstream output_file(p_filepath);
+        std::ofstream output_file(p_filepath.string());
         output_file << output.c_str();
+    }
+
+    bool serializer::load(const std::filesystem::path& p_filepath,
+                          const flecs::world& p_registry) {
+        std::ifstream ins(p_filepath.string());
+        std::stringstream ss;
+        ss << ins.rdbuf();
+
+        YAML::Node data = YAML::Load(ss.str());
+
+        if (!data["Scene"]) {
+            return false;
+        }
+
+        YAML::Node entity_objects = data["Entities"];
+
+        if (entity_objects) {
+            for (YAML::iterator::value_type entity : entity_objects) {
+                std::string name = entity["Entity"].as<std::string>();
+                flecs::entity deserialize_to_object =
+                  p_registry.entity(name.c_str());
+
+                // Deserialize atlas::transform component
+                deserialize_entity(entity, deserialize_to_object);
+            }
+        }
+
+        return true;
     }
 };

@@ -209,6 +209,9 @@ namespace atlas {
             // m_window->present(m_current_frame_index);
             m_renderer->present(m_current_frame_index);
         }
+
+        m_post_serializer_test = serializer(current_scene);
+        m_post_serializer_test.save("LevelScene");
     }
 
     void application::post_destroy() {
