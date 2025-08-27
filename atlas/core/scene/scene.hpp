@@ -22,16 +22,20 @@ namespace atlas {
 
         strong_ref<scene_object> create_object(const std::string& p_tag) {
             return create_strong_ref<scene_object>(
-              m_object_allocator, &m_registry, p_tag);
+              m_allocator, &m_registry, p_tag);
         }
 
-        template<typename T>
-        strong_ref<scene_object> create_custom_object(
-          const std::string& p_tag) {
-            static_assert(std::is_base_of_v<scene_scope, T>,
+        // TODO -- come back to this
+        // The idea behind this is to acquire a custom object that can be
+        // defined by the application-side Such as character_controller,
+        // camera_controller, etc.
+        template<typename T, typename... Args>
+        strong_ref<scene_object> acquire_object(Args&&... args) {
+			static_assert(std::is_base_of_v<scene_scope, T>,
                           "invalid scene_object not inherited with base class "
                           "being scene_object");
-            return create_strong_ref<T>(m_object_allocator, p_tag);
+            return create_strong_ref<scene_object>(m_allocator,
+                                                   std::forward<T>(args...));
         }
 
         template<typename... Comps, typename... Args>
@@ -42,7 +46,7 @@ namespace atlas {
 
         strong_ref<scene_object> search_entity(const std::string& p_name) {
             return memory::make_strong_ptr<scene_object>(
-              m_object_allocator, &m_registry, p_name, false);
+              m_allocator, &m_registry, p_name, false);
         }
 
         virtual ~scene_scope() = default;
@@ -54,7 +58,7 @@ namespace atlas {
         operator flecs::world&() { return m_registry; }
 
     private:
-        std::pmr::polymorphic_allocator<> m_object_allocator;
+        std::pmr::polymorphic_allocator<> m_allocator;
         flecs::world m_registry;
         std::string m_tag = "Undefined Tag";
     };
