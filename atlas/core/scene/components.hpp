@@ -94,7 +94,12 @@ namespace atlas {
     //! either flecs::system or tags to handle specific querying of entities
     // Example Usage: add<flecs::pair<tag::editor, atlas::transform>>();
     namespace tag {
+        
+        //! @brief to indicate which entities are editor-only
         struct editor {};
+
+        //! @brief to tag entities to serialize through the serializer
+        struct serialize {};
     };
 
     //! TODO: Consider either relocating where this is and how it gets handled.
