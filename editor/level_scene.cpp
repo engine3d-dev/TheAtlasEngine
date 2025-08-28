@@ -74,55 +74,7 @@ level_scene::level_scene(const std::string& p_name)
     atlas::register_ui(this, &level_scene::on_ui_update);
 }
 
-void
-draw_transform(flecs::entity& p_entity, atlas::transform* p_transform) {
-    atlas::ui::draw_panel_component<atlas::transform>(
-      "transform", p_entity, [&]() {
-          atlas::ui::draw_vec3("Position", p_transform->position);
-          atlas::ui::draw_vec3("Scale", p_transform->scale);
-          atlas::ui::draw_vec3("Rotation", p_transform->rotation);
-      });
-}
-
-void
-draw_material(flecs::entity& p_entity, atlas::material* p_material) {
-    atlas::ui::draw_panel_component<atlas::material>(
-      "material", p_entity, [&]() {
-          // std::string sphere_filepath="";
-          // std::filesystem::path relative_path =
-          // std::filesystem::relative(sphere_filepath, "./");
-          // p_material->model_path = { relative_path.string() };
-          // // Empty String again to reset the filepath set
-          // sphere_filepath = "";
-
-          // std::array<char, 512> buffer;
-
-          // ImGui::InputText("Model", buffer.data(), buffer.size());
-        //   ImGui::InputText("Model",
-        //                    p_material->model_path.data(),
-        //                    p_material->model_path.size());
-		atlas::ui::draw_input_text(p_material->model_path);
-          // std::string model_path="";
-          // ImGui::InputText("Model", model_path.data(), model_path.size());
-          // p_material->model_path = std::format("{}/{}", p_asset_path,
-          // model_path); p_material->model_path = buffer.data();
-          // ImGui::InputText("Texture", &p_material->texture_path);
-          // p_material->texture_path= buffer.data();
-      });
-}
-
-void
-draw_perspective_camera(flecs::entity& p_entity,
-                        atlas::perspective_camera* p_camera) {
-    atlas::ui::draw_panel_component<atlas::perspective_camera>(
-      "camera", p_entity, [&]() {
-          atlas::ui::draw_float("field of view", p_camera->field_of_view);
-          ImGui::Checkbox("is_active", &p_camera->is_active);
-      });
-}
-
-void
-draw_components_ui_elements(flecs::entity& p_selected_entity) {
+void ui_component_list(flecs::entity& p_selected_entity) {
 	std::string entity_name=p_selected_entity.name().c_str();
 
 	atlas::ui::draw_input_text(entity_name);
@@ -266,21 +218,27 @@ level_scene::on_ui_update() {
 
     if (ImGui::Begin("Properties")) {
         if (m_selected_entity.is_alive()) {
-            draw_components_ui_elements(m_selected_entity);
+            ui_component_list(m_selected_entity);
 
-            draw_transform(m_selected_entity,
-                           m_selected_entity.get_mut<atlas::transform>());
+			atlas::ui::draw_component<atlas::transform>("transform", m_selected_entity, [](atlas::transform* p_transform) {
+				atlas::ui::draw_vec3("Position", p_transform->position);
+				atlas::ui::draw_vec3("Scale", p_transform->scale);
+				atlas::ui::draw_vec3("Rotation", p_transform->rotation);
+			});
 
-            if (m_selected_entity.has<atlas::perspective_camera>()) {
-                draw_perspective_camera(
-                  m_selected_entity,
-                  m_selected_entity.get_mut<atlas::perspective_camera>());
-            }
+			atlas::ui::draw_component<atlas::perspective_camera>("camera", m_selected_entity, [](atlas::perspective_camera* p_camera) {
+				atlas::ui::draw_float("field of view", p_camera->field_of_view);
+				ImGui::Checkbox("is_active", &p_camera->is_active);
+			});
 
-            if (m_selected_entity.has<atlas::material>()) {
-                draw_material(m_selected_entity,
-                              m_selected_entity.get_mut<atlas::material>());
-            }
+			atlas::ui::draw_component<atlas::material>("material", m_selected_entity, [](atlas::material* p_material) {
+				atlas::ui::draw_input_text(p_material->model_path);
+			});
+
+            // if (m_selected_entity.has<atlas::material>()) {
+            //     draw_material(m_selected_entity,
+            //                   m_selected_entity.get_mut<atlas::material>());
+            // }
 
 			// Considering having a way to indicate which objects to serialize during editor runtime
 			// if(m_selected_entity.has<atlas::tag::serialize>()) {

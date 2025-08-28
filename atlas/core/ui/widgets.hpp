@@ -84,19 +84,25 @@ namespace atlas::ui {
         draw panel component
 
         ImGui Renders individual sections that is per-component section
-        @param T is the type of component
-        @param p_entity is the specific entity to do operations with
-        @param UFunction is the callback to the logic for setting up those
-       specific data properties
+        @param T is the specified component
+        @param p_entity is the entity to do operations with
+        @param UFunction is callback to logic for setting up those specific data
+       properties
     */
     template<typename T, typename UFunction>
-    static void draw_panel_component(const std::string& p_tag,
-                                     flecs::entity& p_entity,
-                                     const UFunction& p_callable) {
+    static void draw_component(const std::string& p_tag,
+                               flecs::entity& p_entity,
+                               const UFunction& p_callable) {
         const ImGuiTreeNodeFlags tree_node_flags =
           ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed |
           ImGuiTreeNodeFlags_SpanAvailWidth |
           ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_FramePadding;
+
+        if (!p_entity.has<T>()) {
+            return;
+        }
+
+        T* component = p_entity.get_mut<T>();
 
         ImVec2 content_region = ImGui::GetContentRegionAvail();
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 4, 4 });
@@ -126,7 +132,7 @@ namespace atlas::ui {
         }
 
         if (opened) {
-            p_callable();
+            p_callable(component);
             ImGui::TreePop();
         }
 
