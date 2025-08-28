@@ -3,6 +3,7 @@
 #include <core/engine_logger.hpp>
 #include <core/scene/scene_object.hpp>
 #include <string>
+#include <core/scene/types.hpp>
 
 namespace atlas {
 
@@ -49,17 +50,25 @@ namespace atlas {
               m_allocator, &m_registry, p_name, false);
         }
 
+		[[nodiscard]] bool defer_begin() const {
+			return m_registry.defer_begin();
+		}
+
+		[[nodiscard]] bool defer_end() const {
+			return m_registry.defer_end();
+		}
+
         virtual ~scene_scope() = default;
 
         [[nodiscard]] std::string name() const { return m_name; }
 
         // It's required that the flecs::world is returned by reference
         // This prevents corruption onto the flecs::world object
-        operator flecs::world&() { return m_registry; }
+        operator world&() { return m_registry; }
 
     private:
         std::pmr::polymorphic_allocator<> m_allocator;
-        flecs::world m_registry;
+        world m_registry;
 		std::string m_name;
     };
 }; // namespace atlas

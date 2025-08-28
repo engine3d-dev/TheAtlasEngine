@@ -4,6 +4,9 @@
 
 namespace atlas {
     application* application::s_instance = nullptr;
+
+    // For now we set this globally readable to other graphics-api agnostic
+    // API's Not able to be modified, rather only read.
     static api g_graphics_backend_api = api::vulkan;
 
     application::application(const application_settings& p_settings) {
@@ -18,10 +21,15 @@ namespace atlas {
 
         m_renderer =
           create_scope<renderer>(m_window->current_swapchain(), "Renderer");
-        m_renderer->set_background_color({ p_settings.background_color.x, p_settings.background_color.y, p_settings.background_color.z, p_settings.background_color.w });
+        m_renderer->set_background_color({
+          p_settings.background_color.x,
+          p_settings.background_color.y,
+          p_settings.background_color.z,
+          p_settings.background_color.w,
+        });
 
-        // TODO: Imgui context will need to be refactored
-        // to use shared swapchain ref...
+        // vulkan-specific imgui context that allows us to control our backend
+        // through vulkan
         m_ui_context = vk::imgui_context(m_window);
         s_instance = this;
     }
@@ -58,7 +66,6 @@ namespace atlas {
     }
 
     float application::physics_step() {
-        // return g_physics_step;
         return 0.f;
     }
 
@@ -90,7 +97,7 @@ namespace atlas {
                   transform,
                   perspective_camera>()
           .each([&](flecs::pair<tag::editor, projection_view> p_pair,
-                    transform p_transform,
+                    transform& p_transform,
                     perspective_camera& p_camera) {
               float aspect_ratio = application::aspect_ratio();
               if (!p_camera.is_active) {
@@ -108,7 +115,7 @@ namespace atlas {
               p_pair->view = glm::mat4(1.f);
 
               // This is converting a glm::highp_vec4 to a glm::quat
-            glm::quat quaternion = to_quat(p_transform.quaternion);
+              glm::quat quaternion = to_quat(p_transform.quaternion);
 
               p_pair->view =
                 glm::translate(p_pair->view, p_transform.position) *
@@ -133,7 +140,10 @@ namespace atlas {
 
         while (m_window->available()) {
             auto current_time = std::chrono::high_resolution_clock::now();
-            m_delta_time = std::chrono::duration<float, std::chrono::seconds::period>(current_time - start_time).count();
+            m_delta_time =
+              std::chrono::duration<float, std::chrono::seconds::period>(
+                current_time - start_time)
+                .count();
             start_time = current_time;
             event::update_events();
 
@@ -175,11 +185,7 @@ namespace atlas {
                       return;
                   }
 
-                  // Removing this because not needed for now, we can assume the
-                  // single viewport is going to be if (p_camera.target ==
-                  // screen) {
                   m_proj_view = p_pair->projection * p_pair->view;
-                  // }
               });
 
             // TODO: Introduce scene renderer that will make use of the
@@ -188,13 +194,13 @@ namespace atlas {
             // renderer begin to indicate when a start of the frame to start
             // processing specific tasks that either need to be computed or
             // pre-defined before the renderer does something with it.
-            // TODO: Add scene_manager to assist on what things to be processing
-            // before the frame preparation
+            // TODO: Add scene_manager to coordinate what to process
+            // before frame preparation
             m_renderer->begin(
               currently_active, m_window->current_swapchain(), m_proj_view);
 
-            // TODO: UI will have its own renderpass, command buffers, and
-            // framebuffers specifically for UI-widgets
+            // TODO: vk:imgui_context will have its own renderpass, command
+            // buffers, and framebuffers specifically for UI-widgets + viewport
             m_ui_context.begin(currently_active, m_current_frame_index);
 
             detail::invoke_ui_update();
@@ -203,13 +209,22 @@ namespace atlas {
 
             m_renderer->end();
 
-            // renderer would need to share a reference with the windows
-            // swapchain otherwise invalidation detection on presenting doesn't
-            // get properly propogated to the renderer's swapchain
-            // m_window->present(m_current_frame_index);
+            /*
+                TODO -- have m_window present this to the screen, eventually
+               m_renderer should just fetch the images in the order to offload
+               to the swapchain for rendering.
+
+                Where each image has gone through different phases of the
+               renderpass onto the final image
+            */
+            // Presents to the swapchain to display to screen
             m_renderer->present(m_current_frame_index);
         }
 
+        // Just adding this here, for testing purposes
+        // Basic serialization for testing to conform how the editor may work
+        // TODO -- this would be done through either a stream_writer that can
+        // look at the structure of the graph and serialize according
         m_post_serializer_test = serializer(current_scene);
         m_post_serializer_test.save("LevelScene");
     }

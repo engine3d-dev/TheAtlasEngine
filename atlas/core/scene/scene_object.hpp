@@ -4,6 +4,7 @@
 #include <core/scene/components.hpp>
 #include <tuple>
 #include <flecs.h>
+#include <core/scene/types.hpp>
 
 namespace atlas {
 
@@ -57,7 +58,7 @@ namespace atlas {
         }
 
         //! @brief sets the scene object to correspond to a specified parent
-        void child_of(strong_ref<scene_object>& p_parent) {
+        void child_of(const strong_ref<scene_object>& p_parent) {
             flecs::entity e = *p_parent;
             m_entity.add(flecs::ChildOf, e);
         }
@@ -130,6 +131,11 @@ namespace atlas {
 
         template<typename UComponent>
         void remove() {
+            m_entity.remove<UComponent>();
+        }
+
+        template<typename UComponent>
+        [[nodiscard]] flecs::entity& remove() const {
             return m_entity.remove<UComponent>();
         }
 
@@ -141,6 +147,6 @@ namespace atlas {
         operator flecs::entity() { return m_entity; }
 
     private:
-        flecs::entity m_entity;
+        entity_t m_entity;
     };
 }; // namespace atlas
