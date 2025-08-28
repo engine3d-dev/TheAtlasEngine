@@ -234,16 +234,6 @@ level_scene::on_ui_update() {
 			atlas::ui::draw_component<atlas::material>("material", m_selected_entity, [](atlas::material* p_material) {
 				atlas::ui::draw_input_text(p_material->model_path);
 			});
-
-            // if (m_selected_entity.has<atlas::material>()) {
-            //     draw_material(m_selected_entity,
-            //                   m_selected_entity.get_mut<atlas::material>());
-            // }
-
-			// Considering having a way to indicate which objects to serialize during editor runtime
-			// if(m_selected_entity.has<atlas::tag::serialize>()) {
-			// 	draw_serialize_tag(m_selected_entity, m_selected_entity.get_mut<atlas::tag::serialize>());
-			// }
         }
 		
         ImGui::End();
