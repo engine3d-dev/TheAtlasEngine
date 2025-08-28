@@ -31,6 +31,7 @@ namespace atlas::ui {
                     float p_reset_value = 0.f);
 
     void draw_input_text(std::string& p_value);
+	void draw_text(const std::string& p_value);
 
     // TODO -- Fix this. In-progress of converting all atlas::ref to
     // atlas::strong_ref in the parameters

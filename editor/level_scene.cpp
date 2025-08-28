@@ -74,11 +74,12 @@ level_scene::level_scene(const std::string& p_name)
     atlas::register_ui(this, &level_scene::on_ui_update);
 }
 
-void ui_component_list(flecs::entity& p_selected_entity) {
-	std::string entity_name=p_selected_entity.name().c_str();
+void
+ui_component_list(flecs::entity& p_selected_entity) {
+    std::string entity_name = p_selected_entity.name().c_str();
 
-	atlas::ui::draw_input_text(entity_name);
-	p_selected_entity.set_name(entity_name.c_str());
+    atlas::ui::draw_input_text(entity_name);
+    p_selected_entity.set_name(entity_name.c_str());
 
     ImGui::SameLine();
     ImGui::PushItemWidth(-1);
@@ -103,7 +104,7 @@ void ui_component_list(flecs::entity& p_selected_entity) {
             }
         }
 
-		if (!p_selected_entity.has<atlas::tag::serialize>()) {
+        if (!p_selected_entity.has<atlas::tag::serialize>()) {
             if (ImGui::MenuItem("Tag::Serialize")) {
                 p_selected_entity.add<atlas::tag::serialize>();
                 ImGui::CloseCurrentPopup();
@@ -131,8 +132,8 @@ void ui_component_list(flecs::entity& p_selected_entity) {
 
 void
 level_scene::on_ui_update() {
-    
-	if (ImGui::Begin("Viewport")) {
+
+    if (ImGui::Begin("Viewport")) {
         glm::vec2 viewport_panel_size =
           glm::vec2{ atlas::application::get_window().width(),
                      atlas::application::get_window().height() };
@@ -140,7 +141,7 @@ level_scene::on_ui_update() {
         ImGui::End();
     }
 
-	[[maybe_unused]] bool val = defer_begin();
+    [[maybe_unused]] bool val = defer_begin();
     auto query_builder = this->query_builder<atlas::transform>().build();
 
     if (ImGui::Begin("Scene Heirarchy")) {
@@ -149,8 +150,9 @@ level_scene::on_ui_update() {
         // @param popup_flags - will be the mouse flag (0=right, 1=left)
         if (atlas::ui::begin_popup_context_window(nullptr, 1, false)) {
             if (ImGui::MenuItem("Create Empty Entity")) {
-				// TODO -- Converting the operation to use strong_ptr to make these operation more conformed
-				m_create_entity = create_object("Empty Entity");
+                // TODO -- Converting the operation to use strong_ptr to make
+                // these operation more conformed
+                m_create_entity = create_object("Empty Entity");
             }
             ImGui::EndPopup();
         }
@@ -168,21 +170,21 @@ level_scene::on_ui_update() {
             bool opened = ImGui::TreeNodeEx(p_entity.name().c_str(), flags);
             if (ImGui::IsItemClicked()) {
                 m_selected_entity = p_entity;
-				// m_create_entity = search_entity(p_entity.name().c_str());
+                // m_create_entity = search_entity(p_entity.name().c_str());
             }
 
-			bool delete_entity = false;
-			if(ImGui::BeginPopupContextItem()){
-				if(ImGui::MenuItem("Delete Entity")) {
-					delete_entity = true;
-				}
-				ImGui::EndPopup();
-			}
+            bool delete_entity = false;
+            if (ImGui::BeginPopupContextItem()) {
+                if (ImGui::MenuItem("Delete Entity")) {
+                    delete_entity = true;
+                }
+                ImGui::EndPopup();
+            }
 
-			if(delete_entity){
-				// _context->destroyEntity(entity);
-				m_selected_entity.destruct();
-			}
+            if (delete_entity) {
+                // _context->destroyEntity(entity);
+                m_selected_entity.destruct();
+            }
 
             if (opened) {
                 flags = ImGuiTreeNodeFlags_OpenOnArrow |
@@ -196,12 +198,13 @@ level_scene::on_ui_update() {
                 if (child_count > 0) {
                     m_selected_entity.children(
                       [&](flecs::entity p_child_entity) {
-                          opened =
-                            ImGui::TreeNodeEx(p_child_entity.name().c_str(), flags);
+                          opened = ImGui::TreeNodeEx(
+                            p_child_entity.name().c_str(), flags);
                           if (opened) {
                               if (ImGui::IsItemClicked()) {
-									m_selected_entity = p_child_entity;
-									// m_create_entity = search_entity(p_child_entity.name().c_str());
+                                  m_selected_entity = p_child_entity;
+                                  // m_create_entity =
+                                  // search_entity(p_child_entity.name().c_str());
                               }
                               ImGui::TreePop();
                           }
@@ -212,7 +215,7 @@ level_scene::on_ui_update() {
             }
         });
 
-		[[maybe_unused]] bool val2 = defer_end();
+        [[maybe_unused]] bool val2 = defer_end();
         ImGui::End();
     }
 
@@ -220,22 +223,30 @@ level_scene::on_ui_update() {
         if (m_selected_entity.is_alive()) {
             ui_component_list(m_selected_entity);
 
-			atlas::ui::draw_component<atlas::transform>("transform", m_selected_entity, [](atlas::transform* p_transform) {
-				atlas::ui::draw_vec3("Position", p_transform->position);
-				atlas::ui::draw_vec3("Scale", p_transform->scale);
-				atlas::ui::draw_vec3("Rotation", p_transform->rotation);
-			});
+            atlas::ui::draw_component<atlas::transform>(
+              "transform",
+              m_selected_entity,
+              [](atlas::transform* p_transform) {
+                  atlas::ui::draw_vec3("Position", p_transform->position);
+                  atlas::ui::draw_vec3("Scale", p_transform->scale);
+                  atlas::ui::draw_vec3("Rotation", p_transform->rotation);
+              });
 
-			atlas::ui::draw_component<atlas::perspective_camera>("camera", m_selected_entity, [](atlas::perspective_camera* p_camera) {
-				atlas::ui::draw_float("field of view", p_camera->field_of_view);
-				ImGui::Checkbox("is_active", &p_camera->is_active);
-			});
+            atlas::ui::draw_component<atlas::perspective_camera>(
+              "camera",
+              m_selected_entity,
+              [](atlas::perspective_camera* p_camera) {
+                  atlas::ui::draw_float("field of view",
+                                        p_camera->field_of_view);
+                  ImGui::Checkbox("is_active", &p_camera->is_active);
+              });
 
-			atlas::ui::draw_component<atlas::material>("material", m_selected_entity, [](atlas::material* p_material) {
-				atlas::ui::draw_input_text(p_material->model_path);
-			});
+            atlas::ui::draw_component<atlas::material>(
+              "material", m_selected_entity, [](atlas::material* p_material) {
+                  atlas::ui::draw_input_text(p_material->model_path);
+              });
         }
-		
+
         ImGui::End();
     }
 }
@@ -256,63 +267,62 @@ level_scene::on_update() {
     auto query_cameras =
       query_builder<atlas::perspective_camera, atlas::transform>().build();
 
-    query_cameras.each([]([[maybe_unused]] flecs::entity p_entity,
-                          atlas::perspective_camera& p_camera,
-                          atlas::transform& p_transform) {
-        if (!p_camera.is_active) {
-            return;
-        }
+    query_cameras.each(
+      [](atlas::perspective_camera& p_camera, atlas::transform& p_transform) {
+          if (!p_camera.is_active) {
+              return;
+          }
 
-        // auto camera_transform = p_entity.get_mut<atlas::transform>();
-        float dt = atlas::application::delta_time();
-        float movement_speed = 10.f;
-        float rotation_speed = 1.f;
-        float velocity = movement_speed * dt;
-        float rotation_velocity = rotation_speed * dt;
+          // auto camera_transform = p_entity.get_mut<atlas::transform>();
+          float dt = atlas::application::delta_time();
+          float movement_speed = 10.f;
+          float rotation_speed = 1.f;
+          float velocity = movement_speed * dt;
+          float rotation_velocity = rotation_speed * dt;
 
-        glm::quat to_quaternion = atlas::to_quat(p_transform.quaternion);
+          glm::quat to_quaternion = atlas::to_quat(p_transform.quaternion);
 
-        glm::vec3 up = glm::rotate(to_quaternion, glm::vec3(0.f, 1.f, 0.f));
-        glm::vec3 forward =
-          glm::rotate(to_quaternion, glm::vec3(0.f, 0.f, -1.f));
-        glm::vec3 right =
-          glm::rotate(to_quaternion, glm::vec3(1.0f, 0.0f, 0.0f));
+          glm::vec3 up = glm::rotate(to_quaternion, glm::vec3(0.f, 1.f, 0.f));
+          glm::vec3 forward =
+            glm::rotate(to_quaternion, glm::vec3(0.f, 0.f, -1.f));
+          glm::vec3 right =
+            glm::rotate(to_quaternion, glm::vec3(1.0f, 0.0f, 0.0f));
 
-        if (atlas::event::is_key_pressed(key_left_shift)) {
-            if (atlas::event::is_mouse_pressed(
-                  atlas::event::Mouse::ButtonMiddle)) {
-                p_transform.position += up * velocity;
-            }
+          if (atlas::event::is_key_pressed(key_left_shift)) {
+              if (atlas::event::is_mouse_pressed(
+                    atlas::event::Mouse::ButtonMiddle)) {
+                  p_transform.position += up * velocity;
+              }
 
-            if (atlas::event::is_mouse_pressed(
-                  atlas::event::Mouse::ButtonRight)) {
-                p_transform.position -= up * velocity;
-            }
-        }
+              if (atlas::event::is_mouse_pressed(
+                    atlas::event::Mouse::ButtonRight)) {
+                  p_transform.position -= up * velocity;
+              }
+          }
 
-        if (atlas::event::is_key_pressed(key_w)) {
-            p_transform.position += forward * velocity;
-        }
-        if (atlas::event::is_key_pressed(key_s)) {
-            p_transform.position -= forward * velocity;
-        }
+          if (atlas::event::is_key_pressed(key_w)) {
+              p_transform.position += forward * velocity;
+          }
+          if (atlas::event::is_key_pressed(key_s)) {
+              p_transform.position -= forward * velocity;
+          }
 
-        if (atlas::event::is_key_pressed(key_d)) {
-            p_transform.position += right * velocity;
-        }
-        if (atlas::event::is_key_pressed(key_a)) {
-            p_transform.position -= right * velocity;
-        }
+          if (atlas::event::is_key_pressed(key_d)) {
+              p_transform.position += right * velocity;
+          }
+          if (atlas::event::is_key_pressed(key_a)) {
+              p_transform.position -= right * velocity;
+          }
 
-        if (atlas::event::is_key_pressed(key_q)) {
-            p_transform.rotation.y += rotation_velocity;
-        }
-        if (atlas::event::is_key_pressed(key_e)) {
-            p_transform.rotation.y -= rotation_velocity;
-        }
+          if (atlas::event::is_key_pressed(key_q)) {
+              p_transform.rotation.y += rotation_velocity;
+          }
+          if (atlas::event::is_key_pressed(key_e)) {
+              p_transform.rotation.y -= rotation_velocity;
+          }
 
-        p_transform.set_rotation(p_transform.rotation);
-    });
+          p_transform.set_rotation(p_transform.rotation);
+      });
 
     // atlas::transform* camera_transform =
     // m_selected_entity.get_mut<atlas::transform>();

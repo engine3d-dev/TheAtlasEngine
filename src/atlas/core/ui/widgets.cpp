@@ -233,6 +233,17 @@ namespace atlas::ui {
         }
     }
 
+    void draw_text(const std::string& p_value) {
+        // @context Camera0
+        char buffer[256];
+        
+        // To make null terminated.
+        memset(buffer, 0, sizeof(buffer));
+        strcpy_s(buffer, p_value.c_str());
+
+        ImGui::Text("%s", p_value.data());
+    }
+
     void dockspace_window(GLFWwindow* p_window) {
 
         bool dockspace_open = true;
