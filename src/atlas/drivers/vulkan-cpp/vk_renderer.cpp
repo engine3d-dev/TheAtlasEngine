@@ -225,7 +225,8 @@ namespace atlas::vk {
               current_scene->query_builder<material>().build();
 
             caching.each([this, material_layout](flecs::entity p_entity) {
-                std::string name = std::string(p_entity.name().c_str());
+                // std::string name = std::string(p_entity.name().c_str());
+				uint32_t entity_id = p_entity.id();
                 const material* target = p_entity.get<material>();
 
                 //! @brief My attempt at loading meshes asynchronously and
@@ -237,34 +238,34 @@ namespace atlas::vk {
                 // launch_mesh_loading.get();
                 mesh new_mesh(std::filesystem::path(target->model_path));
                 if (new_mesh.loaded()) {
-                    m_cached_meshes.emplace(name, new_mesh);
+                    m_cached_meshes.emplace(entity_id, new_mesh);
 
-                    m_cached_meshes[name].initialize_uniforms(
+                    m_cached_meshes[entity_id].initialize_uniforms(
                       sizeof(material_uniform));
-                    m_cached_meshes[name].add_texture(target->texture_path);
+                    m_cached_meshes[entity_id].add_texture(target->texture_path);
 
-                    // m_geometry_descriptor[name] =
+                    // m_geometry_descriptor[entity_id] =
                     //   descriptor_set(1, material_layout);
-                    m_mesh_descriptors[name]["materials"] =
+                    m_mesh_descriptors[entity_id]["materials"] =
                       descriptor_set(1, material_layout);
 
                     // Apply mesh-specific uniforms to the mesh-specific
                     // descriptor (model matrix, color, etc)
                     std::array<vk_uniform_buffer, 1> material_uniforms = {
-                        m_cached_meshes[name].material_ubo()
+                        m_cached_meshes[entity_id].material_ubo()
                     };
-                    // m_geometry_descriptor[name].update(
+                    // m_geometry_descriptor[entity_id].update(
                     //   material_uniforms,
-                    //   m_cached_meshes[name].read_textures());
+                    //   m_cached_meshes[entity_id].read_textures());
 
-                    m_mesh_descriptors[name]["materials"].update(
-                      material_uniforms, m_cached_meshes[name].read_textures());
+                    m_mesh_descriptors[entity_id]["materials"].update(
+                      material_uniforms, m_cached_meshes[entity_id].read_textures());
 
                     // m_geometry_descriptor_layout.push_back(
-                    //   m_geometry_descriptor[name].get_layout());
-                    // m_mesh_descriptors[name]["materials"]
+                    //   m_geometry_descriptor[entity_id].get_layout());
+                    // m_mesh_descriptors[entity_id]["materials"]
                     m_geometry_descriptor_layout.push_back(
-                      m_mesh_descriptors[name]["materials"].get_layout());
+                      m_mesh_descriptors[entity_id]["materials"].get_layout());
                 }
             });
 
@@ -374,9 +375,10 @@ namespace atlas::vk {
                 .model = m_model, .color = material_component->color
             };
 
-            std::string entity_name = std::string(p_entity.name().c_str());
-            if (m_cached_meshes[entity_name].loaded()) {
-                m_cached_meshes[entity_name].update_uniform(mesh_material_ubo);
+            // std::string entity_name = std::string(p_entity.name().c_str());
+			uint32_t entity_id = p_entity.id();
+            if (m_cached_meshes[entity_id].loaded()) {
+                m_cached_meshes[entity_id].update_uniform(mesh_material_ubo);
 
                 // Bind global camera data here
                 m_global_descriptor.bind(m_current_command_buffer,
@@ -385,15 +387,15 @@ namespace atlas::vk {
 
                 // Bind mesh-entity specific properties here before initial draw
                 // call
-                // m_geometry_descriptor[entity_name].bind(
+                // m_geometry_descriptor[entity_id].bind(
                 //   m_current_command_buffer,
                 //   m_current_frame,
                 //   m_main_pipeline.get_layout());
-                m_mesh_descriptors[entity_name]["materials"].bind(
+                m_mesh_descriptors[entity_id]["materials"].bind(
                   m_current_command_buffer,
                   m_current_frame,
                   m_main_pipeline.get_layout());
-                m_cached_meshes[entity_name].draw(m_current_command_buffer);
+                m_cached_meshes[entity_id].draw(m_current_command_buffer);
             }
         });
 
