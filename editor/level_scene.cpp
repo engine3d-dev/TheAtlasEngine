@@ -4,11 +4,12 @@
 
 level_scene::level_scene(const std::string& p_name)
   : atlas::scene_scope(p_name) {
-
     m_camera = create_object("editor camera");
     m_camera->add<flecs::pair<atlas::tag::editor, atlas::projection_view>>();
-    m_camera->set<atlas::transform>(
-      { .position = { 3.50f, 4.90f, 36.40f }, .scale{ 1.f } });
+    m_camera->set<atlas::transform>({
+      .position = { 3.50f, 4.90f, 36.40f },
+      .scale{ 1.f },
+    });
     m_camera->set<atlas::perspective_camera>({
       .plane = { 0.1f, 5000.f },
       .is_active = true,
@@ -16,43 +17,46 @@ level_scene::level_scene(const std::string& p_name)
     });
 
     m_viking_room = create_object("Viking Room Object");
-	m_viking_room->add<atlas::tag::serialize>();
+    m_viking_room->add<atlas::tag::serialize>();
     m_viking_room->set<atlas::transform>({
-		.position = { -2.70f, 2.70, -8.30f },
-        .rotation = { 2.30f, 95.90f, 91.80f },
-        .scale{ 1.f },
-	});
-    m_viking_room->set<atlas::material>(
-      { .color = { 1.f, 1.f, 1.f, 1.f },
-        .model_path = "assets/models/viking_room.obj",
-        .texture_path = "assets/models/viking_room.png",
-	});
+      .position = { -2.70f, 2.70, -8.30f },
+      .rotation = { 2.30f, 95.90f, 91.80f },
+      .scale{ 1.f },
+    });
+    m_viking_room->set<atlas::material>({
+      .color = { 1.f, 1.f, 1.f, 1.f },
+      .model_path = "assets/models/viking_room.obj",
+      .texture_path = "assets/models/viking_room.png",
+    });
 
-    m_cube = create_object("Cube");
+    m_cube = create_object("Aircraft");
 
     m_cube->set<atlas::transform>({
-		.position = { 0.f, 2.10f, -7.30f },
-        .scale = { 0.9f, 0.9f, 0.9f },
-	});
+      .position = { 0.f, 2.10f, -7.30f },
+      .scale = { 0.9f, 0.9f, 0.9f },
+    });
 
-    m_cube->set<atlas::material>(
-      { .color = { 1.f, 1.f, 1.f, 1.f },
-        .model_path = "assets/models/E 45 Aircraft_obj.obj",
-        .texture_path = "assets/models/E-45-steel detail_2_col.jpg",
-	});
+    m_cube->set<atlas::material>({
+      .color = { 1.f, 1.f, 1.f, 1.f },
+      .model_path = "assets/models/E 45 Aircraft_obj.obj",
+      .texture_path = "assets/models/E-45-steel detail_2_col.jpg",
+    });
 
-    m_robot_model = create_object("object 1");
-	m_robot_model->add<atlas::tag::serialize>();
+    m_robot_model = create_object("Robot");
+    m_robot_model->add<atlas::tag::serialize>();
     m_robot_model->set<atlas::transform>({
       .position = { 0.f, 0.f, -20.f },
       .scale = { 1.f, 1.f, 1.f },
     });
 
     m_robot_model->set<atlas::material>({
-		.color = { 1.f, 1.f, 1.f, 1.f },
-        .model_path = "assets/models/robot.obj",
-        .texture_path = "assets/models/container_diffuse.png",
-	});
+      .color = { 1.f, 1.f, 1.f, 1.f },
+      .model_path = "assets/models/robot.obj",
+      .texture_path = "assets/models/container_diffuse.png",
+    });
+
+    m_child_object = create_object("Child");
+    m_child_object->child_of(m_robot_model);
 
     m_platform = create_object("Platform");
 
@@ -65,34 +69,118 @@ level_scene::level_scene(const std::string& p_name)
       .texture_path = "assets/models/wood.png",
     });
 
-	atlas::register_start(this, &level_scene::start);
+    atlas::register_start(this, &level_scene::start);
     atlas::register_update(this, &level_scene::on_update);
     atlas::register_ui(this, &level_scene::on_ui_update);
 }
 
 void
+draw_transform(flecs::entity& p_entity, atlas::transform* p_transform) {
+    atlas::ui::draw_panel_component<atlas::transform>(
+      "transform", p_entity, [&]() {
+          atlas::ui::draw_vec3("Position", p_transform->position);
+          atlas::ui::draw_vec3("Scale", p_transform->scale);
+          atlas::ui::draw_vec3("Rotation", p_transform->rotation);
+      });
+}
+
+void
+draw_material(flecs::entity& p_entity, atlas::material* p_material) {
+    atlas::ui::draw_panel_component<atlas::material>(
+      "material", p_entity, [&]() {
+          // std::string sphere_filepath="";
+          // std::filesystem::path relative_path =
+          // std::filesystem::relative(sphere_filepath, "./");
+          // p_material->model_path = { relative_path.string() };
+          // // Empty String again to reset the filepath set
+          // sphere_filepath = "";
+
+          // std::array<char, 512> buffer;
+
+          // ImGui::InputText("Model", buffer.data(), buffer.size());
+        //   ImGui::InputText("Model",
+        //                    p_material->model_path.data(),
+        //                    p_material->model_path.size());
+		atlas::ui::draw_input_text(p_material->model_path);
+          // std::string model_path="";
+          // ImGui::InputText("Model", model_path.data(), model_path.size());
+          // p_material->model_path = std::format("{}/{}", p_asset_path,
+          // model_path); p_material->model_path = buffer.data();
+          // ImGui::InputText("Texture", &p_material->texture_path);
+          // p_material->texture_path= buffer.data();
+      });
+}
+
+void
+draw_perspective_camera(flecs::entity& p_entity,
+                        atlas::perspective_camera* p_camera) {
+    atlas::ui::draw_panel_component<atlas::perspective_camera>(
+      "camera", p_entity, [&]() {
+          atlas::ui::draw_float("field of view", p_camera->field_of_view);
+          ImGui::Checkbox("is_active", &p_camera->is_active);
+      });
+}
+
+void
+draw_components_ui_elements(flecs::entity& p_selected_entity) {
+	std::string entity_name=p_selected_entity.name().c_str();
+
+	atlas::ui::draw_input_text(entity_name);
+	p_selected_entity.set_name(entity_name.c_str());
+
+    ImGui::SameLine();
+    ImGui::PushItemWidth(-1);
+    if (ImGui::Button("Add Component")) {
+        ImGui::OpenPopup("Add Component");
+    }
+
+    if (ImGui::BeginPopup("Add Component")) {
+        if (!p_selected_entity.has<atlas::perspective_camera>()) {
+            if (ImGui::MenuItem("Perspective Camera")) {
+                p_selected_entity.add<
+                  flecs::pair<atlas::tag::editor, atlas::projection_view>>();
+                p_selected_entity.add<atlas::perspective_camera>();
+                ImGui::CloseCurrentPopup();
+            }
+        }
+
+        if (!p_selected_entity.has<atlas::material>()) {
+            if (ImGui::MenuItem("Material (Mesh Component)")) {
+                p_selected_entity.add<atlas::material>();
+                ImGui::CloseCurrentPopup();
+            }
+        }
+
+		if (!p_selected_entity.has<atlas::tag::serialize>()) {
+            if (ImGui::MenuItem("Tag::Serialize")) {
+                p_selected_entity.add<atlas::tag::serialize>();
+                ImGui::CloseCurrentPopup();
+            }
+        }
+
+        // if(!m_selected_entity.has<RigidBody2DComponent>()){
+        // 	if(ImGui::MenuItem("Rigidbody 2D")){
+        // 		m_selected_entity.add<RigidBody2DComponent>();
+        // 		ImGui::CloseCurrentPopup();
+        // 	}
+        // }
+
+        // if(!m_selected_entity.has<BoxCollider2DComponent>()){
+        // 	if(ImGui::MenuItem("Box Collider 2D")){
+        // 		m_selected_entity.add<BoxCollider2DComponent>();
+        // 		ImGui::CloseCurrentPopup();
+        // 	}
+        // }
+        ImGui::EndPopup();
+    }
+
+    ImGui::PopItemWidth();
+}
+
+void
 level_scene::on_ui_update() {
-    flecs::world reg = *this;
-    atlas::transform* viking_transform =
-      m_viking_room->get_mut<atlas::transform>();
-    atlas::transform* robot_transform =
-      m_robot_model->get_mut<atlas::transform>();
-
-    atlas::transform* platform_transform =
-      m_camera->get_mut<atlas::transform>();
-
-    atlas::transform* cube_transform = m_cube->get_mut<atlas::transform>();
-
-    atlas::material* viking_room_material =
-      m_viking_room->get_mut<atlas::material>();
-    atlas::material* platform_material = m_platform->get_mut<atlas::material>();
-
-    atlas::transform* camera_transform = m_camera->get_mut<atlas::transform>();
-
-    atlas::perspective_camera* persp_cam =
-      m_camera->get_mut<atlas::perspective_camera>();
-
-    if (ImGui::Begin("Viewport")) {
+    
+	if (ImGui::Begin("Viewport")) {
         glm::vec2 viewport_panel_size =
           glm::vec2{ atlas::application::get_window().width(),
                      atlas::application::get_window().height() };
@@ -100,121 +188,231 @@ level_scene::on_ui_update() {
         ImGui::End();
     }
 
+	[[maybe_unused]] bool val = defer_begin();
+    auto query_builder = this->query_builder<atlas::transform>().build();
+
     if (ImGui::Begin("Scene Heirarchy")) {
         // @note right click on blank space
         // @param string_id
         // @param popup_flags - will be the mouse flag (0=right, 1=left)
         if (atlas::ui::begin_popup_context_window(nullptr, 1, false)) {
             if (ImGui::MenuItem("Create Empty Entity")) {
+				// TODO -- Converting the operation to use strong_ptr to make these operation more conformed
+				m_create_entity = create_object("Empty Entity");
             }
             ImGui::EndPopup();
         }
-        ImGui::End();
-    }
 
-    if (ImGui::Begin("Properties Panel")) {
-        atlas::ui::draw_panel_component<atlas::material>("Sphere", [&]() {
-            std::string sphere_filepath = "";
-            atlas::ui::draw_vec3("pos 1", viking_transform->position);
-            atlas::ui::draw_vec3("camera pos", camera_transform->position);
-            atlas::ui::draw_vec3("scale 1", viking_transform->scale);
-            atlas::ui::draw_vec3("rotate 1", viking_transform->rotation);
-            atlas::ui::draw_vec4("color 1", viking_room_material->color);
+        query_builder.each([&](flecs::entity p_entity, atlas::transform&) {
+            // We set the imgui flags for our scene heirarchy panel
+            // TODO -- Make the scene heirarchy panel a separate class that is
+            // used for specify the layout and other UI elements here
+            ImGuiTreeNodeFlags flags =
+              ((m_selected_entity == p_entity) ? ImGuiTreeNodeFlags_Selected
+                                               : 0) |
+              ImGuiTreeNodeFlags_OpenOnArrow;
+            flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
+            flags |= ImGuiWindowFlags_Popup;
+            bool opened = ImGui::TreeNodeEx(p_entity.name().c_str(), flags);
+            if (ImGui::IsItemClicked()) {
+                m_selected_entity = p_entity;
+				// m_create_entity = search_entity(p_entity.name().c_str());
+            }
 
-            atlas::ui::draw_float("fov", persp_cam->field_of_view);
+			bool delete_entity = false;
+			if(ImGui::BeginPopupContextItem()){
+				if(ImGui::MenuItem("Delete Entity")) {
+					delete_entity = true;
+				}
+				ImGui::EndPopup();
+			}
 
-            atlas::ui::button_open_file_dialog("Load Mesh 1", sphere_filepath);
+			if(delete_entity){
+				// _context->destroyEntity(entity);
+				m_selected_entity.destruct();
+			}
 
-            if (sphere_filepath != "") {
-                std::filesystem::path relative_path =
-                  std::filesystem::relative(sphere_filepath, "./");
-                console_log_trace("Sphere Filepath = {}", sphere_filepath);
-                viking_room_material->model_path = { relative_path.string() };
-                // Empty String again to reset the filepath set
-                sphere_filepath = "";
+            if (opened) {
+                flags = ImGuiTreeNodeFlags_OpenOnArrow |
+                        ImGuiTreeNodeFlags_SpanAvailWidth;
+                auto query_children_builder =
+                  this->query_builder().with(flecs::ChildOf, p_entity).build();
+                int32_t child_count = query_children_builder.count();
+
+                // // Only show children in scene heirarchy panel if there are
+                // children entities
+                if (child_count > 0) {
+                    m_selected_entity.children(
+                      [&](flecs::entity p_child_entity) {
+                          opened =
+                            ImGui::TreeNodeEx(p_child_entity.name().c_str(), flags);
+                          if (opened) {
+                              if (ImGui::IsItemClicked()) {
+									m_selected_entity = p_child_entity;
+									// m_create_entity = search_entity(p_child_entity.name().c_str());
+                              }
+                              ImGui::TreePop();
+                          }
+                      });
+                }
+
+                ImGui::TreePop();
             }
         });
 
-        atlas::ui::draw_panel_component<atlas::material>("Robot", [&]() {
-            atlas::ui::draw_vec3("position", robot_transform->position);
-            atlas::ui::draw_vec3("rob scale", robot_transform->scale);
-        });
+		[[maybe_unused]] bool val2 = defer_end();
+        ImGui::End();
+    }
 
-        atlas::ui::draw_panel_component<atlas::material>("Cube", [&]() {
-            atlas::ui::draw_vec3("cube pos", cube_transform->position);
-        });
+    if (ImGui::Begin("Properties")) {
+        if (m_selected_entity.is_alive()) {
+            draw_components_ui_elements(m_selected_entity);
 
-        atlas::ui::draw_panel_component<atlas::material>(
-          "platform", [&platform_transform, &platform_material]() {
-              atlas::ui::draw_vec3("platform pos",
-                                   platform_transform->position);
-              atlas::ui::draw_vec3("platform scale", platform_transform->scale);
-              if (ImGui::DragFloat3(
-                    "Some Pos", glm::value_ptr(platform_transform->rotation))) {
-                  auto quaternion = glm::quat(platform_transform->rotation);
-                  platform_transform->quaternion = glm::vec4(
-                    { quaternion.x, quaternion.y, quaternion.z, quaternion.w });
-              }
-              atlas::ui::draw_vec4("platform rgb", platform_material->color);
-          });
+            draw_transform(m_selected_entity,
+                           m_selected_entity.get_mut<atlas::transform>());
 
+            if (m_selected_entity.has<atlas::perspective_camera>()) {
+                draw_perspective_camera(
+                  m_selected_entity,
+                  m_selected_entity.get_mut<atlas::perspective_camera>());
+            }
+
+            if (m_selected_entity.has<atlas::material>()) {
+                draw_material(m_selected_entity,
+                              m_selected_entity.get_mut<atlas::material>());
+            }
+
+			// Considering having a way to indicate which objects to serialize during editor runtime
+			// if(m_selected_entity.has<atlas::tag::serialize>()) {
+			// 	draw_serialize_tag(m_selected_entity, m_selected_entity.get_mut<atlas::tag::serialize>());
+			// }
+        }
+		
         ImGui::End();
     }
 }
 
-void level_scene::start() {
-	m_deserializer_test = atlas::serializer();
+void
+level_scene::start() {
+    m_deserializer_test = atlas::serializer();
 
-	if(!m_deserializer_test.load("LevelScene", *this)) {
-		console_log_error("Could not load yaml file LevelScene!!!");
-	}
+    if (!m_deserializer_test.load("LevelScene", *this)) {
+        console_log_error("Could not load yaml file LevelScene!!!");
+    }
 }
 
 void
 level_scene::on_update() {
-    atlas::transform* camera_transform = m_camera->get_mut<atlas::transform>();
-    float dt = atlas::application::delta_time();
-    float movement_speed = 10.f;
-    float rotation_speed = 1.f;
-    float velocity = movement_speed * dt;
-    float rotation_velocity = rotation_speed * dt;
+    // atlas::transform* camera_transform =
+    // m_camera->get_mut<atlas::transform>();
+    auto query_cameras =
+      query_builder<atlas::perspective_camera, atlas::transform>().build();
 
-	glm::quat to_quaternion = atlas::to_quat(camera_transform->quaternion);
-
-    glm::vec3 up = glm::rotate(to_quaternion, glm::vec3(0.f, 1.f, 0.f));
-    glm::vec3 forward = glm::rotate(to_quaternion, glm::vec3(0.f, 0.f, -1.f));
-    glm::vec3 right = glm::rotate(to_quaternion, glm::vec3(1.0f, 0.0f, 0.0f));
-
-    if (atlas::event::is_key_pressed(key_left_shift)) {
-        if (atlas::event::is_mouse_pressed(atlas::event::Mouse::ButtonMiddle)) {
-            camera_transform->position += up * velocity;
+    query_cameras.each([]([[maybe_unused]] flecs::entity p_entity,
+                          atlas::perspective_camera& p_camera,
+                          atlas::transform& p_transform) {
+        if (!p_camera.is_active) {
+            return;
         }
 
-        if (atlas::event::is_mouse_pressed(atlas::event::Mouse::ButtonRight)) {
-            camera_transform->position -= up * velocity;
+        // auto camera_transform = p_entity.get_mut<atlas::transform>();
+        float dt = atlas::application::delta_time();
+        float movement_speed = 10.f;
+        float rotation_speed = 1.f;
+        float velocity = movement_speed * dt;
+        float rotation_velocity = rotation_speed * dt;
+
+        glm::quat to_quaternion = atlas::to_quat(p_transform.quaternion);
+
+        glm::vec3 up = glm::rotate(to_quaternion, glm::vec3(0.f, 1.f, 0.f));
+        glm::vec3 forward =
+          glm::rotate(to_quaternion, glm::vec3(0.f, 0.f, -1.f));
+        glm::vec3 right =
+          glm::rotate(to_quaternion, glm::vec3(1.0f, 0.0f, 0.0f));
+
+        if (atlas::event::is_key_pressed(key_left_shift)) {
+            if (atlas::event::is_mouse_pressed(
+                  atlas::event::Mouse::ButtonMiddle)) {
+                p_transform.position += up * velocity;
+            }
+
+            if (atlas::event::is_mouse_pressed(
+                  atlas::event::Mouse::ButtonRight)) {
+                p_transform.position -= up * velocity;
+            }
         }
-    }
 
-    if (atlas::event::is_key_pressed(key_w)) {
-        camera_transform->position += forward * velocity;
-    }
-    if (atlas::event::is_key_pressed(key_s)) {
-        camera_transform->position -= forward * velocity;
-    }
+        if (atlas::event::is_key_pressed(key_w)) {
+            p_transform.position += forward * velocity;
+        }
+        if (atlas::event::is_key_pressed(key_s)) {
+            p_transform.position -= forward * velocity;
+        }
 
-    if (atlas::event::is_key_pressed(key_d)) {
-        camera_transform->position += right * velocity;
-    }
-    if (atlas::event::is_key_pressed(key_a)) {
-        camera_transform->position -= right * velocity;
-    }
+        if (atlas::event::is_key_pressed(key_d)) {
+            p_transform.position += right * velocity;
+        }
+        if (atlas::event::is_key_pressed(key_a)) {
+            p_transform.position -= right * velocity;
+        }
 
-    if (atlas::event::is_key_pressed(key_q)) {
-        camera_transform->rotation.y += rotation_velocity;
-    }
-    if (atlas::event::is_key_pressed(key_e)) {
-        camera_transform->rotation.y -= rotation_velocity;
-    }
+        if (atlas::event::is_key_pressed(key_q)) {
+            p_transform.rotation.y += rotation_velocity;
+        }
+        if (atlas::event::is_key_pressed(key_e)) {
+            p_transform.rotation.y -= rotation_velocity;
+        }
 
-	camera_transform->set_rotation(camera_transform->rotation);
+        p_transform.set_rotation(p_transform.rotation);
+    });
+
+    // atlas::transform* camera_transform =
+    // m_selected_entity.get_mut<atlas::transform>();
+    // float dt = atlas::application::delta_time();
+    // float movement_speed = 10.f;
+    // float rotation_speed = 1.f;
+    // float velocity = movement_speed * dt;
+    // float rotation_velocity = rotation_speed * dt;
+
+    // glm::quat to_quaternion = atlas::to_quat(camera_transform->quaternion);
+
+    // glm::vec3 up = glm::rotate(to_quaternion, glm::vec3(0.f, 1.f, 0.f));
+    // glm::vec3 forward = glm::rotate(to_quaternion, glm::vec3(0.f, 0.f,
+    // -1.f)); glm::vec3 right = glm::rotate(to_quaternion, glm::vec3(1.0f,
+    // 0.0f, 0.0f));
+
+    // if (atlas::event::is_key_pressed(key_left_shift)) {
+    //     if
+    //     (atlas::event::is_mouse_pressed(atlas::event::Mouse::ButtonMiddle)) {
+    //         camera_transform->position += up * velocity;
+    //     }
+
+    //     if (atlas::event::is_mouse_pressed(atlas::event::Mouse::ButtonRight))
+    //     {
+    //         camera_transform->position -= up * velocity;
+    //     }
+    // }
+
+    // if (atlas::event::is_key_pressed(key_w)) {
+    //     camera_transform->position += forward * velocity;
+    // }
+    // if (atlas::event::is_key_pressed(key_s)) {
+    //     camera_transform->position -= forward * velocity;
+    // }
+
+    // if (atlas::event::is_key_pressed(key_d)) {
+    //     camera_transform->position += right * velocity;
+    // }
+    // if (atlas::event::is_key_pressed(key_a)) {
+    //     camera_transform->position -= right * velocity;
+    // }
+
+    // if (atlas::event::is_key_pressed(key_q)) {
+    //     camera_transform->rotation.y += rotation_velocity;
+    // }
+    // if (atlas::event::is_key_pressed(key_e)) {
+    //     camera_transform->rotation.y -= rotation_velocity;
+    // }
+
+    // camera_transform->set_rotation(camera_transform->rotation);
 }

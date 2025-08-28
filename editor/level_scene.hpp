@@ -12,13 +12,11 @@
  *
  */
 
-class level_scene : public atlas::scene_scope {
+class level_scene final : public atlas::scene_scope {
 public:
     level_scene(const std::string& p_tag);
 
-    ~level_scene() override {
-        console_log_error("LevelScene::~LevelScene Destructed!!!");
-    }
+    ~level_scene() override = default;
 
     void start();
 
@@ -28,6 +26,10 @@ public:
 
 private:
     atlas::serializer m_deserializer_test;
+    flecs::entity m_selected_entity;
+    // TEMP: this is only for when creating an entity in the editor-space
+    atlas::optional_ref<atlas::scene_object> m_create_entity;
+    atlas::optional_ref<atlas::scene_object> m_child_object;
     atlas::optional_ref<atlas::scene_object> m_viking_room;
     atlas::optional_ref<atlas::scene_object> m_cube;
     atlas::optional_ref<atlas::scene_object> m_robot_model;

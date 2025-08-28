@@ -220,6 +220,19 @@ namespace atlas::ui {
         ImGui::PopID();
     }
 
+    void draw_input_text(std::string& p_value) {
+        // @context Camera0
+        char buffer[256];
+        
+        // To make null terminated.
+        memset(buffer, 0, sizeof(buffer));
+        strcpy_s(buffer, p_value.c_str());
+
+        if(ImGui::InputText("##Tag", buffer, sizeof(buffer))) {
+            p_value = std::string(buffer);
+        }
+    }
+
     void dockspace_window(GLFWwindow* p_window) {
 
         bool dockspace_open = true;
