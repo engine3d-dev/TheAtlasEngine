@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 #include <core/filesystem/file_dialog.hpp>
 #include <core/scene/scene_object.hpp>
+#include <span>
 
 namespace atlas::ui {
 
@@ -31,7 +32,10 @@ namespace atlas::ui {
                     float p_reset_value = 0.f);
 
     void draw_input_text(std::string& p_value);
-	void draw_text(const std::string& p_value);
+	
+    void draw_text(const std::string& p_value);
+
+    std::string draw_select_list(const std::string& p_tag, std::span<std::string>& p_suggestions);
 
     // TODO -- Fix this. In-progress of converting all atlas::ref to
     // atlas::strong_ref in the parameters

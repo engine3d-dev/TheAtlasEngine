@@ -50,11 +50,11 @@ namespace atlas {
               m_allocator, &m_registry, p_name, false);
         }
 
-		[[nodiscard]] bool defer_begin() const {
+		bool defer_begin() {
 			return m_registry.defer_begin();
 		}
 
-		[[nodiscard]] bool defer_end() const {
+		bool defer_end() {
 			return m_registry.defer_end();
 		}
 
