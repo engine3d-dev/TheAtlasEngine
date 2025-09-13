@@ -1,3 +1,10 @@
+/*
+    Copied from https://github.com/libhal/libhal/blob/main/include/libhal/pointers.hpp
+
+    [atlas] modifications 
+    1.) File renamed to memory
+    2.) In the atlas:: namespace.
+*/
 #include <atomic>
 #include <memory_resource>
 #include <type_traits>
