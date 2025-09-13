@@ -27,6 +27,16 @@ namespace atlas {
             output << p_entity.get<material>();
         }
 
+        if (p_entity.has<physics::collider_body>()) {
+            output << p_entity.get<physics::collider_body>();
+        }
+
+        if (p_entity.has<physics::physics_body>()) {
+            output << p_entity.get<physics::physics_body>();
+        }
+
+
+
         // serialize entity childrens -- TODO
         // output << YAML::Key << "Children" << YAML::Value << YAML::BeginSeq;
         // p_entity.children([&](flecs::entity p_child_entity){
@@ -61,13 +71,45 @@ namespace atlas {
 
         // Deserialize atlas::material component
         if (p_entity_value["Material"]) {
-            console_log_fatal("Trying to load material!!!");
             auto perspective_camera_data = p_entity_value["Material"];
             p_deserialize_to_object.set<material>({
               .model_path =
                 perspective_camera_data["Model Path"].as<std::string>(),
               .texture_path =
                 perspective_camera_data["Texture Path"].as<std::string>(),
+            });
+        }
+
+        // deserialize physics body
+        if (p_entity_value["Physics Body"]) {
+            auto physics_body = p_entity_value["Physics Body"];
+            p_deserialize_to_object.set<physics::physics_body>({
+                .linear_velocity = physics_body["Linear Velocity"].as<glm::vec3>(),
+                .angular_velocity = physics_body["Angular Velocity"].as<glm::vec3>(),
+                .cumulative_force = physics_body["Cumulative Force"].as<glm::vec3>(),
+                .cumulative_torque = physics_body["Cumulative Torque"].as<glm::vec3>(),
+                .mass_factor = physics_body["Mass Factor"].as<float>(),
+                .center_mass_position = physics_body["Center Mass Position"].as<glm::vec3>(),
+                .use_gravity = physics_body["Gravity Enabled"].as<bool>(),
+                .gravity_factor = physics_body["Gravity Factor"].as<float>(),
+                .body_type = physics_body["Body Type"].as<physics::body_type>(),
+                .friction = physics_body["Friction"].as<float>(),
+                .body_movement_type = physics_body["Body Movement Type"].as<physics::body_type>(),
+                .body_layer_type = physics_body["Body Layer Type"].as<physics::body_layer>(),
+                .body_id = physics_body["Body ID"].as<uint32_t>(),
+                .count = physics_body["Count"].as<int>(),
+            });
+        }
+
+        if (p_entity_value["Collider Body"]) {
+            auto collider_data = p_entity_value["Collider Body"];
+            p_deserialize_to_object.set<physics::collider_body>({
+                .collision_enabled = collider_data["Enabled"].as<bool>(),
+                .shape_type = collider_data["Shape Type"].as<physics::collider_shape>(),
+                .half_extents = collider_data["Extent"].as<glm::vec3>(),
+                .radius = collider_data["Radius"].as<float>(),
+                .capsule_half_height = collider_data["Capsule Height"].as<float>(),
+                .body_id = collider_data["Body ID"].as<uint8_t>(),
             });
         }
     }
