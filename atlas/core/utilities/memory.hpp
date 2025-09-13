@@ -1661,8 +1661,4 @@ namespace atlas::memory {
 
         return result;
     }
-<<<<<<< HEAD
 } // namespace atlas::memory
-=======
-} // namespace atlas::memory
->>>>>>> 013fe6179ebc39df0645e681b5e08af91dc11bf9
