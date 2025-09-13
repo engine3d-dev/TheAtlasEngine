@@ -147,10 +147,6 @@ namespace atlas {
         operator flecs::entity() { return m_entity; }
 
     private:
-<<<<<<< HEAD
         entity_t m_entity;
-=======
-        flecs::entity m_entity;
->>>>>>> 013fe6179ebc39df0645e681b5e08af91dc11bf9
     };
 }; // namespace atlas
