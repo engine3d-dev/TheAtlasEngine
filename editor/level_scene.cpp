@@ -1,6 +1,7 @@
 #include "level_scene.hpp"
 #include <core/common.hpp>
 #include <core/application.hpp>
+#include <physics/jolt-cpp/jolt_components.hpp>
 
 level_scene::level_scene(const std::string& p_name)
   : atlas::scene_scope(p_name) {
@@ -69,6 +70,17 @@ level_scene::level_scene(const std::string& p_name)
       .texture_path = "assets/models/wood.png",
     });
 
+	atlas::strong_ref<atlas::scene_object> some_object = create_object("Experiment Cube");
+	if(some_object->is_alive()) {
+		console_log_trace("Experiemental Cube Entity ALIVE!!");
+	}
+
+
+	some_object->set<atlas::material>({
+		.model_path = "assets/models/cube.obj",
+		.texture_path = "assets/models/wood.png",
+	});
+
     atlas::register_start(this, &level_scene::start);
     atlas::register_update(this, &level_scene::on_update);
     atlas::register_ui(this, &level_scene::on_ui_update);
@@ -104,9 +116,24 @@ ui_component_list(flecs::entity& p_selected_entity) {
             }
         }
 
-        if (!p_selected_entity.has<atlas::tag::serialize>()) {
-            if (ImGui::MenuItem("Tag::Serialize")) {
-                p_selected_entity.add<atlas::tag::serialize>();
+		// NOTE -- Add this in later...
+        // if (!p_selected_entity.has<atlas::tag::serialize>()) {
+        //     if (ImGui::MenuItem("Tag::Serialize")) {
+        //         p_selected_entity.add<atlas::tag::serialize>();
+        //         ImGui::CloseCurrentPopup();
+        //     }
+        // }
+
+		if (!p_selected_entity.has<atlas::physics::collider_body>()) {
+            if (ImGui::MenuItem("Collider")) {
+                p_selected_entity.add<atlas::physics::collider_body>();
+                ImGui::CloseCurrentPopup();
+            }
+        }
+
+		if (!p_selected_entity.has<atlas::physics::physics_body>()) {
+            if (ImGui::MenuItem("Physics Body")) {
+                p_selected_entity.add<atlas::physics::physics_body>();
                 ImGui::CloseCurrentPopup();
             }
         }
@@ -141,7 +168,7 @@ level_scene::on_ui_update() {
         ImGui::End();
     }
 
-    [[maybe_unused]] bool val = defer_begin();
+    defer_begin();
     auto query_builder = this->query_builder<atlas::transform>().build();
 
     if (ImGui::Begin("Scene Heirarchy")) {
@@ -215,7 +242,7 @@ level_scene::on_ui_update() {
             }
         });
 
-        [[maybe_unused]] bool val2 = defer_end();
+        defer_end();
         ImGui::End();
     }
 
@@ -244,7 +271,36 @@ level_scene::on_ui_update() {
             atlas::ui::draw_component<atlas::material>(
               "material", m_selected_entity, [](atlas::material* p_material) {
                   atlas::ui::draw_input_text(p_material->model_path);
-              });
+			});
+
+			// atlas::ui::draw_component<atlas::physics::collider_body>("Collider", m_selected_entity, [](atlas::physics::collider_body* p_collider) {
+
+			// });
+
+			atlas::ui::draw_component<atlas::physics::physics_body>("Physics Body", m_selected_entity, [](atlas::physics::physics_body* p_body) {
+				const char* items[] = { "Static", "Kinematic", "Dynamic" };
+				const char* combo_preview = items[p_body->body_type];
+				
+				// Begin the combo box
+				if (ImGui::BeginCombo("Body Type", combo_preview)) {
+					for (int n = 0; n < 3; n++) {
+						// Check if the current item is selected
+						const bool is_selected = (p_body->body_type == n);
+						if (ImGui::Selectable(items[n], is_selected)) {
+							// Update the current type when a new item is selected
+							p_body->body_type = static_cast<atlas::physics::body_type>(n);
+						}
+
+						// Set the initial focus when the combo box is first opened
+						if (is_selected) {
+							ImGui::SetItemDefaultFocus();
+						}
+					}
+					ImGui::EndCombo();
+				}
+			});
+
+
         }
 
         ImGui::End();
