@@ -70,17 +70,6 @@ level_scene::level_scene(const std::string& p_name)
       .texture_path = "assets/models/wood.png",
     });
 
-	atlas::strong_ref<atlas::scene_object> some_object = create_object("Experiment Cube");
-	if(some_object->is_alive()) {
-		console_log_trace("Experiemental Cube Entity ALIVE!!");
-	}
-
-
-	some_object->set<atlas::material>({
-		.model_path = "assets/models/cube.obj",
-		.texture_path = "assets/models/wood.png",
-	});
-
     atlas::register_start(this, &level_scene::start);
     atlas::register_update(this, &level_scene::on_update);
     atlas::register_ui(this, &level_scene::on_ui_update);
@@ -304,6 +293,34 @@ level_scene::on_ui_update() {
         }
 
         ImGui::End();
+
+		// Note --- just added this temporarily for testing
+		// auto time = atlas::application::delta_time();
+
+		// if((int)(time * 10.0f) % 8 > 4) {
+		// 	m_blink = !m_blink;
+		// }
+
+		// auto width = atlas::application::get_window().width();
+		// auto height = atlas::application::get_window().height();
+
+		// ImGui::SetNextWindowPos(ImVec2(static_cast<float>(width) * 0.5f, static_cast<float>(height) * 0.5f), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+		// ImGui::SetNextWindowSize(ImVec2(200, 20), ImGuiCond_Always);
+		// ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoInputs;
+		// ImGui::SetNextWindowBgAlpha(0.f);
+
+		// if(ImGui::Begin("Testing", nullptr, flags)) {
+		// 	ImGui::ProgressBar(10.f);
+
+		// 	auto pos = ImGui::GetWindowPos();
+		// 	pos.x += (float)width * 0.5f - 300.0f;
+		// 	pos.y += 50.0f;
+		// 	if(m_blink){
+		// 		ImGui::GetForegroundDrawList()->AddText(m_font, 120.0f, pos, 0xffffffff, "Click to Play!");
+		// 	}
+
+		// 	ImGui::End();
+		// }
     }
 }
 
@@ -314,6 +331,10 @@ level_scene::start() {
     if (!m_deserializer_test.load("LevelScene", *this)) {
         console_log_error("Could not load yaml file LevelScene!!!");
     }
+
+	// Note -- just added for temporary
+	// ImGuiIO io = ImGui::GetIO();
+	// m_font = io.Fonts->AddFontFromFileTTF("assets/OpenSans-Regular.ttf", 120.0f);
 }
 
 void
