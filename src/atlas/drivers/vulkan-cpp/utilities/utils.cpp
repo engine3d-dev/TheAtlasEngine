@@ -176,7 +176,7 @@ namespace atlas::vk {
 
     //
     void write(const vk_buffer& p_buffer,
-               const std::span<vertex_input>& p_in_buffer) {
+               std::span<vertex_input> p_in_buffer) {
         VkDeviceSize buffer_size =
           p_in_buffer
             .size_bytes(); // does equivalent to doing sizeof(p_in_buffer[0]) *
@@ -191,7 +191,7 @@ namespace atlas::vk {
     }
 
     void write(const vk_buffer& p_buffer,
-               const std::span<uint32_t>& p_in_buffer) {
+               std::span<uint32_t> p_in_buffer) {
         VkDeviceSize buffer_size = p_in_buffer.size_bytes();
         VkDevice driver = vk_context::driver_context();
         void* mapped = nullptr;
@@ -406,7 +406,7 @@ namespace atlas::vk {
     }
 
     void queue_submit(const VkQueue& p_queue_handle,
-                      const std::span<VkCommandBuffer>& p_commands) {
+                      std::span<VkCommandBuffer> p_commands) {
         VkSubmitInfo submit_info = {
             .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
             .commandBufferCount = static_cast<uint32_t>(p_commands.size()),

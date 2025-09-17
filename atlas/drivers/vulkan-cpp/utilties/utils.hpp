@@ -41,13 +41,13 @@ namespace atlas::vk {
      * std::span<uint32_t>.
      */
     void write(const vk_buffer& p_buffer,
-               const std::span<uint32_t>& p_in_buffer);
+               std::span<uint32_t> p_in_buffer);
 
     /**
      * @brief Maps buffer handler to data chunks that contain vertices
      */
     void write(const vk_buffer& p_buffer,
-               const std::span<vertex_input>& p_in_buffer);
+               std::span<vertex_input> p_in_buffer);
 
     /**
      * @name transition_image_layout
@@ -122,5 +122,5 @@ namespace atlas::vk {
     //
 
     void queue_submit(const VkQueue& p_queue_handle,
-                      const std::span<VkCommandBuffer>& p_commands);
+                      std::span<VkCommandBuffer>& p_commands);
 };

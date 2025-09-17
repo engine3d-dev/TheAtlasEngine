@@ -35,7 +35,7 @@ namespace atlas::ui {
 	
     void draw_text(const std::string& p_value);
 
-    std::string draw_select_list(const std::string& p_tag, std::span<std::string>& p_suggestions);
+    std::string draw_select_list(const std::string& p_tag, std::span<std::string> p_suggestions);
 
     // TODO -- Fix this. In-progress of converting all atlas::ref to
     // atlas::strong_ref in the parameters

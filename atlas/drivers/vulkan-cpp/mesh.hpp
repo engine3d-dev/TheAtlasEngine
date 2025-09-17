@@ -29,8 +29,8 @@ namespace atlas::vk {
     class mesh {
     public:
         mesh() = default;
-        mesh(const std::span<vertex_input>& p_vertices,
-             const std::span<uint32_t>& p_indices);
+        mesh(std::span<vertex_input> p_vertices,
+             std::span<uint32_t> p_indices);
         mesh(const std::filesystem::path& p_filename);
 
         //! @brief Reload mesh vertices and indices when requested

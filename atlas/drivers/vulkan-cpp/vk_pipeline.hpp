@@ -13,7 +13,7 @@ namespace atlas::vk {
         vk_pipeline(
           const VkRenderPass& p_renderpass,
           const vk_shader_group& p_shader_group,
-          const std::span<VkDescriptorSetLayout>& p_descriptor_layout);
+          std::span<VkDescriptorSetLayout> p_descriptor_layout);
 
         void create(const VkRenderPass& p_renderpass);
 

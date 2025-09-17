@@ -17,7 +17,7 @@ namespace atlas::vk {
     vk_pipeline::vk_pipeline(
       const VkRenderPass& p_renderpass,
       const vk_shader_group& p_shader_group,
-      const std::span<VkDescriptorSetLayout>& p_descriptor_layout) {
+      std::span<VkDescriptorSetLayout> p_descriptor_layout) {
         m_driver = vk_context::driver_context();
         m_shader_group = p_shader_group;
         m_descriptor_layouts = p_descriptor_layout;
@@ -47,9 +47,9 @@ namespace atlas::vk {
 
         // Loading in the vertex attributes and vertex binding attribtues into
         // the pipeline
-        const std::span<VkVertexInputAttributeDescription> vertex_attributes =
+        std::span<const VkVertexInputAttributeDescription> vertex_attributes =
           m_shader_group.vertex_attributes();
-        const std::span<VkVertexInputBindingDescription>
+        std::span<const VkVertexInputBindingDescription>
           bind_vertex_attributes = m_shader_group.vertex_bind_attributes();
 
         VkPipelineVertexInputStateCreateInfo vertex_input_info = {

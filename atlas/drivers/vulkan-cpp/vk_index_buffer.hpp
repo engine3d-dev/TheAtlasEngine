@@ -7,7 +7,7 @@ namespace atlas::vk {
     class vk_index_buffer {
     public:
         vk_index_buffer() = default;
-        vk_index_buffer(const std::span<uint32_t>& p_indices);
+        vk_index_buffer(std::span<uint32_t> p_indices);
 
         void bind(const VkCommandBuffer& p_current);
 

@@ -108,8 +108,8 @@ namespace atlas::vk {
                  "vkAllocateDescriptorSets");
     }
 
-    void descriptor_set::update(const std::span<vk_uniform_buffer>& p_uniforms,
-                                const std::span<texture>& p_textures) {
+    void descriptor_set::update(std::span<vk_uniform_buffer> p_uniforms,
+                                std::span<texture> p_textures) {
         std::vector<VkDescriptorBufferInfo> buffer_infos;
         std::vector<VkDescriptorImageInfo> image_infos;
 
@@ -178,7 +178,7 @@ namespace atlas::vk {
     }
 
     void descriptor_set::update(
-      const std::span<vk_uniform_buffer>& p_uniforms) {
+      std::span<vk_uniform_buffer> p_uniforms) {
         for (size_t i = 0; i < m_allocated_descriptors; i++) {
             VkDescriptorBufferInfo buffer_info = {
                 .buffer = p_uniforms[i],

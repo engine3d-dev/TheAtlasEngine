@@ -20,7 +20,7 @@ namespace atlas::vk {
         //! stage associated with it
         // Does not limit users to the data structure type they need to pass in
         // for the shader sources
-        vk_shader_group(const std::span<shader_info>& p_shader_sources);
+        vk_shader_group(std::span<shader_info> p_shader_sources);
 
         void set_vertex_attributes(
           const std::initializer_list<VkVertexInputAttributeDescription>&
@@ -31,13 +31,13 @@ namespace atlas::vk {
             p_bind_attributes);
 
         void set_vertex_attributes(
-          const std::span<VkVertexInputAttributeDescription>& p_attributes);
+          std::span<VkVertexInputAttributeDescription> p_attributes);
 
         void set_vertex_bind_attributes(
-          const std::span<VkVertexInputBindingDescription>& p_bind_attributes);
+          std::span<VkVertexInputBindingDescription> p_bind_attributes);
 
         void vertex_attributes(
-          const std::span<vertex_attribute>& p_vertex_attributes);
+          std::span<vertex_attribute> p_vertex_attributes);
 
         //! @return span of vk_shader_module that contains the handler and stage
         //! this handler was loaded at

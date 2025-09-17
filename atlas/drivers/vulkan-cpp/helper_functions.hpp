@@ -120,7 +120,7 @@ namespace atlas::vk {
     //! presentation modes available
     VkPresentModeKHR select_compatible_present_mode(
       const VkPresentModeKHR& p_request,
-      const std::span<VkPresentModeKHR>& p_modes);
+      std::span<VkPresentModeKHR> p_modes);
 
     //! @return the image size based on the capabilities of the vulkan
     //! `VkSurfaceKHR` that is supported

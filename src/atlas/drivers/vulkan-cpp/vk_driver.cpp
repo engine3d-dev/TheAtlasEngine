@@ -7,7 +7,7 @@
 namespace atlas::vk {
     static VkFormat search_supported_depth_format(
       const VkPhysicalDevice& p_physical,
-      const std::span<VkFormat>& p_formats,
+      std::span<VkFormat> p_formats,
       VkImageTiling p_tiling,
       VkFormatFeatureFlags p_feature_flag) {
         VkFormat format = VK_FORMAT_UNDEFINED;

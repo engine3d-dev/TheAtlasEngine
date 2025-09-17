@@ -4,7 +4,7 @@
 #include <drivers/vulkan-cpp/utilties/utils.hpp>
 
 namespace atlas::vk {
-    vk_index_buffer::vk_index_buffer(const std::span<uint32_t>& p_indices) {
+    vk_index_buffer::vk_index_buffer(std::span<uint32_t> p_indices) {
         m_driver = vk_context::driver_context();
         m_indices_count = static_cast<uint32_t>(p_indices.size());
 
