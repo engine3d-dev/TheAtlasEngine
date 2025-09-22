@@ -1,5 +1,4 @@
 #pragma once
-#include <type_traits>
 #include <Jolt/Jolt.h>
 #include <core/math/types.hpp>
 #include <glm/gtc/quaternion.hpp>

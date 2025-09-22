@@ -57,13 +57,13 @@ level_scene::level_scene(const std::string& p_name)
       .texture_path = "assets/models/container_diffuse.png",
     });
 
-    m_robot_model->set<atlas::physics::collider_body>({
-      .shape_type = atlas::physics::collider_shape::Box,
+    m_robot_model->set<atlas::collider_body>({
+      .shape_type = atlas::collider_shape::box,
       .half_extents = { 1.f, 1.f, 1.f },
     });
-    m_robot_model->set<atlas::physics::physics_body>({
+    m_robot_model->set<atlas::physics_body>({
       // .restitution = 1.25f,
-      .body_movement_type = atlas::physics::Dynamic,
+      .body_movement_type = atlas::dynamic,
     });
 
     m_child_object = create_object("Child");
@@ -74,8 +74,8 @@ level_scene::level_scene(const std::string& p_name)
     m_platform->set<atlas::transform>({
       .scale = { 15.f, 0.30f, 10.0f },
     });
-    m_platform->set<atlas::physics::collider_body>({
-      .shape_type = atlas::physics::collider_shape::Box,
+    m_platform->set<atlas::collider_body>({
+      .shape_type = atlas::collider_shape::box,
       .half_extents = { 15.f, 0.30f, 10.0f },
       // .radius = 1.f,
       // .half_extents = {15.f, -0.30f, 10.0f}
@@ -190,16 +190,16 @@ ui_component_list(flecs::entity& p_selected_entity) {
         //     }
         // }
 
-        if (!p_selected_entity.has<atlas::physics::collider_body>()) {
+        if (!p_selected_entity.has<atlas::collider_body>()) {
             if (ImGui::MenuItem("Collider")) {
-                p_selected_entity.add<atlas::physics::collider_body>();
+                p_selected_entity.add<atlas::collider_body>();
                 ImGui::CloseCurrentPopup();
             }
         }
 
-        if (!p_selected_entity.has<atlas::physics::physics_body>()) {
+        if (!p_selected_entity.has<atlas::physics_body>()) {
             if (ImGui::MenuItem("Physics Body")) {
-                p_selected_entity.add<atlas::physics::physics_body>();
+                p_selected_entity.add<atlas::physics_body>();
                 ImGui::CloseCurrentPopup();
             }
         }
@@ -339,16 +339,16 @@ level_scene::on_ui_update() {
                   atlas::ui::draw_input_text(p_material->model_path);
               });
 
-            // atlas::ui::draw_component<atlas::physics::collider_body>("Collider",
-            // m_selected_entity, [](atlas::physics::collider_body* p_collider)
+            // atlas::ui::draw_component<atlas::collider_body>("Collider",
+            // m_selected_entity, [](atlas::collider_body* p_collider)
             // {
 
             // });
 
-            atlas::ui::draw_component<atlas::physics::physics_body>(
+            atlas::ui::draw_component<atlas::physics_body>(
               "Physics Body",
               m_selected_entity,
-              [](atlas::physics::physics_body* p_body) {
+              [](atlas::physics_body* p_body) {
                   const char* items[] = { "Static", "Kinematic", "Dynamic" };
                   const char* combo_preview = items[p_body->body_type];
 
@@ -361,7 +361,7 @@ level_scene::on_ui_update() {
                               // Update the current type when a new item is
                               // selected
                               p_body->body_type =
-                                static_cast<atlas::physics::body_type>(n);
+                                static_cast<atlas::body_type>(n);
                           }
 
                           // Set the initial focus when the combo box is first

@@ -70,7 +70,7 @@ namespace atlas {
     }
 
     YAML::Emitter& operator<<(YAML::Emitter& p_output,
-                              const physics::collider_body* p_collider) {
+                              const collider_body* p_collider) {
         p_output << YAML::Key << "Collider Body";
 
         p_output << YAML::BeginMap;
@@ -91,7 +91,7 @@ namespace atlas {
     }
 
     YAML::Emitter& operator<<(YAML::Emitter& p_output,
-                              const physics::physics_body* p_body) {
+                              const physics_body* p_body) {
         p_output << YAML::Key << "Physics Body";
 
         p_output << YAML::BeginMap;

@@ -6,6 +6,7 @@
 #include <physics/physics_3d/physics_context.hpp>
 #include <drivers/jolt-cpp/jolt_components.hpp>
 #include <physics/physics_3d/jolt/interface/jolt_broad_phase.hpp>
+#include <physics/components.hpp>
 
 namespace atlas::physics {
     /**

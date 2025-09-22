@@ -8,6 +8,7 @@
 #include <core/scene/world.hpp>
 #include <core/system/registry.hpp>
 #include <core/application.hpp>
+// #include <physics/components.hpp>
 
 namespace atlas::physics {
 
@@ -42,7 +43,7 @@ namespace atlas::physics {
           create_ref<object_vs_broadphase_layer>();
         m_object_layer_pair_filter = create_ref<object_layer_pair_filter>();
 
-        if (m_settings.thread_type == thread_system::Default) {
+        if (m_settings.thread_type == thread_type::default_system){
 
             m_thread_system = create_scope<JPH::JobSystemThreadPool>(
               // Max jobs must be a power of 2, otherwise jph crashes.
@@ -77,7 +78,7 @@ namespace atlas::physics {
         RefConst<Shape> created_shape;
 
         switch (collider.shape_type) {
-            case collider_shape::Box: {
+            case collider_shape::box: {
                 BoxShapeSettings shape_settings(to_jph(collider.half_extents));
                 auto result = shape_settings.Create();
                 if (result.HasError()) {
@@ -88,7 +89,7 @@ namespace atlas::physics {
                 created_shape = result.Get();
                 break;
             }
-            case collider_shape::Sphere: {
+            case collider_shape::sphere: {
                 SphereShapeSettings shape_settings(collider.radius);
                 auto result = shape_settings.Create();
                 if (result.HasError()) {
@@ -99,7 +100,7 @@ namespace atlas::physics {
                 created_shape = result.Get();
                 break;
             }
-            case collider_shape::Capsule: {
+            case collider_shape::capsule: {
                 CapsuleShapeSettings shape_settings(
                   collider.capsule_half_height, collider.radius);
                 auto result = shape_settings.Create();
@@ -136,7 +137,7 @@ namespace atlas::physics {
             return;
 
         JPH::EMotionType motion_type = JPH::EMotionType::Static;
-        uint8_t layer_type = body_layer::NonMoving;
+        uint8_t layer_type = body_layer::non_moving;
 
         if (body_opt) {
             // Needs to change to a better body type system

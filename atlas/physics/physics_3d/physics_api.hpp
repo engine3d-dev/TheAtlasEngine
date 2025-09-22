@@ -1,5 +1,6 @@
 #pragma once
 #include <drivers/jolt-cpp/jolt_components.hpp>
+#include <physics/components.hpp>
 
 namespace atlas::physics {
 

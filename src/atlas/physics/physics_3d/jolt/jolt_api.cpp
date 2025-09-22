@@ -4,6 +4,8 @@
 #include <Jolt/Physics/PhysicsSystem.h>
 #include <core/engine_logger.hpp>
 
+#include <physics/components.hpp>
+
 namespace atlas::physics {
 
     jolt_api::jolt_api(const jolt_config& p_config,

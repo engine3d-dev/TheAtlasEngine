@@ -9,81 +9,12 @@
 
 namespace atlas::physics {
 
-    /**
-     *  @name Collider Shape
-     *  @brief Required in order for collision types to be synced with jolts
-     * shape filters
-     */
-    enum class collider_shape : uint8_t {
-        Box,
-        Sphere,
-        Capsule,
+    enum thread_type : uint8_t {
+        default_system = 0,
+        job_system = 1,
     };
 
-    enum thread_system : uint8_t {
-        Default = 0,
-        JobSystem = 1,
-    };
-
-    /**
-     * @name Collider Body
-     * @brief Some of this data is not required depending on the shape
-     *
-     * @remark If there is a way to hide or disable certains action in the
-     * editor depending on the collider_shape, it would be good to do so in
-     * this circumstance.
-     */
-
-    struct collider_body {
-        bool collision_enabled = true;
-
-        collider_shape shape_type = collider_shape::Box;
-
-        glm::vec3 half_extents = glm::vec3(0.5f);
-        float radius = 0.5f;
-        float capsule_half_height = 0.5f;
-
-        // The id of the actuall JPH physics body
-        uint32_t body_id = 0;
-    };
-
-    enum body_type : uint8_t { Static = 0, Kenmatic = 1, Dynamic = 2, BodyNum };
-
-    enum body_layer : uint8_t { NonMoving = 0, Moving = 1, LayerNum };
-
-    /**
-     * @name Physics Body
-     * @brief These are one time use calls. They are made to develop settings
-     * for rigid bodies.
-     *
-     * @warning Some of these values should be read only. Meaning it might be
-     * good to think about a read only version of imgui types.
-     */
-    struct physics_body {
-        glm::vec3 linear_velocity = glm::vec3(0.0);
-        glm::vec3 angular_velocity = glm::vec3(0.0f);
-
-        glm::vec3 cumulative_force = glm::vec3(0.0);
-        glm::vec3 cumulative_torque = glm::vec3(0.0);
-
-        float mass_factor = 1.0f;
-        glm::vec3 center_mass_position = glm::vec3(0.0);
-        float linear_damping = 0.0f;
-        float angular_damping = 0.0f;
-
-        bool use_gravity = true;
-        float gravity_factor = 1.0f;
-
-        uint8_t body_type = 2;
-        float friction = 0.8f;
-        float restitution = 0.2f;
-
-        uint8_t body_movement_type = body_type::Static;
-        uint8_t body_layer_type = body_layer::Moving;
-
-        uint32_t body_id = 0;
-        int count = 0;
-    };
+    // enum body_layer : uint8_t { NonMoving = 0, Moving = 1, LayerNum };
 
     /**
      * @brief This is a replacement for an event system to handle collider.
@@ -103,10 +34,10 @@ namespace atlas::physics {
 //! how friction should work. Or have a way for users to override these
 //! functions. Do not delete for it will be needed in the near furture.
 enum combine_friction : uint8_t {
-    FrictionDefualt = 0,
-    FrictionMax = 1,
-    FrictionMin = 2,
-    FrictionNumTypes = 3,
+    friction_default = 0,
+    friction_max = 1,
+    friction_min = 2,
+    friction_num = 3,
 };
 
 //! @brief Created for future use of dynamic physics material
@@ -114,10 +45,10 @@ enum combine_friction : uint8_t {
 //! is required by the basic jolt system. However, disccussion need to be made
 //! about how we allow users to overwrite resititution.
 enum combine_restitution : uint8_t {
-    RestitutionDefualt = 0,
-    RestitutionMax = 1,
-    RestitutionMin = 2,
-    RestitutionNumTypes = 3,
+    restitution_default = 0,
+    restitution_max = 1,
+    restitution_min = 2,
+    restitution_num = 3,
 };
 
 namespace atlas::physics {
@@ -133,12 +64,12 @@ namespace atlas::physics {
 
         // Friction Setting
         // This needs to be set to a function which makes it harder
-        combine_friction friction_type = combine_friction::FrictionDefualt;
+        combine_friction friction_type = combine_friction::friction_default;
 
         // Restitution Settings
         // Same thing need functions for each.
         combine_restitution restitution_type =
-          combine_restitution::RestitutionDefualt;
+          combine_restitution::restitution_default;
 
         //! @brief In seconds
         float time_before_sleep = 5.0f;
@@ -176,7 +107,7 @@ namespace atlas::physics {
         unsigned int allocation_amount = 10 * 1024 * 1024;
 
         // For job system
-        thread_system thread_type = Default;
+        thread_type thread_type = thread_type::default_system;
 
         uint32_t physics_threads =
           std::max(1u, std::thread::hardware_concurrency() - 2);
