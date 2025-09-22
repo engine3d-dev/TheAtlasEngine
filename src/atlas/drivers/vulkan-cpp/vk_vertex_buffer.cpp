@@ -6,8 +6,7 @@
 
 namespace atlas::vk {
 
-    vk_vertex_buffer::vk_vertex_buffer(
-      std::span<vertex_input> p_vertices) {
+    vk_vertex_buffer::vk_vertex_buffer(std::span<vertex_input> p_vertices) {
         m_driver = vk_context::driver_context();
         m_vertices_count = p_vertices.size();
         m_vertices_byte_size_count = p_vertices.size_bytes();
