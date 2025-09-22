@@ -226,7 +226,7 @@ namespace atlas::vk {
 
             caching.each([this, material_layout](flecs::entity p_entity) {
                 // std::string name = std::string(p_entity.name().c_str());
-				uint32_t entity_id = p_entity.id();
+                uint32_t entity_id = p_entity.id();
                 const material* target = p_entity.get<material>();
 
                 //! @brief My attempt at loading meshes asynchronously and
@@ -242,7 +242,8 @@ namespace atlas::vk {
 
                     m_cached_meshes[entity_id].initialize_uniforms(
                       sizeof(material_uniform));
-                    m_cached_meshes[entity_id].add_texture(target->texture_path);
+                    m_cached_meshes[entity_id].add_texture(
+                      target->texture_path);
 
                     // m_geometry_descriptor[entity_id] =
                     //   descriptor_set(1, material_layout);
@@ -259,7 +260,8 @@ namespace atlas::vk {
                     //   m_cached_meshes[entity_id].read_textures());
 
                     m_mesh_descriptors[entity_id]["materials"].update(
-                      material_uniforms, m_cached_meshes[entity_id].read_textures());
+                      material_uniforms,
+                      m_cached_meshes[entity_id].read_textures());
 
                     // m_geometry_descriptor_layout.push_back(
                     //   m_geometry_descriptor[entity_id].get_layout());
@@ -376,7 +378,7 @@ namespace atlas::vk {
             };
 
             // std::string entity_name = std::string(p_entity.name().c_str());
-			uint32_t entity_id = p_entity.id();
+            uint32_t entity_id = p_entity.id();
             if (m_cached_meshes[entity_id].loaded()) {
                 m_cached_meshes[entity_id].update_uniform(mesh_material_ubo);
 

@@ -32,7 +32,7 @@ namespace atlas {
         // camera_controller, etc.
         template<typename T, typename... Args>
         strong_ref<scene_object> acquire_object(Args&&... args) {
-			static_assert(std::is_base_of_v<scene_scope, T>,
+            static_assert(std::is_base_of_v<scene_scope, T>,
                           "invalid scene_object not inherited with base class "
                           "being scene_object");
             return create_strong_ref<scene_object>(m_allocator,
@@ -50,13 +50,9 @@ namespace atlas {
               m_allocator, &m_registry, p_name, false);
         }
 
-		bool defer_begin() {
-			return m_registry.defer_begin();
-		}
+        bool defer_begin() { return m_registry.defer_begin(); }
 
-		bool defer_end() {
-			return m_registry.defer_end();
-		}
+        bool defer_end() { return m_registry.defer_end(); }
 
         virtual ~scene_scope() = default;
 
@@ -69,6 +65,6 @@ namespace atlas {
     private:
         std::pmr::polymorphic_allocator<> m_allocator;
         world m_registry;
-		std::string m_name;
+        std::string m_name;
     };
 }; // namespace atlas

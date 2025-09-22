@@ -175,8 +175,7 @@ namespace atlas::vk {
     }
 
     //
-    void write(const vk_buffer& p_buffer,
-               std::span<vertex_input> p_in_buffer) {
+    void write(const vk_buffer& p_buffer, std::span<vertex_input> p_in_buffer) {
         VkDeviceSize buffer_size =
           p_in_buffer
             .size_bytes(); // does equivalent to doing sizeof(p_in_buffer[0]) *
@@ -190,8 +189,7 @@ namespace atlas::vk {
         vkUnmapMemory(driver, p_buffer.device_memory);
     }
 
-    void write(const vk_buffer& p_buffer,
-               std::span<uint32_t> p_in_buffer) {
+    void write(const vk_buffer& p_buffer, std::span<uint32_t> p_in_buffer) {
         VkDeviceSize buffer_size = p_in_buffer.size_bytes();
         VkDevice driver = vk_context::driver_context();
         void* mapped = nullptr;
