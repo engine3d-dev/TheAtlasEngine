@@ -1,6 +1,6 @@
-#include <physics/jolt-cpp/jolt_components.hpp>
-#include <physics/jolt-cpp/jolt_collision_manager.hpp>
-#include <physics/jolt-cpp/jolt_collision.hpp>
+#include <drivers/jolt-cpp/jolt_components.hpp>
+#include <drivers/jolt-cpp/jolt_collision_manager.hpp>
+#include <drivers/jolt-cpp/jolt_collision.hpp>
 
 #include <core/scene/world.hpp>
 #include <core/system/registry.hpp>

@@ -12,7 +12,7 @@
 #include <core/scene/scene.hpp>
 
 #include <physics/physics_3d/jolt/jolt_helper.hpp>
-#include <physics/jolt-cpp/jolt_components.hpp>
+#include <drivers/jolt-cpp/jolt_components.hpp>
 #include <physics/physics_3d/physics.hpp>
 
 namespace atlas {

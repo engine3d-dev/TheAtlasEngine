@@ -1,7 +1,7 @@
 #include "level_scene.hpp"
 #include <core/common.hpp>
 #include <core/application.hpp>
-#include <physics/jolt-cpp/jolt_components.hpp>
+#include <drivers/jolt-cpp/jolt_components.hpp>
 #include <physics/physics_3d/physics.hpp>
 
 level_scene::level_scene(const std::string& p_name)

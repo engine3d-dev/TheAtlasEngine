@@ -2,7 +2,7 @@
 #include <glm/glm.hpp>
 #include <yaml-cpp/yaml.h>
 #include <core/scene/components.hpp>
-#include <physics/jolt-cpp/jolt_components.hpp>
+#include <drivers/jolt-cpp/jolt_components.hpp>
 
 namespace YAML {
     template<>

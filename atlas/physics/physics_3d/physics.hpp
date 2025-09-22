@@ -1,7 +1,7 @@
 #pragma once
 
 #include <physics/physics_3d/physics_engine.hpp>
-#include <physics/jolt-cpp/jolt_components.hpp>
+#include <drivers/jolt-cpp/jolt_components.hpp>
 #include <core/scene/scene_object.hpp>
 
 namespace atlas::physics {

@@ -2,7 +2,7 @@
 
 #include <Jolt/Jolt.h>
 #include <Jolt/Physics/Collision/ContactListener.h>
-#include <physics/jolt-cpp/jolt_components.hpp>
+#include <drivers/jolt-cpp/jolt_components.hpp>
 #include <core/scene/scene.hpp>
 
 namespace atlas::physics {

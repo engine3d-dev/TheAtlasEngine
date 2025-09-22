@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include <physics/jolt-cpp/jolt_collision.hpp>
+#include <drivers/jolt-cpp/jolt_collision.hpp>
 namespace atlas::physics {
 
     /**
@@ -14,6 +14,7 @@ namespace atlas::physics {
     class jolt_collision_manager {
     public:
         jolt_collision_manager() = default;
+        // jolt_collision_manager(const std::string& p_name);
 
         /**
          * @brief Creates all the neccessary starting components for collisions

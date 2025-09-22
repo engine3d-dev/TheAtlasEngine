@@ -1,9 +1,9 @@
 #include <engine_logger.hpp>
 #include <Jolt/Jolt.h>
 #include <Jolt/Physics/Body/Body.h>
-#include <physics/jolt-cpp/jolt_contact_listener.hpp>
-#include <physics/jolt-cpp/jolt_components.hpp>
-#include <physics/jolt-cpp/jolt_collision_manager.hpp>
+#include <drivers/jolt-cpp/jolt_contact_listener.hpp>
+#include <drivers/jolt-cpp/jolt_components.hpp>
+#include <drivers/jolt-cpp/jolt_collision_manager.hpp>
 
 #include <flecs.h>
 

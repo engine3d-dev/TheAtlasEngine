@@ -3,7 +3,7 @@
 #include <flecs.h>
 #include <physics/physics_3d/physics_api.hpp>
 #include <scene/components.hpp>
-#include <physics/jolt-cpp/jolt_components.hpp>
+#include <drivers/jolt-cpp/jolt_components.hpp>
 
 /**
  * @brief This is the how the user is able to call functions relating to jolt.

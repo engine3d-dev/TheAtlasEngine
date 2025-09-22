@@ -1,6 +1,6 @@
 #include <physics/physics_scene.hpp>
-#include <physics/jolt-cpp/helper_functions.hpp>
-#include <physics/jolt-cpp/jolt_api.hpp>
+#include <drivers/jolt-cpp/helper_functions.hpp>
+#include <drivers/jolt-cpp/jolt_api.hpp>
 
 namespace atlas::physics {
     physics_scene::physics_scene(const scene_scope* p_current_scene_ctx) {

@@ -1,10 +1,10 @@
 #pragma once
 
-#include <physics/jolt-cpp/jolt_contact_listener.hpp>
+#include <drivers/jolt-cpp/jolt_contact_listener.hpp>
 #include <core/core.hpp>
 
 #include <physics/physics_3d/physics_context.hpp>
-#include <physics/jolt-cpp/jolt_components.hpp>
+#include <drivers/jolt-cpp/jolt_components.hpp>
 #include <physics/physics_3d/jolt/interface/jolt_broad_phase.hpp>
 
 namespace atlas::physics {

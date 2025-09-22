@@ -1,8 +1,8 @@
 #pragma once
 
 #include <core/scene/scene.hpp>
-#include <physics/jolt-cpp/jolt_contact_listener.hpp>
-#include <physics/jolt-cpp/jolt_components.hpp>
+#include <drivers/jolt-cpp/jolt_contact_listener.hpp>
+#include <drivers/jolt-cpp/jolt_components.hpp>
 namespace atlas::physics {
     /**
      * @brief This is the collision api. It allows users to create children of
