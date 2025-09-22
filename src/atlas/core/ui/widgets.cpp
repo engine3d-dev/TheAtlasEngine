@@ -221,14 +221,9 @@ namespace atlas::ui {
     }
 
     void draw_input_text(std::string& p_value) {
-        // @context Camera0
-        // char buffer[256];
-
-        // To make null terminated.
-        // memset(buffer, 0, sizeof(buffer));
-        // strcpy_s(buffer, p_value.c_str());
-        std::string value="";
-        if (ImGui::InputText("##Tag", value.data(), (sizeof(char) * value.size()))) {
+        std::string value = "";
+        if (ImGui::InputText(
+              "##Tag", value.data(), (sizeof(char) * value.size()))) {
             p_value = value;
         }
     }
