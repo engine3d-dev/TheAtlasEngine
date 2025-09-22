@@ -43,10 +43,10 @@ set(
     ${SRC_DIR}/physics/physics_3d/physics_context.cpp
     ${SRC_DIR}/physics/physics_3d/physics.cpp
 
-    ${SRC_DIR}/physics/jolt-cpp/jolt_collision_manager.cpp
-    ${SRC_DIR}/physics/jolt-cpp/jolt_collision.cpp
-    ${SRC_DIR}/physics/jolt-cpp/jolt_contact_listener.cpp
-    ${SRC_DIR}/physics/jolt-cpp/jolt_error_handler.cpp
+    ${SRC_DIR}/drivers/jolt-cpp/jolt_collision_manager.cpp
+    ${SRC_DIR}/drivers/jolt-cpp/jolt_collision.cpp
+    ${SRC_DIR}/drivers/jolt-cpp/jolt_contact_listener.cpp
+    ${SRC_DIR}/drivers/jolt-cpp/jolt_error_handler.cpp
 
     # Scene stuff
     ${SRC_DIR}/core/scene/world.cpp
