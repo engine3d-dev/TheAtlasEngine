@@ -57,14 +57,14 @@ level_scene::level_scene(const std::string& p_name)
       .texture_path = "assets/models/container_diffuse.png",
     });
 
-	m_robot_model->set<atlas::physics::collider_body>({
-		.shape_type = atlas::physics::collider_shape::Box,
-		.half_extents = {1.f, 1.f, 1.f},
-	});
-	m_robot_model->set<atlas::physics::physics_body>({
-		// .restitution = 1.25f,
-		.body_movement_type = atlas::physics::Dynamic,
-	});
+    m_robot_model->set<atlas::physics::collider_body>({
+      .shape_type = atlas::physics::collider_shape::Box,
+      .half_extents = { 1.f, 1.f, 1.f },
+    });
+    m_robot_model->set<atlas::physics::physics_body>({
+      // .restitution = 1.25f,
+      .body_movement_type = atlas::physics::Dynamic,
+    });
 
     m_child_object = create_object("Child");
     m_child_object->child_of(m_robot_model);
@@ -74,11 +74,11 @@ level_scene::level_scene(const std::string& p_name)
     m_platform->set<atlas::transform>({
       .scale = { 15.f, 0.30f, 10.0f },
     });
-	m_platform->set<atlas::physics::collider_body>({
-		.shape_type = atlas::physics::collider_shape::Box,
-        .half_extents = {15.f, 0.30f, 10.0f},
-		// .radius = 1.f,
-		// .half_extents = {15.f, -0.30f, 10.0f}
+    m_platform->set<atlas::physics::collider_body>({
+      .shape_type = atlas::physics::collider_shape::Box,
+      .half_extents = { 15.f, 0.30f, 10.0f },
+      // .radius = 1.f,
+      // .half_extents = {15.f, -0.30f, 10.0f}
     });
 
     m_platform->set<atlas::material>({
@@ -86,43 +86,51 @@ level_scene::level_scene(const std::string& p_name)
       .texture_path = "assets/models/wood.png",
     });
 
-
-	// Initiating physics system
-    // Note: Each flecs::world would contain their own respective data of atlas::physics::settings
-    // NOTE: atlas::physics::jolt_settings should not be directly from the application
-    // atlas::physics::jolt_settings is essentially the parameters to initialize JoltPhysics directly.
-    // Consider: This might be considered in a developers settings or so.
-    m_physics_object_representation_of_settings = create_object("Physics Settings");
+    // Initiating physics system
+    // Note: Each flecs::world would contain their own respective data of
+    // atlas::physics::settings NOTE: atlas::physics::jolt_settings should not
+    // be directly from the application atlas::physics::jolt_settings is
+    // essentially the parameters to initialize JoltPhysics directly. Consider:
+    // This might be considered in a developers settings or so.
+    m_physics_object_representation_of_settings =
+      create_object("Physics Settings");
     // settings is for pre-runtime before runtime gets invoked
-    m_physics_object_representation_of_settings->set<atlas::physics::jolt_settings>({});
+    m_physics_object_representation_of_settings
+      ->set<atlas::physics::jolt_settings>({});
 
     // config is for runtime
-    // change atlas::physics::jolt_config to atlas::physics::environment_settings
-    // atlas::physics::jolt_config is the global configuration that gets applied when physics runtime initiates and executes
-    m_physics_object_representation_of_settings->set<atlas::physics::jolt_config>({});
+    // change atlas::physics::jolt_config to
+    // atlas::physics::environment_settings atlas::physics::jolt_config is the
+    // global configuration that gets applied when physics runtime initiates and
+    // executes
+    m_physics_object_representation_of_settings
+      ->set<atlas::physics::jolt_config>({});
 
     atlas::register_start(this, &level_scene::start);
-	atlas::register_physics(this, &level_scene::physics_update);
+    atlas::register_physics(this, &level_scene::physics_update);
     atlas::register_update(this, &level_scene::on_update);
     atlas::register_ui(this, &level_scene::on_ui_update);
 }
 
-void level_scene::runtime_start() {
-	// runs the physics simulation
+void
+level_scene::runtime_start() {
+    // runs the physics simulation
     m_physics_is_runtime = true;
 
     m_physics_engine_handler->start_runtime();
 }
 
-void level_scene::runtime_stop() {
-	m_physics_is_runtime = false;
+void
+level_scene::runtime_stop() {
+    m_physics_is_runtime = false;
 
     m_physics_engine_handler->stop_runtime();
 
     reset_objects();
 }
 
-void level_scene::reset_objects() {
+void
+level_scene::reset_objects() {
 
     m_viking_room->set<atlas::transform>({
       .position = { -2.70f, 2.70, -8.30f },
@@ -142,7 +150,6 @@ void level_scene::reset_objects() {
     m_platform->set<atlas::transform>({
       .scale = { 15.f, -0.30f, 10.0f },
     });
-
 }
 
 void
@@ -411,8 +418,11 @@ level_scene::start() {
         console_log_error("Could not load yaml file LevelScene!!!");
     }
 
-	// Now we instantiate the physics engine itself
-    m_physics_engine_handler = atlas::physics::initialize_engine(m_physics_system_allocator, m_physics_object_representation_of_settings, *this);
+    // Now we instantiate the physics engine itself
+    m_physics_engine_handler = atlas::physics::initialize_engine(
+      m_physics_system_allocator,
+      m_physics_object_representation_of_settings,
+      *this);
 
     // Note -- just added for temporary
     // ImGuiIO io = ImGui::GetIO();
@@ -483,16 +493,15 @@ level_scene::on_update() {
 
           p_transform.set_rotation(p_transform.rotation);
       });
-
 }
 
-
-void level_scene::physics_update() {
-	if (atlas::event::is_key_pressed(key_r) and !m_physics_is_runtime) {
+void
+level_scene::physics_update() {
+    if (atlas::event::is_key_pressed(key_r) and !m_physics_is_runtime) {
         runtime_start();
     }
 
-    if(m_physics_is_runtime) {
+    if (m_physics_is_runtime) {
         m_physics_engine_handler->physics_step();
         m_physics_engine_handler->run_contact_add();
     }
