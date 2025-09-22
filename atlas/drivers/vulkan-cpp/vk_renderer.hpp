@@ -77,7 +77,7 @@ namespace atlas::vk {
         // that entity is there. It is for this vk_renderer to manage
         // std::string = the name of the entity
         // mesh = corresponding to the entity that is being loaded
-        std::map<std::string, mesh> m_cached_meshes;
+        std::map<uint32_t, mesh> m_cached_meshes;
 
         // std::string = entity name
         // descriptor_set for now will represent the material descriptor set
@@ -94,7 +94,7 @@ namespace atlas::vk {
          *
          * This is grouping the resources that correspond to a specific mesh
          */
-        std::map<std::string, std::map<std::string, descriptor_set>>
+        std::map<uint32_t, std::map<std::string, descriptor_set>>
           m_mesh_descriptors;
         descriptor_set_layout m_material_descriptor_layout;
 

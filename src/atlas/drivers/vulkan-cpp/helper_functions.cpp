@@ -942,7 +942,7 @@ namespace atlas::vk {
 
     VkPresentModeKHR select_compatible_present_mode(
       const VkPresentModeKHR& p_request,
-      const std::span<VkPresentModeKHR>& p_modes) {
+      std::span<VkPresentModeKHR> p_modes) {
         for (const auto& mode : p_modes) {
             if (mode == p_request) {
                 return mode;

@@ -48,6 +48,7 @@ class AtlasRecipe(ConanFile):
         self.requires("nfd/1.0")
         self.requires("watcher/0.12.0")
         self.requires("boost-ext-ut/2.1.0")
+        self.requires("vulkan-cpp/1.0")
     
     def export_sources(self):
         copy(self,"CMakeLists.txt", self.recipe_folder, self.export_sources_folder)

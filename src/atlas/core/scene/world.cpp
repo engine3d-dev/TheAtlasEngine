@@ -5,12 +5,7 @@
 namespace atlas {
 
     world_scope::world_scope(const std::string& p_name)
-      : m_name(p_name) {
-        console_log_info("world_scope::world_scope(std::string p_tag) = {}",
-                         m_name);
-        console_log_fatal(
-          "Just registered world using system_registry::register_to(this)");
-    }
+      : m_name(p_name) {}
 
     world_scope::~world_scope() {
         console_log_trace("~world_scope called!!!");
@@ -22,6 +17,6 @@ namespace atlas {
      * created-scenes be done through world_scope
      */
     void world_scope::add_scene(const ref<scene_scope>& p_scene_context) {
-        m_scene_container.emplace(p_scene_context->get_tag(), p_scene_context);
+        m_scene_container.emplace(p_scene_context->name(), p_scene_context);
     }
 };

@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <filesystem>
 
 namespace atlas::filesystem {
     /**
@@ -8,7 +9,11 @@ namespace atlas::filesystem {
      * @example passing "obj;jpg" will only allow to select these files with
      * those extensions
      */
-    std::string load_from_file_dialog(const std::string& p_filter);
+    std::string load_from_file_dialog(
+      const std::string& p_filter,
+      const std::filesystem::path& p_default_path = "assets/models");
 
-    std::string save_to_file(const std::string& p_filter);
+    std::string save_to_file(
+      const std::string& p_filter,
+      const std::filesystem::path& p_default_path = "assets/models");
 }; // namespace atlas::filesystem
