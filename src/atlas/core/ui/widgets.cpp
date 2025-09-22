@@ -226,7 +226,7 @@ namespace atlas::ui {
 
         // To make null terminated.
         memset(buffer, 0, sizeof(buffer));
-        strcpy_s(buffer, p_value.c_str());
+        strcpy(buffer, p_value.c_str());
 
         if (ImGui::InputText("##Tag", buffer, sizeof(buffer))) {
             p_value = std::string(buffer);
@@ -239,7 +239,7 @@ namespace atlas::ui {
 
         // To make null terminated.
         memset(buffer, 0, sizeof(buffer));
-        strcpy_s(buffer, p_value.c_str());
+        strcpy(buffer, p_value.c_str());
 
         ImGui::Text("%s", p_value.data());
     }
