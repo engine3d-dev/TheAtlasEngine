@@ -49,7 +49,7 @@ namespace atlas::vk {
     }
 
     static VkShaderModule create_shader_module(
-      const std::span<uint32_t>& p_binary_blob) {
+      std::span<uint32_t> p_binary_blob) {
         VkDevice driver = vk_context::driver_context();
 
         VkShaderModuleCreateInfo shader_module_ci = {
@@ -68,8 +68,7 @@ namespace atlas::vk {
         return shader_module;
     }
 
-    static VkShaderModule create_shader_module(
-      const std::span<char>& p_binary_blob) {
+    static VkShaderModule create_shader_module(std::span<char> p_binary_blob) {
         VkDevice driver = vk_context::driver_context();
 
         VkShaderModuleCreateInfo shader_module_ci = {
@@ -195,8 +194,7 @@ namespace atlas::vk {
         compile();
     }
 
-    vk_shader_group::vk_shader_group(
-      const std::span<shader_info>& p_shader_sources)
+    vk_shader_group::vk_shader_group(std::span<shader_info> p_shader_sources)
       : m_shader_sources(p_shader_sources.begin(), p_shader_sources.end()) {
         m_driver = vk_context::driver_context();
         compile();
@@ -265,20 +263,20 @@ namespace atlas::vk {
     }
 
     void vk_shader_group::set_vertex_attributes(
-      const std::span<VkVertexInputAttributeDescription>& p_attributes) {
+      std::span<VkVertexInputAttributeDescription> p_attributes) {
         m_vertex_attributes = std::vector<VkVertexInputAttributeDescription>(
           p_attributes.begin(), p_attributes.end());
     }
 
     void vk_shader_group::set_vertex_bind_attributes(
-      const std::span<VkVertexInputBindingDescription>& p_bind_attributes) {
+      std::span<VkVertexInputBindingDescription> p_bind_attributes) {
         m_vertex_binding_attributes =
           std::vector<VkVertexInputBindingDescription>(
             p_bind_attributes.begin(), p_bind_attributes.end());
     }
 
     void vk_shader_group::vertex_attributes(
-      const std::span<vertex_attribute>& p_vertex_attributes) {
+      std::span<vertex_attribute> p_vertex_attributes) {
         // Loading up the vertex binding attributes
         // Vertex binding attributes can be a binding point for specific vertex
         // attribute data

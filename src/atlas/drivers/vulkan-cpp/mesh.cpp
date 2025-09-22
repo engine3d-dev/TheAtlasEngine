@@ -10,8 +10,8 @@
 #include <drivers/vulkan-cpp/hash.hpp>
 
 namespace atlas::vk {
-    mesh::mesh(const std::span<vertex_input>& p_vertices,
-               const std::span<uint32_t>& p_indices) {
+    mesh::mesh(std::span<vertex_input> p_vertices,
+               std::span<uint32_t> p_indices) {
         m_vbo = vk_vertex_buffer(p_vertices);
         m_ibo = vk_index_buffer(p_indices);
     }

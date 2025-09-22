@@ -220,6 +220,18 @@ namespace atlas::ui {
         ImGui::PopID();
     }
 
+    void draw_input_text(std::string& p_value) {
+        std::string value = "";
+        if (ImGui::InputText(
+              "##Tag", value.data(), (sizeof(char) * value.size()))) {
+            p_value = value;
+        }
+    }
+
+    void draw_text(const std::string& p_value) {
+        ImGui::Text("%s", p_value.data());
+    }
+
     void dockspace_window(GLFWwindow* p_window) {
 
         bool dockspace_open = true;

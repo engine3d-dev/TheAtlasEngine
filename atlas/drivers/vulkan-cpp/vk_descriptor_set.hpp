@@ -65,12 +65,12 @@ namespace atlas::vk {
         }
 
         //! @brief Updating descriptors with uniforms/textures specified
-        void update(const std::span<vk_uniform_buffer>& p_uniforms,
-                    const std::span<texture>& p_textures);
+        void update(std::span<vk_uniform_buffer> p_uniforms,
+                    std::span<texture> p_textures);
 
-        void update(const std::span<vk_uniform_buffer>& p_uniforms);
+        void update(std::span<vk_uniform_buffer> p_uniforms);
 
-        // void update(const std::span<write_descriptors>& p_descriptors);
+        // void update(std::span<write_descriptors> p_descriptors);
         // void update(const vk_uniform_buffer& p_uniforms);
 
         void destroy();

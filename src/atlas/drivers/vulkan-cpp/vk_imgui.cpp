@@ -43,10 +43,6 @@ namespace atlas::vk {
           ImVec4{ 0.1f, 0.150f, 0.951f, 1.0f };
     }
 
-    // imgui_context::imgui_context(
-    //   GLFWwindow* p_window_handler,
-    //   const vk_swapchain& p_current_swapchain_handler,
-    //   const VkRenderPass& p_current_renderpass) {
     imgui_context::imgui_context(const ref<window>& p_window_ctx) {
         m_instance = vk_context::handler();
         m_physical = vk_context::physical_driver();

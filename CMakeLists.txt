@@ -3,8 +3,8 @@ project(atlas C CXX)
 set(ENGINE_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/atlas)
 
 # TODO: Remove this once shaderc in the github CI is fixed
-option(USE_SHADERC "[ENGINE] Enabling shaderc" OFF)
-option(ENABLE_TESTS_ONLY "[ENGINE] Enabling unit testing" OFF)
+option(USE_SHADERC "[${PROJECT_NAME}] Enabling shaderc" OFF)
+option(ENABLE_TESTS_ONLY "[${PROJECT_NAME}] Enabling unit testing" OFF)
 
 # USE_SHADERC is set in the conanfile.py with `-o enable_shaderc=True`
 # CI fails when trying to compile with 
@@ -28,14 +28,10 @@ endif()
 build_core_library(
     DIRECTORIES src
 
-    # This is to enable us to control if we want to run test cases or not
     ENABLE_TESTS ${ENABLE_TESTS_ONLY}
 
     UNIT_TEST_SOURCES
 
-    # Another issue that can occur with this
-    # Is what if we receive -1073741819?
-    # This means that either memory corruption, some invalid memory access is happening within the test cases
     tests/main.test.cpp
     tests/basic_add.test.cpp
     tests/entity_component_system.test.cpp
@@ -51,6 +47,7 @@ build_core_library(
     # shaderc # uncomment to use shaderc
     ${SHADERC_PACKAGE}
     watcher
+    vulkan-cpp
 
     LINK_PACKAGES
     tinyobjloader::tinyobjloader
@@ -58,6 +55,7 @@ build_core_library(
     # shaderc::shaderc # uncomment to use shaderc
     ${SHADERC_LINK_PACKAGE}
     watcher::watcher
+    vulkan-cpp::vulkan-cpp
 )
 
 install(TARGETS ${PROJECT_NAME})

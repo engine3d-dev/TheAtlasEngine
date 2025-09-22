@@ -1,7 +1,8 @@
 /*
-    Copied from https://github.com/libhal/libhal/blob/main/include/libhal/pointers.hpp
+    Copied from
+   https://github.com/libhal/libhal/blob/main/include/libhal/pointers.hpp
 
-    [atlas] modifications 
+    [atlas] modifications
     1.) File renamed to memory
     2.) In the atlas:: namespace.
 */

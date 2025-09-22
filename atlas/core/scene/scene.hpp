@@ -3,6 +3,7 @@
 #include <core/engine_logger.hpp>
 #include <core/scene/scene_object.hpp>
 #include <string>
+#include <core/scene/types.hpp>
 
 namespace atlas {
 
@@ -17,21 +18,25 @@ namespace atlas {
     class scene_scope {
     public:
         scene_scope() = default;
-        scene_scope(const std::string& p_tag)
-          : m_tag(p_tag) {}
+        scene_scope(const std::string& p_name)
+          : m_name(p_name) {}
 
         strong_ref<scene_object> create_object(const std::string& p_tag) {
             return create_strong_ref<scene_object>(
-              m_object_allocator, &m_registry, p_tag);
+              m_allocator, &m_registry, p_tag);
         }
 
-        template<typename T>
-        strong_ref<scene_object> create_custom_object(
-          const std::string& p_tag) {
+        // TODO -- come back to this
+        // The idea behind this is to acquire a custom object that can be
+        // defined by the application-side Such as character_controller,
+        // camera_controller, etc.
+        template<typename T, typename... Args>
+        strong_ref<scene_object> acquire_object(Args&&... args) {
             static_assert(std::is_base_of_v<scene_scope, T>,
                           "invalid scene_object not inherited with base class "
                           "being scene_object");
-            return create_strong_ref<T>(m_object_allocator, p_tag);
+            return create_strong_ref<scene_object>(m_allocator,
+                                                   std::forward<T>(args...));
         }
 
         template<typename... Comps, typename... Args>
@@ -40,17 +45,26 @@ namespace atlas {
                                                   std::forward(args)...);
         }
 
+        strong_ref<scene_object> search_entity(const std::string& p_name) {
+            return memory::make_strong_ptr<scene_object>(
+              m_allocator, &m_registry, p_name, false);
+        }
+
+        bool defer_begin() { return m_registry.defer_begin(); }
+
+        bool defer_end() { return m_registry.defer_end(); }
+
         virtual ~scene_scope() = default;
 
-        std::string get_tag() { return m_tag; }
+        [[nodiscard]] std::string name() const { return m_name; }
 
         // It's required that the flecs::world is returned by reference
         // This prevents corruption onto the flecs::world object
-        operator flecs::world&() { return m_registry; }
+        operator world&() { return m_registry; }
 
     private:
-        std::pmr::polymorphic_allocator<> m_object_allocator;
-        flecs::world m_registry;
-        std::string m_tag = "Undefined Tag";
+        std::pmr::polymorphic_allocator<> m_allocator;
+        world m_registry;
+        std::string m_name;
     };
 }; // namespace atlas
