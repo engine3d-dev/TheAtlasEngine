@@ -2,7 +2,7 @@
 #include <glm/glm.hpp>
 
 namespace atlas {
-    
+
     //! @brief converts vec4 to quaterion
     glm::quat to_quat(const glm::vec4& p_values);
 

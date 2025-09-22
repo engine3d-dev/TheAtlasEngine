@@ -12,7 +12,7 @@ namespace atlas {
         std::string name = "Undefined";
         uint32_t width = 0;
         uint32_t height = 0;
-        glm::vec4 background_color={1.f, 0.5f, 0.5f, 1.f};
+        glm::vec4 background_color = { 1.f, 0.5f, 0.5f, 1.f };
     };
 
     class application {
@@ -54,7 +54,7 @@ namespace atlas {
 
     private:
         serializer m_post_serializer_test;
-        float m_delta_time=0.f;
+        float m_delta_time = 0.f;
         ref<window> m_window;
         scope<renderer> m_renderer = nullptr;
         glm::mat4 m_proj_view;

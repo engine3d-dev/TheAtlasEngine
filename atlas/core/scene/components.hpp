@@ -94,7 +94,7 @@ namespace atlas {
     //! either flecs::system or tags to handle specific querying of entities
     // Example Usage: add<flecs::pair<tag::editor, atlas::transform>>();
     namespace tag {
-        
+
         //! @brief to indicate which entities are editor-only
         struct editor {};
 

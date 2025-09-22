@@ -40,14 +40,12 @@ namespace atlas::vk {
      * @brief Maps buffer handler to chunk of data of type, that is
      * std::span<uint32_t>.
      */
-    void write(const vk_buffer& p_buffer,
-               std::span<uint32_t> p_in_buffer);
+    void write(const vk_buffer& p_buffer, std::span<uint32_t> p_in_buffer);
 
     /**
      * @brief Maps buffer handler to data chunks that contain vertices
      */
-    void write(const vk_buffer& p_buffer,
-               std::span<vertex_input> p_in_buffer);
+    void write(const vk_buffer& p_buffer, std::span<vertex_input> p_in_buffer);
 
     /**
      * @name transition_image_layout

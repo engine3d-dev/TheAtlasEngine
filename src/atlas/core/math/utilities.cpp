@@ -11,11 +11,13 @@ namespace atlas {
           p_values.z,
         });
     }
-    
+
     glm::highp_vec4 from_quat(const glm::vec3& p_values) {
-        // converts glm::vec3 rotation to a quaternion returning the quaternion-converted values to glm::highp_vec4
+        // converts glm::vec3 rotation to a quaternion returning the
+        // quaternion-converted values to glm::highp_vec4
         auto quaternion = glm::quat(p_values);
-        return glm::vec4({ quaternion.x, quaternion.y, quaternion.z, quaternion.w });
+        return glm::vec4(
+          { quaternion.x, quaternion.y, quaternion.z, quaternion.w });
     }
 
     glm::quat to_quat(const glm::vec3& p_values) {

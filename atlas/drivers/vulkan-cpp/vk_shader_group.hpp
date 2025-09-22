@@ -36,8 +36,7 @@ namespace atlas::vk {
         void set_vertex_bind_attributes(
           std::span<VkVertexInputBindingDescription> p_bind_attributes);
 
-        void vertex_attributes(
-          std::span<vertex_attribute> p_vertex_attributes);
+        void vertex_attributes(std::span<vertex_attribute> p_vertex_attributes);
 
         //! @return span of vk_shader_module that contains the handler and stage
         //! this handler was loaded at

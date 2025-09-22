@@ -68,8 +68,7 @@ namespace atlas::vk {
         return shader_module;
     }
 
-    static VkShaderModule create_shader_module(
-      std::span<char> p_binary_blob) {
+    static VkShaderModule create_shader_module(std::span<char> p_binary_blob) {
         VkDevice driver = vk_context::driver_context();
 
         VkShaderModuleCreateInfo shader_module_ci = {
@@ -195,8 +194,7 @@ namespace atlas::vk {
         compile();
     }
 
-    vk_shader_group::vk_shader_group(
-      std::span<shader_info> p_shader_sources)
+    vk_shader_group::vk_shader_group(std::span<shader_info> p_shader_sources)
       : m_shader_sources(p_shader_sources.begin(), p_shader_sources.end()) {
         m_driver = vk_context::driver_context();
         compile();

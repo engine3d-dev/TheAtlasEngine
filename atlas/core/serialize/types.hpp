@@ -83,11 +83,13 @@ namespace YAML {
             return node;
         }
 
-        static bool decode(const Node& node, atlas::physics::collider_shape& rhs) {
+        static bool decode(const Node& node,
+                           atlas::physics::collider_shape& rhs) {
             if (!node.IsScalar()) {
                 return false;
             }
-            rhs = static_cast<atlas::physics::collider_shape>(node.as<uint8_t>());
+            rhs =
+              static_cast<atlas::physics::collider_shape>(node.as<uint8_t>());
             return true;
         }
     };
@@ -109,7 +111,7 @@ namespace YAML {
             return true;
         }
     };
-    
+
     // Specialization for body_layer enum
     template<>
     struct convert<atlas::physics::body_layer> {
@@ -153,7 +155,8 @@ namespace YAML {
             return node;
         }
 
-        static bool decode(const Node& node, atlas::physics::physics_body& rhs) {
+        static bool decode(const Node& node,
+                           atlas::physics::physics_body& rhs) {
             if (!node.IsMap()) {
                 return false;
             }
@@ -163,7 +166,8 @@ namespace YAML {
             rhs.cumulative_force = node["Cumulative Force"].as<glm::vec3>();
             rhs.cumulative_torque = node["Cumulative Torque"].as<glm::vec3>();
             rhs.mass_factor = node["Mass Factor"].as<float>();
-            rhs.center_mass_position = node["Center Mass Position"].as<glm::vec3>();
+            rhs.center_mass_position =
+              node["Center Mass Position"].as<glm::vec3>();
             rhs.use_gravity = node["Gravity Enabled"].as<bool>();
             rhs.gravity_factor = node["Gravity Factor"].as<float>();
             rhs.body_type = node["Body Type"].as<uint8_t>();
@@ -179,20 +183,28 @@ namespace YAML {
 };
 
 namespace atlas {
-    YAML::Emitter& operator<<(YAML::Emitter& p_out, const glm::highp_vec2& p_values);
+    YAML::Emitter& operator<<(YAML::Emitter& p_out,
+                              const glm::highp_vec2& p_values);
 
-    YAML::Emitter& operator<<(YAML::Emitter& p_out, const glm::highp_vec3& p_values);
+    YAML::Emitter& operator<<(YAML::Emitter& p_out,
+                              const glm::highp_vec3& p_values);
 
-    YAML::Emitter& operator<<(YAML::Emitter& p_out, const glm::highp_vec4& p_values);
+    YAML::Emitter& operator<<(YAML::Emitter& p_out,
+                              const glm::highp_vec4& p_values);
 
-    YAML::Emitter& operator<<(YAML::Emitter& p_output, const transform* p_transform);
+    YAML::Emitter& operator<<(YAML::Emitter& p_output,
+                              const transform* p_transform);
 
-    YAML::Emitter& operator<<(YAML::Emitter& p_output,  const perspective_camera* p_camera);
+    YAML::Emitter& operator<<(YAML::Emitter& p_output,
+                              const perspective_camera* p_camera);
 
-    YAML::Emitter& operator<<(YAML::Emitter& p_output,  const material* p_material);
+    YAML::Emitter& operator<<(YAML::Emitter& p_output,
+                              const material* p_material);
 
     // physics-based components
-    YAML::Emitter& operator<<(YAML::Emitter& p_output, const physics::collider_body* p_collider);
+    YAML::Emitter& operator<<(YAML::Emitter& p_output,
+                              const physics::collider_body* p_collider);
 
-    YAML::Emitter& operator<<(YAML::Emitter& p_output, const physics::physics_body* p_body);
+    YAML::Emitter& operator<<(YAML::Emitter& p_output,
+                              const physics::physics_body* p_body);
 };
