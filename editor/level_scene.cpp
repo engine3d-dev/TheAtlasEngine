@@ -2,6 +2,7 @@
 #include <core/common.hpp>
 #include <core/application.hpp>
 #include <physics/jolt-cpp/jolt_components.hpp>
+#include <physics/physics_3d/physics.hpp>
 
 level_scene::level_scene(const std::string& p_name)
   : atlas::scene_scope(p_name) {
@@ -44,16 +45,25 @@ level_scene::level_scene(const std::string& p_name)
     });
 
     m_robot_model = create_object("Robot");
-    m_robot_model->add<atlas::tag::serialize>();
+    // m_robot_model->add<atlas::tag::serialize>();
     m_robot_model->set<atlas::transform>({
-      .position = { 0.f, 0.f, -20.f },
+      .position = { 0.00f, 3.50f, 4.10f },
       .scale = { 1.f, 1.f, 1.f },
     });
 
     m_robot_model->set<atlas::material>({
       .color = { 1.f, 1.f, 1.f, 1.f },
-      .model_path = "assets/models/robot.obj",
+      .model_path = "assets/models/cube.obj",
       .texture_path = "assets/models/container_diffuse.png",
+    });
+
+    m_robot_model->set<atlas::physics::collider_body>({
+      .shape_type = atlas::physics::collider_shape::Box,
+      .half_extents = { 1.f, 1.f, 1.f },
+    });
+    m_robot_model->set<atlas::physics::physics_body>({
+      // .restitution = 1.25f,
+      .body_movement_type = atlas::physics::Dynamic,
     });
 
     m_child_object = create_object("Child");
@@ -62,7 +72,13 @@ level_scene::level_scene(const std::string& p_name)
     m_platform = create_object("Platform");
 
     m_platform->set<atlas::transform>({
-      .scale = { 15.f, -0.30f, 10.0f },
+      .scale = { 15.f, 0.30f, 10.0f },
+    });
+    m_platform->set<atlas::physics::collider_body>({
+      .shape_type = atlas::physics::collider_shape::Box,
+      .half_extents = { 15.f, 0.30f, 10.0f },
+      // .radius = 1.f,
+      // .half_extents = {15.f, -0.30f, 10.0f}
     });
 
     m_platform->set<atlas::material>({
@@ -70,9 +86,70 @@ level_scene::level_scene(const std::string& p_name)
       .texture_path = "assets/models/wood.png",
     });
 
+    // Initiating physics system
+    // Note: Each flecs::world would contain their own respective data of
+    // atlas::physics::settings NOTE: atlas::physics::jolt_settings should not
+    // be directly from the application atlas::physics::jolt_settings is
+    // essentially the parameters to initialize JoltPhysics directly. Consider:
+    // This might be considered in a developers settings or so.
+    m_physics_object_representation_of_settings =
+      create_object("Physics Settings");
+    // settings is for pre-runtime before runtime gets invoked
+    m_physics_object_representation_of_settings
+      ->set<atlas::physics::jolt_settings>({});
+
+    // config is for runtime
+    // change atlas::physics::jolt_config to
+    // atlas::physics::environment_settings atlas::physics::jolt_config is the
+    // global configuration that gets applied when physics runtime initiates and
+    // executes
+    m_physics_object_representation_of_settings
+      ->set<atlas::physics::jolt_config>({});
+
     atlas::register_start(this, &level_scene::start);
+    atlas::register_physics(this, &level_scene::physics_update);
     atlas::register_update(this, &level_scene::on_update);
     atlas::register_ui(this, &level_scene::on_ui_update);
+}
+
+void
+level_scene::runtime_start() {
+    // runs the physics simulation
+    m_physics_is_runtime = true;
+
+    m_physics_engine_handler->start_runtime();
+}
+
+void
+level_scene::runtime_stop() {
+    m_physics_is_runtime = false;
+
+    m_physics_engine_handler->stop_runtime();
+
+    reset_objects();
+}
+
+void
+level_scene::reset_objects() {
+
+    m_viking_room->set<atlas::transform>({
+      .position = { -2.70f, 2.70, -8.30f },
+      .rotation = { 2.30f, 95.90f, 91.80f },
+      .scale{ 1.f },
+    });
+
+    m_cube->set<atlas::transform>({
+      .position = { 0.f, 2.10f, -7.30f },
+      .scale = { 0.9f, 0.9f, 0.9f },
+    });
+    m_robot_model->set<atlas::transform>({
+      .position = { 0.00f, 3.50f, 4.10f },
+      .scale = { 1.f, 1.f, 1.f },
+    });
+
+    m_platform->set<atlas::transform>({
+      .scale = { 15.f, -0.30f, 10.0f },
+    });
 }
 
 void
@@ -341,6 +418,12 @@ level_scene::start() {
         console_log_error("Could not load yaml file LevelScene!!!");
     }
 
+    // Now we instantiate the physics engine itself
+    m_physics_engine_handler = atlas::physics::initialize_engine(
+      m_physics_system_allocator,
+      m_physics_object_representation_of_settings,
+      *this);
+
     // Note -- just added for temporary
     // ImGuiIO io = ImGui::GetIO();
     // m_font = io.Fonts->AddFontFromFileTTF("assets/OpenSans-Regular.ttf",
@@ -410,54 +493,20 @@ level_scene::on_update() {
 
           p_transform.set_rotation(p_transform.rotation);
       });
+}
 
-    // atlas::transform* camera_transform =
-    // m_selected_entity.get_mut<atlas::transform>();
-    // float dt = atlas::application::delta_time();
-    // float movement_speed = 10.f;
-    // float rotation_speed = 1.f;
-    // float velocity = movement_speed * dt;
-    // float rotation_velocity = rotation_speed * dt;
+void
+level_scene::physics_update() {
+    if (atlas::event::is_key_pressed(key_r) and !m_physics_is_runtime) {
+        runtime_start();
+    }
 
-    // glm::quat to_quaternion = atlas::to_quat(camera_transform->quaternion);
+    if (m_physics_is_runtime) {
+        m_physics_engine_handler->physics_step();
+        m_physics_engine_handler->run_contact_add();
+    }
 
-    // glm::vec3 up = glm::rotate(to_quaternion, glm::vec3(0.f, 1.f, 0.f));
-    // glm::vec3 forward = glm::rotate(to_quaternion, glm::vec3(0.f, 0.f,
-    // -1.f)); glm::vec3 right = glm::rotate(to_quaternion, glm::vec3(1.0f,
-    // 0.0f, 0.0f));
-
-    // if (atlas::event::is_key_pressed(key_left_shift)) {
-    //     if
-    //     (atlas::event::is_mouse_pressed(atlas::event::Mouse::ButtonMiddle)) {
-    //         camera_transform->position += up * velocity;
-    //     }
-
-    //     if (atlas::event::is_mouse_pressed(atlas::event::Mouse::ButtonRight))
-    //     {
-    //         camera_transform->position -= up * velocity;
-    //     }
-    // }
-
-    // if (atlas::event::is_key_pressed(key_w)) {
-    //     camera_transform->position += forward * velocity;
-    // }
-    // if (atlas::event::is_key_pressed(key_s)) {
-    //     camera_transform->position -= forward * velocity;
-    // }
-
-    // if (atlas::event::is_key_pressed(key_d)) {
-    //     camera_transform->position += right * velocity;
-    // }
-    // if (atlas::event::is_key_pressed(key_a)) {
-    //     camera_transform->position -= right * velocity;
-    // }
-
-    // if (atlas::event::is_key_pressed(key_q)) {
-    //     camera_transform->rotation.y += rotation_velocity;
-    // }
-    // if (atlas::event::is_key_pressed(key_e)) {
-    //     camera_transform->rotation.y -= rotation_velocity;
-    // }
-
-    // camera_transform->set_rotation(camera_transform->rotation);
+    if (atlas::event::is_key_pressed(key_l) and m_physics_is_runtime) {
+        runtime_stop();
+    }
 }
