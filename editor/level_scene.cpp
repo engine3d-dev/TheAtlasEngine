@@ -105,7 +105,7 @@ ui_component_list(flecs::entity& p_selected_entity) {
             }
         }
 
-		// NOTE -- Add this in later...
+        // NOTE -- Add this in later...
         // if (!p_selected_entity.has<atlas::tag::serialize>()) {
         //     if (ImGui::MenuItem("Tag::Serialize")) {
         //         p_selected_entity.add<atlas::tag::serialize>();
@@ -113,14 +113,14 @@ ui_component_list(flecs::entity& p_selected_entity) {
         //     }
         // }
 
-		if (!p_selected_entity.has<atlas::physics::collider_body>()) {
+        if (!p_selected_entity.has<atlas::physics::collider_body>()) {
             if (ImGui::MenuItem("Collider")) {
                 p_selected_entity.add<atlas::physics::collider_body>();
                 ImGui::CloseCurrentPopup();
             }
         }
 
-		if (!p_selected_entity.has<atlas::physics::physics_body>()) {
+        if (!p_selected_entity.has<atlas::physics::physics_body>()) {
             if (ImGui::MenuItem("Physics Body")) {
                 p_selected_entity.add<atlas::physics::physics_body>();
                 ImGui::CloseCurrentPopup();
@@ -260,67 +260,76 @@ level_scene::on_ui_update() {
             atlas::ui::draw_component<atlas::material>(
               "material", m_selected_entity, [](atlas::material* p_material) {
                   atlas::ui::draw_input_text(p_material->model_path);
-			});
+              });
 
-			// atlas::ui::draw_component<atlas::physics::collider_body>("Collider", m_selected_entity, [](atlas::physics::collider_body* p_collider) {
+            // atlas::ui::draw_component<atlas::physics::collider_body>("Collider",
+            // m_selected_entity, [](atlas::physics::collider_body* p_collider)
+            // {
 
-			// });
+            // });
 
-			atlas::ui::draw_component<atlas::physics::physics_body>("Physics Body", m_selected_entity, [](atlas::physics::physics_body* p_body) {
-				const char* items[] = { "Static", "Kinematic", "Dynamic" };
-				const char* combo_preview = items[p_body->body_type];
-				
-				// Begin the combo box
-				if (ImGui::BeginCombo("Body Type", combo_preview)) {
-					for (int n = 0; n < 3; n++) {
-						// Check if the current item is selected
-						const bool is_selected = (p_body->body_type == n);
-						if (ImGui::Selectable(items[n], is_selected)) {
-							// Update the current type when a new item is selected
-							p_body->body_type = static_cast<atlas::physics::body_type>(n);
-						}
+            atlas::ui::draw_component<atlas::physics::physics_body>(
+              "Physics Body",
+              m_selected_entity,
+              [](atlas::physics::physics_body* p_body) {
+                  const char* items[] = { "Static", "Kinematic", "Dynamic" };
+                  const char* combo_preview = items[p_body->body_type];
 
-						// Set the initial focus when the combo box is first opened
-						if (is_selected) {
-							ImGui::SetItemDefaultFocus();
-						}
-					}
-					ImGui::EndCombo();
-				}
-			});
+                  // Begin the combo box
+                  if (ImGui::BeginCombo("Body Type", combo_preview)) {
+                      for (int n = 0; n < 3; n++) {
+                          // Check if the current item is selected
+                          const bool is_selected = (p_body->body_type == n);
+                          if (ImGui::Selectable(items[n], is_selected)) {
+                              // Update the current type when a new item is
+                              // selected
+                              p_body->body_type =
+                                static_cast<atlas::physics::body_type>(n);
+                          }
 
-
+                          // Set the initial focus when the combo box is first
+                          // opened
+                          if (is_selected) {
+                              ImGui::SetItemDefaultFocus();
+                          }
+                      }
+                      ImGui::EndCombo();
+                  }
+              });
         }
 
         ImGui::End();
 
-		// Note --- just added this temporarily for testing
-		// auto time = atlas::application::delta_time();
+        // Note --- just added this temporarily for testing
+        // auto time = atlas::application::delta_time();
 
-		// if((int)(time * 10.0f) % 8 > 4) {
-		// 	m_blink = !m_blink;
-		// }
+        // if((int)(time * 10.0f) % 8 > 4) {
+        // 	m_blink = !m_blink;
+        // }
 
-		// auto width = atlas::application::get_window().width();
-		// auto height = atlas::application::get_window().height();
+        // auto width = atlas::application::get_window().width();
+        // auto height = atlas::application::get_window().height();
 
-		// ImGui::SetNextWindowPos(ImVec2(static_cast<float>(width) * 0.5f, static_cast<float>(height) * 0.5f), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
-		// ImGui::SetNextWindowSize(ImVec2(200, 20), ImGuiCond_Always);
-		// ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoInputs;
-		// ImGui::SetNextWindowBgAlpha(0.f);
+        // ImGui::SetNextWindowPos(ImVec2(static_cast<float>(width) * 0.5f,
+        // static_cast<float>(height) * 0.5f), ImGuiCond_Always, ImVec2(0.5f,
+        // 0.5f)); ImGui::SetNextWindowSize(ImVec2(200, 20), ImGuiCond_Always);
+        // ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration |
+        // ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoInputs;
+        // ImGui::SetNextWindowBgAlpha(0.f);
 
-		// if(ImGui::Begin("Testing", nullptr, flags)) {
-		// 	ImGui::ProgressBar(10.f);
+        // if(ImGui::Begin("Testing", nullptr, flags)) {
+        // 	ImGui::ProgressBar(10.f);
 
-		// 	auto pos = ImGui::GetWindowPos();
-		// 	pos.x += (float)width * 0.5f - 300.0f;
-		// 	pos.y += 50.0f;
-		// 	if(m_blink){
-		// 		ImGui::GetForegroundDrawList()->AddText(m_font, 120.0f, pos, 0xffffffff, "Click to Play!");
-		// 	}
+        // 	auto pos = ImGui::GetWindowPos();
+        // 	pos.x += (float)width * 0.5f - 300.0f;
+        // 	pos.y += 50.0f;
+        // 	if(m_blink){
+        // 		ImGui::GetForegroundDrawList()->AddText(m_font, 120.0f,
+        // pos, 0xffffffff, "Click to Play!");
+        // 	}
 
-		// 	ImGui::End();
-		// }
+        // 	ImGui::End();
+        // }
     }
 }
 
@@ -332,9 +341,10 @@ level_scene::start() {
         console_log_error("Could not load yaml file LevelScene!!!");
     }
 
-	// Note -- just added for temporary
-	// ImGuiIO io = ImGui::GetIO();
-	// m_font = io.Fonts->AddFontFromFileTTF("assets/OpenSans-Regular.ttf", 120.0f);
+    // Note -- just added for temporary
+    // ImGuiIO io = ImGui::GetIO();
+    // m_font = io.Fonts->AddFontFromFileTTF("assets/OpenSans-Regular.ttf",
+    // 120.0f);
 }
 
 void
