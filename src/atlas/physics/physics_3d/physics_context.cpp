@@ -1,7 +1,6 @@
 #include <type_traits>
 #include <Jolt/Jolt.h>
 #include <physics/physics_3d/physics_context.hpp>
-#include <physics/physics_3d/jolt/jolt_context.hpp>
 
 namespace atlas::physics {
 

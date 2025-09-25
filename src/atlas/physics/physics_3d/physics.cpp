@@ -1,7 +1,7 @@
 #include <physics/physics_3d/physics.hpp>
-#include <physics/physics_3d/jolt/jolt_api.hpp>
+#include <drivers/jolt-cpp/jolt_api.hpp>
 #include <physics/physics_3d/physics_context.hpp>
-#include <physics/physics_3d/jolt/jolt_context.hpp>
+#include <drivers/jolt-cpp/jolt_context.hpp>
 
 namespace atlas::physics {
 

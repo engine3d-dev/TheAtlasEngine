@@ -85,4 +85,29 @@ namespace atlas {
         uint32_t body_id = 0;
     };
 
+    struct box_collider {
+        bool enable = true;
+        uint8_t motion_type = body_type::fixed;
+        uint8_t body_layer = body_layer::moving;
+        glm::vec3 half_extent=glm::vec3(0.5f);
+        uint32_t id=0;
+    };
+
+    struct capsule_collider {
+        bool enable = true;
+        uint8_t motion_type = body_type::fixed;
+        uint8_t body_layer = body_layer::moving;
+        float radius=0.5f;
+        float capsule_half_height = 0.5f;
+        uint32_t id=0;
+    };
+
+    struct sphere_collider {
+        bool enable=true;
+        uint8_t motion_type = body_type::fixed;
+        uint8_t body_layer = body_layer::moving;
+        float radius = 0.5f;
+        uint32_t id=0;
+    };
+
 };
