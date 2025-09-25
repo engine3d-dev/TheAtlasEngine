@@ -3,6 +3,7 @@
 #include <core/application.hpp>
 #include <drivers/jolt-cpp/jolt_components.hpp>
 #include <physics/physics_3d/physics.hpp>
+#include <vector>
 
 level_scene::level_scene(const std::string& p_name)
   : atlas::scene_scope(p_name) {
@@ -178,6 +179,13 @@ ui_component_list(flecs::entity& p_selected_entity) {
         if (!p_selected_entity.has<atlas::material>()) {
             if (ImGui::MenuItem("Material (Mesh Component)")) {
                 p_selected_entity.add<atlas::material>();
+                ImGui::CloseCurrentPopup();
+            }
+        }
+
+		if (!p_selected_entity.has<atlas::tag::serialize>()) {
+            if (ImGui::MenuItem("Serialize")) {
+                p_selected_entity.add<atlas::tag::serialize>();
                 ImGui::CloseCurrentPopup();
             }
         }
@@ -373,6 +381,11 @@ level_scene::on_ui_update() {
                       ImGui::EndCombo();
                   }
               });
+
+			atlas::ui::draw_component<atlas::tag::serialize>("Serialize", m_selected_entity, []([[maybe_unused]] atlas::tag::serialize* p_serialize){
+				glm::vec3 val;
+				atlas::ui::draw_vec3("Enable", val);
+			});
         }
 
         ImGui::End();
@@ -395,7 +408,7 @@ level_scene::on_ui_update() {
         // ImGui::SetNextWindowBgAlpha(0.f);
 
         // if(ImGui::Begin("Testing", nullptr, flags)) {
-        // 	ImGui::ProgressBar(10.f);
+        	// ImGui::ProgressBar(10.f);
 
         // 	auto pos = ImGui::GetWindowPos();
         // 	pos.x += (float)width * 0.5f - 300.0f;
