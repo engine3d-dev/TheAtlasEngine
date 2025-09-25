@@ -99,7 +99,7 @@ namespace atlas {
           .each([&](flecs::pair<tag::editor, projection_view> p_pair,
                     transform& p_transform,
                     perspective_camera& p_camera) {
-              float aspect_ratio = application::aspect_ratio();
+              float aspect_ratio = m_window->aspect_ratio();
               if (!p_camera.is_active) {
                   return;
               }

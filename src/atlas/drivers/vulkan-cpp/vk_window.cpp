@@ -65,7 +65,7 @@ namespace atlas::vk {
     }
 
     window_settings vk_window::settings() const {
-        return m_settings;
+        return m_swapchain.settings();
     }
 
     uint32_t vk_window::read_acquired_next_frame() {
