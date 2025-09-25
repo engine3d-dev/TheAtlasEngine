@@ -33,9 +33,9 @@ set(
     ${SRC_DIR}/core/serialize/types.cpp
 
     # jolt
-    ${SRC_DIR}/physics/physics_3d/jolt/jolt_api.cpp
-    ${SRC_DIR}/physics/physics_3d/jolt/jolt_context.cpp
-    ${SRC_DIR}/physics/physics_3d/jolt/jolt_helper.cpp
+    ${SRC_DIR}/drivers/jolt-cpp/jolt_api.cpp
+    ${SRC_DIR}/drivers/jolt-cpp/jolt_context.cpp
+    ${SRC_DIR}/drivers/jolt-cpp/jolt_helper.cpp
 
     # physics stuff
     ${SRC_DIR}/physics/physics_3d/physics_engine.cpp
