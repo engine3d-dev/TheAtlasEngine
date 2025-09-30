@@ -416,7 +416,7 @@ level_scene::start() {
 	atlas::physics::jolt_settings settings = {};
 	atlas::physics::jolt_config config = {};
 	flecs::world registry = *this;
-	m_physics_engine_handler = atlas::physics::physics_engine(settings, config, &registry);
+	m_physics_engine_handler = atlas::physics::physics_engine(settings, config, registry);
 
     // Note -- just added for temporary
     // ImGuiIO io = ImGui::GetIO();

@@ -16,7 +16,7 @@ namespace atlas::physics {
     public:
         // Required by maps but should not be used in anyother circumstance.
         physics_engine() = default;
-        physics_engine(const jolt_settings& p_settings, const jolt_config& p_config, flecs::world* p_registry);
+        physics_engine(const jolt_settings& p_settings, const jolt_config& p_config, flecs::world& p_registry);
 
         /**
          * @brief The runtime is specifically the way to start the physics,
@@ -52,10 +52,7 @@ namespace atlas::physics {
 
     private:
         flecs::world* m_registry;
-        // ref<jolt_context> m_engine_api;
         ref<physics_context> m_physics_context;
-        // ref<jolt_api> m_backend_api;
-        ref<physics_api> m_backend_api;
         jolt_config m_jolt_config;
 
         /**

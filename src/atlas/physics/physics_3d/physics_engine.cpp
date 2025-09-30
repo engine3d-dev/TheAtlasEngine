@@ -7,17 +7,10 @@
 
 namespace atlas::physics {
 
-    physics_engine::physics_engine(const jolt_settings& p_settings, const jolt_config& p_config, flecs::world* p_registry) : m_registry(p_registry), m_jolt_config(p_config) {
-        // ref<jolt_context> engine_access = create_ref<jolt_context>(p_settings);
-        // m_engine_api = create_ref<jolt_context>(p_settings);
-        // m_engine_api = engine_access;
+    physics_engine::physics_engine(const jolt_settings& p_settings, const jolt_config& p_config, flecs::world& p_registry) : m_registry(&p_registry), m_jolt_config(p_config) {
         m_physics_context = initialize_physics_context(p_settings);
-
-        jolt_api user_api(p_config, m_physics_context->physics_instance(), *m_registry);
-
-        m_backend_api = create_ref<jolt_api>(user_api);
-        m_query_transform = p_registry->query<transform, collider_body>();
-        m_query_body = p_registry->query<physics_body>();
+        m_query_transform = m_registry->query<transform, collider_body>();
+        m_query_body = m_registry->query<physics_body>();
     };
 
     void physics_engine::start() {
@@ -27,20 +20,8 @@ namespace atlas::physics {
     void physics_engine::update(float p_delta_time) {
         using namespace JPH;
         auto& physics_system = m_physics_context->physics_instance();
-        // JPH::BodyInterface& interface = physics_system->GetBodyInterface();
         physics_system->SetGravity(to_jph(m_jolt_config.gravity));
-        // m_backend_api->update_jolt_values();
-
-        // m_physics_context->run_physics_step();
         m_physics_context->update(p_delta_time);
-        // float fixed_time_step = 1.0f / 60.0f;
-        // int time_step = 1 + (int)(60 * fixed_time_step);
-        // m_physics_context->update(application::delta_time());
-        // m_physics_system->Update(application::delta_time(),
-        //                             time_step,
-        //                             m_temp_allocator.get(),
-        //                             m_thread_system.get());
-        // m_backend_api->update_atlas_values();
         JPH::BodyInterface& interface = physics_system->GetBodyInterface();
 
         m_query_transform.each(
