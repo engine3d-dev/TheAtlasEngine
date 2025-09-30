@@ -99,7 +99,7 @@ namespace atlas::physics {
     */
     struct jolt_settings {
 
-        unsigned int allocation_amount = 10 * 1024 * 1024;
+        uint32_t allocation_amount = 10 * 1024 * 1024;
 
         // For job system
         thread_type thread_type = thread_type::default_system;
@@ -109,23 +109,19 @@ namespace atlas::physics {
 
         uint32_t max_jobs_power = 10;
         uint32_t max_barriers = physics_threads * 16;
-        bool is_multithreaded = true;
-
-        // Collision detection
-        float broadphase_scale = 1.0f;
-        bool use_4_layer_broadphase = true;
-        uint32_t default_collision_group = 0;
+        // bool is_multithreaded = true;
+        bool enable_multithread = true;
 
         // Filtering out specifica collisions
-        uint32_t collision_filter_layer_count = 32;
-        uint32_t default_filter_mask = 0xFFFFFFFF;
+        // uint32_t collision_filter_layer_count = 32;
+        // uint32_t default_filter_mask = 0xFFFFFFFF;
 
         // Scene position in the world
-        glm::vec3 physics_scene_position = glm::vec3(0.0f, 0.0f, 0.0f);
+        // glm::vec3 physics_scene_position = glm::vec3(0.0f, 0.0f, 0.0f);
 
-        glm::vec3 world_bounds_min = glm::vec3(-500.0f, -500.0f, -500.0f);
+        // glm::vec3 world_bounds_min = glm::vec3(-500.0f, -500.0f, -500.0f);
 
-        glm::vec3 world_bounds_max = glm::vec3(500.0f, 500.0f, 500.0f);
+        // glm::vec3 world_bounds_max = glm::vec3(500.0f, 500.0f, 500.0f);
         // Max memory size per scene
         uint32_t max_bodies = 16384;
         uint32_t max_body_pairs = 32768;
@@ -133,16 +129,16 @@ namespace atlas::physics {
 
         // Time step for fps within the physics
         // If false set to 1/maxFps
-        float fixed_time_step = 1.0f / 60.0f;
+        // float fixed_time_step = 1.0f / 60.0f;
         bool use_fixed_timestep = false;
 
         // solver for velocity and position
-        uint32_t position_iterations = 1;
-        uint32_t velocity_iterations = 8;
+        // uint32_t position_iterations = 1;
+        // uint32_t velocity_iterations = 8;
 
         // When to turn objects on and off depending on speed
-        float sleep_velocity_threshold = 0.05f;
-        float sleep_angular_velocity_threshold = 0.05f;
+        // float sleep_velocity_threshold = 0.05f;
+        // float sleep_angular_velocity_threshold = 0.05f;
     };
 
     // This might be able to be generalized eventually but we will have to

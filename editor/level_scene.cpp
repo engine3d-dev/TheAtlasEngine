@@ -2,9 +2,7 @@
 #include <core/common.hpp>
 #include <core/application.hpp>
 #include <drivers/jolt-cpp/jolt_components.hpp>
-#include <physics/physics_3d/physics.hpp>
 #include <physics/physics_engine.hpp>
-#include <vector>
 
 level_scene::level_scene(const std::string& p_name)
   : atlas::scene_scope(p_name) {

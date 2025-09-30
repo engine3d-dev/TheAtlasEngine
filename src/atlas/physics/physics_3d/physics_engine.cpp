@@ -14,7 +14,7 @@ namespace atlas::physics {
     };
 
     void physics_engine::start() {
-        m_physics_context->create_bodies();
+        m_physics_context->add_bodies();
     }
 
     void physics_engine::update(float p_delta_time) {
@@ -73,11 +73,11 @@ namespace atlas::physics {
         });
 
         // Execute collisions that happen with the collision manager
-        m_physics_context->contact_added_event();
+        m_physics_context->update_collision_events();
     }
 
     void physics_engine::stop() {
-        m_physics_context->clean_bodies();
+        m_physics_context->destroy();
     }
 
 }

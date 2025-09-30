@@ -31,15 +31,6 @@ namespace atlas::physics {
         jolt_context(const jolt_settings& p_settings);
         ~jolt_context() override;
 
-        /**
-         * @brief Gives access to the physics system. Is given to jolt_api as
-         * well. This is to allow us to give seperation of concerns. However,
-         * may change now do to Jolt conflict and unhandled dangling pointers
-         * within jolt_api.
-         *
-         */
-        ref<JPH::PhysicsSystem> m_physics_system;
-
     private:
         /**
          * @brief Creates all of the physics bodies at the start of runtime.
@@ -50,7 +41,7 @@ namespace atlas::physics {
          * get_main_scene() or get_main_scenes() must be created to develop a
          * more dynamic system.
          */
-        void engine_create_physics_bodies() override;
+        void create_bodies() override;
 
         /**
          * @brief Removes all physics bodies and shapes from level_scene.
@@ -59,15 +50,7 @@ namespace atlas::physics {
          * right now.
          *
          */
-        void engine_clean_physics_bodies() override;
-
-        /**
-         * @brief Runs the actual physics. Can be called multiple times in one
-         * frame. Runs the all calculation in physics. Threads must be defined
-         * in the jolt_config in order for this to work correctly.
-         *
-         */
-        void engine_run_physics_step() override;
+        void destroy_bodies() override;
 
         /**
          * @brief Runs a given <contact added> the frame the contact was
@@ -75,7 +58,7 @@ namespace atlas::physics {
          * finished as to stop thread collision issues.
          *
          */
-        void engine_run_contact_added() override;
+        void execute_collisions() override;
 
         ref<JPH::PhysicsSystem>& set_physics_instance() override { return m_physics_system; }
         void update_simulation(float p_delta_time) override;
@@ -147,5 +130,14 @@ namespace atlas::physics {
          *
          */
         ref<contact_listener> m_contact_listener;
+
+        /**
+         * @brief Gives access to the physics system. Is given to jolt_api as
+         * well. This is to allow us to give seperation of concerns. However,
+         * may change now do to Jolt conflict and unhandled dangling pointers
+         * within jolt_api.
+         *
+         */
+        ref<JPH::PhysicsSystem> m_physics_system;
     };
 };

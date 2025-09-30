@@ -16,12 +16,9 @@ namespace atlas::physics {
     class physics_context {
     public:
         virtual ~physics_context() = default;
-        // Pass through function to allow private virtual functions to be called
-        // publically without messing up the virtual table.
-        void create_bodies();
-        void clean_bodies();
-        void run_physics_step();
-        void contact_added_event();
+        void add_bodies() { return create_bodies(); }
+        void destroy() { return destroy_bodies(); }
+        void update_collision_events() { return execute_collisions(); }
         void update(float p_delta_time) { return update_simulation(p_delta_time); }
 
         ref<JPH::PhysicsSystem>& physics_instance() { return set_physics_instance(); }
@@ -35,10 +32,9 @@ namespace atlas::physics {
          */
 
     private:
-        virtual void engine_create_physics_bodies() = 0;
-        virtual void engine_clean_physics_bodies() = 0;
-        virtual void engine_run_physics_step() = 0;
-        virtual void engine_run_contact_added() = 0;
+        virtual void create_bodies() = 0;
+        virtual void destroy_bodies() = 0;
+        virtual void execute_collisions() = 0;
         virtual void update_simulation(float p_delta_time) = 0;
 
         virtual ref<JPH::PhysicsSystem>& set_physics_instance() = 0;
