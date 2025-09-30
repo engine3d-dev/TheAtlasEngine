@@ -99,14 +99,14 @@ level_scene::runtime_start() {
     // runs the physics simulation
     m_physics_is_runtime = true;
 
-    m_physics_engine_handler.start_runtime();
+    m_physics_engine_handler.start();
 }
 
 void
 level_scene::runtime_stop() {
     m_physics_is_runtime = false;
 
-    m_physics_engine_handler.stop_runtime();
+    m_physics_engine_handler.stop();
 
     reset_objects();
 }
@@ -496,8 +496,8 @@ level_scene::physics_update() {
     }
 
     if (m_physics_is_runtime) {
-        m_physics_engine_handler.physics_step();
-        m_physics_engine_handler.run_contact_add();
+        m_physics_engine_handler.update();
+        // m_physics_engine_handler.execute_collisions();
     }
 
     if (atlas::event::is_key_pressed(key_l) and m_physics_is_runtime) {

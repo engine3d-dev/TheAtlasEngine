@@ -24,21 +24,21 @@ namespace atlas::physics {
          * create a physics scene and manage physics step.
          *
          */
-        void start_runtime();
+        void start();
 
         /**
          * @brief Runs a single frame of the simulation. Should at minimum be
          * called 60 fps. If below, it must be called twice.
          *
          */
-        void physics_step();
+        void update();
 
         /**
          * @brief Deletes all physics bodies and shapes. Preps itself for
          * runtime to be called again.
          *
          */
-        void stop_runtime();
+        void stop();
 
         /**
          * @brief Allows for contacts to be handled by the user right after
@@ -48,7 +48,7 @@ namespace atlas::physics {
          * manager to maintain them.
          *
          */
-        void run_contact_add();
+        // void execute_collisions();
 
     private:
         // ref<jolt_context> m_engine_api;

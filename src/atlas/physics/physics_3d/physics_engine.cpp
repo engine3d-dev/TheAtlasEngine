@@ -14,21 +14,21 @@ namespace atlas::physics {
         m_backend_api = create_ref<jolt_api>(user_api);
     };
 
-    void physics_engine::start_runtime() {
+    void physics_engine::start() {
         m_physics_context->create_bodies();
     }
 
-    void physics_engine::physics_step() {
+    void physics_engine::update() {
         m_backend_api->update_jolt_values();
         m_physics_context->run_physics_step();
         m_backend_api->update_atlas_values();
+
+        // Execute collisions that happen with the collision manager
+        m_physics_context->contact_added_event();
     }
 
-    void physics_engine::stop_runtime() {
+    void physics_engine::stop() {
         m_physics_context->clean_bodies();
     }
 
-    void physics_engine::run_contact_add() {
-        m_physics_context->contact_added_event();
-    }
 }
