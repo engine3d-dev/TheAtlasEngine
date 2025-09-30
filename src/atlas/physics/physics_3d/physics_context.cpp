@@ -1,9 +1,10 @@
 #include <type_traits>
 #include <Jolt/Jolt.h>
 #include <physics/physics_3d/physics_context.hpp>
+#include <drivers/jolt-cpp/jolt_context.hpp>
 
 namespace atlas::physics {
-
+    // physics_backend api = physics_backend::jolt_backend;
     void physics_context::create_bodies() {
         engine_create_physics_bodies();
     }
@@ -18,6 +19,11 @@ namespace atlas::physics {
 
     void physics_context::contact_added_event() {
         engine_run_contact_added();
+    }
+
+
+    ref<physics_context> initialize_physics_context(const jolt_settings& p_settings) {
+        return create_ref<jolt_context>(p_settings);
     }
 
 }

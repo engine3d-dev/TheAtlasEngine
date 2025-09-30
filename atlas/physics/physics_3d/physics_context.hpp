@@ -1,4 +1,9 @@
 #pragma once
+#include <core/core.hpp>
+#include <Jolt/Jolt.h>
+#include <drivers/jolt-cpp/jolt_components.hpp>
+#include <drivers/jolt-cpp/jolt-imports.hpp>
+
 namespace atlas::physics {
     /**
      * @brief The context is the way to interact with only the engine. It is the
@@ -10,6 +15,7 @@ namespace atlas::physics {
      */
     class physics_context {
     public:
+        virtual ~physics_context() = default;
         // Pass through function to allow private virtual functions to be called
         // publically without messing up the virtual table.
         void create_bodies();
@@ -17,9 +23,7 @@ namespace atlas::physics {
         void run_physics_step();
         void contact_added_event();
 
-        //! @remark This has to be public to get shared pointer working
-        //! @note With one exception being some friend class but not the way
-        virtual ~physics_context() = default;
+        ref<JPH::PhysicsSystem> physics_instance() { return set_physics_instance(); }
 
         /**
          * @note:
@@ -34,5 +38,9 @@ namespace atlas::physics {
         virtual void engine_clean_physics_bodies() = 0;
         virtual void engine_run_physics_step() = 0;
         virtual void engine_run_contact_added() = 0;
+
+        virtual ref<JPH::PhysicsSystem> set_physics_instance() = 0;
     };
+
+    ref<physics_context> initialize_physics_context(const jolt_settings& p_settings);
 };

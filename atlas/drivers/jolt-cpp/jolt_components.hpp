@@ -87,21 +87,16 @@ namespace atlas::physics {
     };
 
     /**
-     * @name Jolt settings
-     * @brief A data structure to give to flecs and get the physics
-     * engine prepped for Init() phase.
-     */
-
-    /**
-     * @brief This includes global configs for each scene and how the
-     * physics engine will behave in a paticular scene.
-     *
-     * @remark world_bounds_min && world_bounds_max: These values are
-     * arbitrary until further investigation happens and are more of a
-     * reminder that floating point error exsists. True max values
-     * should be determined in the near future.
-     *
-     */
+     * @brief Jolt-specific context configurations
+     * These are going to be internally integrated to jolt_context
+     * 
+     * As these parameters currently are going to be specific to Jolt.
+     * 
+     * These parameters are also only specific to the construction-level, not initiation level of the API's
+     * 
+     * @remark Min and max world bounds are values that are artbitrary (in other words limit the simulation space)
+     * as JoltPhysics has a limit on distance for its limitation in simulation space
+    */
     struct jolt_settings {
 
         unsigned int allocation_amount = 10 * 1024 * 1024;
@@ -148,8 +143,6 @@ namespace atlas::physics {
         // When to turn objects on and off depending on speed
         float sleep_velocity_threshold = 0.05f;
         float sleep_angular_velocity_threshold = 0.05f;
-
-        //! @brief FIXME: maybe add a debug bool here
     };
 
     // This might be able to be generalized eventually but we will have to

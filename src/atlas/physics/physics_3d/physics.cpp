@@ -5,9 +5,9 @@
 
 namespace atlas::physics {
 
-    physics_backend test_api = physics_backend::jolt_backend;
-    ref<physics_context> engine_api;
-    ref<physics_api> backend_api;
+    // physics_backend test_api = physics_backend::jolt_backend;
+    // ref<physics_context> engine_api;
+    // ref<physics_api> backend_api;
 
     // strong_ref<physics_engine> initialize_engine(
     //   [[maybe_unused]] std::pmr::polymorphic_allocator<>& p_object_allocator,

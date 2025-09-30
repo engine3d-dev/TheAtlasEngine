@@ -2,7 +2,6 @@
 
 #include <physics/physics_3d/physics_engine.hpp>
 #include <drivers/jolt-cpp/jolt_components.hpp>
-#include <core/scene/scene_object.hpp>
 
 namespace atlas::physics {
     /**

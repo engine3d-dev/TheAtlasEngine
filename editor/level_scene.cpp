@@ -413,30 +413,6 @@ level_scene::start() {
     }
 
 	// Initiating physics system
-    // Note: Each flecs::world would contain their own respective data of
-    // atlas::physics::settings NOTE: atlas::physics::jolt_settings should not
-    // be directly from the application atlas::physics::jolt_settings is
-    // essentially the parameters to initialize JoltPhysics directly. Consider:
-    // This might be considered in a developers settings or so.
-    m_physics_object_representation_of_settings =
-      create_object("Physics Settings");
-    // settings is for pre-runtime before runtime gets invoked
-    m_physics_object_representation_of_settings
-      ->set<atlas::physics::jolt_settings>({});
-
-    // config is for runtime
-    // change atlas::physics::jolt_config to
-    // atlas::physics::environment_settings atlas::physics::jolt_config is the
-    // global configuration that gets applied when physics runtime initiates and
-    // executes
-    m_physics_object_representation_of_settings
-      ->set<atlas::physics::jolt_config>({});
-
-    // Now we instantiate the physics engine itself
-    // m_physics_engine_handler = atlas::physics::initialize_engine(
-    //   m_physics_system_allocator,
-    //   m_physics_object_representation_of_settings,
-    //   *this);
 	atlas::physics::jolt_settings settings = {};
 	atlas::physics::jolt_config config = {};
 	flecs::world registry = *this;

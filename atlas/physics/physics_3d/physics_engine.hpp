@@ -1,11 +1,9 @@
 #pragma once
 #include <core/core.hpp>
 #include <drivers/jolt-cpp/jolt_components.hpp>
-// #include <drivers/jolt-cpp/jolt_context.hpp>
-// #include <physics/physics_3d/physics_api.hpp>
 #include <drivers/jolt-cpp/jolt_api.hpp>
 #include <physics/physics_3d/physics_context.hpp>
-#include <drivers/jolt-cpp/jolt_context.hpp>
+// #include <drivers/jolt-cpp/jolt_api.hpp>
 
 namespace atlas::physics {
 
@@ -53,8 +51,9 @@ namespace atlas::physics {
         void run_contact_add();
 
     private:
-        jolt_settings m_settings;
-        ref<jolt_context> m_engine_api;
-        ref<jolt_api> m_backend_api;
+        // ref<jolt_context> m_engine_api;
+        ref<physics_context> m_physics_context;
+        // ref<jolt_api> m_backend_api;
+        ref<physics_api> m_backend_api;
     };
 };
