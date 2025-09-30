@@ -77,7 +77,8 @@ namespace atlas::physics {
          */
         void engine_run_contact_added() override;
 
-        ref<JPH::PhysicsSystem> set_physics_instance() override { return m_physics_system; }
+        ref<JPH::PhysicsSystem>& set_physics_instance() override { return m_physics_system; }
+        void update_simulation(float p_delta_time) override;
 
         /**
          * @brief Creates a shape given a jolt collider

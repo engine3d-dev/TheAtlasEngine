@@ -4,7 +4,6 @@
 #include <drivers/jolt-cpp/jolt_context.hpp>
 
 namespace atlas::physics {
-    // physics_backend api = physics_backend::jolt_backend;
     void physics_context::create_bodies() {
         engine_create_physics_bodies();
     }

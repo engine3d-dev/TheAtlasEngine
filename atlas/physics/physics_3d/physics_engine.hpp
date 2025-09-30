@@ -31,7 +31,7 @@ namespace atlas::physics {
          * called 60 fps. If below, it must be called twice.
          *
          */
-        void update();
+        void update(float p_delta_time);
 
         /**
          * @brief Deletes all physics bodies and shapes. Preps itself for
@@ -51,9 +51,19 @@ namespace atlas::physics {
         // void execute_collisions();
 
     private:
+        flecs::world* m_registry;
         // ref<jolt_context> m_engine_api;
         ref<physics_context> m_physics_context;
         // ref<jolt_api> m_backend_api;
         ref<physics_api> m_backend_api;
+        jolt_config m_jolt_config;
+
+        /**
+         * @brief Flecs querys deticated to reading and writing from jolt and
+         * atlas. Targeting physics bodies.
+         *
+         */
+        flecs::query<transform, collider_body> m_query_transform;
+        flecs::query<physics_body> m_query_body;
     };
 };

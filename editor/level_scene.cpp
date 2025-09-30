@@ -491,12 +491,13 @@ level_scene::on_update() {
 
 void
 level_scene::physics_update() {
+	float dt = atlas::application::delta_time();
     if (atlas::event::is_key_pressed(key_r) and !m_physics_is_runtime) {
         runtime_start();
     }
 
     if (m_physics_is_runtime) {
-        m_physics_engine_handler.update();
+        m_physics_engine_handler.update(dt);
         // m_physics_engine_handler.execute_collisions();
     }
 
