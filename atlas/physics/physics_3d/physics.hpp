@@ -21,10 +21,10 @@ namespace atlas::physics {
      * @param p_registery
      * @return ref<physics_engine>
      */
-    strong_ref<physics_engine> initialize_engine(
-      std::pmr::polymorphic_allocator<>& p_object_allocator,
-      const strong_ref<scene_object>& p_physics_object,
-      flecs::world& p_registery);
+    // strong_ref<physics_engine> initialize_engine(
+    //   std::pmr::polymorphic_allocator<>& p_object_allocator,
+    //   const strong_ref<scene_object>& p_physics_object,
+    //   flecs::world& p_registery);
 
     /**
      * @brief These functions are the generic functions implmented in jolt but

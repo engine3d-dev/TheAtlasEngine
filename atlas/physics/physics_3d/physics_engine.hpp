@@ -1,8 +1,11 @@
 #pragma once
 #include <core/core.hpp>
 #include <drivers/jolt-cpp/jolt_components.hpp>
+// #include <drivers/jolt-cpp/jolt_context.hpp>
+// #include <physics/physics_3d/physics_api.hpp>
+#include <drivers/jolt-cpp/jolt_api.hpp>
+#include <physics/physics_3d/physics_context.hpp>
 #include <drivers/jolt-cpp/jolt_context.hpp>
-#include <physics/physics_3d/physics_api.hpp>
 
 namespace atlas::physics {
 
@@ -15,9 +18,7 @@ namespace atlas::physics {
     public:
         // Required by maps but should not be used in anyother circumstance.
         physics_engine() = default;
-        physics_engine(const jolt_settings& p_settings,
-                       const ref<physics_context>& p_engine,
-                       const ref<physics_api>& p_user_api);
+        physics_engine(const jolt_settings& p_settings, const jolt_config& p_config, flecs::world* p_registry);
 
         /**
          * @brief The runtime is specifically the way to start the physics,
@@ -53,7 +54,7 @@ namespace atlas::physics {
 
     private:
         jolt_settings m_settings;
-        ref<physics_context> m_engine_api;
-        ref<physics_api> m_backend_api;
+        ref<jolt_context> m_engine_api;
+        ref<jolt_api> m_backend_api;
     };
 };

@@ -6,6 +6,8 @@ namespace atlas::physics {
 
     class physics_api {
     public:
+        virtual ~physics_api() = default;
+
         /**
          * @brief Allows for flecs values to sync with jolt without running into
          * collisions.
@@ -52,8 +54,6 @@ namespace atlas::physics {
 
         void set_angular_velocity_by_body(const glm::vec3& p_angular_velocity,
                                           const physics_body& p_body);
-
-        virtual ~physics_api() = default;
 
     private:
         /**

@@ -18,6 +18,11 @@ namespace atlas {
         layer_num,
     };
 
+    enum activation : uint8_t {
+        activate,
+        deactivate
+    };
+
     /**
      * @name Physics Body
      * @brief These are one time use calls. They are made to develop settings
@@ -47,6 +52,7 @@ namespace atlas {
 
         uint8_t body_movement_type = body_type::fixed;
         uint8_t body_layer_type = body_layer::moving;
+        activation mode = activation::deactivate;
 
         uint32_t body_id = 0;
         int count = 0;

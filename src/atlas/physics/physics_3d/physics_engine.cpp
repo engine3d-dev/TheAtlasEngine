@@ -1,13 +1,17 @@
 #include <physics/physics_3d/physics_engine.hpp>
+#include <drivers/jolt-cpp/jolt_api.hpp>
 
 namespace atlas::physics {
 
-    physics_engine::physics_engine(const jolt_settings& p_settings,
-                                   const ref<physics_context>& p_engine,
-                                   const ref<physics_api>& p_user_api)
-      : m_settings(p_settings)
-      , m_engine_api(p_engine)
-      , m_backend_api(p_user_api) {};
+    physics_engine::physics_engine(const jolt_settings& p_settings, const jolt_config& p_config, flecs::world* p_registry) : m_settings(p_settings) {
+        ref<jolt_context> engine_access = create_ref<jolt_context>(p_settings);
+        m_engine_api = create_ref<jolt_context>(p_settings);
+        m_engine_api = engine_access;
+
+        jolt_api user_api(p_config, engine_access->m_physics_system, *p_registry);
+
+        m_backend_api = create_ref<jolt_api>(user_api);
+    };
 
     void physics_engine::start_runtime() {
         m_engine_api->create_bodies();

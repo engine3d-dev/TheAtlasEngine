@@ -3,6 +3,7 @@
 #include <core/application.hpp>
 #include <drivers/jolt-cpp/jolt_components.hpp>
 #include <physics/physics_3d/physics.hpp>
+#include <physics/physics_engine.hpp>
 #include <vector>
 
 level_scene::level_scene(const std::string& p_name)
@@ -87,26 +88,6 @@ level_scene::level_scene(const std::string& p_name)
       .texture_path = "assets/models/wood.png",
     });
 
-    // Initiating physics system
-    // Note: Each flecs::world would contain their own respective data of
-    // atlas::physics::settings NOTE: atlas::physics::jolt_settings should not
-    // be directly from the application atlas::physics::jolt_settings is
-    // essentially the parameters to initialize JoltPhysics directly. Consider:
-    // This might be considered in a developers settings or so.
-    m_physics_object_representation_of_settings =
-      create_object("Physics Settings");
-    // settings is for pre-runtime before runtime gets invoked
-    m_physics_object_representation_of_settings
-      ->set<atlas::physics::jolt_settings>({});
-
-    // config is for runtime
-    // change atlas::physics::jolt_config to
-    // atlas::physics::environment_settings atlas::physics::jolt_config is the
-    // global configuration that gets applied when physics runtime initiates and
-    // executes
-    m_physics_object_representation_of_settings
-      ->set<atlas::physics::jolt_config>({});
-
     atlas::register_start(this, &level_scene::start);
     atlas::register_physics(this, &level_scene::physics_update);
     atlas::register_update(this, &level_scene::on_update);
@@ -118,14 +99,14 @@ level_scene::runtime_start() {
     // runs the physics simulation
     m_physics_is_runtime = true;
 
-    m_physics_engine_handler->start_runtime();
+    m_physics_engine_handler.start_runtime();
 }
 
 void
 level_scene::runtime_stop() {
     m_physics_is_runtime = false;
 
-    m_physics_engine_handler->stop_runtime();
+    m_physics_engine_handler.stop_runtime();
 
     reset_objects();
 }
@@ -431,11 +412,35 @@ level_scene::start() {
         console_log_error("Could not load yaml file LevelScene!!!");
     }
 
+	// Initiating physics system
+    // Note: Each flecs::world would contain their own respective data of
+    // atlas::physics::settings NOTE: atlas::physics::jolt_settings should not
+    // be directly from the application atlas::physics::jolt_settings is
+    // essentially the parameters to initialize JoltPhysics directly. Consider:
+    // This might be considered in a developers settings or so.
+    m_physics_object_representation_of_settings =
+      create_object("Physics Settings");
+    // settings is for pre-runtime before runtime gets invoked
+    m_physics_object_representation_of_settings
+      ->set<atlas::physics::jolt_settings>({});
+
+    // config is for runtime
+    // change atlas::physics::jolt_config to
+    // atlas::physics::environment_settings atlas::physics::jolt_config is the
+    // global configuration that gets applied when physics runtime initiates and
+    // executes
+    m_physics_object_representation_of_settings
+      ->set<atlas::physics::jolt_config>({});
+
     // Now we instantiate the physics engine itself
-    m_physics_engine_handler = atlas::physics::initialize_engine(
-      m_physics_system_allocator,
-      m_physics_object_representation_of_settings,
-      *this);
+    // m_physics_engine_handler = atlas::physics::initialize_engine(
+    //   m_physics_system_allocator,
+    //   m_physics_object_representation_of_settings,
+    //   *this);
+	atlas::physics::jolt_settings settings = {};
+	atlas::physics::jolt_config config = {};
+	flecs::world registry = *this;
+	m_physics_engine_handler = atlas::physics::physics_engine(settings, config, &registry);
 
     // Note -- just added for temporary
     // ImGuiIO io = ImGui::GetIO();
@@ -515,8 +520,8 @@ level_scene::physics_update() {
     }
 
     if (m_physics_is_runtime) {
-        m_physics_engine_handler->physics_step();
-        m_physics_engine_handler->run_contact_add();
+        m_physics_engine_handler.physics_step();
+        m_physics_engine_handler.run_contact_add();
     }
 
     if (atlas::event::is_key_pressed(key_l) and m_physics_is_runtime) {
