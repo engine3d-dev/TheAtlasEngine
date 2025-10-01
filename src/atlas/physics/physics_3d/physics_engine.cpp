@@ -15,6 +15,7 @@ namespace atlas::physics {
 
     void physics_engine::start() {
         m_physics_context->add_bodies();
+        m_physics_context->prepare();
     }
 
     void physics_engine::update(float p_delta_time) {
@@ -54,7 +55,8 @@ namespace atlas::physics {
 
             if (angular_velocity.IsClose({ 0, 0, 0 }, 0.0001f))
                 angular_velocity = { 0, 0, 0 };
-
+            
+            // TODO: Provide read_linear_velocity and read_angular_velocity(uint32_t p_id);
             body.linear_velocity = glm::vec3(linear_velocity.GetX(),
                                              linear_velocity.GetY(),
                                              linear_velocity.GetZ());

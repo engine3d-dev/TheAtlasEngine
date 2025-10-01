@@ -29,7 +29,7 @@ namespace atlas::physics {
     public:
         jolt_context() = default;
         jolt_context(const jolt_settings& p_settings);
-        ~jolt_context() override;
+        ~jolt_context() override = default;
 
     private:
         /**
@@ -51,6 +51,8 @@ namespace atlas::physics {
          *
          */
         void destroy_bodies() override;
+
+        void prepare_and_finalize() override;
 
         /**
          * @brief Runs a given <contact added> the frame the contact was

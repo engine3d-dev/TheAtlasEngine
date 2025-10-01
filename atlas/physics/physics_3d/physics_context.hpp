@@ -21,6 +21,8 @@ namespace atlas::physics {
         void update_collision_events() { return execute_collisions(); }
         void update(float p_delta_time) { return update_simulation(p_delta_time); }
 
+        void prepare() { return prepare_and_finalize(); }
+
         ref<JPH::PhysicsSystem>& physics_instance() { return set_physics_instance(); }
 
         /**
@@ -35,6 +37,8 @@ namespace atlas::physics {
         virtual void create_bodies() = 0;
         virtual void destroy_bodies() = 0;
         virtual void execute_collisions() = 0;
+
+        virtual void prepare_and_finalize() = 0;
         virtual void update_simulation(float p_delta_time) = 0;
 
         virtual ref<JPH::PhysicsSystem>& set_physics_instance() = 0;
