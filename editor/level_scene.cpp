@@ -96,6 +96,10 @@ level_scene::level_scene(const std::string& p_name)
 		.half_extent = { 15.f, 0.30f, 10.0f },
 	});
 
+	console_log_info("Sphere ID = {}", m_viking_room->id());
+	console_log_info("Cube ID = {}", m_robot_model->id());
+	console_log_info("Platform ID = {}", m_platform->id());
+
     // m_platform->set<atlas::collider_body>({
     //   .shape_type = atlas::collider_shape::box,
     //   .half_extents = { 15.f, 0.30f, 10.0f },

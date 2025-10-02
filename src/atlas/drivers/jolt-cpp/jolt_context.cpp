@@ -110,7 +110,12 @@ namespace atlas::physics {
 
         auto& box = result.Get();
         BodyCreationSettings body_settings(box, to_jph(p_transform->position), to_jph(p_transform->quaternion), motion_type, p_body->body_layer_type);
+        
+        // NOTE TO  SELF ------ This is setting some pointer to the entity ID
+        // WE CAN USE THIS TO TELL THE EVENT SYSTEM WHICH FLECS ENTITY COLLIDED WITH EACH OTHER!!!!!!!!
+        // Because each contact listener allows you to take a pointer from the physics bodies that are just blocks of data!!!
         body_settings.mUserData = static_cast<uint64_t>(p_entity_id);
+        console_log_info("Entity ID = {}", p_entity_id);
 
         Body* body = body_interface.CreateBody(body_settings);
         m_cached_body_ids.emplace(p_entity_id, body->GetID());
