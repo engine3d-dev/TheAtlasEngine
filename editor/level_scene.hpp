@@ -4,7 +4,7 @@
 #include <core/scene/scene_object.hpp>
 #include <core/serialize/serializer.hpp>
 #include <imgui.h>
-#include <physics/physics_3d/physics_engine.hpp>
+#include <physics/physics_engine.hpp>
 
 /**
  * @brief Implementation of a custom scene

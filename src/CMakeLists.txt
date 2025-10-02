@@ -38,8 +38,8 @@ set(
     ${SRC_DIR}/drivers/jolt-cpp/jolt_helper.cpp
 
     # physics stuff
-    ${SRC_DIR}/physics/physics_3d/physics_engine.cpp
-    ${SRC_DIR}/physics/physics_3d/physics_context.cpp
+    ${SRC_DIR}/physics/physics_engine.cpp
+    ${SRC_DIR}/physics/physics_context.cpp
 
     ${SRC_DIR}/drivers/jolt-cpp/jolt_collision_manager.cpp
     ${SRC_DIR}/drivers/jolt-cpp/jolt_collision.cpp

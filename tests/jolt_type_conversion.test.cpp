@@ -9,7 +9,7 @@
 
 #include <drivers/jolt-cpp/jolt_helper.hpp>
 #include <drivers/jolt-cpp/jolt_components.hpp>
-#include <physics/physics_3d/physics.hpp>
+#include <physics/physics.hpp>
 
 namespace atlas {
 
