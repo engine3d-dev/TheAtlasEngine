@@ -11,27 +11,24 @@ namespace atlas::physics {
         m_physics_context = initialize_physics_context(p_settings);
         m_query_transform = m_registry->query<transform, collider_body>();
         m_query_body = m_registry->query<physics_body>();
-        m_query_box_collider = m_registry->query<physics_body, box_collider, transform>();
+        m_query_box_collider = m_registry->query<transform, physics_body, box_collider, transform>();
     };
 
     void physics_engine::start() {
         // m_physics_context->add_bodies();
-        m_query_box_collider.each([&](flecs::entity p_entity, physics_body& p_body, box_collider& p_collider, transform&){
+        m_query_box_collider.each([&](flecs::entity p_entity, transform& p_transform, physics_body& p_body, box_collider& p_collider, transform&){
             console_log_warn("Create Bodies!");
-            m_physics_context->add_box_collider(p_entity, &p_body, &p_collider);
+            m_physics_context->add_box_collider(p_entity.id(), &p_transform, &p_body, &p_collider);
         });
         m_physics_context->prepare();
     }
 
     void physics_engine::update(float p_delta_time) {
         using namespace JPH;
-        auto& physics_system = m_physics_context->physics_instance();
-        physics_system->SetGravity(to_jph(m_jolt_config.gravity));
         m_physics_context->update(p_delta_time);
-        // JPH::BodyInterface& interface = physics_system->GetBodyInterface();
 
         m_query_box_collider.each(
-          [&](flecs::entity p_entity, physics_body& p_body, box_collider&, transform& p_transform) {
+          [&](flecs::entity p_entity, transform&, physics_body& p_body, box_collider&, transform& p_transform) {
             // Updating the transform parameter properties
             transform t = m_physics_context->read_transform(p_entity.id());
             p_transform.position = t.position;

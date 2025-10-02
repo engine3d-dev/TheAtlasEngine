@@ -32,16 +32,6 @@ namespace atlas::physics {
         ~jolt_context() override = default;
 
     private:
-        /**
-         * @brief Creates all of the physics bodies at the start of runtime.
-         * Utilizing the main scene provided in flecs to establish what to load.
-         *
-         * @warning Main scene is not defined and therefore will only utilzed
-         * level_scene as of right now. In order to fix this issue a
-         * get_main_scene() or get_main_scenes() must be created to develop a
-         * more dynamic system.
-         */
-        void create_bodies() override;
 
         /**
          * @brief Removes all physics bodies and shapes from level_scene.
@@ -62,40 +52,10 @@ namespace atlas::physics {
          */
         void execute_collisions() override;
 
-        ref<JPH::PhysicsSystem>& set_physics_instance() override { return m_physics_system; }
-
         void update_simulation(float p_delta_time) override;
 
-        /**
-         * @brief Creates a shape given a jolt collider
-         *
-         * @param e the entity who shape you are creating
-         * @param collider the entities jolt collider
-         * @return JPH::RefConst<JPH::Shape> The shape needs to be created and
-         * stored for ref counting and scope.
-         */
-        JPH::RefConst<JPH::Shape> create_shape_from_collider(
-          const collider_body& collider);
-
-        /**
-         * @brief Creates the body and shapes from queries of Rigidbody and
-         * collider. Calling Jolt create body from the physics_system to allow
-         * jolt to keep track of each shape and associate to each physics body.
-         * It then moves that physics body into the jolt simulation. Allowing
-         * Jolt to manipulate the numbers associated with it during
-         * physics_step().
-         *
-         */
-        void add_body(flecs::entity e,
-                      const physics_body* body_opt,
-                      const collider_body& collider,
-                      const transform& location,
-                      std::vector<JPH::BodyCreationSettings>& settings_list,
-                      std::vector<flecs::entity>& entity_list);
-        
-
     protected:
-        void emplace_box_collider(flecs::entity p_entity, const physics_body* p_body, const box_collider* p_collider) override;
+        void emplace_box_collider(uint32_t p_entity_id, const transform* p_transform, const physics_body* p_body, const box_collider* p_collider) override;
         // void set_position_rotation(flecs::entity p_entity, const physics_body* p_body, const box_collider* p_collider, const transform* p_transform) override;
         transform context_read_transform(uint32_t p_id) override;
 

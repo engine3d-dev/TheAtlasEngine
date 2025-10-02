@@ -19,43 +19,42 @@ namespace atlas::physics {
     class physics_context {
     public:
         virtual ~physics_context() = default;
-        void add_bodies() { return create_bodies(); }
+
+        //! @brief Post-cleanup of any of the physics bodies parameters that has been created
+        // for this runtime stimulation
         void destroy() { return destroy_bodies(); }
+
+        //! @brief Executes any collision events that occurred
+        // This is what the event system will use to detect any collided events that occurred
         void update_collision_events() { return execute_collisions(); }
+
         void update(float p_delta_time) { return update_simulation(p_delta_time); }
 
+        //! @brief Prepare the bodies created with the colliders and finalizing those creations
+        // into the physics system
         void prepare() { return prepare_and_finalize(); }
 
-        ref<JPH::PhysicsSystem>& physics_instance() { return set_physics_instance(); }
-
-        void add_box_collider(flecs::entity p_entity, const physics_body* p_body, const box_collider* p_collider) { return emplace_box_collider(p_entity, p_body, p_collider); }
-
-        // void position_and_rotation(flecs::entity p_entity, const physics_body* p_body, const box_collider* p_collider, const transform* p_transform) { return set_position_rotation(p_entity, p_body, p_collider, p_transform); }
+        void add_box_collider(uint32_t p_entity_id, const transform* p_transform, const physics_body* p_body, const box_collider* p_collider) { return emplace_box_collider(p_entity_id, p_transform, p_body, p_collider); }
 
         transform read_transform(uint32_t p_id) { return context_read_transform(p_id); }
 
         physics_body read_physics_body(uint32_t p_id) { return context_read_physics_body(p_id); }
 
     private:
-        virtual void create_bodies() = 0;
         
         virtual void destroy_bodies() = 0;
 
         virtual void execute_collisions() = 0;
 
-        // new API's for creating physics-specific bodies
-        virtual void emplace_box_collider(flecs::entity p_entity, const physics_body* p_body, const box_collider* p_collider) = 0;
-
-        // virtual void set_position_rotation(flecs::entity p_entity, const physics_body* p_body, const box_collider* p_collider, const transform* p_transform) = 0;
+        virtual void emplace_box_collider(uint32_t p_entity_id, const transform* p_transform, const physics_body* p_body, const box_collider* p_collider) = 0;
 
         virtual transform context_read_transform(uint32_t p_id) = 0;
 
         virtual physics_body context_read_physics_body(uint32_t p_id) = 0;
 
         virtual void prepare_and_finalize() = 0;
-        virtual void update_simulation(float p_delta_time) = 0;
 
-        virtual ref<JPH::PhysicsSystem>& set_physics_instance() = 0;
+        virtual void update_simulation(float p_delta_time) = 0;
     };
 
     ref<physics_context> initialize_physics_context(const jolt_settings& p_settings);
