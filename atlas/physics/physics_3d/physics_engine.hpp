@@ -62,5 +62,6 @@ namespace atlas::physics {
          */
         flecs::query<transform, collider_body> m_query_transform;
         flecs::query<physics_body> m_query_body;
+        flecs::query<physics_body, box_collider, transform> m_query_box_collider;
     };
 };

@@ -57,10 +57,13 @@ level_scene::level_scene(const std::string& p_name)
       .texture_path = "assets/models/container_diffuse.png",
     });
 
-    m_robot_model->set<atlas::collider_body>({
-      .shape_type = atlas::collider_shape::box,
-      .half_extents = { 1.f, 1.f, 1.f },
-    });
+    // m_robot_model->set<atlas::collider_body>({
+    //   .shape_type = atlas::collider_shape::box,
+    //   .half_extents = { 1.f, 1.f, 1.f },
+    // });
+	m_robot_model->set<atlas::box_collider>({
+		.half_extent = {1.f, 1.f, 1.f}
+	});
     m_robot_model->set<atlas::physics_body>({
       // .restitution = 1.25f,
       .body_movement_type = atlas::dynamic,
@@ -74,12 +77,19 @@ level_scene::level_scene(const std::string& p_name)
     m_platform->set<atlas::transform>({
       .scale = { 15.f, 0.30f, 10.0f },
     });
-    m_platform->set<atlas::collider_body>({
-      .shape_type = atlas::collider_shape::box,
-      .half_extents = { 15.f, 0.30f, 10.0f },
-      // .radius = 1.f,
-      // .half_extents = {15.f, -0.30f, 10.0f}
+	m_platform->set<atlas::physics_body>({
+      .body_movement_type = atlas::fixed,
     });
+	m_platform->set<atlas::box_collider>({
+		.half_extent = { 15.f, 0.30f, 10.0f },
+	});
+
+    // m_platform->set<atlas::collider_body>({
+    //   .shape_type = atlas::collider_shape::box,
+    //   .half_extents = { 15.f, 0.30f, 10.0f },
+    //   // .radius = 1.f,
+    //   // .half_extents = {15.f, -0.30f, 10.0f}
+    // });
 
     m_platform->set<atlas::material>({
       .model_path = "assets/models/cube.obj",
@@ -424,8 +434,6 @@ level_scene::start() {
 
 void
 level_scene::on_update() {
-    // atlas::transform* camera_transform =
-    // m_camera->get_mut<atlas::transform>();
     auto query_cameras =
       query_builder<atlas::perspective_camera, atlas::transform>().build();
 
@@ -484,7 +492,8 @@ level_scene::on_update() {
           }
 
           p_transform.set_rotation(p_transform.rotation);
-      });
+    });
+
 }
 
 void
