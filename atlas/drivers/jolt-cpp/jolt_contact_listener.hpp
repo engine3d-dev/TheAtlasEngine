@@ -13,6 +13,38 @@ namespace atlas::physics {
      *
      */
     class contact_listener : public JPH::ContactListener {
+    public:
+        /**
+         * @brief Construct a new contact listener object
+         *
+         */
+        contact_listener();
+
+        /**
+         * @brief Deletes all events. Helps reset the collisions on load, etc...
+         *
+         */
+        // void clear_events();
+
+        /**
+         * @brief Calls all events that came into contact this frame
+         *
+         */
+        // void run_events_added();
+
+        /**
+         * @brief Runs all events that came into contact every frame but first
+         * and last.
+         *
+         */
+        // void run_events_persisted();
+
+        /**
+         * @brief Runs all events who stopped contact this frame
+         *
+         */
+        // void run_events_removed();
+        
     private:
         /**
          * @brief This allows us to make sure that the contacts are valid and
@@ -74,59 +106,27 @@ namespace atlas::physics {
         void OnContactRemoved(
           const JPH::SubShapeIDPair& in_sub_shape_pair) override;
 
-    public:
-        /**
-         * @brief Construct a new contact listener object
-         *
-         */
-        contact_listener();
-
-        /**
-         * @brief Deletes all events. Helps reset the collisions on load, etc...
-         *
-         */
-        void clear_events();
-
-        /**
-         * @brief Calls all events that came into contact this frame
-         *
-         */
-        void run_events_added();
-
-        /**
-         * @brief Runs all events that came into contact every frame but first
-         * and last.
-         *
-         */
-        void run_events_persisted();
-
-        /**
-         * @brief Runs all events who stopped contact this frame
-         *
-         */
-        void run_events_removed();
-
     private:
         /**
          * @brief A way to gather all the events and organize them each frame
          *
          */
-        std::vector<contact_event> m_contacts_added;
+        // std::vector<contact_event> m_contacts_added;
 
         /**
          * @brief FIXME: These two are unused and will be used when
          * OnContactPersisted and OncontactRemoved get implemented.
          *
          */
-        std::vector<contact_event> m_contacts_persisted;
-        std::vector<contact_event> m_contacts_removed;
+        // std::vector<contact_event> m_contacts_persisted;
+        // std::vector<contact_event> m_contacts_removed;
 
         /**
          * @brief Access to this scene. Should be replaced with get_scenes()
          * function. So it can update based on loading and scene changes.
          *
          */
-        ref<scene_scope> m_scene;
-        flecs::world m_registry;
+        // ref<scene_scope> m_scene;
+        // flecs::world m_registry;
     };
 };

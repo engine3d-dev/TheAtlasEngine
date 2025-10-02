@@ -50,7 +50,7 @@ namespace atlas::physics {
          * finished as to stop thread collision issues.
          *
          */
-        void execute_collisions() override;
+        // void execute_collisions() override;
 
         void update_simulation(float p_delta_time) override;
 
@@ -106,7 +106,8 @@ namespace atlas::physics {
          * @brief Creates a way to recognize collisions
          *
          */
-        ref<contact_listener> m_contact_listener;
+        // ref<contact_listener> m_contact_listener;
+        contact_listener m_contact_listener;
 
         /**
          * @brief Gives access to the physics system. Is given to jolt_api as

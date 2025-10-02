@@ -32,19 +32,14 @@ set(
     ${SRC_DIR}/core/serialize/serializer.cpp
     ${SRC_DIR}/core/serialize/types.cpp
 
-    # jolt
-    # ${SRC_DIR}/drivers/jolt-cpp/jolt_api.cpp
-    ${SRC_DIR}/drivers/jolt-cpp/jolt_context.cpp
-    ${SRC_DIR}/drivers/jolt-cpp/jolt_helper.cpp
-
     # physics stuff
     ${SRC_DIR}/physics/physics_engine.cpp
     ${SRC_DIR}/physics/physics_context.cpp
 
-    ${SRC_DIR}/drivers/jolt-cpp/jolt_collision_manager.cpp
-    ${SRC_DIR}/drivers/jolt-cpp/jolt_collision.cpp
+    # jolt
+    ${SRC_DIR}/drivers/jolt-cpp/types.cpp
+    ${SRC_DIR}/drivers/jolt-cpp/jolt_context.cpp
     ${SRC_DIR}/drivers/jolt-cpp/jolt_contact_listener.cpp
-    ${SRC_DIR}/drivers/jolt-cpp/jolt_error_handler.cpp
 
     # Scene stuff
     ${SRC_DIR}/core/scene/world.cpp

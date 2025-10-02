@@ -8,50 +8,10 @@
 #include <Jolt/Physics/Collision/ContactListener.h>
 
 namespace atlas::physics {
-
     enum thread_type : uint8_t {
         default_system = 0,
         job_system = 1,
     };
-
-    // enum body_layer : uint8_t { NonMoving = 0, Moving = 1, LayerNum };
-
-    /**
-     * @brief This is a replacement for an event system to handle collider.
-     * It will be replaced by an event system once we have functional one up
-     * and running.
-     *
-     * Its point is to associate entities with user made jolt collisions.
-     *
-     */
-    struct collider_event {
-        uint64_t id = 0;
-    };
-}
-
-//! @brief created for future use of dynamic physics material
-//! @remark FIXME: This needs to be associated with our own interpretations of
-//! how friction should work. Or have a way for users to override these
-//! functions. Do not delete for it will be needed in the near furture.
-enum combine_friction : uint8_t {
-    friction_default = 0,
-    friction_max = 1,
-    friction_min = 2,
-    friction_num = 3,
-};
-
-//! @brief Created for future use of dynamic physics material
-//! @remark FIXME: Same thing here, this will be used in the near future. As it
-//! is required by the basic jolt system. However, disccussion need to be made
-//! about how we allow users to overwrite resititution.
-enum combine_restitution : uint8_t {
-    restitution_default = 0,
-    restitution_max = 1,
-    restitution_min = 2,
-    restitution_num = 3,
-};
-
-namespace atlas::physics {
 
     /**
      * @brief Used to keep global data for player access and use.
@@ -61,15 +21,6 @@ namespace atlas::physics {
     struct jolt_config {
         // Global gravity vector for all in scene
         glm::vec3 gravity = glm::vec3(0.0f, -9.80665f, 0.0f);
-
-        // Friction Setting
-        // This needs to be set to a function which makes it harder
-        combine_friction friction_type = combine_friction::friction_default;
-
-        // Restitution Settings
-        // Same thing need functions for each.
-        combine_restitution restitution_type =
-          combine_restitution::restitution_default;
 
         //! @brief In seconds
         float time_before_sleep = 5.0f;

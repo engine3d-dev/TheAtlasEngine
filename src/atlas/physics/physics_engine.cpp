@@ -1,5 +1,5 @@
 #include <physics/physics_engine.hpp>
-#include <drivers/jolt-cpp/jolt_helper.hpp>
+#include <drivers/jolt-cpp/types.hpp>
 #include <drivers/jolt-cpp/jolt-imports.hpp>
 #include <Jolt/Physics/Body/BodyLockMulti.h>
 #include <core/application.hpp>
@@ -40,18 +40,6 @@ namespace atlas::physics {
             p_transform.position = t.position;
             p_transform.rotation = t.rotation;
             p_transform.quaternion = t.quaternion;
-            //   const JPH::BodyID id = JPH::BodyID(collider.body_id);
-
-            //   JPH::Vec3 pos = interface.GetPosition(id);
-            //   JPH::Quat rot = interface.GetRotation(id);
-            //   JPH::Vec3 rot_euler = rot.GetEulerAngles();
-
-            //   transform.position =
-            //     glm::vec3(pos.GetX(), pos.GetY(), pos.GetZ());
-            //   transform.quaternion =
-            //     glm::vec4(rot.GetX(), rot.GetY(), rot.GetZ(), rot.GetW());
-            //   transform.rotation =
-            //     glm::vec3(rot_euler.GetX(), rot_euler.GetY(), rot_euler.GetZ());
 
             // Handle updating the physics body parameters here
             auto body = m_physics_context->read_physics_body(p_entity.id());
@@ -100,7 +88,7 @@ namespace atlas::physics {
         });
 
         // Execute collisions that happen with the collision manager
-        m_physics_context->update_collision_events();
+        // m_physics_context->update_collision_events();
     }
 
     void physics_engine::stop() {

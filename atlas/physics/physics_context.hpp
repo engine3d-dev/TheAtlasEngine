@@ -26,7 +26,7 @@ namespace atlas::physics {
 
         //! @brief Executes any collision events that occurred
         // This is what the event system will use to detect any collided events that occurred
-        void update_collision_events() { return execute_collisions(); }
+        // void update_collision_events() { return execute_collisions(); }
 
         void update(float p_delta_time) { return update_simulation(p_delta_time); }
 
@@ -48,7 +48,7 @@ namespace atlas::physics {
         
         virtual void destroy_bodies() = 0;
 
-        virtual void execute_collisions() = 0;
+        // virtual void execute_collisions() = 0;
 
         virtual void emplace_box_collider(uint32_t p_entity_id, const transform* p_transform, const physics_body* p_body, const box_collider* p_collider) = 0;
 

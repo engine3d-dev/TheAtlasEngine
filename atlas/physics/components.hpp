@@ -58,36 +58,6 @@ namespace atlas {
         int count = 0;
     };
 
-    /**
-     *  @name Collider Shape
-     *  @brief Required in order for collision types to be synced with jolts
-     * shape filters
-     */
-    // enum class collider_shape : uint8_t {
-    //     box,
-    //     sphere,
-    //     capsule,
-    // };
-
-    /**
-     * @name Collider Body
-     * @brief Some of this data is not required depending on the shape
-     *
-     * @remark If there is a way to hide or disable certains action in the
-     * editor depending on the collider_shape, it would be good to do so in
-     * this circumstance.
-     */
-
-    // struct collider_body {
-    //     bool collision_enabled = true;
-
-    //     collider_shape shape_type = collider_shape::box;
-
-    //     glm::vec3 half_extents = glm::vec3(0.5f);
-    //     float radius = 0.5f;
-    //     float capsule_half_height = 0.5f;
-    // };
-
     struct box_collider {
         bool enable = true;
         uint8_t motion_type = body_type::fixed;

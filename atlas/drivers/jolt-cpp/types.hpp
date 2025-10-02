@@ -31,11 +31,7 @@ namespace atlas {
 
 namespace atlas::physics {
 
-    inline JPH::Vec3 to_jph(const glm::vec3& v) {
-        return { v.x, v.y, v.z };
-    }
+    JPH::Vec3 to_jph(const glm::vec3& v);
 
-    inline JPH::Quat to_jph(const glm::vec4& q) {
-        return { q.x, q.y, q.z, q.w };
-    }
+    JPH::Quat to_jph(const glm::vec4& q);
 };
