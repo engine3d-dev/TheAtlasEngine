@@ -72,8 +72,9 @@ level_scene::level_scene(const std::string& p_name)
     //   .shape_type = atlas::collider_shape::box,
     //   .half_extents = { 1.f, 1.f, 1.f },
     // });
-	m_robot_model->set<atlas::box_collider>({
-		.half_extent = {1.f, 1.f, 1.f}
+	m_robot_model->set<atlas::capsule_collider>({
+		// .half_extent = {1.f, 1.f, 1.f}
+		.half_height = 0.5f,
 	});
     m_robot_model->set<atlas::physics_body>({
       // .restitution = 1.25f,

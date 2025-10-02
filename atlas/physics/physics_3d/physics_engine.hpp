@@ -53,7 +53,9 @@ namespace atlas::physics {
         ref<physics_context> m_physics_context;
         jolt_config m_jolt_config;
 
-        flecs::query<transform, physics_body, sphere_collider> m_query_sphere_collider;
         flecs::query<transform, physics_body, box_collider> m_query_box_collider;
+        flecs::query<transform, physics_body, sphere_collider> m_query_sphere_collider;
+        flecs::query<transform, physics_body, capsule_collider> m_query_capsule_collider;
+        
     };
 };
