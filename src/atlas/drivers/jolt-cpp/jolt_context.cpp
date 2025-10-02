@@ -7,7 +7,7 @@
 #include <core/engine_logger.hpp>
 
 namespace atlas::physics {
-    void trace_impl(const char* p_in_fmt, ...) {
+    static void trace_impl(const char* p_in_fmt, ...) {
         va_list list;
         va_start(list, p_in_fmt);
         char buffer[1024];
@@ -16,7 +16,7 @@ namespace atlas::physics {
         console_log_error("{}", buffer);
     }
 
-    bool assert_failed_impl(const char* p_in_expression,
+    static bool assert_failed_impl(const char* p_in_expression,
                             const char* p_in_message,
                             const char* p_in_file,
                             unsigned int p_in_line) {
