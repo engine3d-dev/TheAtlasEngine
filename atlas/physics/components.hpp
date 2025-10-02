@@ -63,11 +63,11 @@ namespace atlas {
      *  @brief Required in order for collision types to be synced with jolts
      * shape filters
      */
-    enum class collider_shape : uint8_t {
-        box,
-        sphere,
-        capsule,
-    };
+    // enum class collider_shape : uint8_t {
+    //     box,
+    //     sphere,
+    //     capsule,
+    // };
 
     /**
      * @name Collider Body
@@ -78,25 +78,21 @@ namespace atlas {
      * this circumstance.
      */
 
-    struct collider_body {
-        bool collision_enabled = true;
+    // struct collider_body {
+    //     bool collision_enabled = true;
 
-        collider_shape shape_type = collider_shape::box;
+    //     collider_shape shape_type = collider_shape::box;
 
-        glm::vec3 half_extents = glm::vec3(0.5f);
-        float radius = 0.5f;
-        float capsule_half_height = 0.5f;
-
-        // The id of the actuall JPH physics body
-        uint32_t body_id = 0;
-    };
+    //     glm::vec3 half_extents = glm::vec3(0.5f);
+    //     float radius = 0.5f;
+    //     float capsule_half_height = 0.5f;
+    // };
 
     struct box_collider {
         bool enable = true;
         uint8_t motion_type = body_type::fixed;
         uint8_t body_layer = body_layer::moving;
         glm::vec3 half_extent=glm::vec3(0.5f);
-        uint32_t id=0;
     };
 
     struct capsule_collider {
@@ -104,8 +100,7 @@ namespace atlas {
         uint8_t motion_type = body_type::fixed;
         uint8_t body_layer = body_layer::moving;
         float radius=0.5f;
-        float capsule_half_height = 0.5f;
-        uint32_t id=0;
+        float half_height = 0.5f;
     };
 
     struct sphere_collider {
@@ -113,7 +108,6 @@ namespace atlas {
         uint8_t motion_type = body_type::fixed;
         uint8_t body_layer = body_layer::moving;
         float radius = 0.5f;
-        uint32_t id=0;
     };
 
 };

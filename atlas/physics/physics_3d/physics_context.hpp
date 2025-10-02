@@ -36,6 +36,10 @@ namespace atlas::physics {
 
         void add_box_collider(uint32_t p_entity_id, const transform* p_transform, const physics_body* p_body, const box_collider* p_collider) { return emplace_box_collider(p_entity_id, p_transform, p_body, p_collider); }
 
+        void add_sphere_collider(uint32_t p_entity_id, const transform* p_transform, const physics_body* p_body, const sphere_collider* p_collider) { return emplace_sphere_collider(p_entity_id, p_transform, p_body, p_collider); }
+
+        void add_capsule_collider(uint32_t p_entity_id, const transform* p_transform, const physics_body* p_body, const capsule_collider* p_collider) { return emplace_capsule_collider(p_entity_id, p_transform, p_body, p_collider); }
+
         transform read_transform(uint32_t p_id) { return context_read_transform(p_id); }
 
         physics_body read_physics_body(uint32_t p_id) { return context_read_physics_body(p_id); }
@@ -47,6 +51,10 @@ namespace atlas::physics {
         virtual void execute_collisions() = 0;
 
         virtual void emplace_box_collider(uint32_t p_entity_id, const transform* p_transform, const physics_body* p_body, const box_collider* p_collider) = 0;
+
+        virtual void emplace_sphere_collider(uint32_t p_entity_id, const transform* p_transform, const physics_body* p_body, const sphere_collider* p_collider)  = 0;
+
+        virtual void emplace_capsule_collider(uint32_t p_entity_id, const transform* p_transform, const physics_body* p_body, const capsule_collider* p_collider)  = 0;
 
         virtual transform context_read_transform(uint32_t p_id) = 0;
 

@@ -1,9 +1,7 @@
 #pragma once
 #include <core/core.hpp>
 #include <drivers/jolt-cpp/jolt_components.hpp>
-#include <drivers/jolt-cpp/jolt_api.hpp>
 #include <physics/physics_3d/physics_context.hpp>
-// #include <drivers/jolt-cpp/jolt_api.hpp>
 
 namespace atlas::physics {
 
@@ -55,13 +53,7 @@ namespace atlas::physics {
         ref<physics_context> m_physics_context;
         jolt_config m_jolt_config;
 
-        /**
-         * @brief Flecs querys deticated to reading and writing from jolt and
-         * atlas. Targeting physics bodies.
-         *
-         */
-        flecs::query<transform, collider_body> m_query_transform;
-        flecs::query<physics_body> m_query_body;
-        flecs::query<transform, physics_body, box_collider, transform> m_query_box_collider;
+        flecs::query<transform, physics_body, sphere_collider> m_query_sphere_collider;
+        flecs::query<transform, physics_body, box_collider> m_query_box_collider;
     };
 };

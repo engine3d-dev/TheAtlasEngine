@@ -56,6 +56,11 @@ namespace atlas::physics {
 
     protected:
         void emplace_box_collider(uint32_t p_entity_id, const transform* p_transform, const physics_body* p_body, const box_collider* p_collider) override;
+
+        void emplace_sphere_collider(uint32_t p_entity_id, const transform* p_transform, const physics_body* p_body, const sphere_collider* p_collider) override;
+
+        void emplace_capsule_collider(uint32_t p_entity_id, const transform* p_transform, const physics_body* p_body, const capsule_collider* p_collider) override;
+
         // void set_position_rotation(flecs::entity p_entity, const physics_body* p_body, const box_collider* p_collider, const transform* p_transform) override;
         transform context_read_transform(uint32_t p_id) override;
 

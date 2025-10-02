@@ -19,7 +19,7 @@ level_scene::level_scene(const std::string& p_name)
     });
 
     m_viking_room = create_object("Viking Room Object");
-    m_viking_room->add<atlas::tag::serialize>();
+    // m_viking_room->add<atlas::tag::serialize>();
     m_viking_room->set<atlas::transform>({
       .position = { -2.70f, 2.70, -8.30f },
       .rotation = { 2.30f, 95.90f, 91.80f },
@@ -27,9 +27,20 @@ level_scene::level_scene(const std::string& p_name)
     });
     m_viking_room->set<atlas::material>({
       .color = { 1.f, 1.f, 1.f, 1.f },
-      .model_path = "assets/models/viking_room.obj",
-      .texture_path = "assets/models/viking_room.png",
+    //   .model_path = "assets/models/viking_room.obj",
+    //   .texture_path = "assets/models/viking_room.png",
+		.model_path = "assets/models/Ball OBJ.obj",
+		.texture_path = "assets/models/clear.png",
     });
+
+	m_viking_room->set<atlas::sphere_collider>({
+		.radius = 1.0f,
+	});
+
+	m_viking_room->set<atlas::physics_body>({
+		.restitution = 1.25f,
+		.body_movement_type = atlas::dynamic,
+	});
 
     m_cube = create_object("Aircraft");
 
@@ -187,12 +198,12 @@ ui_component_list(flecs::entity& p_selected_entity) {
         //     }
         // }
 
-        if (!p_selected_entity.has<atlas::collider_body>()) {
-            if (ImGui::MenuItem("Collider")) {
-                p_selected_entity.add<atlas::collider_body>();
-                ImGui::CloseCurrentPopup();
-            }
-        }
+        // if (!p_selected_entity.has<atlas::collider_body>()) {
+        //     if (ImGui::MenuItem("Collider")) {
+        //         p_selected_entity.add<atlas::collider_body>();
+        //         ImGui::CloseCurrentPopup();
+        //     }
+        // }
 
         if (!p_selected_entity.has<atlas::physics_body>()) {
             if (ImGui::MenuItem("Physics Body")) {
@@ -414,11 +425,11 @@ level_scene::on_ui_update() {
 
 void
 level_scene::start() {
-    m_deserializer_test = atlas::serializer();
+    // m_deserializer_test = atlas::serializer();
 
-    if (!m_deserializer_test.load("LevelScene", *this)) {
-        console_log_error("Could not load yaml file LevelScene!!!");
-    }
+    // if (!m_deserializer_test.load("LevelScene", *this)) {
+    //     console_log_error("Could not load yaml file LevelScene!!!");
+    // }
 
 	// Initiating physics system
 	atlas::physics::jolt_settings settings = {};
