@@ -28,10 +28,6 @@ namespace atlas {
             output << p_entity.get<material>();
         }
 
-        if (p_entity.has<collider_body>()) {
-            output << p_entity.get<collider_body>();
-        }
-
         if (p_entity.has<physics_body>()) {
             output << p_entity.get<physics_body>();
         }
@@ -80,46 +76,32 @@ namespace atlas {
         }
 
         // deserialize physics body
-        if (p_entity_value["Physics Body"]) {
-            auto body = p_entity_value["Physics Body"];
-            p_deserialize_to_object.set<physics_body>({
-              .linear_velocity =
-                body["Linear Velocity"].as<glm::vec3>(),
-              .angular_velocity =
-                body["Angular Velocity"].as<glm::vec3>(),
-              .cumulative_force =
-                body["Cumulative Force"].as<glm::vec3>(),
-              .cumulative_torque =
-                body["Cumulative Torque"].as<glm::vec3>(),
-              .mass_factor = body["Mass Factor"].as<float>(),
-              .center_mass_position =
-                body["Center Mass Position"].as<glm::vec3>(),
-              .use_gravity = body["Gravity Enabled"].as<bool>(),
-              .gravity_factor = body["Gravity Factor"].as<float>(),
-              .body_type = body["Body Type"].as<body_type>(),
-              .friction = body["Friction"].as<float>(),
-              .body_movement_type =
-                body["Body Movement Type"].as<body_type>(),
-              .body_layer_type =
-                body["Body Layer Type"].as<body_layer>(),
-              .body_id = body["Body ID"].as<uint32_t>(),
-              .count = body["Count"].as<int>(),
-            });
-        }
-
-        if (p_entity_value["Collider Body"]) {
-            auto collider_data = p_entity_value["Collider Body"];
-            p_deserialize_to_object.set<collider_body>({
-              .collision_enabled = collider_data["Enabled"].as<bool>(),
-              .shape_type =
-                collider_data["Shape Type"].as<collider_shape>(),
-              .half_extents = collider_data["Extent"].as<glm::vec3>(),
-              .radius = collider_data["Radius"].as<float>(),
-              .capsule_half_height =
-                collider_data["Capsule Height"].as<float>(),
-              .body_id = collider_data["Body ID"].as<uint8_t>(),
-            });
-        }
+        // if (p_entity_value["Physics Body"]) {
+        //     auto body = p_entity_value["Physics Body"];
+        //     p_deserialize_to_object.set<physics_body>({
+        //       .linear_velocity =
+        //         body["Linear Velocity"].as<glm::vec3>(),
+        //       .angular_velocity =
+        //         body["Angular Velocity"].as<glm::vec3>(),
+        //       .cumulative_force =
+        //         body["Cumulative Force"].as<glm::vec3>(),
+        //       .cumulative_torque =
+        //         body["Cumulative Torque"].as<glm::vec3>(),
+        //       .mass_factor = body["Mass Factor"].as<float>(),
+        //       .center_mass_position =
+        //         body["Center Mass Position"].as<glm::vec3>(),
+        //       .use_gravity = body["Gravity Enabled"].as<bool>(),
+        //       .gravity_factor = body["Gravity Factor"].as<float>(),
+        //       .body_type = body["Body Type"].as<body_type>(),
+        //       .friction = body["Friction"].as<float>(),
+        //       .body_movement_type =
+        //         body["Body Movement Type"].as<body_type>(),
+        //       .body_layer_type =
+        //         body["Body Layer Type"].as<body_layer>(),
+        //       .body_id = body["Body ID"].as<uint32_t>(),
+        //       .count = body["Count"].as<int>(),
+        //     });
+        // }
     }
 
     serializer::serializer(const ref<scene_scope>& p_scene_ctx)

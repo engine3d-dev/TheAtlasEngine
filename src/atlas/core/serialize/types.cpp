@@ -69,26 +69,26 @@ namespace atlas {
         return p_output;
     }
 
-    YAML::Emitter& operator<<(YAML::Emitter& p_output,
-                              const collider_body* p_collider) {
-        p_output << YAML::Key << "Collider Body";
+    // YAML::Emitter& operator<<(YAML::Emitter& p_output,
+    //                           const collider_body* p_collider) {
+    //     p_output << YAML::Key << "Collider Body";
 
-        p_output << YAML::BeginMap;
-        p_output << YAML::Key << "Enabled" << YAML::Value
-                 << p_collider->collision_enabled;
-        p_output << YAML::Key << "Shape Type" << YAML::Value
-                 << (int)p_collider->shape_type;
-        p_output << YAML::Key << "Extent" << YAML::Value
-                 << p_collider->half_extents;
-        p_output << YAML::Key << "Radius" << YAML::Value << p_collider->radius;
-        p_output << YAML::Key << "Capsule Height" << YAML::Value
-                 << p_collider->capsule_half_height;
-        p_output << YAML::Key << "Body ID" << YAML::Value
-                 << p_collider->body_id;
-        p_output << YAML::EndMap;
+    //     p_output << YAML::BeginMap;
+    //     p_output << YAML::Key << "Enabled" << YAML::Value
+    //              << p_collider->collision_enabled;
+    //     p_output << YAML::Key << "Shape Type" << YAML::Value
+    //              << (int)p_collider->shape_type;
+    //     p_output << YAML::Key << "Extent" << YAML::Value
+    //              << p_collider->half_extents;
+    //     p_output << YAML::Key << "Radius" << YAML::Value << p_collider->radius;
+    //     p_output << YAML::Key << "Capsule Height" << YAML::Value
+    //              << p_collider->capsule_half_height;
+    //     p_output << YAML::Key << "Body ID" << YAML::Value
+    //              << p_collider->body_id;
+    //     p_output << YAML::EndMap;
 
-        return p_output;
-    }
+    //     return p_output;
+    // }
 
     YAML::Emitter& operator<<(YAML::Emitter& p_output,
                               const physics_body* p_body) {

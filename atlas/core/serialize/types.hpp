@@ -75,24 +75,24 @@ namespace YAML {
         }
     };
 
-    template<>
-    struct convert<atlas::collider_shape> {
-        static Node encode(const atlas::collider_shape& rhs) {
-            Node node;
-            node.push_back(static_cast<uint8_t>(rhs));
-            return node;
-        }
+    // template<>
+    // struct convert<atlas::collider_shape> {
+    //     static Node encode(const atlas::collider_shape& rhs) {
+    //         Node node;
+    //         node.push_back(static_cast<uint8_t>(rhs));
+    //         return node;
+    //     }
 
-        static bool decode(const Node& node,
-                           atlas::collider_shape& rhs) {
-            if (!node.IsScalar()) {
-                return false;
-            }
-            rhs =
-              static_cast<atlas::collider_shape>(node.as<uint8_t>());
-            return true;
-        }
-    };
+    //     static bool decode(const Node& node,
+    //                        atlas::collider_shape& rhs) {
+    //         if (!node.IsScalar()) {
+    //             return false;
+    //         }
+    //         rhs =
+    //           static_cast<atlas::collider_shape>(node.as<uint8_t>());
+    //         return true;
+    //     }
+    // };
 
     // Specialization for body_type enum
     template<>
@@ -202,8 +202,8 @@ namespace atlas {
                               const material* p_material);
 
     // physics-based components
-    YAML::Emitter& operator<<(YAML::Emitter& p_output,
-                              const collider_body* p_collider);
+    // YAML::Emitter& operator<<(YAML::Emitter& p_output,
+    //                           const collider_body* p_collider);
 
     YAML::Emitter& operator<<(YAML::Emitter& p_output,
                               const physics_body* p_body);
