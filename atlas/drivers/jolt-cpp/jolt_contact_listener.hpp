@@ -44,7 +44,7 @@ namespace atlas::physics {
          *
          */
         // void run_events_removed();
-        
+
     private:
         /**
          * @brief This allows us to make sure that the contacts are valid and

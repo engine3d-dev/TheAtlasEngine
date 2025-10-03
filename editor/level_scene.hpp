@@ -50,7 +50,7 @@ private:
     // std::vector<atlas::strong_ref<atlas::scene_object>> m_many_objects;
 
     // Pre-setup that should be handled by atlas::physics_system
-    atlas::physics::physics_engine m_physics_engine_handler; 
+    atlas::physics::physics_engine m_physics_engine_handler;
 
     bool m_blink_text = false;
     glm::vec3 m_offset_from_camera;

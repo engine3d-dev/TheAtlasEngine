@@ -18,10 +18,7 @@ namespace atlas {
         layer_num,
     };
 
-    enum activation : uint8_t {
-        activate,
-        deactivate
-    };
+    enum activation : uint8_t { activate, deactivate };
 
     /**
      * @name Physics Body
@@ -62,19 +59,19 @@ namespace atlas {
         bool enable = true;
         uint8_t motion_type = body_type::fixed;
         uint8_t body_layer = body_layer::moving;
-        glm::vec3 half_extent=glm::vec3(0.5f);
+        glm::vec3 half_extent = glm::vec3(0.5f);
     };
 
     struct capsule_collider {
         bool enable = true;
         uint8_t motion_type = body_type::fixed;
         uint8_t body_layer = body_layer::moving;
-        float radius=0.5f;
+        float radius = 0.5f;
         float half_height = 0.5f;
     };
 
     struct sphere_collider {
-        bool enable=true;
+        bool enable = true;
         uint8_t motion_type = body_type::fixed;
         uint8_t body_layer = body_layer::moving;
         float radius = 0.5f;

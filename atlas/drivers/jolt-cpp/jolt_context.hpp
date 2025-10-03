@@ -30,7 +30,6 @@ namespace atlas::physics {
         ~jolt_context() override = default;
 
     private:
-
         /**
          * @brief Removes all physics bodies and shapes from level_scene.
          *
@@ -53,18 +52,31 @@ namespace atlas::physics {
         void update_simulation(float p_delta_time) override;
 
     protected:
-        void emplace_box_collider(uint32_t p_entity_id, const transform* p_transform, const physics_body* p_body, const box_collider* p_collider) override;
+        void emplace_box_collider(uint32_t p_entity_id,
+                                  const transform* p_transform,
+                                  const physics_body* p_body,
+                                  const box_collider* p_collider) override;
 
-        void emplace_sphere_collider(uint32_t p_entity_id, const transform* p_transform, const physics_body* p_body, const sphere_collider* p_collider) override;
+        void emplace_sphere_collider(
+          uint32_t p_entity_id,
+          const transform* p_transform,
+          const physics_body* p_body,
+          const sphere_collider* p_collider) override;
 
-        void emplace_capsule_collider(uint32_t p_entity_id, const transform* p_transform, const physics_body* p_body, const capsule_collider* p_collider) override;
+        void emplace_capsule_collider(
+          uint32_t p_entity_id,
+          const transform* p_transform,
+          const physics_body* p_body,
+          const capsule_collider* p_collider) override;
 
-        // void set_position_rotation(flecs::entity p_entity, const physics_body* p_body, const box_collider* p_collider, const transform* p_transform) override;
+        // void set_position_rotation(flecs::entity p_entity, const
+        // physics_body* p_body, const box_collider* p_collider, const
+        // transform* p_transform) override;
         transform context_read_transform(uint32_t p_id) override;
 
         physics_body context_read_physics_body(uint32_t p_id) override;
-    private:
 
+    private:
         //! @note Must be defined before physics can be initialized otherwise
         //! jolt cannot be created properly.
         jolt_settings m_settings;
@@ -115,7 +127,7 @@ namespace atlas::physics {
          *
          */
         ref<JPH::PhysicsSystem> m_physics_system;
-        
+
         std::map<uint32_t, JPH::BodyID> m_cached_body_ids;
     };
 };

@@ -14,7 +14,8 @@ namespace atlas::physics {
     public:
         // Required by maps but should not be used in anyother circumstance.
         physics_engine() = default;
-        physics_engine(const jolt_settings& p_settings, flecs::world& p_registry);
+        physics_engine(const jolt_settings& p_settings,
+                       flecs::world& p_registry);
 
         /**
          * @brief The runtime is specifically the way to start the physics,
@@ -52,9 +53,11 @@ namespace atlas::physics {
         flecs::world* m_registry;
         ref<physics_context> m_physics_context;
 
-        flecs::query<transform, physics_body, box_collider> m_query_box_collider;
-        flecs::query<transform, physics_body, sphere_collider> m_query_sphere_collider;
-        flecs::query<transform, physics_body, capsule_collider> m_query_capsule_collider;
-        
+        flecs::query<transform, physics_body, box_collider>
+          m_query_box_collider;
+        flecs::query<transform, physics_body, sphere_collider>
+          m_query_sphere_collider;
+        flecs::query<transform, physics_body, capsule_collider>
+          m_query_capsule_collider;
     };
 };

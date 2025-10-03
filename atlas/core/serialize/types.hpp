@@ -155,8 +155,7 @@ namespace YAML {
             return node;
         }
 
-        static bool decode(const Node& node,
-                           atlas::physics_body& rhs) {
+        static bool decode(const Node& node, atlas::physics_body& rhs) {
             if (!node.IsMap()) {
                 return false;
             }

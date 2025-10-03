@@ -40,14 +40,16 @@ namespace atlas::physics {
     /**
      * @brief Jolt-specific context configurations
      * These are going to be internally integrated to jolt_context
-     * 
+     *
      * As these parameters currently are going to be specific to Jolt.
-     * 
-     * These parameters are also only specific to the construction-level, not initiation level of the API's
-     * 
-     * @remark Min and max world bounds are values that are artbitrary (in other words limit the simulation space)
-     * as JoltPhysics has a limit on distance for its limitation in simulation space
-    */
+     *
+     * These parameters are also only specific to the construction-level, not
+     * initiation level of the API's
+     *
+     * @remark Min and max world bounds are values that are artbitrary (in other
+     * words limit the simulation space) as JoltPhysics has a limit on distance
+     * for its limitation in simulation space
+     */
     struct jolt_settings {
 
         uint32_t allocation_amount = 10 * 1024 * 1024;
