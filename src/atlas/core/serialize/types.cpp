@@ -80,8 +80,9 @@ namespace atlas {
     //              << (int)p_collider->shape_type;
     //     p_output << YAML::Key << "Extent" << YAML::Value
     //              << p_collider->half_extents;
-    //     p_output << YAML::Key << "Radius" << YAML::Value << p_collider->radius;
-    //     p_output << YAML::Key << "Capsule Height" << YAML::Value
+    //     p_output << YAML::Key << "Radius" << YAML::Value <<
+    //     p_collider->radius; p_output << YAML::Key << "Capsule Height" <<
+    //     YAML::Value
     //              << p_collider->capsule_half_height;
     //     p_output << YAML::Key << "Body ID" << YAML::Value
     //              << p_collider->body_id;
