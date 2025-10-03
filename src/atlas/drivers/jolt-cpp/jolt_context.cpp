@@ -16,7 +16,7 @@ namespace atlas::physics {
         console_log_error("{}", buffer);
     }
 
-    static bool assert_failed_impl(const char* p_in_expression,
+    [[maybe_unused]] static bool assert_failed_impl(const char* p_in_expression,
                             const char* p_in_message,
                             const char* p_in_file,
                             unsigned int p_in_line) {
