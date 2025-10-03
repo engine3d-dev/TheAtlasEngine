@@ -7,9 +7,8 @@
 #include <core/scene/scene.hpp>
 #include <core/scene/scene_object.hpp>
 
-#include <drivers/jolt-cpp/jolt_helper.hpp>
+#include <drivers/jolt-cpp/types.hpp>
 #include <drivers/jolt-cpp/jolt_components.hpp>
-#include <physics/physics.hpp>
 
 namespace atlas {
 
