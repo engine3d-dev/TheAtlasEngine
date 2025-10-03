@@ -72,9 +72,8 @@ level_scene::level_scene(const std::string& p_name)
     //   .shape_type = atlas::collider_shape::box,
     //   .half_extents = { 1.f, 1.f, 1.f },
     // });
-	m_robot_model->set<atlas::capsule_collider>({
-		// .half_extent = {1.f, 1.f, 1.f}
-		.half_height = 0.5f,
+	m_robot_model->set<atlas::box_collider>({
+		.half_extent = {1.f, 1.f, 1.f}
 	});
     m_robot_model->set<atlas::physics_body>({
       // .restitution = 1.25f,
@@ -96,16 +95,35 @@ level_scene::level_scene(const std::string& p_name)
 		.half_extent = { 15.f, 0.30f, 10.0f },
 	});
 
+	// for(size_t i = 0; i < 30; i++) {
+	// 	auto obj = create_object(std::format("Object #{}", i));
+	// 	obj->set<atlas::physics_body>({
+	// 		.restitution = 1.25f,
+	// 		.body_movement_type = atlas::dynamic,
+	// 	});
+
+	// 	obj->set<atlas::sphere_collider>(
+	// 		{
+	// 		.radius = 1.0f,
+	// 	});
+
+	// 	glm::vec3 pos = {float(0*1.4),float(0 * 1.4),float(0 * -3) };
+
+	// 	obj->set<atlas::transform>({
+	// 		.position = pos,
+	// 		.rotation = {.3f, 0.0f, 0.0f},
+	// 	});
+
+	// 	obj->set<atlas::material>({
+	// 		.model_path = "assets/models/Ball OBJ.obj",
+	// 		.texture_path = "assets/models/clear.png",
+	// 	});
+	// 	m_many_objects.emplace_back(obj);
+	// }
+
 	console_log_info("Sphere ID = {}", m_viking_room->id());
 	console_log_info("Cube ID = {}", m_robot_model->id());
 	console_log_info("Platform ID = {}", m_platform->id());
-
-    // m_platform->set<atlas::collider_body>({
-    //   .shape_type = atlas::collider_shape::box,
-    //   .half_extents = { 15.f, 0.30f, 10.0f },
-    //   // .radius = 1.f,
-    //   // .half_extents = {15.f, -0.30f, 10.0f}
-    // });
 
     m_platform->set<atlas::material>({
       .model_path = "assets/models/cube.obj",
@@ -438,9 +456,8 @@ level_scene::start() {
 
 	// Initiating physics system
 	atlas::physics::jolt_settings settings = {};
-	atlas::physics::jolt_config config = {};
 	flecs::world registry = *this;
-	m_physics_engine_handler = atlas::physics::physics_engine(settings, config, registry);
+	m_physics_engine_handler = atlas::physics::physics_engine(settings, registry);
 
     // Note -- just added for temporary
     // ImGuiIO io = ImGui::GetIO();

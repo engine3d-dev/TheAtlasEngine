@@ -47,6 +47,7 @@ private:
     atlas::optional_ref<atlas::scene_object> m_platform;
     std::pmr::polymorphic_allocator<> m_allocator;
     atlas::optional_ref<atlas::scene_object> m_camera;
+    // std::vector<atlas::strong_ref<atlas::scene_object>> m_many_objects;
 
     // Pre-setup that should be handled by atlas::physics_system
     atlas::physics::physics_engine m_physics_engine_handler; 

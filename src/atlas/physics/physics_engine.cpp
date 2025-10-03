@@ -7,7 +7,7 @@
 
 namespace atlas::physics {
 
-    physics_engine::physics_engine(const jolt_settings& p_settings, const jolt_config& p_config, flecs::world& p_registry) : m_registry(&p_registry), m_jolt_config(p_config) {
+    physics_engine::physics_engine(const jolt_settings& p_settings, flecs::world& p_registry) : m_registry(&p_registry) {
         m_physics_context = initialize_physics_context(p_settings);
         m_query_box_collider = m_registry->query<transform, physics_body, box_collider>();
         m_query_sphere_collider = m_registry->query<transform, physics_body, sphere_collider>();
