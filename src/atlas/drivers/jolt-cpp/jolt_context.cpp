@@ -1,9 +1,7 @@
 #include <drivers/jolt-cpp/jolt_context.hpp>
-
+#include <drivers/jolt-cpp/jolt-imports.hpp>
 #include <physics/math_types.hpp>
-#include <scene/scene.hpp>
 #include <drivers/jolt-cpp/types.hpp>
-#include <core/application.hpp>
 #include <core/engine_logger.hpp>
 
 namespace atlas::physics {

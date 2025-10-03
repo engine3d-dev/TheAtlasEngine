@@ -1,7 +1,6 @@
-#include <core/engine_logger.hpp>
-#include <Jolt/Jolt.h>
-#include <Jolt/Physics/Body/Body.h>
+#include <drivers/jolt-cpp/jolt-imports.hpp>
 #include <drivers/jolt-cpp/jolt_contact_listener.hpp>
+#include <core/engine_logger.hpp>
 #include <drivers/jolt-cpp/jolt_components.hpp>
 
 namespace atlas::physics {
