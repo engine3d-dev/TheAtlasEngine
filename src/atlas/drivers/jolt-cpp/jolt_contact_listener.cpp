@@ -24,16 +24,16 @@ namespace atlas::physics {
 
         console_log_info("Collisions Added!");
 
-
         // Code that works well!
-        // We can use GetUserData to fetch the flecs::entity::id() that we assign when creating using BodyCreationSettings.mUserData parameter.
-        // Then using the event system, we can then report back to the listeners who subscribed to that, and send off these ID's when needed.
+        // We can use GetUserData to fetch the flecs::entity::id() that we
+        // assign when creating using BodyCreationSettings.mUserData parameter.
+        // Then using the event system, we can then report back to the listeners
+        // who subscribed to that, and send off these ID's when needed.
         uint64_t entity_id1 = static_cast<uint64_t>(p_body1.GetUserData());
         uint64_t entity_id2 = static_cast<uint64_t>(p_body2.GetUserData());
 
         console_log_info("Collided Added with Entity ID = {}", entity_id1);
         console_log_info("Collided Added with Entity ID = {}", entity_id2);
-
 
         // For Event system to handle when collision begins
     }

@@ -7,24 +7,41 @@
 
 namespace atlas::physics {
 
-    physics_engine::physics_engine(const jolt_settings& p_settings, flecs::world& p_registry) : m_registry(&p_registry) {
+    physics_engine::physics_engine(const jolt_settings& p_settings,
+                                   flecs::world& p_registry)
+      : m_registry(&p_registry) {
         m_physics_context = initialize_physics_context(p_settings);
-        m_query_box_collider = m_registry->query<transform, physics_body, box_collider>();
-        m_query_sphere_collider = m_registry->query<transform, physics_body, sphere_collider>();
-        m_query_capsule_collider = m_registry->query<transform, physics_body, capsule_collider>();
+        m_query_box_collider =
+          m_registry->query<transform, physics_body, box_collider>();
+        m_query_sphere_collider =
+          m_registry->query<transform, physics_body, sphere_collider>();
+        m_query_capsule_collider =
+          m_registry->query<transform, physics_body, capsule_collider>();
     };
 
     void physics_engine::start() {
-        m_query_box_collider.each([&](flecs::entity p_entity, transform& p_transform, physics_body& p_body, box_collider& p_collider){
-            m_physics_context->add_box_collider(p_entity.id(), &p_transform, &p_body, &p_collider);
+        m_query_box_collider.each([&](flecs::entity p_entity,
+                                      transform& p_transform,
+                                      physics_body& p_body,
+                                      box_collider& p_collider) {
+            m_physics_context->add_box_collider(
+              p_entity.id(), &p_transform, &p_body, &p_collider);
         });
 
-        m_query_sphere_collider.each([this](flecs::entity p_entity, transform& p_transform, physics_body& p_body, sphere_collider& p_collider){
-            m_physics_context->add_sphere_collider(p_entity.id(), &p_transform, &p_body, &p_collider);
+        m_query_sphere_collider.each([this](flecs::entity p_entity,
+                                            transform& p_transform,
+                                            physics_body& p_body,
+                                            sphere_collider& p_collider) {
+            m_physics_context->add_sphere_collider(
+              p_entity.id(), &p_transform, &p_body, &p_collider);
         });
 
-        m_query_capsule_collider.each([this](flecs::entity p_entity, transform& p_transform, physics_body& p_body, capsule_collider& p_collider){
-            m_physics_context->add_capsule_collider(p_entity.id(), &p_transform, &p_body, &p_collider);
+        m_query_capsule_collider.each([this](flecs::entity p_entity,
+                                             transform& p_transform,
+                                             physics_body& p_body,
+                                             capsule_collider& p_collider) {
+            m_physics_context->add_capsule_collider(
+              p_entity.id(), &p_transform, &p_body, &p_collider);
         });
         m_physics_context->prepare();
     }
@@ -33,8 +50,10 @@ namespace atlas::physics {
         using namespace JPH;
         m_physics_context->update(p_delta_time);
 
-        m_query_box_collider.each(
-          [&](flecs::entity p_entity, transform& p_transform, physics_body& p_body, box_collider&) {
+        m_query_box_collider.each([&](flecs::entity p_entity,
+                                      transform& p_transform,
+                                      physics_body& p_body,
+                                      box_collider&) {
             // Updating the transform parameter properties
             transform t = m_physics_context->read_transform(p_entity.id());
             p_transform.position = t.position;
@@ -53,7 +72,10 @@ namespace atlas::physics {
             p_body.body_type = body.body_type;
         });
 
-        m_query_sphere_collider.each([this](flecs::entity p_entity, transform& p_transform, physics_body& p_body, sphere_collider&){
+        m_query_sphere_collider.each([this](flecs::entity p_entity,
+                                            transform& p_transform,
+                                            physics_body& p_body,
+                                            sphere_collider&) {
             transform t = m_physics_context->read_transform(p_entity.id());
             p_transform.position = t.position;
             p_transform.rotation = t.rotation;
@@ -70,7 +92,10 @@ namespace atlas::physics {
             p_body.body_type = body.body_type;
         });
 
-        m_query_capsule_collider.each([this](flecs::entity p_entity, transform& p_transform, physics_body& p_body, capsule_collider&){
+        m_query_capsule_collider.each([this](flecs::entity p_entity,
+                                             transform& p_transform,
+                                             physics_body& p_body,
+                                             capsule_collider&) {
             transform t = m_physics_context->read_transform(p_entity.id());
             p_transform.position = t.position;
             p_transform.rotation = t.rotation;

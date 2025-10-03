@@ -5,7 +5,8 @@
 
 namespace atlas::physics {
 
-    ref<physics_context> initialize_physics_context(const jolt_settings& p_settings) {
+    ref<physics_context> initialize_physics_context(
+      const jolt_settings& p_settings) {
         return create_ref<jolt_context>(p_settings);
     }
 
