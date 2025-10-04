@@ -38,7 +38,7 @@ level_scene::level_scene(const std::string& p_name)
     });
 
     m_viking_room->set<atlas::physics_body>({
-      .restitution = 1.25f,
+      .restitution = 1.f,
       .body_movement_type = atlas::dynamic,
     });
 
@@ -64,7 +64,8 @@ level_scene::level_scene(const std::string& p_name)
 
     m_robot_model->set<atlas::material>({
       .color = { 1.f, 1.f, 1.f, 1.f },
-      .model_path = "assets/models/cube.obj",
+        .model_path = "assets/models/cube.obj",
+    //   .model_path = "assets/robot_model/l2back.obj",
       .texture_path = "assets/models/container_diffuse.png",
     });
 
@@ -72,10 +73,11 @@ level_scene::level_scene(const std::string& p_name)
     //   .shape_type = atlas::collider_shape::box,
     //   .half_extents = { 1.f, 1.f, 1.f },
     // });
-    m_robot_model->set<atlas::box_collider>(
-      { .half_extent = { 1.f, 1.f, 1.f } });
+    m_robot_model->set<atlas::box_collider>({
+      .half_extent = { 1.f, 1.f, 1.f },
+    });
     m_robot_model->set<atlas::physics_body>({
-      // .restitution = 1.25f,
+    //   .restitution = 1.f,
       .body_movement_type = atlas::dynamic,
     });
 
@@ -94,7 +96,7 @@ level_scene::level_scene(const std::string& p_name)
       .half_extent = { 15.f, 0.30f, 10.0f },
     });
 
-    // for(size_t i = 0; i < 30; i++) {
+    // for(size_t i = 0; i < 26; i++) {
     // 	auto obj = create_object(std::format("Object #{}", i));
     // 	obj->set<atlas::physics_body>({
     // 		.restitution = 1.25f,

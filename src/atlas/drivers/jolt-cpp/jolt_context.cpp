@@ -40,7 +40,7 @@ namespace atlas::physics {
         m_temp_allocator =
           create_ref<JPH::TempAllocatorImpl>(p_settings.allocation_amount);
 
-        // Sets up basic settings for physics engine
+        // This just sets up the JoltPhysics system and any listeners
         m_physics_system = create_ref<JPH::PhysicsSystem>();
         m_broad_phase_layer_interface =
           create_ref<broad_phase_layer_interface>();
@@ -58,8 +58,8 @@ namespace atlas::physics {
               p_settings.physics_threads);
         }
         else {
-            console_log_error("Unsupported thread system: {}",
-                              (int)p_settings.thread_type);
+            console_log_error("Unsupported custom job system");
+            assert(false);
         }
 
         m_physics_system->Init(p_settings.max_bodies,
@@ -80,9 +80,11 @@ namespace atlas::physics {
                                             const box_collider* p_collider) {
         using namespace JPH;
         auto& body_interface = m_physics_system->GetBodyInterface();
-        // ensure that the half_extent of the box shape always matches the
-        // object and reference that information through the transform
-        BoxShapeSettings shape_settings(to_jph(p_collider->half_extent));
+
+        // Creating our box shape and specifying half_extent that is a glm::vec3
+        // conversion to JPH::Vec3 half_extents must be 0.5f or else it can get
+        // an invalid convex radius
+        BoxShapeSettings shape_settings(jolt::to_vec3(p_collider->half_extent));
         auto result = shape_settings.Create();
 
         if (result.HasError()) {
@@ -107,11 +109,12 @@ namespace atlas::physics {
         }
 
         auto& box = result.Get();
-        BodyCreationSettings body_settings(box,
-                                           to_jph(p_transform->position),
-                                           to_jph(p_transform->quaternion),
-                                           motion_type,
-                                           p_body->body_layer_type);
+        BodyCreationSettings body_settings(
+          box,
+          jolt::to_vec3(p_transform->position),
+          jolt::to_quat(p_transform->quaternion),
+          motion_type,
+          p_body->body_layer_type);
 
         // NOTE TO  SELF ------ This is setting some pointer to the entity ID
         // WE CAN USE THIS TO TELL THE EVENT SYSTEM WHICH FLECS ENTITY COLLIDED
@@ -146,34 +149,35 @@ namespace atlas::physics {
         switch (p_body->body_movement_type) {
             case body_type::fixed: {
                 motion_type = EMotionType::Static;
-                console_log_info("EMotionType::Static!");
             } break;
             case body_type::dynamic: {
                 motion_type = EMotionType::Dynamic;
-                console_log_info("EMotionType::Dynamic!");
             } break;
             case body_type::kinematic: {
                 motion_type = EMotionType::Kinematic;
-                console_log_info("EMotionType::Kinematic!");
             } break;
         }
 
         auto& box = result.Get();
-        BodyCreationSettings body_settings(box,
-                                           to_jph(p_transform->position),
-                                           to_jph(p_transform->quaternion),
-                                           motion_type,
-                                           p_body->body_layer_type);
+        BodyCreationSettings body_settings(
+          box,
+          jolt::to_vec3(p_transform->position),
+          jolt::to_quat(p_transform->quaternion),
+          motion_type,
+          p_body->body_layer_type);
+
+        // Assigning the entity ID as the user data
+        // This can be used when the contact listener is given two entities at
+        // collision-levels
         body_settings.mUserData = static_cast<uint64_t>(p_entity_id);
-
+        body_settings.mRestitution = p_body->restitution;
         Body* body = body_interface.CreateBody(body_settings);
-        m_cached_body_ids.emplace(p_entity_id, body->GetID());
-
         // TODO: Fix this. Resitution increases when making collision contacts
         // here As this is broken (for now, it works, but this does need a
         // change) For now commenting this out because the issue is: When it
         // bounces, it increases. Which is NOT how that is supposed to work
         // body_interface.SetRestitution(body->GetID(), p_body->restitution);
+        m_cached_body_ids.emplace(p_entity_id, body->GetID());
     }
 
     void jolt_context::emplace_capsule_collider(
@@ -198,25 +202,24 @@ namespace atlas::physics {
         switch (p_body->body_movement_type) {
             case body_type::fixed: {
                 motion_type = EMotionType::Static;
-                console_log_info("EMotionType::Static!");
             } break;
             case body_type::dynamic: {
                 motion_type = EMotionType::Dynamic;
-                console_log_info("EMotionType::Dynamic!");
             } break;
             case body_type::kinematic: {
                 motion_type = EMotionType::Kinematic;
-                console_log_info("EMotionType::Kinematic!");
             } break;
         }
 
         auto& box = result.Get();
-        BodyCreationSettings body_settings(box,
-                                           to_jph(p_transform->position),
-                                           to_jph(p_transform->quaternion),
-                                           motion_type,
-                                           p_body->body_layer_type);
+        BodyCreationSettings body_settings(
+          box,
+          jolt::to_vec3(p_transform->position),
+          jolt::to_quat(p_transform->quaternion),
+          motion_type,
+          p_body->body_layer_type);
         body_settings.mUserData = static_cast<uint64_t>(p_entity_id);
+        body_settings.mRestitution = p_body->restitution;
 
         Body* body = body_interface.CreateBody(body_settings);
         m_cached_body_ids.emplace(p_entity_id, body->GetID());
@@ -232,21 +235,21 @@ namespace atlas::physics {
         using namespace JPH;
         transform new_transform{};
         auto& body_interface = m_physics_system->GetBodyInterface();
-        // if(!m_cached_body_ids.contains(p_entity.id())) {
-        //     // console_log_warn("Entity ID Not Found in Cache!!!");
-        //     return {};
-        // }
-        // BodyID body_id = m_cached_body_ids.at(p_entity.id());
+
         BodyID body_id = m_cached_body_ids[p_id];
         JPH::Vec3 pos = body_interface.GetPosition(body_id);
         JPH::Quat rot = body_interface.GetRotation(body_id);
         JPH::Vec3 rot_euler = rot.GetEulerAngles();
 
-        new_transform.position = glm::vec3(pos.GetX(), pos.GetY(), pos.GetZ());
-        new_transform.quaternion =
-          glm::vec4(rot.GetX(), rot.GetY(), rot.GetZ(), rot.GetW());
-        new_transform.rotation =
-          glm::vec3(rot_euler.GetX(), rot_euler.GetY(), rot_euler.GetZ());
+        // new_transform.position = glm::vec3(pos.GetX(), pos.GetY(),
+        // pos.GetZ());
+        new_transform.position = to_vec3(pos);
+        // new_transform.quaternion =
+        //   glm::vec4(rot.GetX(), rot.GetY(), rot.GetZ(), rot.GetW());
+        new_transform.quaternion = to_vec4(rot);
+        // new_transform.rotation =
+        //   glm::vec3(rot_euler.GetX(), rot_euler.GetY(), rot_euler.GetZ());
+        new_transform.rotation = to_vec3(rot_euler);
 
         return new_transform;
     }
@@ -279,23 +282,26 @@ namespace atlas::physics {
 
         // TODO: Provide read_linear_velocity and read_angular_velocity(uint32_t
         // p_id);
-        body.linear_velocity = glm::vec3(linear_velocity.GetX(),
-                                         linear_velocity.GetY(),
-                                         linear_velocity.GetZ());
-        body.angular_velocity = glm::vec3(angular_velocity.GetX(),
-                                          angular_velocity.GetY(),
-                                          angular_velocity.GetZ());
+        // body.linear_velocity = glm::vec3(linear_velocity.GetX(),
+        //                                  linear_velocity.GetY(),
+        //                                  linear_velocity.GetZ());
+        body.linear_velocity = to_vec3(linear_velocity);
+        // body.angular_velocity = glm::vec3(angular_velocity.GetX(),
+        //                                   angular_velocity.GetY(),
+        //                                   angular_velocity.GetZ());
+        body.angular_velocity = to_vec3(angular_velocity);
 
         JPH::Vec3 center_mass = body_interface.GetCenterOfMassPosition(body_id);
-        body.center_mass_position =
-          glm::vec3(center_mass.GetX(), center_mass.GetY(), center_mass.GetZ());
+        // body.center_mass_position =
+        //   glm::vec3(center_mass.GetX(), center_mass.GetY(),
+        //   center_mass.GetZ());
+        body.center_mass_position = to_vec3(center_mass);
 
         body.gravity_factor = body_interface.GetGravityFactor(body_id);
         body.friction = body_interface.GetFriction(body_id);
         body.restitution = body_interface.GetRestitution(body_id);
         body.body_type =
           static_cast<uint8_t>(body_interface.GetMotionType(body_id));
-
         return body;
     }
 
