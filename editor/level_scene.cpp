@@ -64,8 +64,8 @@ level_scene::level_scene(const std::string& p_name)
 
     m_robot_model->set<atlas::material>({
       .color = { 1.f, 1.f, 1.f, 1.f },
-        .model_path = "assets/models/cube.obj",
-    //   .model_path = "assets/robot_model/l2back.obj",
+      .model_path = "assets/models/cube.obj",
+      //   .model_path = "assets/robot_model/l2back.obj",
       .texture_path = "assets/models/container_diffuse.png",
     });
 
@@ -77,7 +77,7 @@ level_scene::level_scene(const std::string& p_name)
       .half_extent = { 1.f, 1.f, 1.f },
     });
     m_robot_model->set<atlas::physics_body>({
-    //   .restitution = 1.f,
+      //   .restitution = 1.f,
       .body_movement_type = atlas::dynamic,
     });
 

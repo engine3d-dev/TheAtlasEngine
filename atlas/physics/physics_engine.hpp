@@ -39,16 +39,6 @@ namespace atlas::physics {
          */
         void stop();
 
-        /**
-         * @brief Allows for contacts to be handled by the user right after
-         * physics_step has fully run.
-         *
-         * @warning It is important that these stay distict until we have a job
-         * manager to maintain them.
-         *
-         */
-        // void execute_collisions();
-
     private:
         flecs::world* m_registry;
         ref<physics_context> m_physics_context;

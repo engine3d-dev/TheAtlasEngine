@@ -33,7 +33,6 @@ namespace atlas::physics {
         void update_simulation(float p_delta_time) override;
 
     protected:
-    
         void emplace_box_collider(uint32_t p_entity_id,
                                   const transform* p_transform,
                                   const physics_body* p_body,
