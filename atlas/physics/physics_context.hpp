@@ -9,36 +9,42 @@
 
 namespace atlas::physics {
     /**
-     * @brief The context is the way to interact with only the engine. It is the
-     * api for all the background funcitons and information that the user
-     * shouldn not see. It is a virtual based type erasure class so thatmany
-     * engines can implement the same functions. Specifically realted to backend
-     * engine creation like batching, starting runtime, etc...
+     * @brief The context is the way to interact with specific backend context
+     * implementation such as JoltPhysics as our specific implementation-backend
+     *
+     * Provides API's to interact with the implemented physics context to run
+     * its simulation
      *
      */
     class physics_context {
     public:
         virtual ~physics_context() = default;
 
-        //! @brief Post-cleanup of any of the physics bodies parameters that has
-        //! been created
-        // for this runtime stimulation
+        //! @brief Performs cleanup when simulation stops
         void destroy() { return destroy_bodies(); }
 
-        //! @brief Executes any collision events that occurred
-        // This is what the event system will use to detect any collided events
-        // that occurred void update_collision_events() { return
-        // execute_collisions(); }
-
+        //! @brief updates our simulation using delta time and works with a
+        //! fixed timestep
         void update(float p_delta_time) {
             return update_simulation(p_delta_time);
         }
 
-        //! @brief Prepare the bodies created with the colliders and finalizing
-        //! those creations
-        // into the physics system
+        /**
+         * @brief As soon all physics bodies/colliders are created
+         *
+         * prepare() will be called to finalize all creation and apply them to
+         * the physics system for simulation
+         */
         void prepare() { return prepare_and_finalize(); }
 
+        /**
+         * @param p_entity_id is the entity ID to associate with adding the
+         * sphere collider
+         * @param p_transform provide the location of the entity when creating
+         * this entity
+         * @param p_physics_body provide the actual physics body representation
+         * @param p_collider provides the actual sphere collider
+         */
         void add_box_collider(uint32_t p_entity_id,
                               const transform* p_transform,
                               const physics_body* p_body,
@@ -47,6 +53,14 @@ namespace atlas::physics {
               p_entity_id, p_transform, p_body, p_collider);
         }
 
+        /**
+         * @param p_entity_id is the entity ID to associate with adding the
+         * sphere collider
+         * @param p_transform provide the location of the entity when creating
+         * this entity
+         * @param p_physics_body provide the actual physics body representation
+         * @param p_collider provides the actual sphere collider
+         */
         void add_sphere_collider(uint32_t p_entity_id,
                                  const transform* p_transform,
                                  const physics_body* p_body,
@@ -55,6 +69,14 @@ namespace atlas::physics {
               p_entity_id, p_transform, p_body, p_collider);
         }
 
+        /**
+         * @param p_entity_id is the entity ID to associate with adding the
+         * sphere collider
+         * @param p_transform provide the location of the entity when creating
+         * this entity
+         * @param p_physics_body provide the actual physics body representation
+         * @param p_collider provides the actual capsule collider
+         */
         void add_capsule_collider(uint32_t p_entity_id,
                                   const transform* p_transform,
                                   const physics_body* p_body,
@@ -63,10 +85,20 @@ namespace atlas::physics {
               p_entity_id, p_transform, p_body, p_collider);
         }
 
+        /**
+         * @param p_id is the entity ID that is required to specifiy which
+         * entity this transform in physics simulation to return to
+         * @return transform back to the entity after its modification
+         */
         transform read_transform(uint32_t p_id) {
             return context_read_transform(p_id);
         }
 
+        /**
+         * @param p_id is the entity ID that is required to specifiy which
+         * entity this transform in physics simulation to return to
+         * @return physics body back to the entity after its modification
+         */
         physics_body read_physics_body(uint32_t p_id) {
             return context_read_physics_body(p_id);
         }
@@ -74,8 +106,15 @@ namespace atlas::physics {
     private:
         virtual void destroy_bodies() = 0;
 
-        // virtual void execute_collisions() = 0;
-
+        /**
+         * @brief Any emplace_* specific function are specific collider
+         * implementation-specific to the backend (context) API's they are
+         * implemented with
+         *
+         * Since colliders have specific parameters that define them. It would
+         * simplify what parameter-access they have when adding these specific
+         * colliders to the physics system
+         */
         virtual void emplace_box_collider(uint32_t p_entity_id,
                                           const transform* p_transform,
                                           const physics_body* p_body,
@@ -102,6 +141,9 @@ namespace atlas::physics {
         virtual void update_simulation(float p_delta_time) = 0;
     };
 
+    //! @brief initializes the physics backend. SHOULD have an API associated
+    //! with but for now, we assume we only have JoltPhysics as our only physics
+    //! backend
     ref<physics_context> initialize_physics_context(
       const jolt_settings& p_settings);
 };

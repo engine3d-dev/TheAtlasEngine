@@ -308,6 +308,8 @@ namespace atlas::physics {
     void jolt_context::destroy_bodies() {
         auto& body_interface = m_physics_system->GetBodyInterface();
 
+        // Retrieve all body ID's to ensure that we do proper deactivation and
+        // post cleanup for the physics simulation
         JPH::BodyIDVector all_body_ids;
         m_physics_system->GetBodies(all_body_ids);
 
@@ -322,16 +324,8 @@ namespace atlas::physics {
             body_interface.DestroyBodies(all_body_ids.data(),
                                          static_cast<int>(all_body_ids.size()));
 
-            // std::unordered_map<uint64_t, JPH::RefConst<JPH::Shape>> empty;
-
-            // m_shape_registry.swap(empty);
-            // m_shape_registry.clear();
             m_cached_body_ids.clear();
         }
-
-        // if(!m_cached_body_ids.empty()) {
-        // m_cached_body_ids.clear();
-        // }
 
         console_log_info("Removed All shapes and bodies...\n");
     }

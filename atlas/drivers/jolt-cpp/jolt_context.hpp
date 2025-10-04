@@ -8,20 +8,13 @@
 
 namespace atlas::physics {
     /**
-     * @brief This class is made to be 1 of three api wrappers for jolt. Jolt
-     * context is specifically for engine only use of the api. It wraps the
-     * inititialization, the physics step and the clean up. Allow use not to
-     * have to write batching algorithms for each time we want to change the
-     * settings of jolt physics.
+     * jolt_context is the backend implementation of physics context
      *
-     * @remark This is different that jolt_api, which is the user wrapper. It is
-     * meant to contain all the effects that can happen during runtime. Where
-     * most of the data can be called by the user. m_physics_system is the only
-     * link between the two classes. Both of which use it for different
-     * purposes. Jolt context to control the functionality of the entire systems
-     * and the Jolt Api for user based control of the system and bodies.
+     * Which refers to the jolt-specific implementation that should only have
+     * access to jolt-specific types.
      *
-     * @remark The third api is collisions which has its own context for jolt.
+     * Any of the external abstraction and interaction should well be defined by
+     * the engine-specific parameters.
      */
     class jolt_context : public physics_context {
     public:
@@ -31,27 +24,16 @@ namespace atlas::physics {
 
     private:
         /**
-         * @brief Removes all physics bodies and shapes from level_scene.
-         *
-         * @warning Similar to create this only works with level_scene as of
-         * right now.
-         *
+         * @brief Performs any specific cleanup needed by Jolt
          */
         void destroy_bodies() override;
 
         void prepare_and_finalize() override;
 
-        /**
-         * @brief Runs a given <contact added> the frame the contact was
-         * created. Allows for all contacts to run after the physics has
-         * finished as to stop thread collision issues.
-         *
-         */
-        // void execute_collisions() override;
-
         void update_simulation(float p_delta_time) override;
 
     protected:
+    
         void emplace_box_collider(uint32_t p_entity_id,
                                   const transform* p_transform,
                                   const physics_body* p_body,
