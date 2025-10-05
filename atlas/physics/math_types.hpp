@@ -1,6 +1,6 @@
 #pragma once
 
-#include <physics/jolt-cpp/jolt-imports.hpp>
+#include <drivers/jolt-cpp/jolt-imports.hpp>
 #include <glm/glm.hpp>
 
 /**

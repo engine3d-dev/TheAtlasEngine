@@ -1,8 +1,7 @@
 #pragma once
 #include <core/core.hpp>
-#include <physics/jolt-cpp/jolt_components.hpp>
-#include <physics/physics_3d/jolt/jolt_context.hpp>
-#include <physics/physics_3d/physics_api.hpp>
+#include <drivers/jolt-cpp/jolt_components.hpp>
+#include <physics/physics_context.hpp>
 
 namespace atlas::physics {
 
@@ -16,8 +15,7 @@ namespace atlas::physics {
         // Required by maps but should not be used in anyother circumstance.
         physics_engine() = default;
         physics_engine(const jolt_settings& p_settings,
-                       const ref<physics_context>& p_engine,
-                       const ref<physics_api>& p_user_api);
+                       flecs::world& p_registry);
 
         /**
          * @brief The runtime is specifically the way to start the physics,
@@ -25,35 +23,31 @@ namespace atlas::physics {
          * create a physics scene and manage physics step.
          *
          */
-        void start_runtime();
+        void start();
 
         /**
          * @brief Runs a single frame of the simulation. Should at minimum be
          * called 60 fps. If below, it must be called twice.
          *
          */
-        void physics_step();
+        void update(float p_delta_time);
 
         /**
          * @brief Deletes all physics bodies and shapes. Preps itself for
          * runtime to be called again.
          *
          */
-        void stop_runtime();
-
-        /**
-         * @brief Allows for contacts to be handled by the user right after
-         * physics_step has fully run.
-         *
-         * @warning It is important that these stay distict until we have a job
-         * manager to maintain them.
-         *
-         */
-        void run_contact_add();
+        void stop();
 
     private:
-        jolt_settings m_settings;
-        ref<physics_context> m_engine_api;
-        ref<physics_api> m_backend_api;
+        flecs::world* m_registry;
+        ref<physics_context> m_physics_context;
+
+        flecs::query<transform, physics_body, box_collider>
+          m_query_box_collider;
+        flecs::query<transform, physics_body, sphere_collider>
+          m_query_sphere_collider;
+        flecs::query<transform, physics_body, capsule_collider>
+          m_query_capsule_collider;
     };
 };

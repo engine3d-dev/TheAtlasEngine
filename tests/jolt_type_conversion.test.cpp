@@ -7,9 +7,8 @@
 #include <core/scene/scene.hpp>
 #include <core/scene/scene_object.hpp>
 
-#include <physics/physics_3d/jolt/jolt_helper.hpp>
-#include <physics/jolt-cpp/jolt_components.hpp>
-#include <physics/physics_3d/physics.hpp>
+#include <drivers/jolt-cpp/types.hpp>
+#include <drivers/jolt-cpp/jolt_components.hpp>
 
 namespace atlas {
 
@@ -22,7 +21,7 @@ namespace atlas {
 
         "to_jph::vec3 conversion"_test = [] {
             glm::vec3 glm_vec{ 1.0f, 2.0f, 3.0f };
-            JPH::Vec3 jph_vec = physics::to_jph(glm_vec);
+            JPH::Vec3 jph_vec = jolt::to_vec3(glm_vec);
 
             expect(approx_equal(jph_vec.GetX(), 1.0f));
             expect(approx_equal(jph_vec.GetY(), 2.0f));
@@ -34,7 +33,7 @@ namespace atlas {
             glm::vec4 quat_vec =
               glm::vec4(glm_quat.x, glm_quat.y, glm_quat.z, glm_quat.w);
 
-            JPH::Quat jph_quat = physics::to_jph(quat_vec);
+            JPH::Quat jph_quat = jolt::to_quat(quat_vec);
 
             expect(approx_equal(jph_quat.GetX(), 0.0f));
             expect(approx_equal(jph_quat.GetY(), 0.707f));

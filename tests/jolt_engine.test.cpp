@@ -11,9 +11,8 @@
 #include <core/scene/world.hpp>
 #include <core/scene/scene.hpp>
 
-#include <physics/physics_3d/jolt/jolt_helper.hpp>
-#include <physics/jolt-cpp/jolt_components.hpp>
-#include <physics/physics_3d/physics.hpp>
+#include <drivers/jolt-cpp/types.hpp>
+#include <drivers/jolt-cpp/jolt_components.hpp>
 
 namespace atlas {
 

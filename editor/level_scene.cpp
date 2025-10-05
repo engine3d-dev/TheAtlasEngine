@@ -1,8 +1,8 @@
 #include "level_scene.hpp"
 #include <core/common.hpp>
 #include <core/application.hpp>
-#include <physics/jolt-cpp/jolt_components.hpp>
-#include <physics/physics_3d/physics.hpp>
+#include <drivers/jolt-cpp/jolt_components.hpp>
+#include <physics/physics_engine.hpp>
 
 level_scene::level_scene(const std::string& p_name)
   : atlas::scene_scope(p_name) {
@@ -19,7 +19,7 @@ level_scene::level_scene(const std::string& p_name)
     });
 
     m_viking_room = create_object("Viking Room Object");
-    m_viking_room->add<atlas::tag::serialize>();
+    // m_viking_room->add<atlas::tag::serialize>();
     m_viking_room->set<atlas::transform>({
       .position = { -2.70f, 2.70, -8.30f },
       .rotation = { 2.30f, 95.90f, 91.80f },
@@ -27,8 +27,19 @@ level_scene::level_scene(const std::string& p_name)
     });
     m_viking_room->set<atlas::material>({
       .color = { 1.f, 1.f, 1.f, 1.f },
-      .model_path = "assets/models/viking_room.obj",
-      .texture_path = "assets/models/viking_room.png",
+      //   .model_path = "assets/models/viking_room.obj",
+      //   .texture_path = "assets/models/viking_room.png",
+      .model_path = "assets/models/Ball OBJ.obj",
+      .texture_path = "assets/models/clear.png",
+    });
+
+    m_viking_room->set<atlas::sphere_collider>({
+      .radius = 1.0f,
+    });
+
+    m_viking_room->set<atlas::physics_body>({
+      .restitution = 1.f,
+      .body_movement_type = atlas::dynamic,
     });
 
     m_cube = create_object("Aircraft");
@@ -54,16 +65,20 @@ level_scene::level_scene(const std::string& p_name)
     m_robot_model->set<atlas::material>({
       .color = { 1.f, 1.f, 1.f, 1.f },
       .model_path = "assets/models/cube.obj",
+      //   .model_path = "assets/robot_model/l2back.obj",
       .texture_path = "assets/models/container_diffuse.png",
     });
 
-    m_robot_model->set<atlas::physics::collider_body>({
-      .shape_type = atlas::physics::collider_shape::Box,
-      .half_extents = { 1.f, 1.f, 1.f },
+    // m_robot_model->set<atlas::collider_body>({
+    //   .shape_type = atlas::collider_shape::box,
+    //   .half_extents = { 1.f, 1.f, 1.f },
+    // });
+    m_robot_model->set<atlas::box_collider>({
+      .half_extent = { 1.f, 1.f, 1.f },
     });
-    m_robot_model->set<atlas::physics::physics_body>({
-      // .restitution = 1.25f,
-      .body_movement_type = atlas::physics::Dynamic,
+    m_robot_model->set<atlas::physics_body>({
+      //   .restitution = 1.f,
+      .body_movement_type = atlas::dynamic,
     });
 
     m_child_object = create_object("Child");
@@ -74,37 +89,47 @@ level_scene::level_scene(const std::string& p_name)
     m_platform->set<atlas::transform>({
       .scale = { 15.f, 0.30f, 10.0f },
     });
-    m_platform->set<atlas::physics::collider_body>({
-      .shape_type = atlas::physics::collider_shape::Box,
-      .half_extents = { 15.f, 0.30f, 10.0f },
-      // .radius = 1.f,
-      // .half_extents = {15.f, -0.30f, 10.0f}
+    m_platform->set<atlas::physics_body>({
+      .body_movement_type = atlas::fixed,
     });
+    m_platform->set<atlas::box_collider>({
+      .half_extent = { 15.f, 0.30f, 10.0f },
+    });
+
+    // for(size_t i = 0; i < 26; i++) {
+    // 	auto obj = create_object(std::format("Object #{}", i));
+    // 	obj->set<atlas::physics_body>({
+    // 		.restitution = 1.25f,
+    // 		.body_movement_type = atlas::dynamic,
+    // 	});
+
+    // 	obj->set<atlas::sphere_collider>(
+    // 		{
+    // 		.radius = 1.0f,
+    // 	});
+
+    // 	glm::vec3 pos = {float(0*1.4),float(0 * 1.4),float(0 * -3) };
+
+    // 	obj->set<atlas::transform>({
+    // 		.position = pos,
+    // 		.rotation = {.3f, 0.0f, 0.0f},
+    // 	});
+
+    // 	obj->set<atlas::material>({
+    // 		.model_path = "assets/models/Ball OBJ.obj",
+    // 		.texture_path = "assets/models/clear.png",
+    // 	});
+    // 	m_many_objects.emplace_back(obj);
+    // }
+
+    console_log_info("Sphere ID = {}", m_viking_room->id());
+    console_log_info("Cube ID = {}", m_robot_model->id());
+    console_log_info("Platform ID = {}", m_platform->id());
 
     m_platform->set<atlas::material>({
       .model_path = "assets/models/cube.obj",
       .texture_path = "assets/models/wood.png",
     });
-
-    // Initiating physics system
-    // Note: Each flecs::world would contain their own respective data of
-    // atlas::physics::settings NOTE: atlas::physics::jolt_settings should not
-    // be directly from the application atlas::physics::jolt_settings is
-    // essentially the parameters to initialize JoltPhysics directly. Consider:
-    // This might be considered in a developers settings or so.
-    m_physics_object_representation_of_settings =
-      create_object("Physics Settings");
-    // settings is for pre-runtime before runtime gets invoked
-    m_physics_object_representation_of_settings
-      ->set<atlas::physics::jolt_settings>({});
-
-    // config is for runtime
-    // change atlas::physics::jolt_config to
-    // atlas::physics::environment_settings atlas::physics::jolt_config is the
-    // global configuration that gets applied when physics runtime initiates and
-    // executes
-    m_physics_object_representation_of_settings
-      ->set<atlas::physics::jolt_config>({});
 
     atlas::register_start(this, &level_scene::start);
     atlas::register_physics(this, &level_scene::physics_update);
@@ -117,14 +142,14 @@ level_scene::runtime_start() {
     // runs the physics simulation
     m_physics_is_runtime = true;
 
-    m_physics_engine_handler->start_runtime();
+    m_physics_engine_handler.start();
 }
 
 void
 level_scene::runtime_stop() {
     m_physics_is_runtime = false;
 
-    m_physics_engine_handler->stop_runtime();
+    m_physics_engine_handler.stop();
 
     reset_objects();
 }
@@ -182,6 +207,13 @@ ui_component_list(flecs::entity& p_selected_entity) {
             }
         }
 
+        if (!p_selected_entity.has<atlas::tag::serialize>()) {
+            if (ImGui::MenuItem("Serialize")) {
+                p_selected_entity.add<atlas::tag::serialize>();
+                ImGui::CloseCurrentPopup();
+            }
+        }
+
         // NOTE -- Add this in later...
         // if (!p_selected_entity.has<atlas::tag::serialize>()) {
         //     if (ImGui::MenuItem("Tag::Serialize")) {
@@ -190,16 +222,16 @@ ui_component_list(flecs::entity& p_selected_entity) {
         //     }
         // }
 
-        if (!p_selected_entity.has<atlas::physics::collider_body>()) {
-            if (ImGui::MenuItem("Collider")) {
-                p_selected_entity.add<atlas::physics::collider_body>();
-                ImGui::CloseCurrentPopup();
-            }
-        }
+        // if (!p_selected_entity.has<atlas::collider_body>()) {
+        //     if (ImGui::MenuItem("Collider")) {
+        //         p_selected_entity.add<atlas::collider_body>();
+        //         ImGui::CloseCurrentPopup();
+        //     }
+        // }
 
-        if (!p_selected_entity.has<atlas::physics::physics_body>()) {
+        if (!p_selected_entity.has<atlas::physics_body>()) {
             if (ImGui::MenuItem("Physics Body")) {
-                p_selected_entity.add<atlas::physics::physics_body>();
+                p_selected_entity.add<atlas::physics_body>();
                 ImGui::CloseCurrentPopup();
             }
         }
@@ -339,39 +371,42 @@ level_scene::on_ui_update() {
                   atlas::ui::draw_input_text(p_material->model_path);
               });
 
-            // atlas::ui::draw_component<atlas::physics::collider_body>("Collider",
-            // m_selected_entity, [](atlas::physics::collider_body* p_collider)
-            // {
+            atlas::ui::draw_component<atlas::physics_body>(
+              "Physics Body", m_selected_entity, [](atlas::physics_body*) {
+                  /*
+                  const char* items[] = { "Static", "Kinematic",
+                  "Dynamic", }; const char* combo_preview =
+                  items[p_body->body_type];
 
-            // });
+                  //   Begin the combo box
+                    if (ImGui::BeginCombo("Body Type", combo_preview)) {
+                        for (int n = 0; n < 3; n++) {
+                            // Check if the current item is selected
+                            const bool is_selected = (p_body->body_type == n);
+                            if (ImGui::Selectable(items[n], is_selected)) {
+                                // Update the current type when a new item is
+                                // selected
+                                p_body->body_type =
+                                  static_cast<atlas::body_type>(n);
+                            }
 
-            atlas::ui::draw_component<atlas::physics::physics_body>(
-              "Physics Body",
+                            Set the initial focus when the combo box is first
+                            opened
+                            if (is_selected) {
+                                ImGui::SetItemDefaultFocus();
+                            }
+                        }
+                        ImGui::EndCombo();
+                    }
+                */
+              });
+
+            atlas::ui::draw_component<atlas::tag::serialize>(
+              "Serialize",
               m_selected_entity,
-              [](atlas::physics::physics_body* p_body) {
-                  const char* items[] = { "Static", "Kinematic", "Dynamic" };
-                  const char* combo_preview = items[p_body->body_type];
-
-                  // Begin the combo box
-                  if (ImGui::BeginCombo("Body Type", combo_preview)) {
-                      for (int n = 0; n < 3; n++) {
-                          // Check if the current item is selected
-                          const bool is_selected = (p_body->body_type == n);
-                          if (ImGui::Selectable(items[n], is_selected)) {
-                              // Update the current type when a new item is
-                              // selected
-                              p_body->body_type =
-                                static_cast<atlas::physics::body_type>(n);
-                          }
-
-                          // Set the initial focus when the combo box is first
-                          // opened
-                          if (is_selected) {
-                              ImGui::SetItemDefaultFocus();
-                          }
-                      }
-                      ImGui::EndCombo();
-                  }
+              []([[maybe_unused]] atlas::tag::serialize* p_serialize) {
+                  glm::vec3 val;
+                  atlas::ui::draw_vec3("Enable", val);
               });
         }
 
@@ -395,7 +430,7 @@ level_scene::on_ui_update() {
         // ImGui::SetNextWindowBgAlpha(0.f);
 
         // if(ImGui::Begin("Testing", nullptr, flags)) {
-        // 	ImGui::ProgressBar(10.f);
+        // ImGui::ProgressBar(10.f);
 
         // 	auto pos = ImGui::GetWindowPos();
         // 	pos.x += (float)width * 0.5f - 300.0f;
@@ -412,17 +447,17 @@ level_scene::on_ui_update() {
 
 void
 level_scene::start() {
-    m_deserializer_test = atlas::serializer();
+    // m_deserializer_test = atlas::serializer();
 
-    if (!m_deserializer_test.load("LevelScene", *this)) {
-        console_log_error("Could not load yaml file LevelScene!!!");
-    }
+    // if (!m_deserializer_test.load("LevelScene", *this)) {
+    //     console_log_error("Could not load yaml file LevelScene!!!");
+    // }
 
-    // Now we instantiate the physics engine itself
-    m_physics_engine_handler = atlas::physics::initialize_engine(
-      m_physics_system_allocator,
-      m_physics_object_representation_of_settings,
-      *this);
+    // Initiating physics system
+    atlas::physics::jolt_settings settings = {};
+    flecs::world registry = *this;
+    m_physics_engine_handler =
+      atlas::physics::physics_engine(settings, registry);
 
     // Note -- just added for temporary
     // ImGuiIO io = ImGui::GetIO();
@@ -432,8 +467,6 @@ level_scene::start() {
 
 void
 level_scene::on_update() {
-    // atlas::transform* camera_transform =
-    // m_camera->get_mut<atlas::transform>();
     auto query_cameras =
       query_builder<atlas::perspective_camera, atlas::transform>().build();
 
@@ -497,13 +530,13 @@ level_scene::on_update() {
 
 void
 level_scene::physics_update() {
+    float dt = atlas::application::delta_time();
     if (atlas::event::is_key_pressed(key_r) and !m_physics_is_runtime) {
         runtime_start();
     }
 
     if (m_physics_is_runtime) {
-        m_physics_engine_handler->physics_step();
-        m_physics_engine_handler->run_contact_add();
+        m_physics_engine_handler.update(dt);
     }
 
     if (atlas::event::is_key_pressed(key_l) and m_physics_is_runtime) {

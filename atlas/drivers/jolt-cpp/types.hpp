@@ -28,15 +28,20 @@ namespace atlas {
     private:
         glm::vec3 m_value;
     };
-};
 
-namespace atlas::physics {
+    namespace jolt {
+        JPH::RVec3 to_rvec3(const glm::vec3& p_value);
 
-    inline JPH::Vec3 to_jph(const glm::vec3& v) {
-        return { v.x, v.y, v.z };
-    }
+        JPH::Vec3 to_vec3(const glm::vec3& p_value);
 
-    inline JPH::Quat to_jph(const glm::vec4& q) {
-        return { q.x, q.y, q.z, q.w };
-    }
+        JPH::Quat to_quat(const glm::vec4& q);
+
+        JPH::Quat to_quat(glm::quat& p_value);
+    };
+
+    glm::vec3 to_vec3(const JPH::Vec3& p_value);
+
+    glm::quat to_quat(const JPH::Quat& p_value);
+
+    glm::vec4 to_vec4(const JPH::Quat& p_value);
 };
