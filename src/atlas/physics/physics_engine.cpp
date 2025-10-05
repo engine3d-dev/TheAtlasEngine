@@ -33,7 +33,7 @@ namespace atlas::physics {
         // At the start of every simulation we create physics bodies to run
         // simulation on those physics bodies with the specific colliders
         // associated with them
-        m_query_box_collider.each([&](flecs::entity p_entity,
+        m_query_box_collider.each([this](flecs::entity p_entity,
                                       transform& p_transform,
                                       physics_body& p_body,
                                       box_collider& p_collider) {
@@ -86,7 +86,7 @@ namespace atlas::physics {
             p_body.center_mass_position = body.center_mass_position;
             p_body.friction = body.friction;
             p_body.restitution = body.restitution;
-            p_body.body_type = body.body_type;
+            // p_body.body_type = body.body_type;
         });
 
         // updating sphere collider
@@ -109,7 +109,7 @@ namespace atlas::physics {
             p_body.center_mass_position = body.center_mass_position;
             p_body.friction = body.friction;
             p_body.restitution = body.restitution;
-            p_body.body_type = body.body_type;
+            // p_body.body_type = body.body_type;
         });
 
         // updating capsule collider
@@ -130,7 +130,7 @@ namespace atlas::physics {
             p_body.center_mass_position = body.center_mass_position;
             p_body.friction = body.friction;
             p_body.restitution = body.restitution;
-            p_body.body_type = body.body_type;
+            // p_body.body_type = body.body_type;
         });
     }
 

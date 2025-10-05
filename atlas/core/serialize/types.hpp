@@ -142,15 +142,15 @@ namespace YAML {
             node["Cumulative Torque"] = rhs.cumulative_torque;
             node["Mass Factor"] = rhs.mass_factor;
             node["Center Mass Position"] = rhs.center_mass_position;
-            node["Gravity Enabled"] = rhs.use_gravity;
+            // node["Gravity Enabled"] = rhs.use_gravity;
             node["Gravity Factor"] = rhs.gravity_factor;
-            node["Body Type"] = rhs.body_type;
+            // node["Body Type"] = rhs.body_type;
             node["Friction"] = rhs.friction;
             node["Restitution"] = rhs.restitution;
             node["Body Movement Type"] = rhs.body_movement_type;
             node["Body Layer Type"] = rhs.body_layer_type;
-            node["Body ID"] = rhs.body_id;
-            node["Count"] = rhs.count;
+            // node["Body ID"] = rhs.body_id;
+            // node["Count"] = rhs.count;
 
             return node;
         }
@@ -167,15 +167,15 @@ namespace YAML {
             rhs.mass_factor = node["Mass Factor"].as<float>();
             rhs.center_mass_position =
               node["Center Mass Position"].as<glm::vec3>();
-            rhs.use_gravity = node["Gravity Enabled"].as<bool>();
+            // rhs.use_gravity = node["Gravity Enabled"].as<bool>();
             rhs.gravity_factor = node["Gravity Factor"].as<float>();
-            rhs.body_type = node["Body Type"].as<uint8_t>();
+            // rhs.body_type = node["Body Type"].as<uint8_t>();
             rhs.friction = node["Friction"].as<float>();
             rhs.restitution = node["Restitution"].as<float>();
             rhs.body_movement_type = node["Body Movement Type"].as<uint8_t>();
             rhs.body_layer_type = node["Body Layer Type"].as<uint8_t>();
-            rhs.body_id = node["Body ID"].as<uint32_t>();
-            rhs.count = node["Count"].as<int>();
+            // rhs.body_id = node["Body ID"].as<uint32_t>();
+            // rhs.count = node["Count"].as<int>();
             return true;
         }
     };

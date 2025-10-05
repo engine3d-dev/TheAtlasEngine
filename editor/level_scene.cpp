@@ -371,39 +371,34 @@ level_scene::on_ui_update() {
                   atlas::ui::draw_input_text(p_material->model_path);
               });
 
-            // atlas::ui::draw_component<atlas::collider_body>("Collider",
-            // m_selected_entity, [](atlas::collider_body* p_collider)
-            // {
-
-            // });
-
             atlas::ui::draw_component<atlas::physics_body>(
-              "Physics Body",
-              m_selected_entity,
-              [](atlas::physics_body* p_body) {
-                  const char* items[] = { "Static", "Kinematic", "Dynamic" };
-                  const char* combo_preview = items[p_body->body_type];
+              "Physics Body", m_selected_entity, [](atlas::physics_body*) {
+                  /*
+                  const char* items[] = { "Static", "Kinematic",
+                  "Dynamic", }; const char* combo_preview =
+                  items[p_body->body_type];
 
-                  // Begin the combo box
-                  if (ImGui::BeginCombo("Body Type", combo_preview)) {
-                      for (int n = 0; n < 3; n++) {
-                          // Check if the current item is selected
-                          const bool is_selected = (p_body->body_type == n);
-                          if (ImGui::Selectable(items[n], is_selected)) {
-                              // Update the current type when a new item is
-                              // selected
-                              p_body->body_type =
-                                static_cast<atlas::body_type>(n);
-                          }
+                  //   Begin the combo box
+                    if (ImGui::BeginCombo("Body Type", combo_preview)) {
+                        for (int n = 0; n < 3; n++) {
+                            // Check if the current item is selected
+                            const bool is_selected = (p_body->body_type == n);
+                            if (ImGui::Selectable(items[n], is_selected)) {
+                                // Update the current type when a new item is
+                                // selected
+                                p_body->body_type =
+                                  static_cast<atlas::body_type>(n);
+                            }
 
-                          // Set the initial focus when the combo box is first
-                          // opened
-                          if (is_selected) {
-                              ImGui::SetItemDefaultFocus();
-                          }
-                      }
-                      ImGui::EndCombo();
-                  }
+                            Set the initial focus when the combo box is first
+                            opened
+                            if (is_selected) {
+                                ImGui::SetItemDefaultFocus();
+                            }
+                        }
+                        ImGui::EndCombo();
+                    }
+                */
               });
 
             atlas::ui::draw_component<atlas::tag::serialize>(
@@ -542,7 +537,6 @@ level_scene::physics_update() {
 
     if (m_physics_is_runtime) {
         m_physics_engine_handler.update(dt);
-        // m_physics_engine_handler.execute_collisions();
     }
 
     if (atlas::event::is_key_pressed(key_l) and m_physics_is_runtime) {

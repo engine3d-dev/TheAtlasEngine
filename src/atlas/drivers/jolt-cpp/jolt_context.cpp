@@ -300,8 +300,6 @@ namespace atlas::physics {
         body.gravity_factor = body_interface.GetGravityFactor(body_id);
         body.friction = body_interface.GetFriction(body_id);
         body.restitution = body_interface.GetRestitution(body_id);
-        body.body_type =
-          static_cast<uint8_t>(body_interface.GetMotionType(body_id));
         return body;
     }
 

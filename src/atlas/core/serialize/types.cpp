@@ -108,12 +108,12 @@ namespace atlas {
                  << p_body->mass_factor;
         p_output << YAML::Key << "Center Mass Position" << YAML::Value
                  << p_body->center_mass_position;
-        p_output << YAML::Key << "Gravity Enabled" << YAML::Value
-                 << p_body->use_gravity;
-        p_output << YAML::Key << "Gravity Factor" << YAML::Value
-                 << p_body->gravity_factor;
-        p_output << YAML::Key << "Body Type" << YAML::Value
-                 << p_body->body_type;
+        // p_output << YAML::Key << "Gravity Enabled" << YAML::Value
+        //          << p_body->use_gravity;
+        // p_output << YAML::Key << "Gravity Factor" << YAML::Value
+        //          << p_body->gravity_factor;
+        // p_output << YAML::Key << "Body Type" << YAML::Value
+        //          << p_body->body_type;
         p_output << YAML::Key << "Friction" << YAML::Value << p_body->friction;
         p_output << YAML::Key << "Restitution" << YAML::Value
                  << p_body->restitution;
@@ -121,8 +121,8 @@ namespace atlas {
                  << p_body->body_movement_type;
         p_output << YAML::Key << "Body Layer Type" << YAML::Value
                  << p_body->body_layer_type;
-        p_output << YAML::Key << "Body ID" << YAML::Value << p_body->body_id;
-        p_output << YAML::Key << "Count" << YAML::Value << p_body->count;
+        // p_output << YAML::Key << "Body ID" << YAML::Value << p_body->body_id;
+        // p_output << YAML::Key << "Count" << YAML::Value << p_body->count;
         p_output << YAML::EndMap;
         return p_output;
     }

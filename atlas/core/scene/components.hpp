@@ -20,19 +20,7 @@ namespace atlas {
             quaternion = from_quat(rotation);
         }
     };
-
-    //! @note Our interpretation of the RigidBody3D
-    struct rigidbody3d {
-        rigidbody3d() = default;
-
-        enum class body_type { e_static = 0, e_dynamic = 1, e_kinematic = 2 };
-
-        body_type type = body_type::e_static;
-        bool hax_fixation = false;
-        void* body_at_runtime =
-          nullptr; // for storing the actual data of the body
-    };
-
+    
     //! @note Our interpretation of the BoxCollider that will get interpreted
     //! based on physics API's enabled
     struct box_collider3d {
