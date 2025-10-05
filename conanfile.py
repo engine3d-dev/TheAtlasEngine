@@ -1,6 +1,5 @@
 from conan import ConanFile
 from conan.tools.cmake import CMakeToolchain, CMake, cmake_layout, CMakeDeps
-from conan.tools.scm import Git
 from conan.tools.files import copy
 import os
 import shutil
@@ -24,7 +23,7 @@ class AtlasRecipe(ConanFile):
 
     def build_requirements(self):
         self.tool_requires("make/4.4.1")
-        self.tool_requires("cmake/3.27.1")
+        self.tool_requires("cmake/4.1.1")
         self.tool_requires("engine3d-cmake-utils/4.0")
 
     def requirements(self):
@@ -33,22 +32,21 @@ class AtlasRecipe(ConanFile):
             self.requires("shaderc/2024.1")
         self.requires("imguidocking/2.0")
         self.requires("flecs/4.0.4")
-        self.requires("glfw/3.4", transitive_headers=True)
-        self.requires("opengl/system", transitive_headers=True)
+        self.requires("glfw/3.4")
         self.requires("spdlog/1.15.1")
-        self.requires("glm/1.0.1", transitive_headers=True)
-        self.requires("yaml-cpp/0.8.0", transitive_headers=True)
+        self.requires("glm/1.0.1")
+        self.requires("yaml-cpp/0.8.0")
 
         # Vulkan-related headers and includes packages
-        self.requires("vulkan-headers/1.3.290.0", transitive_headers=True)
+        self.requires("vulkan-headers/1.3.290.0")
+        self.requires("vulkan-cpp/1.0")
         self.requires("tinyobjloader/2.0.0-rc10")
         self.requires("tinygltf/2.9.0")
         self.requires("stb/cci.20230920")
 
         self.requires("nfd/1.0")
         self.requires("watcher/0.12.0")
-        self.requires("boost-ext-ut/2.1.0")
-        self.requires("vulkan-cpp/1.0")
+        self.requires("boost-ext-ut/2.3.1")
     
     def export_sources(self):
         copy(self,"CMakeLists.txt", self.recipe_folder, self.export_sources_folder)
