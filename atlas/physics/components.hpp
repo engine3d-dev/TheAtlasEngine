@@ -13,9 +13,11 @@ namespace atlas {
     };
 
     /**
-     * @param non_moving is used for static objects that saves for not using the collider component
-     * @param moving is used for dynamic, kinematic, and character objects that will be used 
-    */
+     * @param non_moving is used for static objects that saves for not using the
+     * collider component
+     * @param moving is used for dynamic, kinematic, and character objects that
+     * will be used
+     */
     enum body_layer : uint8_t {
         non_moving = 0,
         moving = 1,

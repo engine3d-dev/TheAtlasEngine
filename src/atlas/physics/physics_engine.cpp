@@ -34,9 +34,9 @@ namespace atlas::physics {
         // simulation on those physics bodies with the specific colliders
         // associated with them
         m_query_box_collider.each([this](flecs::entity p_entity,
-                                      transform& p_transform,
-                                      physics_body& p_body,
-                                      box_collider& p_collider) {
+                                         transform& p_transform,
+                                         physics_body& p_body,
+                                         box_collider& p_collider) {
             m_physics_context->add_box_collider(
               p_entity.id(), &p_transform, &p_body, &p_collider);
         });

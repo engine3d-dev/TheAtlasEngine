@@ -20,7 +20,7 @@ namespace atlas {
             quaternion = from_quat(rotation);
         }
     };
-    
+
     //! @note Our interpretation of the BoxCollider that will get interpreted
     //! based on physics API's enabled
     struct box_collider3d {
