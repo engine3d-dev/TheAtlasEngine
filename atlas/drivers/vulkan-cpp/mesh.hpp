@@ -9,6 +9,10 @@
 #include <drivers/vulkan-cpp/vk_texture.hpp>
 #include <filesystem>
 #include <drivers/vulkan-cpp/vk_uniform_buffer.hpp>
+#include <vulkan-cpp/uniform_buffer.hpp>
+#include <vulkan-cpp/vertex_buffer.hpp>
+#include <vulkan-cpp/index_buffer.hpp>
+// #include <vulkan-cpp/texture.hpp>
 
 namespace atlas::vk {
 
@@ -39,7 +43,7 @@ namespace atlas::vk {
 
         void update_uniform(const material_uniform& p_material_ubo);
 
-        [[nodiscard]] vk_uniform_buffer material_ubo() const {
+        [[nodiscard]] ::vk::uniform_buffer material_ubo() const {
             return m_geoemtry_ubo;
         }
 
@@ -60,10 +64,12 @@ namespace atlas::vk {
         void load_gltf(const std::filesystem::path& p_filename);
 
     private:
+        vk_physical_driver m_physical;
+        VkDevice m_device=nullptr;
         std::vector<texture> m_textures;
-        vk_vertex_buffer m_vbo{};
-        vk_index_buffer m_ibo{};
-        vk_uniform_buffer m_geoemtry_ubo;
+        ::vk::vertex_buffer m_vbo{};
+        ::vk::index_buffer m_ibo{};
+        ::vk::uniform_buffer m_geoemtry_ubo;
         bool m_model_loaded = false;
     };
 };

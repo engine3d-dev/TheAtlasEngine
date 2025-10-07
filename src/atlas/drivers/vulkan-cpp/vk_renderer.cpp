@@ -13,6 +13,8 @@ namespace atlas::vk {
     vk_renderer::vk_renderer(const vk_swapchain& p_swapchain,
                              const std::string& p_tag) {
         console_log_manager::create_new_logger(p_tag);
+        m_device = vk_context::driver_context();
+        m_physical = vk_context::physical_driver();
         m_main_swapchain = p_swapchain;
         m_image_count = p_swapchain.image_size();
 #ifdef USE_SHADERC
@@ -23,127 +25,120 @@ namespace atlas::vk {
                          shader_stage::fragment }
         };
 #else
-        std::array<shader_info, 2> shader_sources = {
-            shader_info{ "experimental-shaders/test_vert.spv",
-                         shader_stage::vertex },
-            shader_info{ "experimental-shaders/test_frag.spv",
-                         shader_stage::fragment }
+        std::array<::vk::shader_source, 2> shader_sources = {
+            ::vk::shader_source{
+              "experimental-shaders/test.vert.spv",
+              ::vk::shader_stage::vertex,
+            },
+            ::vk::shader_source{
+              "experimental-shaders/test.frag.spv",
+              ::vk::shader_stage::fragment,
+            }
         };
 #endif
 
-        m_shader_group = vk_shader_group(shader_sources);
-
-        std::array<vertex_attribute_entry, 4> attribute_entries = {
-            vertex_attribute_entry{
+        // m_shader_group = vk_shader_group(shader_sources);
+        std::array<::vk::vertex_attribute_entry, 4> attribute_entries = {
+            ::vk::vertex_attribute_entry{
               .location = 0,
-              .format = format::rgb32_sfloat,
+              .format = ::vk::format::rgb32_sfloat,
               .stride = offsetof(vk::vertex_input, position),
             },
-            vertex_attribute_entry{
+            ::vk::vertex_attribute_entry{
               .location = 1,
-              .format = format::rgb32_sfloat,
+              .format = ::vk::format::rgb32_sfloat,
               .stride = offsetof(vk::vertex_input, color),
             },
-            vertex_attribute_entry{
+            ::vk::vertex_attribute_entry{
               .location = 2,
-              .format = format::rgb32_sfloat,
-              .stride = offsetof(vk::vertex_input, normals),
+              .format = ::vk::format::rgb32_sfloat,
+              .stride = offsetof(vertex_input, normals),
             },
-            vertex_attribute_entry{
+            ::vk::vertex_attribute_entry{
               .location = 3,
-              .format = format::rg32_sfloat,
-              .stride = offsetof(vk::vertex_input, uv),
+              .format = ::vk::format::rg32_sfloat,
+              .stride = offsetof(vertex_input, uv),
             }
         };
 
-        std::array<vertex_attribute, 1> attribute = {
-            vertex_attribute{
+        std::array<::vk::vertex_attribute, 1> attribute = {
+            ::vk::vertex_attribute{
               // layout (set = 0, binding = 0)
               .binding = 0,
               .entries = attribute_entries,
               .stride = sizeof(vk::vertex_input),
-              .input_rate = input_rate::vertex,
+              .input_rate = ::vk::input_rate::vertex,
             },
         };
 
+        ::vk::shader_resource_info shader_info = {
+            .sources = shader_sources,
+        };
+        m_shader_group = ::vk::shader_resource(m_device, shader_info);
         m_shader_group.vertex_attributes(attribute);
 
-        m_global_uniforms =
-          std::vector<vk_uniform_buffer>(p_swapchain.image_size());
+        // Setting global descriptor set 0
+        std::vector<::vk::descriptor_entry> set0_entries = {
+			::vk::descriptor_entry{
+				// specifies "layout (set = 0, binding = 0) uniform GlobalUbo"
+				.type = ::vk::buffer::uniform,
+				.binding_point = {
+					.binding = 0,
+					.stage = ::vk::shader_stage::vertex,
+				},
+				.descriptor_count = 1,
+			},
+		};
 
-        for (size_t i = 0; i < m_global_uniforms.size(); i++) {
-            m_global_uniforms[i] = vk_uniform_buffer(sizeof(camera_ubo));
-        }
-
-        // Descriptor Set 0
-        std::vector<descriptor_binding_entry> entries = {
-            descriptor_binding_entry{
-              // specifies "layout (set = 0, binding = 0) uniform GlobalUbo"
-              .type = vk::buffer::uniform,
-              .binding_point = { .binding = 0, .stage = shader_stage::vertex },
-              .descriptor_count = 1,
-            }
-        };
-
-        descriptor_set_layout set0_descriptor_layout = {
+        // uint32_t image_count = image_count;
+        ::vk::descriptor_layout set0_layout = {
+            .slot = 0, // indicate that this is descriptor set 0
             .allocate_count = m_image_count, // the count how many descriptor
                                              // set layout able to be allocated
             .max_sets =
               m_image_count, // max of descriptor sets able to allocate
             .size_bytes =
-              sizeof(camera_ubo), // size of bytes of the uniforms utilized by
+              sizeof(global_ubo), // size of bytes of the uniforms utilized by
                                   // this descriptor sets
-            .entry = entries      // specifies pool sizes and descriptor layout
+            .entries = set0_entries,   // specifies pool sizes and descriptor layout
         };
+        m_global_descriptors = ::vk::descriptor_resource(m_device, set0_layout);
 
-        m_global_descriptor = descriptor_set(0, set0_descriptor_layout);
+		::vk::uniform_buffer_info geo_info = {
+			.phsyical_memory_properties = m_physical.memory_properties(),
+			.size_bytes = sizeof(global_ubo)
+		};
+		m_global_uniforms = ::vk::uniform_buffer(m_device, geo_info);
 
-        m_geometry_descriptor_layout = {
-            m_global_descriptor.get_layout(),
+
+		std::array<::vk::write_buffer_descriptor, 1> set0_write_buffers = {
+			::vk::write_buffer_descriptor{
+				.dst_binding = 0,
+				.buffer = m_global_uniforms,
+				.offset = 0,
+				.range = m_global_uniforms.size_bytes()
+			}
+		};
+        m_global_descriptors.update(set0_write_buffers);
+
+        m_sets_layouts = {
+            m_global_descriptors.layout(),
         };
-
-        /*
-            Pipeline Layout
-            [Set 0] [Set 1] [Set 2]    [Set 3]
-               |      |       |          |
-               v      v       v          v
-            Camera   Material Textures Lights
-            UBO      UBO     UBO     UBO
-        */
-        // m_main_pipeline =
-        // vk_pipeline(m_main_swapchain.swapchain_renderpass(), m_shader_group,
-        // set_layouts);
-
-        m_global_descriptor.update(m_global_uniforms);
 
         vk_context::submit_resource_free([this]() {
             m_shader_group.destroy();
+            m_global_descriptors.destroy();
+            for (auto& [key, value] : m_cached_meshes) {
+                console_log_trace("Entity \"{}\" Destroyed in vk_renderer!!!", key);
+
+				value.destroy();
+            }
+            for (auto& [key, descriptor_map] : m_mesh_descriptors) {
+                for (auto& [descriptor_type, descriptor] : descriptor_map) {
+                    descriptor.destroy();
+                }
+            }
             m_main_pipeline.destroy();
-            // global uniforms camera data
-            m_global_descriptor.destroy();
-
-            for (size_t i = 0; i < m_global_uniforms.size(); i++) {
-                m_global_uniforms[i].destroy();
-            }
-
-            //! @brief Ensures all meshes that are cached are also destroyed
-            for (auto [key, value] : m_cached_meshes) {
-                console_log_trace("Entity \"{}\" Destroyed in vk_renderer!!!",
-                                  key);
-                // To ensure that the mesh we are destroying are valid
-                if (value.loaded()) {
-                    value.destroy();
-                }
-            }
-
-            //! @brief This iterates through all of the meshes resources
-            //! (descriptors) and make sure that any of the valid resources are
-            //! cleaned up
-            for (auto& [key, value] : m_mesh_descriptors) {
-                for (auto [key2, value2] : value) {
-                    value2.destroy();
-                }
-            }
         });
     }
 
@@ -162,7 +157,6 @@ namespace atlas::vk {
                                   const glm::mat4& p_proj_view) {
         m_proj_view = p_proj_view;
         m_main_swapchain = p_swapchain_handler; // ?? This is here to do some
-        // testing with swapchain validation
         m_current_frame = application::current_frame();
 
         std::array<VkClearValue, 2> clear_values = {};
@@ -171,51 +165,8 @@ namespace atlas::vk {
         clear_values[1].depthStencil = { 1.f, 0 };
         window_settings settings = m_main_swapchain.settings();
 
-        //! TODO: This will need to be changed.
-        //! @brief THis is used to initialize our meshes but also before we
-        //! begin recording the command buffers, we update the descriptor sets
-        //! as well
         if (m_begin_initialize) {
-
-            std::vector<descriptor_binding_entry> material_set1_entries = {
-				// entry for layout (set = 1, binding = 0)
-                descriptor_binding_entry{
-                  .type = vk::buffer::uniform,
-                  .binding_point = { .binding = 0,
-                                     .stage = shader_stage::vertex, },
-                  .descriptor_count = 1,
-                },
-				// entry for layout (set = 1, binding = 1),
-                descriptor_binding_entry{
-                  .type = vk::buffer::combined_image_sampler,
-                  .binding_point = { .binding = 1,
-                                     .stage = shader_stage::fragment, },
-                  .descriptor_count = 1,
-                },
-				// entry for layout (set = 1, binding = 1)
-                // descriptor_binding_entry{
-                //     .type = vk::buffer::combined_image_sampler,
-                //     .binding_point = {
-                //         .binding = 1,
-                //         .stage = shader_stage::fragment
-                //     },
-                //     .descriptor_count = 1
-                // }
-            };
-
-            descriptor_set_layout material_layout = {
-                .allocate_count =
-                  m_image_count, // the count how many descriptor set layout
-                                 // able to be allocated
-                .max_sets =
-                  m_image_count, // max of descriptor sets able to allocate
-                .size_bytes =
-                  sizeof(material_uniform), // size of bytes of the uniforms
-                                            // utilized by this descriptor sets
-                .entry = material_set1_entries // specifies pool sizes and
-                                               // descriptor layout
-            };
-
+            // set 1 -- material uniforms
             ref<world_scope> current_world =
               system_registry::get_world("Editor World");
             ref<scene_scope> current_scene =
@@ -224,57 +175,90 @@ namespace atlas::vk {
             flecs::query<> caching =
               current_scene->query_builder<material>().build();
 
-            caching.each([this, material_layout](flecs::entity p_entity) {
-                // std::string name = std::string(p_entity.name().c_str());
-                uint32_t entity_id = p_entity.id();
+            caching.each([this](flecs::entity p_entity) {
                 const material* target = p_entity.get<material>();
-
-                //! @brief My attempt at loading meshes asynchronously and
-                //! seeing that the mesh gets loaded and rendering
-                //! already-loaded mesh.
-                // std::future<mesh> launch_mesh_loading =
-                // std::async(std::launch::async, [target](){ return
-                // mesh(target->model_path); } ); mesh new_mesh =
-                // launch_mesh_loading.get();
                 mesh new_mesh(std::filesystem::path(target->model_path));
                 if (new_mesh.loaded()) {
-                    m_cached_meshes.emplace(entity_id, new_mesh);
-
-                    m_cached_meshes[entity_id].initialize_uniforms(
+                    new_mesh.initialize_uniforms(
                       sizeof(material_uniform));
-                    m_cached_meshes[entity_id].add_texture(
-                      target->texture_path);
+                    new_mesh.add_texture(
+                      std::filesystem::path(target->texture_path));
+					m_cached_meshes.emplace(p_entity.id(), new_mesh);
 
-                    // m_geometry_descriptor[entity_id] =
-                    //   descriptor_set(1, material_layout);
-                    m_mesh_descriptors[entity_id]["materials"] =
-                      descriptor_set(1, material_layout);
+                    std::vector<::vk::descriptor_entry> set1_entries = {
+						::vk::descriptor_entry{
+							// specifies "layout (set = 1, binding = 0) uniform MaterialSource"
+							.type = ::vk::buffer::uniform,
+							.binding_point = {
+								.binding = 0,
+								.stage = ::vk::shader_stage::vertex,
+							},
+							.descriptor_count = 1,
+						},
+						::vk::descriptor_entry{
+							// specifies "layout (set = 1, binding = 1) uniform sampler2D texture1"
+							.type = ::vk::buffer::combined_image_sampler,
+							.binding_point = {
+								.binding = 1,
+								.stage = ::vk::shader_stage::fragment,
+							},
+							.descriptor_count = 1,
+						},
+					};
 
-                    // Apply mesh-specific uniforms to the mesh-specific
-                    // descriptor (model matrix, color, etc)
-                    std::array<vk_uniform_buffer, 1> material_uniforms = {
-                        m_cached_meshes[entity_id].material_ubo()
+                    ::vk::descriptor_layout set1_layout = {
+                        .slot = 1,
+                        .allocate_count = m_image_count,
+                        .max_sets = m_image_count,
+                        .size_bytes = sizeof(material_uniform),
+                        .entries = set1_entries,
                     };
-                    // m_geometry_descriptor[entity_id].update(
-                    //   material_uniforms,
-                    //   m_cached_meshes[entity_id].read_textures());
 
-                    m_mesh_descriptors[entity_id]["materials"].update(
-                      material_uniforms,
-                      m_cached_meshes[entity_id].read_textures());
+					m_mesh_descriptors[p_entity.id()].emplace("materials", ::vk::descriptor_resource(m_device, set1_layout));
 
-                    // m_geometry_descriptor_layout.push_back(
-                    //   m_geometry_descriptor[entity_id].get_layout());
-                    // m_mesh_descriptors[entity_id]["materials"]
-                    m_geometry_descriptor_layout.push_back(
-                      m_mesh_descriptors[entity_id]["materials"].get_layout());
+                    std::vector<::vk::write_buffer_descriptor>
+                      material_uniforms = {
+                          ::vk::write_buffer_descriptor{
+                            .dst_binding = 1,
+                            .buffer =
+                              m_cached_meshes[p_entity.id()].material_ubo(),
+                            .offset = 0,
+                            .range = m_cached_meshes[p_entity.id()]
+                                       .material_ubo()
+                                       .size_bytes(),
+                          },
+                      };
+
+                    std::vector<::vk::write_image_descriptor>
+                      material_textures = {
+                          ::vk::write_image_descriptor{
+                            .dst_binding = 1,
+                            .view = m_cached_meshes[p_entity.id()]
+                                      .read_textures()[0]
+                                      .image_view(),
+                            .sampler = m_cached_meshes[p_entity.id()]
+                                         .read_textures()[0]
+                                         .sampler(),
+                          },
+                      };
+
+                    m_mesh_descriptors[p_entity.id()]["materials"].update(
+                      material_uniforms, material_textures);
+
+                    m_sets_layouts.push_back(
+                      m_mesh_descriptors[p_entity.id()]["materials"].layout());
                 }
             });
+            ::vk::pipeline_settings pipeline_configuration = {
+                .renderpass = m_main_swapchain.swapchain_renderpass(),
+                .shader_modules = m_shader_group.handles(),
+                .vertex_attributes = m_shader_group.vertex_attributes(),
+                .vertex_bind_attributes =
+                  m_shader_group.vertex_bind_attributes(),
+                .descriptor_layouts = m_sets_layouts
+            };
+            m_main_pipeline = ::vk::pipeline(m_device, pipeline_configuration);
 
-            m_main_pipeline =
-              vk_pipeline(m_main_swapchain.swapchain_renderpass(),
-                          m_shader_group,
-                          m_geometry_descriptor_layout);
             m_begin_initialize = false;
         }
         VkRenderPassBeginInfo renderpass_begin_info = {
@@ -326,42 +310,22 @@ namespace atlas::vk {
     }
 
     void vk_renderer::post_frame() {
-        // camera uniforms
-
-        // camera_ubo ubo{};
-        // ubo.view = m_camera.get_view();
-        // ubo.projection = m_camera.get_projection();
 
         // For now, using this. Will need to remove this before vulkan
         // integration merging into dev This is for testing and to hopefully
         // have a global_ubo for globalized uniforms
-        global_ubo global_frame_ubo = { // .mvp = ubo.projection * ubo.view,
-                                        .mvp = m_proj_view
-        };
+        global_ubo global_frame_ubo = { .mvp = m_proj_view };
 
-        // glm::mat4 mvp = ubo.Projection * ubo.View * ubo.Model;
-        m_global_uniforms[m_current_frame].update(&global_frame_ubo);
+		m_global_uniforms.update(&global_frame_ubo);
 
         ref<world_scope> current_world =
           system_registry::get_world("Editor World");
         ref<scene_scope> current_scene = current_world->get_scene("LevelScene");
 
         //! TODO: Replace rendertarget3d with a material component
-        // Should rmeove glm::mat4 from material-specific components
-        flecs::query<> query_targets =
-          current_scene->query_builder<material>().build();
+        flecs::query<> query_targets = current_scene->query_builder<material>().build();
         m_main_pipeline.bind(m_current_command_buffer);
         query_targets.each([this](flecs::entity p_entity) {
-            // const material* target = p_entity.get<material>();
-            //! @brief This is going to be removed, because to prepare for the
-            //! offloading of the rendering, that'll get done in preparation of
-            //! that frame.
-            //! @brief Meaning utilizing
-            //! TODO: Probably have a way of handling reloading when a mesh 3d
-            //! model filepath changes; this should be done when preparing the
-            //! frame not as its rendering
-            // if(target->texture_reload) {}
-
             const transform* transform_component = p_entity.get<transform>();
             const material* material_component = p_entity.get<material>();
             m_model = glm::mat4(1.f);
@@ -376,28 +340,21 @@ namespace atlas::vk {
             material_uniform mesh_material_ubo = {
                 .model = m_model, .color = material_component->color
             };
+			// Bind global camera data here
+			m_global_descriptors.bind(m_current_command_buffer,
+										m_current_frame,
+										m_main_pipeline.layout());
 
-            // std::string entity_name = std::string(p_entity.name().c_str());
-            uint32_t entity_id = p_entity.id();
-            if (m_cached_meshes[entity_id].loaded()) {
-                m_cached_meshes[entity_id].update_uniform(mesh_material_ubo);
+            if (m_cached_meshes[p_entity.id()].loaded()) {
 
-                // Bind global camera data here
-                m_global_descriptor.bind(m_current_command_buffer,
-                                         m_current_frame,
-                                         m_main_pipeline.get_layout());
+                m_cached_meshes[p_entity.id()].update_uniform(
+                  mesh_material_ubo);
 
-                // Bind mesh-entity specific properties here before initial draw
-                // call
-                // m_geometry_descriptor[entity_id].bind(
-                //   m_current_command_buffer,
-                //   m_current_frame,
-                //   m_main_pipeline.get_layout());
-                m_mesh_descriptors[entity_id]["materials"].bind(
+                m_mesh_descriptors[p_entity.id()]["materials"].bind(
                   m_current_command_buffer,
                   m_current_frame,
-                  m_main_pipeline.get_layout());
-                m_cached_meshes[entity_id].draw(m_current_command_buffer);
+                  m_main_pipeline.layout());
+                m_cached_meshes[p_entity.id()].draw(m_current_command_buffer);
             }
         });
 

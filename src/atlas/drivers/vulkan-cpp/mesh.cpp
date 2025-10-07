@@ -8,16 +8,21 @@
 #include <tiny_gltf.h>
 #include <core/engine_logger.hpp>
 #include <drivers/vulkan-cpp/hash.hpp>
+#include <drivers/vulkan-cpp/vk_context.hpp>
 
 namespace atlas::vk {
-    mesh::mesh(std::span<vertex_input> p_vertices,
-               std::span<uint32_t> p_indices) {
-        m_vbo = vk_vertex_buffer(p_vertices);
-        m_ibo = vk_index_buffer(p_indices);
+    mesh::mesh(std::span<vertex_input>,
+               std::span<uint32_t>) {
+		m_physical = vk_context::physical_driver();
+		m_device = vk_context::driver_context();
+        // m_vbo = vk_vertex_buffer(p_vertices);
+        // m_ibo = vk_index_buffer(p_indices);
     }
 
     mesh::mesh(const std::filesystem::path& p_filename) {
-        reload_mesh(p_filename);
+		m_physical = vk_context::physical_driver();
+        m_device = vk_context::driver_context();
+		reload_mesh(p_filename);
     }
 
     void mesh::reload_mesh(const std::filesystem::path& p_filename) {
@@ -346,8 +351,8 @@ namespace atlas::vk {
             }
         }
 
-        m_vbo = vk_vertex_buffer(vertices);
-        m_ibo = vk_index_buffer(indices);
+        // m_vbo = vk_vertex_buffer(vertices);
+        // m_ibo = vk_index_buffer(indices);
         m_model_loaded = true;
     }
 
@@ -375,13 +380,13 @@ namespace atlas::vk {
             return;
         }
 
-        std::vector<vertex_input> vertices;
+        std::vector<::vk::vertex_input> vertices;
         std::vector<uint32_t> indices;
-        std::unordered_map<vertex_input, uint32_t> unique_vertices{};
+        std::unordered_map<::vk::vertex_input, uint32_t> unique_vertices{};
 
         for (const auto& shape : shapes) {
             for (const auto& index : shape.mesh.indices) {
-                vertex_input vertex{};
+                ::vk::vertex_input vertex{};
 
                 // vertices.push_back(vertex);
                 if (!unique_vertices.contains(vertex)) {
@@ -429,13 +434,25 @@ namespace atlas::vk {
             }
         }
 
-        m_vbo = vk_vertex_buffer(vertices);
-        m_ibo = vk_index_buffer(indices);
+		::vk::vertex_buffer_settings vbo_settings = {
+			.phsyical_memory_properties = m_physical.memory_properties(),
+			.vertices = vertices
+		};
+		::vk::index_buffer_settings ibo_settings = {
+			.phsyical_memory_properties = m_physical.memory_properties(),
+			.indices = indices
+		};
+        m_vbo = ::vk::vertex_buffer(m_device, vbo_settings);
+        m_ibo = ::vk::index_buffer(m_device, ibo_settings);
         m_model_loaded = true;
     }
 
     void mesh::initialize_uniforms(uint32_t p_size_bytes_ubo) {
-        m_geoemtry_ubo = vk_uniform_buffer(p_size_bytes_ubo);
+		::vk::uniform_buffer_info geo_info = {
+			.phsyical_memory_properties = m_physical.memory_properties(),
+			.size_bytes = p_size_bytes_ubo
+		};
+        m_geoemtry_ubo = ::vk::uniform_buffer(m_device, geo_info);
     }
 
     void mesh::update_uniform(const material_uniform& p_material_ubo) {
@@ -443,17 +460,27 @@ namespace atlas::vk {
     }
 
     void mesh::add_texture(const std::filesystem::path& p_path) {
-        m_textures.emplace_back(p_path.string());
+		texture test_texture(p_path.string());
+		if(!test_texture.loaded()) {
+			console_log_info("Test Texture {} is NOT loaded!!!", p_path.string());;
+			return;
+		}
+		else {
+			console_log_info("Test Tetxure {} IS LOADED!!!", p_path.string());
+		}
+        m_textures.emplace_back(test_texture);
+
     }
 
     void mesh::draw(const VkCommandBuffer& p_current) {
         m_vbo.bind(p_current);
         if (m_ibo.size() > 0) {
             m_ibo.bind(p_current);
-            m_ibo.draw(p_current);
+            // m_ibo.draw(p_current);
+			vkCmdDrawIndexed(p_current, m_ibo.size(), 1, 0, 0, 0);
         }
         else {
-            m_vbo.draw(p_current);
+            vkCmdDraw(p_current, m_vbo.size(), 1, 0, 0);
         }
     }
 

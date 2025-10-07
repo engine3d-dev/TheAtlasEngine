@@ -10,6 +10,10 @@
 #include <drivers/vulkan-cpp/vk_uniform_buffer.hpp>
 #include <vector>
 #include <map>
+#include <vulkan-cpp/uniform_buffer.hpp>
+#include <vulkan-cpp/pipeline.hpp>
+#include <vulkan-cpp/descriptor_resource.hpp>
+#include <vulkan-cpp/shader_resource.hpp>
 
 namespace atlas::vk {
     /**
@@ -55,29 +59,37 @@ namespace atlas::vk {
         void post_frame() override;
 
     private:
+        VkDevice m_device=nullptr;
+        vk_physical_driver m_physical;
         glm::mat4 m_proj_view;
 
         vk_swapchain m_main_swapchain{};
         vk_command_buffer m_current_command_buffer{};
         VkClearColorValue m_color;
 
-        vk_shader_group m_shader_group;
-        vk_pipeline m_main_pipeline{};
         uint32_t m_image_count = 0;
+        ::vk::shader_resource m_shader_group;
+        ::vk::pipeline m_main_pipeline;
+        ::vk::descriptor_resource m_global_descriptors;
+        std::vector<VkDescriptorSetLayout> m_sets_layouts;
+
+        std::map<uint32_t, mesh> m_cached_meshes;
+        ::vk::uniform_buffer m_global_uniforms;
+        std::map<uint32_t, std::map<std::string, ::vk::descriptor_resource>> m_mesh_descriptors;
 
         // descriptors for global uniforms for global camera data
-        std::vector<vk_uniform_buffer> m_global_uniforms{};
-        descriptor_set m_global_descriptor{};
+        // std::vector<vk_uniform_buffer> m_global_uniforms{};
+        // descriptor_set m_global_descriptor{};
 
         // Contain descriptor layouts that gets used by the main VkPipeline
         // (graphics pipeline)
-        std::vector<VkDescriptorSetLayout> m_geometry_descriptor_layout;
+        // std::vector<VkDescriptorSetLayout> m_geometry_descriptor_layout;
 
         // This is for caching any loaded mesh and only modifying this mesh if
         // that entity is there. It is for this vk_renderer to manage
         // std::string = the name of the entity
         // mesh = corresponding to the entity that is being loaded
-        std::map<uint32_t, mesh> m_cached_meshes;
+        // std::map<uint32_t, mesh> m_cached_meshes;
 
         // std::string = entity name
         // descriptor_set for now will represent the material descriptor set
@@ -94,9 +106,9 @@ namespace atlas::vk {
          *
          * This is grouping the resources that correspond to a specific mesh
          */
-        std::map<uint32_t, std::map<std::string, descriptor_set>>
-          m_mesh_descriptors;
-        descriptor_set_layout m_material_descriptor_layout;
+        // std::map<uint32_t, std::map<std::string, descriptor_set>>
+        //   m_mesh_descriptors;
+        // descriptor_set_layout m_material_descriptor_layout;
 
         bool m_begin_initialize = true;
         uint32_t m_current_frame = 0;
