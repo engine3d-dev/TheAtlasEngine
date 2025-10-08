@@ -1,6 +1,4 @@
 #pragma once
-#include <drivers/vulkan-cpp/vk_types.hpp>
-
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
 #include <filesystem>
@@ -8,7 +6,8 @@
 #include <vulkan-cpp/vertex_buffer.hpp>
 #include <vulkan-cpp/index_buffer.hpp>
 #include <vulkan-cpp/texture.hpp>
-#include <drivers/vulkan-cpp/vk_context.hpp>
+#include <drivers/vulkan-cpp/vk_types.hpp>
+#include <drivers/vulkan-cpp/vk_physical_driver.hpp>
 
 namespace atlas::vk {
 
