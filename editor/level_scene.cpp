@@ -64,11 +64,9 @@ level_scene::level_scene(const std::string& p_name)
 
     m_robot_model->set<atlas::material>({
       .color = { 1.f, 1.f, 1.f, 1.f },
-    //   .model_path = "assets/models/cube.obj",
+      .model_path = "assets/models/cube.obj",
       //   .model_path = "assets/robot_model/l2back.obj",
-    //   .texture_path = "assets/models/container_diffuse.png",
-		.model_path = "assets/models/viking_room.obj",
-        .texture_path = "assets/models/viking_room.png",
+      .texture_path = "assets/models/container_diffuse.png",
     });
 
     // m_robot_model->set<atlas::collider_body>({
