@@ -3,8 +3,6 @@
 #include <drivers/renderer_context.hpp>
 #include <drivers/vulkan-cpp/vk_swapchain.hpp>
 #include <drivers/vulkan-cpp/vk_command_buffer.hpp>
-#include <drivers/vulkan-cpp/vk_shader_group.hpp>
-#include <drivers/vulkan-cpp/vk_pipeline.hpp>
 #include <vector>
 #include <drivers/vulkan-cpp/mesh.hpp>
 #include <vector>

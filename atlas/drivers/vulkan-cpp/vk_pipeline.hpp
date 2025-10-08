@@ -1,6 +1,5 @@
 #pragma once
 #include <vulkan/vulkan.h>
-#include <drivers/vulkan-cpp/vk_shader_group.hpp>
 
 namespace atlas::vk {
 

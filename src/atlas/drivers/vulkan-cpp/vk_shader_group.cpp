@@ -1,4 +1,3 @@
-#include <drivers/vulkan-cpp/vk_shader_group.hpp>
 #include <fstream>
 #include <core/engine_logger.hpp>
 #include <drivers/vulkan-cpp/vk_context.hpp>

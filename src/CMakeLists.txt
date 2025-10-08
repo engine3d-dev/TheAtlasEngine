@@ -66,8 +66,6 @@ set(
     ${VULKAN_SRC_DIR}/vk_graphics_queue.cpp
     ${VULKAN_SRC_DIR}/vk_present_queue.cpp
     ${VULKAN_SRC_DIR}/vk_renderpass.cpp
-    ${VULKAN_SRC_DIR}/vk_shader_group.cpp
-    ${VULKAN_SRC_DIR}/vk_pipeline.cpp
     ${VULKAN_SRC_DIR}/mesh.cpp
     ${VULKAN_SRC_DIR}/vk_renderer.cpp
 )
