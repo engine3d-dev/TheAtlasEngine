@@ -9,7 +9,7 @@ set(
     ${SRC_DIR}/core/application.cpp
     ${SRC_DIR}/core/event/event.cpp
 
-    ${SRC_DIR}/core/image/stb_image.cpp
+    # ${SRC_DIR}/core/image/stb_image.cpp
 
     ${SRC_DIR}/core/engine_logger.cpp
     ${SRC_DIR}/core/window.cpp
@@ -71,7 +71,7 @@ set(
     ${VULKAN_SRC_DIR}/vk_vertex_buffer.cpp
     ${VULKAN_SRC_DIR}/vk_index_buffer.cpp
     ${VULKAN_SRC_DIR}/vk_uniform_buffer.cpp
-    ${VULKAN_SRC_DIR}/vk_texture.cpp
+    # ${VULKAN_SRC_DIR}/vk_texture.cpp
     ${VULKAN_SRC_DIR}/vk_descriptor_set.cpp
     ${VULKAN_SRC_DIR}/mesh.cpp
     ${VULKAN_SRC_DIR}/vk_renderer.cpp

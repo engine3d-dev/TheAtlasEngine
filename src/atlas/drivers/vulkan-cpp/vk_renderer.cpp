@@ -18,10 +18,10 @@ namespace atlas::vk {
         m_main_swapchain = p_swapchain;
         m_image_count = p_swapchain.image_size();
 #ifdef USE_SHADERC
-        std::array<shader_info, 2> shader_sources = {
-            shader_info{ "experimental-shaders/test.vert",
+        std::array<::vk::shader_source, 2> shader_sources = {
+            ::vk::shader_source{ "experimental-shaders/test.vert",
                          shader_stage::vertex },
-            shader_info{ "experimental-shaders/test.frag",
+            ::vk::shader_source{ "experimental-shaders/test.frag",
                          shader_stage::fragment }
         };
 #else
@@ -178,11 +178,12 @@ namespace atlas::vk {
             caching.each([this](flecs::entity p_entity) {
                 const material* target = p_entity.get<material>();
                 mesh new_mesh(std::filesystem::path(target->model_path));
+				new_mesh.initialize_uniforms(
+					sizeof(material_uniform));
+				new_mesh.add_texture(
+					std::filesystem::path(target->texture_path));
+
                 if (new_mesh.loaded()) {
-                    new_mesh.initialize_uniforms(
-                      sizeof(material_uniform));
-                    new_mesh.add_texture(
-                      std::filesystem::path(target->texture_path));
 					m_cached_meshes.emplace(p_entity.id(), new_mesh);
 
                     std::vector<::vk::descriptor_entry> set1_entries = {
@@ -216,10 +217,11 @@ namespace atlas::vk {
 
 					m_mesh_descriptors[p_entity.id()].emplace("materials", ::vk::descriptor_resource(m_device, set1_layout));
 
+					// layout(set=  1, binding = 0)
                     std::vector<::vk::write_buffer_descriptor>
                       material_uniforms = {
                           ::vk::write_buffer_descriptor{
-                            .dst_binding = 1,
+                            .dst_binding = 0,
                             .buffer =
                               m_cached_meshes[p_entity.id()].material_ubo(),
                             .offset = 0,
@@ -228,17 +230,13 @@ namespace atlas::vk {
                                        .size_bytes(),
                           },
                       };
-
+					// layout(set = 1, binding = 1)
                     std::vector<::vk::write_image_descriptor>
                       material_textures = {
                           ::vk::write_image_descriptor{
                             .dst_binding = 1,
-                            .view = m_cached_meshes[p_entity.id()]
-                                      .read_textures()[0]
-                                      .image_view(),
-                            .sampler = m_cached_meshes[p_entity.id()]
-                                         .read_textures()[0]
-                                         .sampler(),
+                            .view = m_cached_meshes[p_entity.id()].image().image_view(),
+                            .sampler = m_cached_meshes[p_entity.id()].image().sampler(),
                           },
                       };
 
@@ -249,6 +247,7 @@ namespace atlas::vk {
                       m_mesh_descriptors[p_entity.id()]["materials"].layout());
                 }
             });
+			
             ::vk::pipeline_settings pipeline_configuration = {
                 .renderpass = m_main_swapchain.swapchain_renderpass(),
                 .shader_modules = m_shader_group.handles(),
@@ -325,7 +324,11 @@ namespace atlas::vk {
         //! TODO: Replace rendertarget3d with a material component
         flecs::query<> query_targets = current_scene->query_builder<material>().build();
         m_main_pipeline.bind(m_current_command_buffer);
-        query_targets.each([this](flecs::entity p_entity) {
+        // Bind global camera data here
+		m_global_descriptors.bind(m_current_command_buffer,
+									m_current_frame,
+									m_main_pipeline.layout());
+		query_targets.each([this](flecs::entity p_entity) {
             const transform* transform_component = p_entity.get<transform>();
             const material* material_component = p_entity.get<material>();
             m_model = glm::mat4(1.f);
@@ -340,10 +343,6 @@ namespace atlas::vk {
             material_uniform mesh_material_ubo = {
                 .model = m_model, .color = material_component->color
             };
-			// Bind global camera data here
-			m_global_descriptors.bind(m_current_command_buffer,
-										m_current_frame,
-										m_main_pipeline.layout());
 
             if (m_cached_meshes[p_entity.id()].loaded()) {
 

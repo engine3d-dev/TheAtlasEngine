@@ -38,3 +38,4 @@ compile_commands.json
 
 CMakeUserPresets.json
 .DS_Store
+*.spv

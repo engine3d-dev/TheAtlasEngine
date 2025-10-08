@@ -12,7 +12,7 @@
 #include <vulkan-cpp/uniform_buffer.hpp>
 #include <vulkan-cpp/vertex_buffer.hpp>
 #include <vulkan-cpp/index_buffer.hpp>
-// #include <vulkan-cpp/texture.hpp>
+#include <vulkan-cpp/texture.hpp>
 
 namespace atlas::vk {
 
@@ -33,7 +33,7 @@ namespace atlas::vk {
     class mesh {
     public:
         mesh() = default;
-        mesh(std::span<vertex_input> p_vertices, std::span<uint32_t> p_indices);
+        mesh(std::span<::vk::vertex_input> p_vertices, std::span<uint32_t> p_indices);
         mesh(const std::filesystem::path& p_filename);
 
         //! @brief Reload mesh vertices and indices when requested
@@ -54,19 +54,18 @@ namespace atlas::vk {
         //! @brief Loading single texture with specified std::filesystem::path
         void add_texture(const std::filesystem::path& p_path);
 
-        [[nodiscard]] std::span<texture> read_textures() { return m_textures; }
+        [[nodiscard]] ::vk::sample_image image() const { return m_texture.image(); }
 
         //! @return true if mesh geometry model loaded succesfully
         [[nodiscard]] bool loaded() const { return m_model_loaded; }
 
     private:
         void load_obj(const std::filesystem::path& p_filename);
-        void load_gltf(const std::filesystem::path& p_filename);
 
     private:
         vk_physical_driver m_physical;
         VkDevice m_device=nullptr;
-        std::vector<texture> m_textures;
+        ::vk::texture m_texture;
         ::vk::vertex_buffer m_vbo{};
         ::vk::index_buffer m_ibo{};
         ::vk::uniform_buffer m_geoemtry_ubo;

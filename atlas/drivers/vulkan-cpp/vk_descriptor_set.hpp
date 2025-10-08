@@ -13,14 +13,19 @@
 namespace atlas::vk {
 
     // TODO: These structs are for adding some high-level specifications for
-    // writing resources via to the descriptors struct write_buffer_descriptor {
-    //     std::span<vk_uniform_buffer> data;
-    // };
+    // writing resources via to the descriptors 
+    struct write_buffer_descriptor {
+        uint32_t dst_binding;
+        vk_uniform_buffer buffer;
+        uint32_t offset;
+        uint32_t range;
+    };
 
-    // struct write_image_descriptor {
-    //     std::span<texture> data;
-    //     image_layout layout;
-    // };
+    struct write_image_descriptor {
+        uint32_t dst_binding;
+        VkImageView view;
+        VkSampler sampler;
+    };
 
     // struct write_descriptors {
     //     std::span<vk_uniform_buffer> uniforms;

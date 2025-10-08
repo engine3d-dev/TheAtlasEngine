@@ -64,9 +64,11 @@ level_scene::level_scene(const std::string& p_name)
 
     m_robot_model->set<atlas::material>({
       .color = { 1.f, 1.f, 1.f, 1.f },
-      .model_path = "assets/models/cube.obj",
+    //   .model_path = "assets/models/cube.obj",
       //   .model_path = "assets/robot_model/l2back.obj",
-      .texture_path = "assets/models/container_diffuse.png",
+    //   .texture_path = "assets/models/container_diffuse.png",
+		.model_path = "assets/models/viking_room.obj",
+        .texture_path = "assets/models/viking_room.png",
     });
 
     // m_robot_model->set<atlas::collider_body>({
@@ -88,6 +90,10 @@ level_scene::level_scene(const std::string& p_name)
 
     m_platform->set<atlas::transform>({
       .scale = { 15.f, 0.30f, 10.0f },
+    });
+    m_platform->set<atlas::material>({
+      .model_path = "assets/models/cube.obj",
+      .texture_path = "assets/models/wood.png",
     });
     m_platform->set<atlas::physics_body>({
       .body_movement_type = atlas::fixed,
@@ -125,11 +131,6 @@ level_scene::level_scene(const std::string& p_name)
     console_log_info("Sphere ID = {}", m_viking_room->id());
     console_log_info("Cube ID = {}", m_robot_model->id());
     console_log_info("Platform ID = {}", m_platform->id());
-
-    m_platform->set<atlas::material>({
-      .model_path = "assets/models/cube.obj",
-      .texture_path = "assets/models/wood.png",
-    });
 
     atlas::register_start(this, &level_scene::start);
     atlas::register_physics(this, &level_scene::physics_update);
