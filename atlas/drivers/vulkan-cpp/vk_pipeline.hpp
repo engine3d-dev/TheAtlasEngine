@@ -1,7 +1,6 @@
 #pragma once
 #include <vulkan/vulkan.h>
 #include <drivers/vulkan-cpp/vk_shader_group.hpp>
-#include <drivers/vulkan-cpp/vk_descriptor_set.hpp>
 
 namespace atlas::vk {
 
@@ -37,7 +36,6 @@ namespace atlas::vk {
         VkPipelineLayout m_pipeline_layout = nullptr;
         VkPipeline m_pipeline_handler = nullptr;
         vk_shader_group m_shader_group;
-        // VkDescriptorSetLayout m_descriptor_set_layout=nullptr;
         std::span<VkDescriptorSetLayout> m_descriptor_layouts{};
     };
 };

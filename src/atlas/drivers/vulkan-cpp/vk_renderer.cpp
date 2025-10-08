@@ -92,15 +92,11 @@ namespace atlas::vk {
 
         // uint32_t image_count = image_count;
         ::vk::descriptor_layout set0_layout = {
-            .slot = 0, // indicate that this is descriptor set 0
-            .allocate_count = m_image_count, // the count how many descriptor
-                                             // set layout able to be allocated
-            .max_sets =
-              m_image_count, // max of descriptor sets able to allocate
-            .size_bytes =
-              sizeof(global_ubo), // size of bytes of the uniforms utilized by
-                                  // this descriptor sets
-            .entries = set0_entries,   // specifies pool sizes and descriptor layout
+            .slot = 0,
+            .allocate_count = m_image_count,
+            .max_sets = m_image_count,
+            .size_bytes = sizeof(global_ubo),
+            .entries = set0_entries,
         };
         m_global_descriptors = ::vk::descriptor_resource(m_device, set0_layout);
 
@@ -247,7 +243,7 @@ namespace atlas::vk {
                       m_mesh_descriptors[p_entity.id()]["materials"].layout());
                 }
             });
-			
+
             ::vk::pipeline_settings pipeline_configuration = {
                 .renderpass = m_main_swapchain.swapchain_renderpass(),
                 .shader_modules = m_shader_group.handles(),

@@ -1,18 +1,14 @@
 #pragma once
-#include <drivers/vulkan-cpp/vk_vertex_buffer.hpp>
-#include <drivers/vulkan-cpp/vk_index_buffer.hpp>
-
 #include <drivers/vulkan-cpp/vk_types.hpp>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
-#include <drivers/vulkan-cpp/vk_texture.hpp>
 #include <filesystem>
-#include <drivers/vulkan-cpp/vk_uniform_buffer.hpp>
 #include <vulkan-cpp/uniform_buffer.hpp>
 #include <vulkan-cpp/vertex_buffer.hpp>
 #include <vulkan-cpp/index_buffer.hpp>
 #include <vulkan-cpp/texture.hpp>
+#include <drivers/vulkan-cpp/vk_context.hpp>
 
 namespace atlas::vk {
 

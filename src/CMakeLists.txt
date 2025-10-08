@@ -68,11 +68,6 @@ set(
     ${VULKAN_SRC_DIR}/vk_renderpass.cpp
     ${VULKAN_SRC_DIR}/vk_shader_group.cpp
     ${VULKAN_SRC_DIR}/vk_pipeline.cpp
-    ${VULKAN_SRC_DIR}/vk_vertex_buffer.cpp
-    ${VULKAN_SRC_DIR}/vk_index_buffer.cpp
-    ${VULKAN_SRC_DIR}/vk_uniform_buffer.cpp
-    # ${VULKAN_SRC_DIR}/vk_texture.cpp
-    ${VULKAN_SRC_DIR}/vk_descriptor_set.cpp
     ${VULKAN_SRC_DIR}/mesh.cpp
     ${VULKAN_SRC_DIR}/vk_renderer.cpp
 )

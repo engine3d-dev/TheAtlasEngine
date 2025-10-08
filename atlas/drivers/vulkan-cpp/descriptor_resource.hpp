@@ -1,7 +1,6 @@
 #pragma once
 #include <vulkan/vulkan.h>
 #include <drivers/vulkan-cpp/vk_types.hpp>
-#include <drivers/vulkan-cpp/vk_uniform_buffer.hpp>
 #include <span>
 #include <vector>
 

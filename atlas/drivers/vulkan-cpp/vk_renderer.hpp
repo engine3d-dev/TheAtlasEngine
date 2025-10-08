@@ -7,13 +7,13 @@
 #include <drivers/vulkan-cpp/vk_pipeline.hpp>
 #include <vector>
 #include <drivers/vulkan-cpp/mesh.hpp>
-#include <drivers/vulkan-cpp/vk_uniform_buffer.hpp>
 #include <vector>
 #include <map>
 #include <vulkan-cpp/uniform_buffer.hpp>
 #include <vulkan-cpp/pipeline.hpp>
 #include <vulkan-cpp/descriptor_resource.hpp>
 #include <vulkan-cpp/shader_resource.hpp>
+#include <vulkan-cpp/renderpass.hpp>
 
 namespace atlas::vk {
     /**
@@ -76,39 +76,6 @@ namespace atlas::vk {
         std::map<uint32_t, mesh> m_cached_meshes;
         ::vk::uniform_buffer m_global_uniforms;
         std::map<uint32_t, std::map<std::string, ::vk::descriptor_resource>> m_mesh_descriptors;
-
-        // descriptors for global uniforms for global camera data
-        // std::vector<vk_uniform_buffer> m_global_uniforms{};
-        // descriptor_set m_global_descriptor{};
-
-        // Contain descriptor layouts that gets used by the main VkPipeline
-        // (graphics pipeline)
-        // std::vector<VkDescriptorSetLayout> m_geometry_descriptor_layout;
-
-        // This is for caching any loaded mesh and only modifying this mesh if
-        // that entity is there. It is for this vk_renderer to manage
-        // std::string = the name of the entity
-        // mesh = corresponding to the entity that is being loaded
-        // std::map<uint32_t, mesh> m_cached_meshes;
-
-        // std::string = entity name
-        // descriptor_set for now will represent the material descriptor set
-        // std::map<std::string, descriptor_set> m_geometry_descriptor;
-
-        /**
-         * @brief contains groups of descriptor resources that correspond to a
-         * specific geometry Format of the entity is hash_table<entity_name:
-         * string, <resource_name, descriptor>> Example:
-         * m_mesh_descriptors[entity_name]["material"].bind(some data);, this
-         * gets entity_name and the material and bind that to the mesh This can
-         * be expanded to use lighting so if there are point light resources,
-         * then you correspond that to a name.
-         *
-         * This is grouping the resources that correspond to a specific mesh
-         */
-        // std::map<uint32_t, std::map<std::string, descriptor_set>>
-        //   m_mesh_descriptors;
-        // descriptor_set_layout m_material_descriptor_layout;
 
         bool m_begin_initialize = true;
         uint32_t m_current_frame = 0;
