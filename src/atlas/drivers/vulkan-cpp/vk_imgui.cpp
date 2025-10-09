@@ -79,6 +79,24 @@ namespace atlas::vk {
             style.Colors[ImGuiCol_WindowBg].w = 1.0f;
         }
 
+
+		// Initializing vulkan objects for ImGui setup
+
+		m_imgui_command_buffers.resize(p_window_ctx->current_swapchain().image_size());
+
+		for(size_t i = 0; i < m_imgui_command_buffers.size(); i++) {
+			::vk::command_enumeration settings = {
+				.levels = ::vk::command_levels::primary,
+				// .queue_index = enumerate_swapchain_settings.present_index,
+				.queue_index = 0,
+				.flags = ::vk::command_pool_flags::reset,
+			};
+			m_imgui_command_buffers[i] = ::vk::command_buffer(m_driver, settings);
+		}
+
+
+		// ::vk::descriptor_res
+		// m_imgui_descriptor = ::vk::descriptor_resource(m_driver, {});
         // 1: create descriptor pool for IMGUI
         //  the size of the pool is very oversize, but it's copied from imgui
         //  demo itself.
@@ -111,12 +129,12 @@ namespace atlas::vk {
                        m_driver, &desc_pool_create_info, nullptr, &m_desc_pool),
                      "vkCreateDescriptorPool");
 
-        recreate(*p_window_ctx,
+        create(*p_window_ctx,
                  p_window_ctx->current_swapchain().image_size(),
                  p_window_ctx->current_swapchain().swapchain_renderpass());
     }
 
-    void imgui_context::recreate(GLFWwindow* p_window_handler,
+    void imgui_context::create(GLFWwindow* p_window_handler,
                                  const uint32_t& p_image_size,
                                  const VkRenderPass& p_current_renderpass) {
         ImGui_ImplGlfw_InitForVulkan(p_window_handler, true);
@@ -133,16 +151,6 @@ namespace atlas::vk {
         init_info.UseDynamicRendering = false;
         init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
         ImGui_ImplVulkan_Init(&init_info);
-
-        vk_context::submit_resource_free([]() {
-            //! @note This will probably be submitted at construction to be
-            //! destructed when the application shutsdown
-            ImGui_ImplVulkan_Shutdown();
-            // vkDestroyDescriptorPool(m_driver, m_desc_pool, nullptr);
-            // vkDestroyDescriptorPool(m_driver, m_desc_pool, nullptr);
-            // vkDestroyRenderPass(m_driver, m_re, nullptr);
-            // vkDestroyCommandPool(m_driver, m_imgui_command_pool, nullptr);
-        });
     }
 
     void imgui_context::begin(
@@ -268,4 +276,15 @@ namespace atlas::vk {
               crosshair_color);
         }
     }
+
+	void imgui_context::destroy() {
+		// ImGui_ImplVulkan_Shutdown();
+		ImGui_ImplVulkan_Shutdown();
+		vkDestroyDescriptorPool(m_driver, m_desc_pool, nullptr);
+		for(auto& command_buffer : m_imgui_command_buffers) {
+			command_buffer.destroy();
+		}
+		ImGui_ImplGlfw_Shutdown();
+		ImGui::DestroyContext();
+	}
 };

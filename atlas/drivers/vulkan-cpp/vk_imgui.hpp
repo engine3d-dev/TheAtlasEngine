@@ -6,6 +6,8 @@
 #include <drivers/vulkan-cpp/vk_driver.hpp>
 #include <drivers/vulkan-cpp/vk_swapchain.hpp>
 #include <core/window.hpp>
+#include <vulkan-cpp/descriptor_resource.hpp>
+#include <vulkan-cpp/command_buffer.hpp>
 
 namespace atlas::vk {
     struct hud_data {
@@ -19,12 +21,9 @@ namespace atlas::vk {
     class imgui_context {
     public:
         imgui_context() = default;
-        // imgui_context(GLFWwindow* p_window_handler,
-        //               const vk_swapchain& p_current_swapchain_handler,
-        //               const VkRenderPass& p_current_renderpass);
         imgui_context(const ref<window>& p_window_ctx);
 
-        void recreate(GLFWwindow* p_window_handler,
+        void create(GLFWwindow* p_window_handler,
                       const uint32_t& p_image_size,
                       const VkRenderPass& p_current_renderpass);
 
@@ -67,7 +66,8 @@ namespace atlas::vk {
         */
         void draw_hud(const hud_data& p_test,
                       const window_settings& p_settings);
-
+        
+        void destroy();
     private:
         VkInstance m_instance = nullptr;
         VkPhysicalDevice m_physical = nullptr;
@@ -76,5 +76,9 @@ namespace atlas::vk {
 
         VkDescriptorPool m_desc_pool = nullptr;
         VkCommandBuffer m_current_command = nullptr;
+
+        // ::vk::descriptor_resource m_imgui_descriptor;
+
+        std::vector<::vk::command_buffer> m_imgui_command_buffers;
     };
 };

@@ -125,6 +125,7 @@ namespace atlas::vk {
         vk_context::submit_resource_free([this]() {
             m_shader_group.destroy();
             m_global_descriptors.destroy();
+			m_global_uniforms.destroy();
             for (auto& [key, value] : m_cached_meshes) {
                 console_log_trace("Entity \"{}\" Destroyed in vk_renderer!!!", key);
 

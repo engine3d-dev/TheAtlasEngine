@@ -4,7 +4,6 @@
 #include <vulkan/vulkan.h>
 #include <core/utilities/types.hpp>
 #include <drivers/vulkan-cpp/vk_swapchain.hpp>
-#include <drivers/vulkan-cpp/vk_command_buffer.hpp>
 #include <vulkan-cpp/command_buffer.hpp>
 
 namespace atlas {

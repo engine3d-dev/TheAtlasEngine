@@ -1,6 +1,7 @@
 #include <core/application.hpp>
 #include <core/common.hpp>
 #include <drivers/vulkan-cpp/vk_swapchain.hpp>
+#include <drivers/vulkan-cpp/vk_context.hpp>
 
 namespace atlas {
     application* application::s_instance = nullptr;
@@ -31,6 +32,10 @@ namespace atlas {
         // vulkan-specific imgui context that allows us to control our backend
         // through vulkan
         m_ui_context = vk::imgui_context(m_window);
+
+        vk::vk_context::submit_resource_free([this](){
+            m_ui_context.destroy();
+        });
         s_instance = this;
     }
 

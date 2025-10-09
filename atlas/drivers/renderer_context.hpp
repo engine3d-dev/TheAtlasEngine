@@ -2,7 +2,6 @@
 #include <string>
 #include <core/core.hpp>
 #include <drivers/vulkan-cpp/vk_swapchain.hpp>
-#include <drivers/vulkan-cpp/vk_command_buffer.hpp>
 
 namespace atlas {
     class render_context {
@@ -14,7 +13,8 @@ namespace atlas {
                          const VkRenderPass& p_renderpass,
                          const VkFramebuffer& p_framebuffer,
                          const glm::mat4& p_proj_view) {
-            return start_frame(p_current, p_settings, p_renderpass, p_framebuffer, p_proj_view);
+            return start_frame(
+              p_current, p_settings, p_renderpass, p_framebuffer, p_proj_view);
         }
 
         void end_frame() { return post_frame(); }
@@ -23,7 +23,9 @@ namespace atlas {
             return background_color(p_color);
         }
 
-        [[nodiscard]] ::vk::command_buffer get_active() const { return active_command(); }
+        [[nodiscard]] ::vk::command_buffer get_active() const {
+            return active_command();
+        }
 
     private:
         virtual void start_frame(const ::vk::command_buffer& p_current,
