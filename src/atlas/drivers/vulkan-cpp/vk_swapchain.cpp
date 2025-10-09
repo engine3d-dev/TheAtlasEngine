@@ -181,17 +181,7 @@ namespace atlas::vk {
     }
 
     void vk_swapchain::invalidate() {
-
         destroy();
-		//!@brief operations that only need to happen when the swapchain
-        // is recreated again -- examples include getting the new extent
-        // upon a window resize
-		m_surface_properties =
-          m_physical.get_surface_properties(m_current_surface);
-        m_window_settings.width =
-          m_surface_properties.surface_capabilities.currentExtent.width;
-        m_window_settings.height =
-          m_surface_properties.surface_capabilities.currentExtent.height;
         create();
     }
 
