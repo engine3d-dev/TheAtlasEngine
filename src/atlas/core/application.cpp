@@ -225,7 +225,11 @@ namespace atlas {
             // Submitting commands to swapchain
             // TODO: Need to this a bit better, for now refactoring will take this form for submitting some work to GPU
             auto current_executed_command = m_renderer->current_command();
-            m_window->current_swapchain().submit(current_executed_command);
+
+			std::array<const VkCommandBuffer, 1> commands = {
+				current_executed_command
+			};
+            m_window->current_swapchain().submit(commands);
             // Presents to the swapchain to display to screen
             // m_renderer->present(m_current_frame_index);
             m_window->present(m_current_frame_index);

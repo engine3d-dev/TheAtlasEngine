@@ -55,7 +55,7 @@ namespace atlas::vk {
 
         void destroy();
 
-        void submit(const VkCommandBuffer& p_command);
+        void submit(std::span<const VkCommandBuffer> p_command);
 
         operator VkSwapchainKHR() const { return m_swapchain_handler; }
 

@@ -208,9 +208,9 @@ namespace atlas::vk {
         }
     }
 
-    void vk_swapchain::submit(const VkCommandBuffer& p_command) {
+    void vk_swapchain::submit(std::span<const VkCommandBuffer> p_commands) {
         // m_present_to_queue.submit_immediate_async(p_command);
-		m_present_to_queue.submit_async(p_command);
+		m_present_to_queue.submit_async(p_commands);
     }
 
     void vk_swapchain::destroy() {
