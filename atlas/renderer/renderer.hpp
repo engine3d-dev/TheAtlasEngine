@@ -37,8 +37,6 @@ namespace atlas {
 
         void set_background_color(const std::array<float, 4>& p_color);
 
-        [[nodiscard]] ::vk::command_buffer current_command() const { return m_render_context->get_active(); }
-
     private:
         static renderer* s_instance;
         scope<render_context> m_render_context = nullptr;

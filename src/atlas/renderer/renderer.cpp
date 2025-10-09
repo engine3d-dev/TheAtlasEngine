@@ -1,6 +1,5 @@
 #include <renderer/renderer.hpp>
 #include <drivers/renderer_context.hpp>
-#include <core/engine_logger.hpp>
 
 namespace atlas {
     renderer* renderer::s_instance = nullptr;

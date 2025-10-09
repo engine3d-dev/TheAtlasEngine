@@ -23,10 +23,6 @@ namespace atlas {
             return background_color(p_color);
         }
 
-        [[nodiscard]] ::vk::command_buffer get_active() const {
-            return active_command();
-        }
-
     private:
         virtual void start_frame(const ::vk::command_buffer& p_current,
                                  const window_settings& p_settings,
@@ -36,8 +32,6 @@ namespace atlas {
         virtual void post_frame() = 0;
 
         virtual void background_color(const std::array<float, 4>& p_color) = 0;
-
-        [[nodiscard]] virtual ::vk::command_buffer active_command() const = 0;
     };
 
     scope<render_context> initialize_renderer(

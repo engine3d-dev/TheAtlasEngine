@@ -222,12 +222,9 @@ namespace atlas {
                 Where each image has gone through different phases of the
                renderpass onto the final image
             */
-            // Submitting commands to swapchain
-            // TODO: Need to this a bit better, for now refactoring will take this form for submitting some work to GPU
-            auto current_executed_command = m_renderer->current_command();
 
 			std::array<const VkCommandBuffer, 1> commands = {
-				current_executed_command
+				currently_active
 			};
             m_window->current_swapchain().submit(commands);
             // Presents to the swapchain to display to screen

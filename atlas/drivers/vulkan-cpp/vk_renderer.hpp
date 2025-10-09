@@ -52,16 +52,12 @@ namespace atlas::vk {
                          const glm::mat4& p_proj_view) override;
         void background_color(const std::array<float, 4>& p_color) override;
 
-        [[nodiscard]] ::vk::command_buffer active_command() const override { return m_current_command_buffer; }
-
         void post_frame() override;
 
     private:
         VkDevice m_device=nullptr;
         vk_physical_driver m_physical;
         glm::mat4 m_proj_view;
-
-        // vk_swapchain m_main_swapchain{};
         window_settings m_window_extent;
         ::vk::command_buffer m_current_command_buffer{};
         VkClearColorValue m_color;
