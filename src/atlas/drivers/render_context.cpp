@@ -6,11 +6,12 @@
 namespace atlas {
 
     scope<render_context> initialize_renderer(
-      const vk::vk_swapchain& p_swapchain,
+      const window_settings& p_window_extent,
+      uint32_t p_image_size,
       const std::string& p_tag) {
         switch (application::current_api()) {
             case api::vulkan:
-                return create_scope<vk::vk_renderer>(p_swapchain, p_tag);
+                return create_scope<vk::vk_renderer>(p_window_extent, p_image_size, p_tag);
             default:
                 return nullptr;
         }

@@ -42,10 +42,6 @@ namespace atlas {
             return window_swapchain();
         }
 
-        vk::vk_command_buffer active_command_buffer(uint32_t p_frame_idx) {
-            return current_active_command_buffer(p_frame_idx);
-        }
-
         ::vk::command_buffer active_command(uint32_t p_frame_index) {
             return current_active_command(p_frame_index);
         }
@@ -70,8 +66,6 @@ namespace atlas {
         [[nodiscard]] virtual GLFWwindow* native_window() const = 0;
         [[nodiscard]] virtual uint32_t read_acquired_next_frame() = 0;
         [[nodiscard]] virtual vk::vk_swapchain window_swapchain() const = 0;
-        [[nodiscard]] virtual vk::vk_command_buffer
-        current_active_command_buffer(const uint32_t& p_frame_idx) = 0;
 
         [[nodiscard]] virtual ::vk::command_buffer current_active_command(uint32_t p_frame_idx) = 0;
         

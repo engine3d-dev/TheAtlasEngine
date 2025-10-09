@@ -1,8 +1,8 @@
 #pragma once
 #include <core/core.hpp>
 #include <vulkan/vulkan.hpp>
-#include <drivers/renderer_context.hpp>
 #include <drivers/vulkan-cpp/vk_swapchain.hpp>
+#include <drivers/renderer_context.hpp>
 
 namespace atlas {
     /**
@@ -17,14 +17,17 @@ namespace atlas {
     class renderer {
     public:
         renderer() = default;
-        renderer(const vk::vk_swapchain& p_swapchain,
+        renderer(const window_settings& p_window_extent,
+                 uint32_t p_image_size,
                  const std::string& p_tag = "Renderer");
         /**
          * @brief Indicates to the renderer is at the start of the next frame to
          * prepare workloads before next frame is processeed
          */
-        void begin(const vk::vk_command_buffer& p_current,
-                   const vk::vk_swapchain& p_current_rp,
+        void begin(const ::vk::command_buffer& p_current,
+                   const window_settings& p_settings,
+                   const VkRenderPass& p_renderpass,
+                   const VkFramebuffer& p_framebuffer,
                    const glm::mat4& p_proj_view);
 
         /**
@@ -33,6 +36,8 @@ namespace atlas {
         void end();
 
         void set_background_color(const std::array<float, 4>& p_color);
+
+        [[nodiscard]] ::vk::command_buffer current_command() const { return m_render_context->get_active(); }
 
     private:
         static renderer* s_instance;

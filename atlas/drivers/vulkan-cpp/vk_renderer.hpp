@@ -1,12 +1,10 @@
 #pragma once
-#include <string>
 #include <drivers/renderer_context.hpp>
 #include <drivers/vulkan-cpp/vk_swapchain.hpp>
-#include <drivers/vulkan-cpp/vk_command_buffer.hpp>
-#include <vector>
 #include <drivers/vulkan-cpp/mesh.hpp>
 #include <vector>
 #include <map>
+#include <string>
 #include <vulkan-cpp/uniform_buffer.hpp>
 #include <vulkan-cpp/pipeline.hpp>
 #include <vulkan-cpp/descriptor_resource.hpp>
@@ -42,15 +40,19 @@ namespace atlas::vk {
      */
     class vk_renderer : public render_context {
     public:
-        vk_renderer(const vk_swapchain& p_swapchain, const std::string& p_tag);
+        vk_renderer(const window_settings& p_settings, uint32_t p_image_size, const std::string& p_tag);
 
         ~vk_renderer() override = default;
 
     private:
-        void start_frame(const vk_command_buffer& p_current,
-                         const vk_swapchain& p_swapchain_handler,
+        void start_frame(const ::vk::command_buffer& p_current,
+                         const window_settings& p_settings,
+                         const VkRenderPass& p_renderpass,
+                         const VkFramebuffer& p_framebuffer,
                          const glm::mat4& p_proj_view) override;
         void background_color(const std::array<float, 4>& p_color) override;
+
+        [[nodiscard]] ::vk::command_buffer active_command() const override { return m_current_command_buffer; }
 
         void post_frame() override;
 
@@ -59,8 +61,9 @@ namespace atlas::vk {
         vk_physical_driver m_physical;
         glm::mat4 m_proj_view;
 
-        vk_swapchain m_main_swapchain{};
-        vk_command_buffer m_current_command_buffer{};
+        // vk_swapchain m_main_swapchain{};
+        window_settings m_window_extent;
+        ::vk::command_buffer m_current_command_buffer{};
         VkClearColorValue m_color;
 
         uint32_t m_image_count = 0;

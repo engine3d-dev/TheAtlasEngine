@@ -1,7 +1,6 @@
 #pragma once
 #include <core/utilities/types.hpp>
 #include <drivers/vulkan-cpp/vk_driver.hpp>
-#include <drivers/vulkan-cpp/vk_command_buffer.hpp>
 #include <vulkan-cpp/command_buffer.hpp>
 #include <vulkan-cpp/framebuffer.hpp>
 #include <vulkan-cpp/renderpass.hpp>
@@ -28,19 +27,12 @@ namespace atlas::vk {
         vk_swapchain(const VkSurfaceKHR& p_surface,
                      const window_settings& p_settings);
 
-        //! @brief Used for when swapchain is resized then only reconfigured
-        //! properties to get resizability
-        // NOTE: Should remove this. Leaving this here is because currently
-        // deciding what might be an approach for setting up swapchain void
-        // reconfigure(const window_settings& p_settings);
-
         //! @return uint32_t the next available image to present acquired
         uint32_t read_acquired_image();
 
         //! @return current active command buffer being processed
-        [[nodiscard]] vk_command_buffer active_command_buffer(
-          uint32_t p_frame) const {
-            return m_swapchain_command_buffers[p_frame];
+        [[nodiscard]] ::vk::command_buffer active_command(uint32_t p_frame_index) {
+            return m_swapchain_command_buffers[p_frame_index];
         }
 
         [[nodiscard]] VkFramebuffer active_framebuffer(uint32_t p_frame) const {
@@ -87,7 +79,7 @@ namespace atlas::vk {
 
         VkSurfaceKHR m_current_surface = nullptr;
         surface_properties m_surface_properties{};
-        std::vector<vk_command_buffer> m_swapchain_command_buffers{};
+        std::vector<::vk::command_buffer> m_swapchain_command_buffers{};
         std::vector<::vk::framebuffer> m_swapchain_framebuffers;
 
         //! @brief setting up images

@@ -120,13 +120,14 @@ namespace atlas::vk {
         m_swapchain_command_buffers.resize(image_count);
 
         for (size_t i = 0; i < m_swapchain_command_buffers.size(); i++) {
-            command_buffer_settings settings = {
-                present_index,
-                command_buffer_levels::primary,
-                VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT
-            };
+			::vk::command_enumeration settings = {
+				.levels = ::vk::command_levels::primary,
+				// .queue_index = enumerate_swapchain_settings.present_index,
+				.queue_index = 0,
+				.flags = ::vk::command_pool_flags::reset,
+			};
 
-            m_swapchain_command_buffers[i] = vk_command_buffer(settings);
+			m_swapchain_command_buffers[i] = ::vk::command_buffer(m_driver, settings);
         }
 
 		std::array<::vk::attachment, 2> renderpass_attachments = {
