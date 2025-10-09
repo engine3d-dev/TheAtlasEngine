@@ -218,7 +218,8 @@ namespace atlas {
                renderpass onto the final image
             */
             // Presents to the swapchain to display to screen
-            m_renderer->present(m_current_frame_index);
+            // m_renderer->present(m_current_frame_index);
+            m_window->present(m_current_frame_index);
         }
 
         // Just adding this here, for testing purposes

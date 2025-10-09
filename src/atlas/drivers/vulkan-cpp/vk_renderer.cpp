@@ -144,10 +144,6 @@ namespace atlas::vk {
         };
     }
 
-    void vk_renderer::present(uint32_t p_frame_index) {
-        m_main_swapchain.present(p_frame_index);
-    }
-
     void vk_renderer::start_frame(const vk_command_buffer& p_current,
                                   const vk::vk_swapchain& p_swapchain_handler,
                                   const glm::mat4& p_proj_view) {
@@ -310,8 +306,10 @@ namespace atlas::vk {
         // integration merging into dev This is for testing and to hopefully
         // have a global_ubo for globalized uniforms
         global_ubo global_frame_ubo = { .mvp = m_proj_view };
-
-		m_global_uniforms.update(&global_frame_ubo);
+		std::span<uint8_t> bytes_data(reinterpret_cast<uint8_t*>(&global_frame_ubo), sizeof(global_frame_ubo));
+		// std::span<global_ubo> global_uniform(global_frame_ubo, 1);
+		// m_global_uniforms.update(&global_frame_ubo);
+		m_global_uniforms.update(bytes_data.data());
 
         ref<world_scope> current_world =
           system_registry::get_world("Editor World");

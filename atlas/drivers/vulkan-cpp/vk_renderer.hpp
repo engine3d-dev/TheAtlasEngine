@@ -46,8 +46,6 @@ namespace atlas::vk {
 
         ~vk_renderer() override = default;
 
-        void present(uint32_t p_frame_index) override;
-
     private:
         void start_frame(const vk_command_buffer& p_current,
                          const vk_swapchain& p_swapchain_handler,

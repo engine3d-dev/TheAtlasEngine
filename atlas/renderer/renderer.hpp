@@ -32,8 +32,6 @@ namespace atlas {
          */
         void end();
 
-        void present(uint32_t p_frame_index);
-
         void set_background_color(const std::array<float, 4>& p_color);
 
     private:
