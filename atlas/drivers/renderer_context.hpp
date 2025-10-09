@@ -4,28 +4,6 @@
 #include <drivers/vulkan-cpp/vk_swapchain.hpp>
 #include <drivers/vulkan-cpp/vk_command_buffer.hpp>
 
-/**
- * @note This is just a class abstraction idea
-
-    class swapchain {
-    public:
-        virtual ~swapchain();
-
-        uint32_t read_acquired_next_image();
-
-
-    private:
-        virtual uint32_t swapchain_read_acquried_image() = 0;
-    };
-
-    Here are responsibilities I want the renderer/vk_renderer to have
-    * Task graph for command buffer submission/execution
-    * API's are going to be using defer_submit
-    * API's are potentially (with ???) using immediate_submit
-
-
-*/
-
 namespace atlas {
     class render_context {
     public:

@@ -4,7 +4,9 @@
 #include <drivers/vulkan-cpp/vk_command_buffer.hpp>
 #include <drivers/vulkan-cpp/vk_types.hpp>
 #include <drivers/vulkan-cpp/vk_present_queue.hpp>
-#include <drivers/vulkan-cpp/vk_renderpass.hpp>
+#include <vulkan-cpp/command_buffer.hpp>
+#include <vulkan-cpp/framebuffer.hpp>
+#include <vulkan-cpp/renderpass.hpp>
 
 namespace atlas::vk {
     /**
@@ -49,7 +51,7 @@ namespace atlas::vk {
         }
 
         [[nodiscard]] VkRenderPass swapchain_renderpass() const {
-            return m_swapchain_main_renderpass;
+            return m_final_renderpass;
         }
 
         [[nodiscard]] window_settings settings() const {
@@ -91,9 +93,6 @@ namespace atlas::vk {
 
         uint32_t m_image_size = 0;
 
-        //! @brief Render Pass Specifications
-        VkRenderPass m_color_renderpass = nullptr;
-
         VkSurfaceKHR m_current_surface = nullptr;
         surface_properties m_surface_properties{};
         std::vector<vk_command_buffer> m_swapchain_command_buffers{};
@@ -103,10 +102,7 @@ namespace atlas::vk {
         std::vector<vk_image_handle> m_swapchain_images{};
         std::vector<vk_image> m_swapchain_depth_images{};
 
-        //! @brief Main swapchain renderpass
-        //! @brief color renderpass
-        // VkRenderPass m_swapchain_renderpass=nullptr;
-        vk_renderpass m_swapchain_main_renderpass{};
+        ::vk::renderpass m_final_renderpass;
 
         vk_present_queue m_present_to_queue{};
     };

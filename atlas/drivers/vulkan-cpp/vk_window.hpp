@@ -25,6 +25,10 @@ namespace atlas::vk {
             return m_swapchain.active_command_buffer(p_frame_idx);
         }
 
+        [[nodiscard]] ::vk::command_buffer current_active_command(uint32_t) override {
+            return {};
+        }
+
     private:
         VkInstance m_instance_handler = nullptr;
         GLFWwindow* m_window_handler = nullptr;

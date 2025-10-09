@@ -4,6 +4,7 @@
 #include <drivers/vulkan-cpp/helper_functions.hpp>
 #include <drivers/vulkan-cpp/vk_types.hpp>
 #include <array>
+#include <vulkan-cpp/types.hpp>
 
 namespace atlas::vk {
 
@@ -140,69 +141,31 @@ namespace atlas::vk {
             m_swapchain_command_buffers[i] = vk_command_buffer(settings);
         }
 
-        // m_swapchain_renderpass = create_simple_renderpass(
-        //   m_driver, m_surface_properties.surface_format);
-        // m_swapchain_main_renderpass.configure(m_renderpass_options);
-        VkAttachmentDescription color_attachment = {
-            .flags = 0,
-            .format = m_surface_properties.surface_format.format,
-            .samples = VK_SAMPLE_COUNT_1_BIT,
-            .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
-            .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
-            .stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-            .stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-            .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-            .finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
-        };
-
-        VkAttachmentDescription depth_attachment = {
-            .flags = 0,
-            .format = m_driver.depth_format(),
-            .samples = VK_SAMPLE_COUNT_1_BIT,
-            .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
-            .storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-            .stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-            .stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
-            .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-            .finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
-        };
-
-        std::array<VkAttachmentDescription, 2> attachments = {
-            color_attachment, depth_attachment
-        };
-
-        VkAttachmentReference color_attachment_ref = {
-            .attachment = 0, .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
-        };
-
-        VkAttachmentReference depth_attachment_reference = {
-            .attachment = 1,
-            .layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
-        };
-
-        VkSubpassDescription subpass_description = {
-            .flags = 0,
-            .pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
-            .inputAttachmentCount = 0,
-            .pInputAttachments = nullptr,
-            .colorAttachmentCount = 1,
-            .pColorAttachments = &color_attachment_ref,
-            .pResolveAttachments = nullptr,
-            .pDepthStencilAttachment =
-              &depth_attachment_reference, // enable depth buffering
-            .preserveAttachmentCount = 0,
-            .pPreserveAttachments = nullptr
-        };
-
-        std::array<VkSubpassDescription, 1> subpass_desc = {
-            subpass_description
-        };
-
-        vk_renderpass_options renderpass_options = { .attachments = attachments,
-                                                     .subpass_descriptions =
-                                                       subpass_desc };
-
-        m_swapchain_main_renderpass = vk_renderpass(renderpass_options);
+		std::array<::vk::attachment, 2> renderpass_attachments = {
+			::vk::attachment{
+			.format = m_surface_properties.surface_format.format,
+			.layout = ::vk::image_layout::color_optimal,
+			.samples = ::vk::sample_bit::count_1,
+			.load = ::vk::attachment_load::clear,
+			.store = ::vk::attachment_store::store,
+			.stencil_load = ::vk::attachment_load::clear,
+			.stencil_store = ::vk::attachment_store::dont_care,
+			.initial_layout = ::vk::image_layout::undefined,
+			.final_layout = ::vk::image_layout::present_src_khr,
+			},
+			::vk::attachment{
+			.format = depth_format,
+			.layout = ::vk::image_layout::depth_stencil_optimal,
+			.samples = ::vk::sample_bit::count_1,
+			.load = ::vk::attachment_load::clear,
+			.store = ::vk::attachment_store::dont_care,
+			.stencil_load = ::vk::attachment_load::dont_care,
+			.stencil_store = ::vk::attachment_store::dont_care,
+			.initial_layout = ::vk::image_layout::undefined,
+			.final_layout = ::vk::image_layout::depth_stencil_optimal,
+			},
+		};
+		m_final_renderpass = ::vk::renderpass(m_driver, renderpass_attachments);
 
         // creating framebuffers
         m_swapchain_framebuffers.resize(m_swapchain_images.size());
@@ -217,7 +180,7 @@ namespace atlas::vk {
                 .sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
                 .pNext = nullptr,
                 .flags = 0,
-                .renderPass = m_swapchain_main_renderpass,
+                .renderPass = m_final_renderpass,
                 // .attachmentCount = 1,
                 // .pAttachments = &m_swapchain_images[i].image_view,
                 .attachmentCount =
@@ -282,7 +245,7 @@ namespace atlas::vk {
               m_driver, m_swapchain_framebuffers[i], nullptr);
         }
 
-        m_swapchain_main_renderpass.destroy();
+        m_final_renderpass.destroy();
 
         m_present_to_queue.destroy();
 

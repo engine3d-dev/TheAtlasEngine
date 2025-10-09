@@ -5,6 +5,7 @@
 #include <core/utilities/types.hpp>
 #include <drivers/vulkan-cpp/vk_swapchain.hpp>
 #include <drivers/vulkan-cpp/vk_command_buffer.hpp>
+#include <vulkan-cpp/command_buffer.hpp>
 
 namespace atlas {
 
@@ -45,6 +46,10 @@ namespace atlas {
             return current_active_command_buffer(p_frame_idx);
         }
 
+        ::vk::command_buffer active_command(uint32_t p_frame_index) {
+            return current_active_command(p_frame_index);
+        }
+
         operator GLFWwindow*() const { return native_window(); }
 
         operator GLFWwindow*() { return native_window(); }
@@ -67,6 +72,9 @@ namespace atlas {
         [[nodiscard]] virtual vk::vk_swapchain window_swapchain() const = 0;
         [[nodiscard]] virtual vk::vk_command_buffer
         current_active_command_buffer(const uint32_t& p_frame_idx) = 0;
+
+        [[nodiscard]] virtual ::vk::command_buffer current_active_command(uint32_t p_frame_idx) = 0;
+        
         virtual void presentation_process(const uint32_t& p_current_frame) = 0;
     };
 
