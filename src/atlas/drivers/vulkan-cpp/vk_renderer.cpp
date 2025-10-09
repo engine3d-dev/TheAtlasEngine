@@ -275,9 +275,7 @@ namespace atlas::vk {
         };
 
         m_current_command_buffer = p_current;
-        // m_current_command_buffer.begin(
 		m_current_command_buffer.begin(::vk::command_usage::simulatneous_use_bit);
-        //   VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT);
 
         VkViewport viewport = {
             .x = 0.0f,
@@ -359,7 +357,5 @@ namespace atlas::vk {
 
         vkCmdEndRenderPass(m_current_command_buffer);
         m_current_command_buffer.end();
-
-        // m_main_swapchain.submit(m_current_command_buffer);
     }
 };
