@@ -16,19 +16,10 @@ namespace atlas::vk {
         m_physical = vk_context::physical_driver();
         m_driver = vk_context::driver_context();
 
-        on_create();
+        create();
     }
 
-    void vk_swapchain::on_recreate() {
-        m_surface_properties =
-          m_physical.get_surface_properties(m_current_surface);
-        m_window_settings.width =
-          m_surface_properties.surface_capabilities.currentExtent.width;
-        m_window_settings.height =
-          m_surface_properties.surface_capabilities.currentExtent.height;
-    }
-
-    void vk_swapchain::on_create() {
+    void vk_swapchain::create() {
 
         // surface properties are always updated from the physical device
         // so they are valid should the swapchain be recreated
@@ -174,26 +165,12 @@ namespace atlas::vk {
 				m_swapchain_depth_images[i].image_view()
 			};
 
-            VkFramebufferCreateInfo framebuffer_ci = {
-                .sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
-                .pNext = nullptr,
-                .flags = 0,
-                .renderPass = m_final_renderpass,
-                // .attachmentCount = 1,
-                // .pAttachments = &m_swapchain_images[i].image_view,
-                .attachmentCount =
-                  static_cast<uint32_t>(image_attachments.size()),
-                .pAttachments = image_attachments.data(),
-                .width = m_swapchain_extent.width,
-                .height = m_swapchain_extent.height,
-                .layers = 1
-            };
-
-            vk_check(vkCreateFramebuffer(m_driver,
-                                         &framebuffer_ci,
-                                         nullptr,
-                                         &m_swapchain_framebuffers[i]),
-                     "vkCreateFramebuffer");
+			::vk::framebuffer_settings framebuffer_info = {
+				.renderpass = m_final_renderpass,
+				.views = image_attachments,
+				.extent = m_swapchain_extent
+			};
+			m_swapchain_framebuffers[i] = ::vk::framebuffer(m_driver, framebuffer_info);
         }
 
         vk_queue_options options = {
@@ -203,11 +180,19 @@ namespace atlas::vk {
         m_present_to_queue = vk_present_queue(m_swapchain_handler, options);
     }
 
-    void vk_swapchain::recreate() {
+    void vk_swapchain::invalidate() {
 
         destroy();
-        on_recreate();
-        on_create();
+		//!@brief operations that only need to happen when the swapchain
+        // is recreated again -- examples include getting the new extent
+        // upon a window resize
+		m_surface_properties =
+          m_physical.get_surface_properties(m_current_surface);
+        m_window_settings.width =
+          m_surface_properties.surface_capabilities.currentExtent.width;
+        m_window_settings.height =
+          m_surface_properties.surface_capabilities.currentExtent.height;
+        create();
     }
 
     uint32_t vk_swapchain::read_acquired_image() {
@@ -215,7 +200,7 @@ namespace atlas::vk {
 
         uint32_t frame_idx = m_present_to_queue.acquired_frame();
         if (m_present_to_queue.resize_requested()) {
-            recreate();
+            invalidate();
             m_present_to_queue.set_resize_status(false);
             frame_idx = m_present_to_queue.acquired_frame();
         }
@@ -226,7 +211,7 @@ namespace atlas::vk {
     void vk_swapchain::present(const uint32_t& p_current_frame) {
         m_present_to_queue.present_frame(p_current_frame);
         if (m_present_to_queue.resize_requested()) {
-            recreate();
+            invalidate();
             m_present_to_queue.set_resize_status(false);
         }
     }
@@ -239,8 +224,7 @@ namespace atlas::vk {
         vkDeviceWaitIdle(m_driver);
 
         for (size_t i = 0; i < m_swapchain_framebuffers.size(); i++) {
-            vkDestroyFramebuffer(
-              m_driver, m_swapchain_framebuffers[i], nullptr);
+            m_swapchain_framebuffers[i].destroy();
         }
 
         m_final_renderpass.destroy();

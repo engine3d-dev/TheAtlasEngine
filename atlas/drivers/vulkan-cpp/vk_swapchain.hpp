@@ -8,6 +8,7 @@
 #include <vulkan-cpp/framebuffer.hpp>
 #include <vulkan-cpp/renderpass.hpp>
 #include <vulkan-cpp/sample_image.hpp>
+#include <vulkan-cpp/surface.hpp>
 
 namespace atlas::vk {
     /**
@@ -27,10 +28,6 @@ namespace atlas::vk {
          */
         vk_swapchain(const VkSurfaceKHR& p_surface,
                      const window_settings& p_settings);
-
-        //! @brief Constructs new swapchain with specified window-integration
-        //! configuration settings
-        void configure(const window_settings& p_settings);
 
         //! @brief Used for when swapchain is resized then only reconfigured
         //! properties to get resizability
@@ -76,13 +73,8 @@ namespace atlas::vk {
         void present(const uint32_t& p_current_frame);
 
     private:
-        void recreate();
-        void on_create();
-
-        //!@brief operations that only need to happen when the swapchain
-        // is recreated again -- examples include getting the new extent
-        // upon a window resize
-        void on_recreate();
+        void invalidate();
+        void create();
 
     private:
         vk_physical_driver m_physical{};
@@ -97,7 +89,7 @@ namespace atlas::vk {
         VkSurfaceKHR m_current_surface = nullptr;
         surface_properties m_surface_properties{};
         std::vector<vk_command_buffer> m_swapchain_command_buffers{};
-        std::vector<VkFramebuffer> m_swapchain_framebuffers{};
+        std::vector<::vk::framebuffer> m_swapchain_framebuffers;
 
         //! @brief setting up images
         std::vector<::vk::sample_image> m_swapchain_images;
