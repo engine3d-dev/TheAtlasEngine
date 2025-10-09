@@ -173,11 +173,11 @@ namespace atlas::vk {
 			m_swapchain_framebuffers[i] = ::vk::framebuffer(m_driver, framebuffer_info);
         }
 
-        vk_queue_options options = {
-            .family_index = 0, // using defauly queue family
-            .queue_index = 0   // using defauly presentation queue available
-        };
-        m_present_to_queue = vk_present_queue(m_swapchain_handler, options);
+		::vk::queue_enumeration present_queue_params{
+			.family = 0,
+			.index = 0,
+		};
+		m_present_to_queue = ::vk::device_present_queue(m_driver, m_swapchain_handler, present_queue_params);
     }
 
     void vk_swapchain::invalidate() {
@@ -188,11 +188,12 @@ namespace atlas::vk {
     uint32_t vk_swapchain::read_acquired_image() {
         m_present_to_queue.wait_idle();
 
-        uint32_t frame_idx = m_present_to_queue.acquired_frame();
-        if (m_present_to_queue.resize_requested()) {
+        // uint32_t frame_idx = m_present_to_queue.acquired_frame();
+		uint32_t frame_idx = m_present_to_queue.acquire_next_image();
+        if (m_present_to_queue.out_of_date()) {
             invalidate();
-            m_present_to_queue.set_resize_status(false);
-            frame_idx = m_present_to_queue.acquired_frame();
+            m_present_to_queue.out_of_date(false);
+            frame_idx = m_present_to_queue.acquire_next_image();
         }
 
         return frame_idx;
@@ -200,14 +201,15 @@ namespace atlas::vk {
 
     void vk_swapchain::present(const uint32_t& p_current_frame) {
         m_present_to_queue.present_frame(p_current_frame);
-        if (m_present_to_queue.resize_requested()) {
+        if (m_present_to_queue.out_of_date()) {
             invalidate();
-            m_present_to_queue.set_resize_status(false);
+            m_present_to_queue.out_of_date(false);
         }
     }
 
-    void vk_swapchain::submit(const VkCommandBuffer& p_command) const {
-        m_present_to_queue.submit_immediate_async(p_command);
+    void vk_swapchain::submit(const VkCommandBuffer& p_command) {
+        // m_present_to_queue.submit_immediate_async(p_command);
+		m_present_to_queue.submit_async(p_command);
     }
 
     void vk_swapchain::destroy() {

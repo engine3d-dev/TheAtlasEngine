@@ -2,13 +2,12 @@
 #include <core/utilities/types.hpp>
 #include <drivers/vulkan-cpp/vk_driver.hpp>
 #include <drivers/vulkan-cpp/vk_command_buffer.hpp>
-#include <drivers/vulkan-cpp/vk_types.hpp>
-#include <drivers/vulkan-cpp/vk_present_queue.hpp>
 #include <vulkan-cpp/command_buffer.hpp>
 #include <vulkan-cpp/framebuffer.hpp>
 #include <vulkan-cpp/renderpass.hpp>
 #include <vulkan-cpp/sample_image.hpp>
 #include <vulkan-cpp/surface.hpp>
+#include <vulkan-cpp/device_present_queue.hpp>
 
 namespace atlas::vk {
     /**
@@ -64,7 +63,7 @@ namespace atlas::vk {
 
         void destroy();
 
-        void submit(const VkCommandBuffer& p_command) const;
+        void submit(const VkCommandBuffer& p_command);
 
         operator VkSwapchainKHR() const { return m_swapchain_handler; }
 
@@ -97,7 +96,7 @@ namespace atlas::vk {
 
         ::vk::renderpass m_final_renderpass;
 
-        vk_present_queue m_present_to_queue{};
+        ::vk::device_present_queue m_present_to_queue;
     };
 
 };
