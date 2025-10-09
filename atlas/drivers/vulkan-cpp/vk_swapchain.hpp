@@ -7,6 +7,7 @@
 #include <vulkan-cpp/command_buffer.hpp>
 #include <vulkan-cpp/framebuffer.hpp>
 #include <vulkan-cpp/renderpass.hpp>
+#include <vulkan-cpp/sample_image.hpp>
 
 namespace atlas::vk {
     /**
@@ -99,8 +100,8 @@ namespace atlas::vk {
         std::vector<VkFramebuffer> m_swapchain_framebuffers{};
 
         //! @brief setting up images
-        std::vector<vk_image_handle> m_swapchain_images{};
-        std::vector<vk_image> m_swapchain_depth_images{};
+        std::vector<::vk::sample_image> m_swapchain_images;
+        std::vector<::vk::sample_image> m_swapchain_depth_images;
 
         ::vk::renderpass m_final_renderpass;
 

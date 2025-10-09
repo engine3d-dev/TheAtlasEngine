@@ -96,35 +96,32 @@ namespace atlas::vk {
         m_swapchain_depth_images.resize(image_count);
 
         VkFormat depth_format = m_driver.depth_format();
-        uint32_t layer_count = 1;
-        uint32_t mip_levels = 1;
-        for (uint32_t i = 0; i < m_swapchain_images.size(); i++) {
-            m_swapchain_images[i].image = images[i];
-            m_swapchain_images[i].image_view =
-              create_image_view(m_driver,
-                                images[i],
-                                m_surface_properties.surface_format,
-                                VK_IMAGE_ASPECT_COLOR_BIT,
-                                VK_IMAGE_VIEW_TYPE_2D,
-                                layer_count,
-                                mip_levels);
 
-            // Creating Depth Images for depth buffering
-            VkImageUsageFlagBits usage =
-              VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
-            VkMemoryPropertyFlagBits property_flags =
-              VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
-            // Creates our images
-            m_swapchain_depth_images[i] =
-              create_image2d(m_swapchain_extent.width,
-                             m_swapchain_extent.height,
-                             depth_format,
-                             usage,
-                             property_flags);
-            m_swapchain_depth_images[i].image_view =
-              create_image_view(m_swapchain_depth_images[i].image,
-                                depth_format,
-                                VK_IMAGE_ASPECT_DEPTH_BIT);
+        for (uint32_t i = 0; i < m_swapchain_images.size(); i++) {
+			::vk::image_configuration_information color_image_config = {
+				.extent = {m_swapchain_extent.width, m_swapchain_extent.width},
+				.format = m_surface_properties.surface_format.format,
+				.aspect = ::vk::image_aspect_flags::color_bit,
+				.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+				.mip_levels = 1,
+				.layer_count = 1,
+				.phsyical_memory_properties = m_physical.memory_properties(),
+
+			};
+
+			m_swapchain_images[i] = ::vk::sample_image(m_driver, images[i], color_image_config);
+
+			::vk::image_configuration_information depth_image_config = {
+				.extent = {m_swapchain_extent.width, m_swapchain_extent.width},
+				.format = depth_format,
+				.aspect = ::vk::image_aspect_flags::depth_bit,
+				.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
+				.mip_levels = 1,
+				.layer_count = 1,
+				.phsyical_memory_properties = m_physical.memory_properties(),
+			};
+
+			m_swapchain_depth_images[i] = ::vk::sample_image(m_driver, depth_image_config);
         }
 
         // command buffers
@@ -171,10 +168,11 @@ namespace atlas::vk {
         m_swapchain_framebuffers.resize(m_swapchain_images.size());
 
         for (uint32_t i = 0; i < m_swapchain_images.size(); i++) {
-            std::vector<VkImageView> image_view_attachments;
-            image_view_attachments.push_back(m_swapchain_images[i].image_view);
-            image_view_attachments.push_back(
-              m_swapchain_depth_images[i].image_view);
+
+			std::array<VkImageView, renderpass_attachments.size()> image_attachments = {
+				m_swapchain_images[i].image_view(),
+				m_swapchain_depth_images[i].image_view()
+			};
 
             VkFramebufferCreateInfo framebuffer_ci = {
                 .sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
@@ -184,8 +182,8 @@ namespace atlas::vk {
                 // .attachmentCount = 1,
                 // .pAttachments = &m_swapchain_images[i].image_view,
                 .attachmentCount =
-                  static_cast<uint32_t>(image_view_attachments.size()),
-                .pAttachments = image_view_attachments.data(),
+                  static_cast<uint32_t>(image_attachments.size()),
+                .pAttachments = image_attachments.data(),
                 .width = m_swapchain_extent.width,
                 .height = m_swapchain_extent.height,
                 .layers = 1
@@ -254,12 +252,11 @@ namespace atlas::vk {
         }
 
         for (uint32_t i = 0; i < m_swapchain_depth_images.size(); i++) {
-            free_image(m_driver, m_swapchain_depth_images[i]);
+			m_swapchain_depth_images[i].destroy();
         }
 
         for (uint32_t i = 0; i < m_swapchain_images.size(); i++) {
-            vkDestroyImageView(
-              m_driver, m_swapchain_images[i].image_view, nullptr);
+			m_swapchain_images[i].destroy();
         }
 
         vkDestroySwapchainKHR(m_driver, m_swapchain_handler, nullptr);
