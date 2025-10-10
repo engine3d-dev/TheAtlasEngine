@@ -7,6 +7,7 @@
 #include <vulkan-cpp/sample_image.hpp>
 #include <vulkan-cpp/surface.hpp>
 #include <vulkan-cpp/device_present_queue.hpp>
+#include <span>
 
 namespace atlas::vk {
     /**
@@ -56,6 +57,8 @@ namespace atlas::vk {
         void destroy();
 
         void submit(std::span<const VkCommandBuffer> p_command);
+
+        [[nodiscard]] ::vk::sample_image active_image(uint32_t p_index) const {return m_swapchain_images[p_index]; }
 
         operator VkSwapchainKHR() const { return m_swapchain_handler; }
 

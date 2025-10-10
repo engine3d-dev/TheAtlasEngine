@@ -8,6 +8,9 @@
 #include <core/window.hpp>
 #include <vulkan-cpp/descriptor_resource.hpp>
 #include <vulkan-cpp/command_buffer.hpp>
+#include <vulkan-cpp/texture.hpp>
+#include <vulkan-cpp/pipeline.hpp>
+#include <vulkan-cpp/shader_resource.hpp>
 
 namespace atlas::vk {
     struct hud_data {
@@ -28,7 +31,7 @@ namespace atlas::vk {
                       const VkRenderPass& p_current_renderpass);
 
         void begin(const uint32_t& p_current_frame_idx);
-        
+
         void end();
 
         // HUD Example, using this to test if imgui initialization works
@@ -75,10 +78,7 @@ namespace atlas::vk {
         vk_driver m_driver{};
         uint32_t m_current_frame_index = 0;
         VkSwapchainKHR m_current_swapchain_handler = nullptr;
-
         VkDescriptorPool m_desc_pool = nullptr;
-        // VkCommandBuffer m_current_command = nullptr;
-
         std::vector<::vk::command_buffer> m_viewport_command_buffers;
     };
 };
