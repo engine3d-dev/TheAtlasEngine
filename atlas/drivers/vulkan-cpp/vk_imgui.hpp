@@ -27,8 +27,8 @@ namespace atlas::vk {
                       const uint32_t& p_image_size,
                       const VkRenderPass& p_current_renderpass);
 
-        void begin(const VkCommandBuffer& p_current,
-                   const uint32_t& p_current_frame_idx);
+        void begin(const uint32_t& p_current_frame_idx);
+        
         void end();
 
         // HUD Example, using this to test if imgui initialization works
@@ -67,18 +67,18 @@ namespace atlas::vk {
         void draw_hud(const hud_data& p_test,
                       const window_settings& p_settings);
         
+        [[nodiscard]] ::vk::command_buffer imgui_active_command() const { return m_viewport_command_buffers[m_current_frame_index]; }
         void destroy();
     private:
         VkInstance m_instance = nullptr;
         VkPhysicalDevice m_physical = nullptr;
         vk_driver m_driver{};
+        uint32_t m_current_frame_index = 0;
         VkSwapchainKHR m_current_swapchain_handler = nullptr;
 
         VkDescriptorPool m_desc_pool = nullptr;
-        VkCommandBuffer m_current_command = nullptr;
+        // VkCommandBuffer m_current_command = nullptr;
 
-        // ::vk::descriptor_resource m_imgui_descriptor;
-
-        std::vector<::vk::command_buffer> m_imgui_command_buffers;
+        std::vector<::vk::command_buffer> m_viewport_command_buffers;
     };
 };

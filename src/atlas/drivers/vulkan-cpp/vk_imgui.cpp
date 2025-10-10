@@ -82,16 +82,16 @@ namespace atlas::vk {
 
 		// Initializing vulkan objects for ImGui setup
 
-		m_imgui_command_buffers.resize(p_window_ctx->current_swapchain().image_size());
+		m_viewport_command_buffers.resize(p_window_ctx->current_swapchain().image_size());
 
-		for(size_t i = 0; i < m_imgui_command_buffers.size(); i++) {
+		for(size_t i = 0; i < m_viewport_command_buffers.size(); i++) {
 			::vk::command_enumeration settings = {
 				.levels = ::vk::command_levels::primary,
 				// .queue_index = enumerate_swapchain_settings.present_index,
 				.queue_index = 0,
 				.flags = ::vk::command_pool_flags::reset,
 			};
-			m_imgui_command_buffers[i] = ::vk::command_buffer(m_driver, settings);
+			m_viewport_command_buffers[i] = ::vk::command_buffer(m_driver, settings);
 		}
 
 
@@ -100,28 +100,28 @@ namespace atlas::vk {
         // 1: create descriptor pool for IMGUI
         //  the size of the pool is very oversize, but it's copied from imgui
         //  demo itself.
-        VkDescriptorPoolSize pool_sizes[] = {
-            { VK_DESCRIPTOR_TYPE_SAMPLER, 100 },
-            { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 100 },
-            { VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 100 },
-            { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 100 },
-            { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 100 },
-            { VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 100 },
-            { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 100 },
-            { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 100 },
-            { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 100 },
-            { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 100 },
-            { VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 100 }
+        std::array<VkDescriptorPoolSize , 11> pool_sizes = {
+            VkDescriptorPoolSize { VK_DESCRIPTOR_TYPE_SAMPLER, 100 },
+            VkDescriptorPoolSize { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 100 },
+            VkDescriptorPoolSize { VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 100 },
+            VkDescriptorPoolSize { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 100 },
+            VkDescriptorPoolSize { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 100 },
+            VkDescriptorPoolSize { VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 100 },
+            VkDescriptorPoolSize { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 100 },
+            VkDescriptorPoolSize { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 100 },
+            VkDescriptorPoolSize { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 100 },
+            VkDescriptorPoolSize { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 100 },
+            VkDescriptorPoolSize { VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 100 }
         };
 
         VkDescriptorPoolCreateInfo desc_pool_create_info = {
             .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
             .pNext = nullptr,
             .flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT,
-            .maxSets = 1000 * IM_ARRAYSIZE(pool_sizes),
+            .maxSets = static_cast<uint32_t>(1000 * pool_sizes.size()),
             // .poolSizeCount = (uint32_t)std::size(pool_sizes),
-            .poolSizeCount = (uint32_t)IM_ARRAYSIZE(pool_sizes),
-            .pPoolSizes = pool_sizes
+            .poolSizeCount = static_cast<uint32_t>(pool_sizes.size()),
+            .pPoolSizes = pool_sizes.data()
         };
 
         // VkDescriptorPool imgui_pool;
@@ -154,20 +154,22 @@ namespace atlas::vk {
     }
 
     void imgui_context::begin(
-      const VkCommandBuffer& p_current,
-      [[maybe_unused]] const uint32_t& p_current_frame_idx) {
+      const uint32_t& p_frame_index) {
         ImGui_ImplVulkan_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        m_current_command = p_current;
+		m_current_frame_index = p_frame_index;
+
+		m_viewport_command_buffers[m_current_frame_index].begin(::vk::command_usage::simulatneous_use_bit);
     }
 
     void imgui_context::end() {
         ImGui::Render();
 
         ImDrawData* draw_data = ImGui::GetDrawData();
-        ImGui_ImplVulkan_RenderDrawData(draw_data, m_current_command);
+        ImGui_ImplVulkan_RenderDrawData(draw_data, m_viewport_command_buffers[m_current_frame_index]);
+		m_viewport_command_buffers[m_current_frame_index].end();
 
         ImGuiIO& io = ImGui::GetIO();
         if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
@@ -278,10 +280,9 @@ namespace atlas::vk {
     }
 
 	void imgui_context::destroy() {
-		// ImGui_ImplVulkan_Shutdown();
 		ImGui_ImplVulkan_Shutdown();
 		vkDestroyDescriptorPool(m_driver, m_desc_pool, nullptr);
-		for(auto& command_buffer : m_imgui_command_buffers) {
+		for(auto& command_buffer : m_viewport_command_buffers) {
 			command_buffer.destroy();
 		}
 		ImGui_ImplGlfw_Shutdown();
