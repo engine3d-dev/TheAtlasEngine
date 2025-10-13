@@ -1,14 +1,13 @@
 #pragma once
-#include <drivers/vulkan-cpp/vk_vertex_buffer.hpp>
-#include <drivers/vulkan-cpp/vk_index_buffer.hpp>
-
-#include <drivers/vulkan-cpp/vk_types.hpp>
-
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
-#include <drivers/vulkan-cpp/vk_texture.hpp>
 #include <filesystem>
-#include <drivers/vulkan-cpp/vk_uniform_buffer.hpp>
+#include <vulkan-cpp/uniform_buffer.hpp>
+#include <vulkan-cpp/vertex_buffer.hpp>
+#include <vulkan-cpp/index_buffer.hpp>
+#include <vulkan-cpp/texture.hpp>
+#include <drivers/vulkan-cpp/vk_types.hpp>
+#include <drivers/vulkan-cpp/vk_physical_driver.hpp>
 
 namespace atlas::vk {
 
@@ -29,7 +28,8 @@ namespace atlas::vk {
     class mesh {
     public:
         mesh() = default;
-        mesh(std::span<vertex_input> p_vertices, std::span<uint32_t> p_indices);
+        mesh(std::span<::vk::vertex_input> p_vertices,
+             std::span<uint32_t> p_indices);
         mesh(const std::filesystem::path& p_filename);
 
         //! @brief Reload mesh vertices and indices when requested
@@ -39,7 +39,7 @@ namespace atlas::vk {
 
         void update_uniform(const material_uniform& p_material_ubo);
 
-        [[nodiscard]] vk_uniform_buffer material_ubo() const {
+        [[nodiscard]] ::vk::uniform_buffer material_ubo() const {
             return m_geoemtry_ubo;
         }
 
@@ -50,20 +50,23 @@ namespace atlas::vk {
         //! @brief Loading single texture with specified std::filesystem::path
         void add_texture(const std::filesystem::path& p_path);
 
-        [[nodiscard]] std::span<texture> read_textures() { return m_textures; }
+        [[nodiscard]] ::vk::sample_image image() const {
+            return m_texture.image();
+        }
 
         //! @return true if mesh geometry model loaded succesfully
         [[nodiscard]] bool loaded() const { return m_model_loaded; }
 
     private:
         void load_obj(const std::filesystem::path& p_filename);
-        void load_gltf(const std::filesystem::path& p_filename);
 
     private:
-        std::vector<texture> m_textures;
-        vk_vertex_buffer m_vbo{};
-        vk_index_buffer m_ibo{};
-        vk_uniform_buffer m_geoemtry_ubo;
+        vk_physical_driver m_physical;
+        VkDevice m_device = nullptr;
+        ::vk::texture m_texture;
+        ::vk::vertex_buffer m_vbo{};
+        ::vk::index_buffer m_ibo{};
+        ::vk::uniform_buffer m_geoemtry_ubo;
         bool m_model_loaded = false;
     };
 };

@@ -89,6 +89,10 @@ level_scene::level_scene(const std::string& p_name)
     m_platform->set<atlas::transform>({
       .scale = { 15.f, 0.30f, 10.0f },
     });
+    m_platform->set<atlas::material>({
+      .model_path = "assets/models/cube.obj",
+      .texture_path = "assets/models/wood.png",
+    });
     m_platform->set<atlas::physics_body>({
       .body_movement_type = atlas::fixed,
     });
@@ -125,11 +129,6 @@ level_scene::level_scene(const std::string& p_name)
     console_log_info("Sphere ID = {}", m_viking_room->id());
     console_log_info("Cube ID = {}", m_robot_model->id());
     console_log_info("Platform ID = {}", m_platform->id());
-
-    m_platform->set<atlas::material>({
-      .model_path = "assets/models/cube.obj",
-      .texture_path = "assets/models/wood.png",
-    });
 
     atlas::register_start(this, &level_scene::start);
     atlas::register_physics(this, &level_scene::physics_update);
@@ -369,6 +368,7 @@ level_scene::on_ui_update() {
             atlas::ui::draw_component<atlas::material>(
               "material", m_selected_entity, [](atlas::material* p_material) {
                   atlas::ui::draw_input_text(p_material->model_path);
+                  atlas::ui::draw_vec4("Color", p_material->color);
               });
 
             atlas::ui::draw_component<atlas::physics_body>(

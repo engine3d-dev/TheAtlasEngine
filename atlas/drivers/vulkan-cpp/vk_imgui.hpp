@@ -6,6 +6,11 @@
 #include <drivers/vulkan-cpp/vk_driver.hpp>
 #include <drivers/vulkan-cpp/vk_swapchain.hpp>
 #include <core/window.hpp>
+#include <vulkan-cpp/descriptor_resource.hpp>
+#include <vulkan-cpp/command_buffer.hpp>
+#include <vulkan-cpp/texture.hpp>
+#include <vulkan-cpp/pipeline.hpp>
+#include <vulkan-cpp/shader_resource.hpp>
 
 namespace atlas::vk {
     struct hud_data {
@@ -19,17 +24,14 @@ namespace atlas::vk {
     class imgui_context {
     public:
         imgui_context() = default;
-        // imgui_context(GLFWwindow* p_window_handler,
-        //               const vk_swapchain& p_current_swapchain_handler,
-        //               const VkRenderPass& p_current_renderpass);
         imgui_context(const ref<window>& p_window_ctx);
 
-        void recreate(GLFWwindow* p_window_handler,
-                      const uint32_t& p_image_size,
-                      const VkRenderPass& p_current_renderpass);
+        void create(GLFWwindow* p_window_handler,
+                    const uint32_t& p_image_size,
+                    const VkRenderPass& p_current_renderpass);
 
-        void begin(const VkCommandBuffer& p_current,
-                   const uint32_t& p_current_frame_idx);
+        void begin(const uint32_t& p_current_frame_idx);
+
         void end();
 
         // HUD Example, using this to test if imgui initialization works
@@ -68,13 +70,18 @@ namespace atlas::vk {
         void draw_hud(const hud_data& p_test,
                       const window_settings& p_settings);
 
+        [[nodiscard]] ::vk::command_buffer imgui_active_command() const {
+            return m_viewport_command_buffers[m_current_frame_index];
+        }
+        void destroy();
+
     private:
         VkInstance m_instance = nullptr;
         VkPhysicalDevice m_physical = nullptr;
         vk_driver m_driver{};
+        uint32_t m_current_frame_index = 0;
         VkSwapchainKHR m_current_swapchain_handler = nullptr;
-
         VkDescriptorPool m_desc_pool = nullptr;
-        VkCommandBuffer m_current_command = nullptr;
+        std::vector<::vk::command_buffer> m_viewport_command_buffers;
     };
 };

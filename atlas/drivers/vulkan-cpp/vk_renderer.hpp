@@ -1,15 +1,15 @@
 #pragma once
-#include <string>
 #include <drivers/renderer_context.hpp>
 #include <drivers/vulkan-cpp/vk_swapchain.hpp>
-#include <drivers/vulkan-cpp/vk_command_buffer.hpp>
-#include <drivers/vulkan-cpp/vk_shader_group.hpp>
-#include <drivers/vulkan-cpp/vk_pipeline.hpp>
-#include <vector>
 #include <drivers/vulkan-cpp/mesh.hpp>
-#include <drivers/vulkan-cpp/vk_uniform_buffer.hpp>
 #include <vector>
 #include <map>
+#include <string>
+#include <vulkan-cpp/uniform_buffer.hpp>
+#include <vulkan-cpp/pipeline.hpp>
+#include <vulkan-cpp/descriptor_resource.hpp>
+#include <vulkan-cpp/shader_resource.hpp>
+#include <vulkan-cpp/renderpass.hpp>
 
 namespace atlas::vk {
     /**
@@ -40,63 +40,40 @@ namespace atlas::vk {
      */
     class vk_renderer : public render_context {
     public:
-        vk_renderer(const vk_swapchain& p_swapchain, const std::string& p_tag);
+        vk_renderer(const window_settings& p_settings,
+                    uint32_t p_image_size,
+                    const std::string& p_tag);
 
         ~vk_renderer() override = default;
 
-        void present(uint32_t p_frame_index) override;
-
     private:
-        void start_frame(const vk_command_buffer& p_current,
-                         const vk_swapchain& p_swapchain_handler,
+        void start_frame(const ::vk::command_buffer& p_current,
+                         const window_settings& p_settings,
+                         const VkRenderPass& p_renderpass,
+                         const VkFramebuffer& p_framebuffer,
                          const glm::mat4& p_proj_view) override;
         void background_color(const std::array<float, 4>& p_color) override;
 
         void post_frame() override;
 
     private:
+        VkDevice m_device = nullptr;
+        vk_physical_driver m_physical;
         glm::mat4 m_proj_view;
-
-        vk_swapchain m_main_swapchain{};
-        vk_command_buffer m_current_command_buffer{};
+        window_settings m_window_extent;
+        ::vk::command_buffer m_current_command_buffer{};
         VkClearColorValue m_color;
 
-        vk_shader_group m_shader_group;
-        vk_pipeline m_main_pipeline{};
         uint32_t m_image_count = 0;
+        ::vk::shader_resource m_shader_group;
+        ::vk::pipeline m_main_pipeline;
+        ::vk::descriptor_resource m_global_descriptors;
+        std::vector<VkDescriptorSetLayout> m_sets_layouts;
 
-        // descriptors for global uniforms for global camera data
-        std::vector<vk_uniform_buffer> m_global_uniforms{};
-        descriptor_set m_global_descriptor{};
-
-        // Contain descriptor layouts that gets used by the main VkPipeline
-        // (graphics pipeline)
-        std::vector<VkDescriptorSetLayout> m_geometry_descriptor_layout;
-
-        // This is for caching any loaded mesh and only modifying this mesh if
-        // that entity is there. It is for this vk_renderer to manage
-        // std::string = the name of the entity
-        // mesh = corresponding to the entity that is being loaded
         std::map<uint32_t, mesh> m_cached_meshes;
-
-        // std::string = entity name
-        // descriptor_set for now will represent the material descriptor set
-        // std::map<std::string, descriptor_set> m_geometry_descriptor;
-
-        /**
-         * @brief contains groups of descriptor resources that correspond to a
-         * specific geometry Format of the entity is hash_table<entity_name:
-         * string, <resource_name, descriptor>> Example:
-         * m_mesh_descriptors[entity_name]["material"].bind(some data);, this
-         * gets entity_name and the material and bind that to the mesh This can
-         * be expanded to use lighting so if there are point light resources,
-         * then you correspond that to a name.
-         *
-         * This is grouping the resources that correspond to a specific mesh
-         */
-        std::map<uint32_t, std::map<std::string, descriptor_set>>
+        ::vk::uniform_buffer m_global_uniforms;
+        std::map<uint32_t, std::map<std::string, ::vk::descriptor_resource>>
           m_mesh_descriptors;
-        descriptor_set_layout m_material_descriptor_layout;
 
         bool m_begin_initialize = true;
         uint32_t m_current_frame = 0;

@@ -10,7 +10,6 @@ layout (location = 3) in vec4 materialColor;
 layout(location = 0) out vec4 outColor;
 
 layout (set = 1, binding = 1) uniform sampler2D texture1;
-layout (set = 1, binding = 2) uniform sampler2D texture2;
 
 void main(){
     // vec4 color = vec4(1.0, 1.0, 1.0, 1.0);

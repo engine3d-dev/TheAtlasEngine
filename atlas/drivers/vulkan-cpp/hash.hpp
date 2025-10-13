@@ -2,6 +2,7 @@
 #include <drivers/vulkan-cpp/vk_types.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
+#include <vulkan-cpp/types.hpp>
 
 namespace atlas {
     template<typename T, typename... Rest>
@@ -14,13 +15,24 @@ namespace atlas {
 
 namespace std {
 
+    // template<>
+    // struct hash<atlas::vk::vertex_input> {
+    //     size_t operator()(const atlas::vk::vertex_input& vertex) const {
+    //         size_t seed = 0;
+    //         atlas::hash_combine(
+    //           seed, vertex.position, vertex.color, vertex.normals,
+    //           vertex.uv);
+    //         return seed;
+    //     }
+    // };
     template<>
-    struct hash<atlas::vk::vertex_input> {
-        size_t operator()(const atlas::vk::vertex_input& vertex) const {
+    struct hash<::vk::vertex_input> {
+        size_t operator()(const ::vk::vertex_input& vertex) const {
             size_t seed = 0;
             atlas::hash_combine(
               seed, vertex.position, vertex.color, vertex.normals, vertex.uv);
             return seed;
         }
     };
+
 }
