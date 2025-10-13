@@ -28,7 +28,8 @@ namespace atlas::vk {
     class mesh {
     public:
         mesh() = default;
-        mesh(std::span<::vk::vertex_input> p_vertices, std::span<uint32_t> p_indices);
+        mesh(std::span<::vk::vertex_input> p_vertices,
+             std::span<uint32_t> p_indices);
         mesh(const std::filesystem::path& p_filename);
 
         //! @brief Reload mesh vertices and indices when requested
@@ -49,7 +50,9 @@ namespace atlas::vk {
         //! @brief Loading single texture with specified std::filesystem::path
         void add_texture(const std::filesystem::path& p_path);
 
-        [[nodiscard]] ::vk::sample_image image() const { return m_texture.image(); }
+        [[nodiscard]] ::vk::sample_image image() const {
+            return m_texture.image();
+        }
 
         //! @return true if mesh geometry model loaded succesfully
         [[nodiscard]] bool loaded() const { return m_model_loaded; }
@@ -59,7 +62,7 @@ namespace atlas::vk {
 
     private:
         vk_physical_driver m_physical;
-        VkDevice m_device=nullptr;
+        VkDevice m_device = nullptr;
         ::vk::texture m_texture;
         ::vk::vertex_buffer m_vbo{};
         ::vk::index_buffer m_ibo{};

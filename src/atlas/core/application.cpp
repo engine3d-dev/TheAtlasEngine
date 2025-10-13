@@ -20,8 +20,8 @@ namespace atlas {
         };
         m_window = create_window(settings);
 
-        m_renderer =
-          create_scope<renderer>(settings, m_window->current_swapchain().image_size(), "Renderer");
+        m_renderer = create_scope<renderer>(
+          settings, m_window->current_swapchain().image_size(), "Renderer");
         m_renderer->set_background_color({
           p_settings.background_color.x,
           p_settings.background_color.y,
@@ -33,9 +33,8 @@ namespace atlas {
         // through vulkan
         m_ui_context = vk::imgui_context(m_window);
 
-        vk::vk_context::submit_resource_free([this](){
-            m_ui_context.destroy();
-        });
+        vk::vk_context::submit_resource_free(
+          [this]() { m_ui_context.destroy(); });
         s_instance = this;
     }
 
@@ -169,7 +168,8 @@ namespace atlas {
             // TODO: Going to need to figure out where to put this
             // Added this here because to ensure the handlers being used by the
             // renderer is in sync when swapchain is resized
-            ::vk::command_buffer currently_active = m_window->active_command(m_current_frame_index);
+            ::vk::command_buffer currently_active =
+              m_window->active_command(m_current_frame_index);
 
             detail::invoke_physics_update();
 
@@ -200,9 +200,15 @@ namespace atlas {
             // pre-defined before the renderer does something with it.
             // TODO: Add scene_manager to coordinate what to process
             // before frame preparation
-            auto current_framebuffer = m_window->current_swapchain().active_framebuffer(m_current_frame_index);
+            auto current_framebuffer =
+              m_window->current_swapchain().active_framebuffer(
+                m_current_frame_index);
             m_renderer->begin(
-              currently_active, m_window->current_swapchain().settings(), m_window->current_swapchain().swapchain_renderpass(), current_framebuffer, m_proj_view);
+              currently_active,
+              m_window->current_swapchain().settings(),
+              m_window->current_swapchain().swapchain_renderpass(),
+              current_framebuffer,
+              m_proj_view);
 
             // TODO: vk:imgui_context will have its own renderpass, command
             // buffers, and framebuffers specifically for UI-widgets + viewport
@@ -223,10 +229,10 @@ namespace atlas {
                renderpass onto the final image
             */
 
-			std::array<const VkCommandBuffer, 2> commands = {
-				m_ui_context.imgui_active_command(),
+            std::array<const VkCommandBuffer, 2> commands = {
+                m_ui_context.imgui_active_command(),
                 currently_active,
-			};
+            };
             m_window->current_swapchain().submit(commands);
             // Presents to the swapchain to display to screen
             // m_renderer->present(m_current_frame_index);

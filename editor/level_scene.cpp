@@ -368,7 +368,7 @@ level_scene::on_ui_update() {
             atlas::ui::draw_component<atlas::material>(
               "material", m_selected_entity, [](atlas::material* p_material) {
                   atlas::ui::draw_input_text(p_material->model_path);
-				  atlas::ui::draw_vec4("Color", p_material->color);
+                  atlas::ui::draw_vec4("Color", p_material->color);
               });
 
             atlas::ui::draw_component<atlas::physics_body>(

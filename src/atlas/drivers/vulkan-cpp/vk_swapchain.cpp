@@ -89,30 +89,34 @@ namespace atlas::vk {
         VkFormat depth_format = m_driver.depth_format();
 
         for (uint32_t i = 0; i < m_swapchain_images.size(); i++) {
-			::vk::image_configuration_information color_image_config = {
-				.extent = {m_swapchain_extent.width, m_swapchain_extent.width},
-				.format = m_surface_properties.surface_format.format,
-				.aspect = ::vk::image_aspect_flags::color_bit,
-				.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
-				.mip_levels = 1,
-				.layer_count = 1,
-				.phsyical_memory_properties = m_physical.memory_properties(),
+            ::vk::image_configuration_information color_image_config = {
+                .extent = { m_swapchain_extent.width,
+                            m_swapchain_extent.width },
+                .format = m_surface_properties.surface_format.format,
+                .aspect = ::vk::image_aspect_flags::color_bit,
+                .usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+                .mip_levels = 1,
+                .layer_count = 1,
+                .phsyical_memory_properties = m_physical.memory_properties(),
 
-			};
+            };
 
-			m_swapchain_images[i] = ::vk::sample_image(m_driver, images[i], color_image_config);
+            m_swapchain_images[i] =
+              ::vk::sample_image(m_driver, images[i], color_image_config);
 
-			::vk::image_configuration_information depth_image_config = {
-				.extent = {m_swapchain_extent.width, m_swapchain_extent.width},
-				.format = depth_format,
-				.aspect = ::vk::image_aspect_flags::depth_bit,
-				.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
-				.mip_levels = 1,
-				.layer_count = 1,
-				.phsyical_memory_properties = m_physical.memory_properties(),
-			};
+            ::vk::image_configuration_information depth_image_config = {
+                .extent = { m_swapchain_extent.width,
+                            m_swapchain_extent.width },
+                .format = depth_format,
+                .aspect = ::vk::image_aspect_flags::depth_bit,
+                .usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
+                .mip_levels = 1,
+                .layer_count = 1,
+                .phsyical_memory_properties = m_physical.memory_properties(),
+            };
 
-			m_swapchain_depth_images[i] = ::vk::sample_image(m_driver, depth_image_config);
+            m_swapchain_depth_images[i] =
+              ::vk::sample_image(m_driver, depth_image_config);
         }
 
         // command buffers
@@ -120,65 +124,67 @@ namespace atlas::vk {
         m_swapchain_command_buffers.resize(image_count);
 
         for (size_t i = 0; i < m_swapchain_command_buffers.size(); i++) {
-			::vk::command_enumeration settings = {
-				.levels = ::vk::command_levels::primary,
-				// .queue_index = enumerate_swapchain_settings.present_index,
-				.queue_index = 0,
-				.flags = ::vk::command_pool_flags::reset,
-			};
+            ::vk::command_enumeration settings = {
+                .levels = ::vk::command_levels::primary,
+                // .queue_index = enumerate_swapchain_settings.present_index,
+                .queue_index = 0,
+                .flags = ::vk::command_pool_flags::reset,
+            };
 
-			m_swapchain_command_buffers[i] = ::vk::command_buffer(m_driver, settings);
+            m_swapchain_command_buffers[i] =
+              ::vk::command_buffer(m_driver, settings);
         }
 
-		std::array<::vk::attachment, 2> renderpass_attachments = {
-			::vk::attachment{
-			.format = m_surface_properties.surface_format.format,
-			.layout = ::vk::image_layout::color_optimal,
-			.samples = ::vk::sample_bit::count_1,
-			.load = ::vk::attachment_load::clear,
-			.store = ::vk::attachment_store::store,
-			.stencil_load = ::vk::attachment_load::clear,
-			.stencil_store = ::vk::attachment_store::dont_care,
-			.initial_layout = ::vk::image_layout::undefined,
-			.final_layout = ::vk::image_layout::present_src_khr,
-			},
-			::vk::attachment{
-			.format = depth_format,
-			.layout = ::vk::image_layout::depth_stencil_optimal,
-			.samples = ::vk::sample_bit::count_1,
-			.load = ::vk::attachment_load::clear,
-			.store = ::vk::attachment_store::dont_care,
-			.stencil_load = ::vk::attachment_load::dont_care,
-			.stencil_store = ::vk::attachment_store::dont_care,
-			.initial_layout = ::vk::image_layout::undefined,
-			.final_layout = ::vk::image_layout::depth_stencil_optimal,
-			},
-		};
-		m_final_renderpass = ::vk::renderpass(m_driver, renderpass_attachments);
+        std::array<::vk::attachment, 2> renderpass_attachments = {
+            ::vk::attachment{
+              .format = m_surface_properties.surface_format.format,
+              .layout = ::vk::image_layout::color_optimal,
+              .samples = ::vk::sample_bit::count_1,
+              .load = ::vk::attachment_load::clear,
+              .store = ::vk::attachment_store::store,
+              .stencil_load = ::vk::attachment_load::clear,
+              .stencil_store = ::vk::attachment_store::dont_care,
+              .initial_layout = ::vk::image_layout::undefined,
+              .final_layout = ::vk::image_layout::present_src_khr,
+            },
+            ::vk::attachment{
+              .format = depth_format,
+              .layout = ::vk::image_layout::depth_stencil_optimal,
+              .samples = ::vk::sample_bit::count_1,
+              .load = ::vk::attachment_load::clear,
+              .store = ::vk::attachment_store::dont_care,
+              .stencil_load = ::vk::attachment_load::dont_care,
+              .stencil_store = ::vk::attachment_store::dont_care,
+              .initial_layout = ::vk::image_layout::undefined,
+              .final_layout = ::vk::image_layout::depth_stencil_optimal,
+            },
+        };
+        m_final_renderpass = ::vk::renderpass(m_driver, renderpass_attachments);
 
         // creating framebuffers
         m_swapchain_framebuffers.resize(m_swapchain_images.size());
 
         for (uint32_t i = 0; i < m_swapchain_images.size(); i++) {
 
-			std::array<VkImageView, renderpass_attachments.size()> image_attachments = {
-				m_swapchain_images[i].image_view(),
-				m_swapchain_depth_images[i].image_view()
-			};
+            std::array<VkImageView, renderpass_attachments.size()>
+              image_attachments = { m_swapchain_images[i].image_view(),
+                                    m_swapchain_depth_images[i].image_view() };
 
-			::vk::framebuffer_settings framebuffer_info = {
-				.renderpass = m_final_renderpass,
-				.views = image_attachments,
-				.extent = m_swapchain_extent
-			};
-			m_swapchain_framebuffers[i] = ::vk::framebuffer(m_driver, framebuffer_info);
+            ::vk::framebuffer_settings framebuffer_info = {
+                .renderpass = m_final_renderpass,
+                .views = image_attachments,
+                .extent = m_swapchain_extent
+            };
+            m_swapchain_framebuffers[i] =
+              ::vk::framebuffer(m_driver, framebuffer_info);
         }
 
-		::vk::queue_enumeration present_queue_params{
-			.family = 0,
-			.index = 0,
-		};
-		m_present_to_queue = ::vk::device_present_queue(m_driver, m_swapchain_handler, present_queue_params);
+        ::vk::queue_enumeration present_queue_params{
+            .family = 0,
+            .index = 0,
+        };
+        m_present_to_queue = ::vk::device_present_queue(
+          m_driver, m_swapchain_handler, present_queue_params);
     }
 
     void vk_swapchain::invalidate() {
@@ -190,7 +196,7 @@ namespace atlas::vk {
         m_present_to_queue.wait_idle();
 
         // uint32_t frame_idx = m_present_to_queue.acquired_frame();
-		uint32_t frame_idx = m_present_to_queue.acquire_next_image();
+        uint32_t frame_idx = m_present_to_queue.acquire_next_image();
         if (m_present_to_queue.out_of_date()) {
             invalidate();
             m_present_to_queue.out_of_date(false);
@@ -210,7 +216,7 @@ namespace atlas::vk {
 
     void vk_swapchain::submit(std::span<const VkCommandBuffer> p_commands) {
         // m_present_to_queue.submit_immediate_async(p_command);
-		m_present_to_queue.submit_async(p_commands);
+        m_present_to_queue.submit_async(p_commands);
     }
 
     void vk_swapchain::destroy() {
@@ -229,11 +235,11 @@ namespace atlas::vk {
         }
 
         for (uint32_t i = 0; i < m_swapchain_depth_images.size(); i++) {
-			m_swapchain_depth_images[i].destroy();
+            m_swapchain_depth_images[i].destroy();
         }
 
         for (uint32_t i = 0; i < m_swapchain_images.size(); i++) {
-			m_swapchain_images[i].destroy();
+            m_swapchain_images[i].destroy();
         }
 
         vkDestroySwapchainKHR(m_driver, m_swapchain_handler, nullptr);

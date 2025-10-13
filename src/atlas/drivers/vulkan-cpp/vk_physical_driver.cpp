@@ -122,9 +122,11 @@ namespace atlas::vk {
         return presentation_index;
     }
 
-	VkPhysicalDeviceMemoryProperties vk_physical_driver::memory_properties() const {
+    VkPhysicalDeviceMemoryProperties vk_physical_driver::memory_properties()
+      const {
         VkPhysicalDeviceMemoryProperties physical_memory_properties;
-        vkGetPhysicalDeviceMemoryProperties(m_physical_driver, &physical_memory_properties);
+        vkGetPhysicalDeviceMemoryProperties(m_physical_driver,
+                                            &physical_memory_properties);
         return physical_memory_properties;
     }
 };

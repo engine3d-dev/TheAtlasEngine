@@ -32,7 +32,8 @@ namespace atlas::vk {
         uint32_t read_acquired_image();
 
         //! @return current active command buffer being processed
-        [[nodiscard]] ::vk::command_buffer active_command(uint32_t p_frame_index) {
+        [[nodiscard]] ::vk::command_buffer active_command(
+          uint32_t p_frame_index) {
             return m_swapchain_command_buffers[p_frame_index];
         }
 
@@ -58,7 +59,9 @@ namespace atlas::vk {
 
         void submit(std::span<const VkCommandBuffer> p_command);
 
-        [[nodiscard]] ::vk::sample_image active_image(uint32_t p_index) const {return m_swapchain_images[p_index]; }
+        [[nodiscard]] ::vk::sample_image active_image(uint32_t p_index) const {
+            return m_swapchain_images[p_index];
+        }
 
         operator VkSwapchainKHR() const { return m_swapchain_handler; }
 

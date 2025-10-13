@@ -25,7 +25,8 @@ namespace atlas::vk {
             return m_queue_indices;
         }
 
-        [[nodiscard]] VkPhysicalDeviceMemoryProperties memory_properties() const;
+        [[nodiscard]] VkPhysicalDeviceMemoryProperties memory_properties()
+          const;
 
         [[nodiscard]] uint32_t read_presentation_index(
           const VkSurfaceKHR& p_surface);

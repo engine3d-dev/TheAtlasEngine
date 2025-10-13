@@ -27,8 +27,8 @@ namespace atlas::vk {
         imgui_context(const ref<window>& p_window_ctx);
 
         void create(GLFWwindow* p_window_handler,
-                      const uint32_t& p_image_size,
-                      const VkRenderPass& p_current_renderpass);
+                    const uint32_t& p_image_size,
+                    const VkRenderPass& p_current_renderpass);
 
         void begin(const uint32_t& p_current_frame_idx);
 
@@ -69,9 +69,12 @@ namespace atlas::vk {
         */
         void draw_hud(const hud_data& p_test,
                       const window_settings& p_settings);
-        
-        [[nodiscard]] ::vk::command_buffer imgui_active_command() const { return m_viewport_command_buffers[m_current_frame_index]; }
+
+        [[nodiscard]] ::vk::command_buffer imgui_active_command() const {
+            return m_viewport_command_buffers[m_current_frame_index];
+        }
         void destroy();
+
     private:
         VkInstance m_instance = nullptr;
         VkPhysicalDevice m_physical = nullptr;

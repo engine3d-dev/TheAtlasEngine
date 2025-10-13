@@ -40,7 +40,9 @@ namespace atlas::vk {
      */
     class vk_renderer : public render_context {
     public:
-        vk_renderer(const window_settings& p_settings, uint32_t p_image_size, const std::string& p_tag);
+        vk_renderer(const window_settings& p_settings,
+                    uint32_t p_image_size,
+                    const std::string& p_tag);
 
         ~vk_renderer() override = default;
 
@@ -55,7 +57,7 @@ namespace atlas::vk {
         void post_frame() override;
 
     private:
-        VkDevice m_device=nullptr;
+        VkDevice m_device = nullptr;
         vk_physical_driver m_physical;
         glm::mat4 m_proj_view;
         window_settings m_window_extent;
@@ -70,7 +72,8 @@ namespace atlas::vk {
 
         std::map<uint32_t, mesh> m_cached_meshes;
         ::vk::uniform_buffer m_global_uniforms;
-        std::map<uint32_t, std::map<std::string, ::vk::descriptor_resource>> m_mesh_descriptors;
+        std::map<uint32_t, std::map<std::string, ::vk::descriptor_resource>>
+          m_mesh_descriptors;
 
         bool m_begin_initialize = true;
         uint32_t m_current_frame = 0;

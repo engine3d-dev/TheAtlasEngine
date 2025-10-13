@@ -10,20 +10,22 @@
 
 namespace atlas::vk {
 
-    vk_renderer::vk_renderer(const window_settings& p_settings, uint32_t p_image_size, const std::string& p_tag) {
+    vk_renderer::vk_renderer(const window_settings& p_settings,
+                             uint32_t p_image_size,
+                             const std::string& p_tag) {
         console_log_manager::create_new_logger(p_tag);
         m_device = vk_context::driver_context();
         m_physical = vk_context::physical_driver();
         // m_main_swapchain = p_swapchain;
-		m_window_extent = p_settings;
+        m_window_extent = p_settings;
 
         m_image_count = p_image_size;
 #ifdef USE_SHADERC
         std::array<::vk::shader_source, 2> shader_sources = {
             ::vk::shader_source{ "experimental-shaders/test.vert",
-                         shader_stage::vertex },
+                                 shader_stage::vertex },
             ::vk::shader_source{ "experimental-shaders/test.frag",
-                         shader_stage::fragment }
+                                 shader_stage::fragment }
         };
 #else
         std::array<::vk::shader_source, 2> shader_sources = {
@@ -101,21 +103,19 @@ namespace atlas::vk {
         };
         m_global_descriptors = ::vk::descriptor_resource(m_device, set0_layout);
 
-		::vk::uniform_buffer_info geo_info = {
-			.phsyical_memory_properties = m_physical.memory_properties(),
-			.size_bytes = sizeof(global_ubo)
-		};
-		m_global_uniforms = ::vk::uniform_buffer(m_device, geo_info);
+        ::vk::uniform_buffer_info geo_info = { .phsyical_memory_properties =
+                                                 m_physical.memory_properties(),
+                                               .size_bytes =
+                                                 sizeof(global_ubo) };
+        m_global_uniforms = ::vk::uniform_buffer(m_device, geo_info);
 
-
-		std::array<::vk::write_buffer_descriptor, 1> set0_write_buffers = {
-			::vk::write_buffer_descriptor{
-				.dst_binding = 0,
-				.buffer = m_global_uniforms,
-				.offset = 0,
-				.range = m_global_uniforms.size_bytes()
-			}
-		};
+        std::array<::vk::write_buffer_descriptor, 1> set0_write_buffers = {
+            ::vk::write_buffer_descriptor{ .dst_binding = 0,
+                                           .buffer = m_global_uniforms,
+                                           .offset = 0,
+                                           .range =
+                                             m_global_uniforms.size_bytes() }
+        };
         m_global_descriptors.update(set0_write_buffers);
 
         m_sets_layouts = {
@@ -125,11 +125,12 @@ namespace atlas::vk {
         vk_context::submit_resource_free([this]() {
             m_shader_group.destroy();
             m_global_descriptors.destroy();
-			m_global_uniforms.destroy();
+            m_global_uniforms.destroy();
             for (auto& [key, value] : m_cached_meshes) {
-                console_log_trace("Entity \"{}\" Destroyed in vk_renderer!!!", key);
+                console_log_trace("Entity \"{}\" Destroyed in vk_renderer!!!",
+                                  key);
 
-				value.destroy();
+                value.destroy();
             }
             for (auto& [key, descriptor_map] : m_mesh_descriptors) {
                 for (auto& [descriptor_type, descriptor] : descriptor_map) {
@@ -148,8 +149,8 @@ namespace atlas::vk {
 
     void vk_renderer::start_frame(const ::vk::command_buffer& p_current,
                                   const window_settings& p_settings,
-									const VkRenderPass& p_renderpass,
-									const VkFramebuffer& p_framebuffer,
+                                  const VkRenderPass& p_renderpass,
+                                  const VkFramebuffer& p_framebuffer,
                                   const glm::mat4& p_proj_view) {
         m_proj_view = p_proj_view;
         // m_main_swapchain = p_swapchain_handler; // ?? This is here to do some
@@ -174,13 +175,12 @@ namespace atlas::vk {
             caching.each([this](flecs::entity p_entity) {
                 const material* target = p_entity.get<material>();
                 mesh new_mesh(std::filesystem::path(target->model_path));
-				new_mesh.initialize_uniforms(
-					sizeof(material_uniform));
-				new_mesh.add_texture(
-					std::filesystem::path(target->texture_path));
+                new_mesh.initialize_uniforms(sizeof(material_uniform));
+                new_mesh.add_texture(
+                  std::filesystem::path(target->texture_path));
 
                 if (new_mesh.loaded()) {
-					m_cached_meshes.emplace(p_entity.id(), new_mesh);
+                    m_cached_meshes.emplace(p_entity.id(), new_mesh);
 
                     std::vector<::vk::descriptor_entry> set1_entries = {
 						::vk::descriptor_entry{
@@ -211,9 +211,11 @@ namespace atlas::vk {
                         .entries = set1_entries,
                     };
 
-					m_mesh_descriptors[p_entity.id()].emplace("materials", ::vk::descriptor_resource(m_device, set1_layout));
+                    m_mesh_descriptors[p_entity.id()].emplace(
+                      "materials",
+                      ::vk::descriptor_resource(m_device, set1_layout));
 
-					// layout(set=  1, binding = 0)
+                    // layout(set=  1, binding = 0)
                     std::vector<::vk::write_buffer_descriptor>
                       material_uniforms = {
                           ::vk::write_buffer_descriptor{
@@ -226,13 +228,16 @@ namespace atlas::vk {
                                        .size_bytes(),
                           },
                       };
-					// layout(set = 1, binding = 1)
+                    // layout(set = 1, binding = 1)
                     std::vector<::vk::write_image_descriptor>
                       material_textures = {
                           ::vk::write_image_descriptor{
                             .dst_binding = 1,
-                            .view = m_cached_meshes[p_entity.id()].image().image_view(),
-                            .sampler = m_cached_meshes[p_entity.id()].image().sampler(),
+                            .view = m_cached_meshes[p_entity.id()]
+                                      .image()
+                                      .image_view(),
+                            .sampler =
+                              m_cached_meshes[p_entity.id()].image().sampler(),
                           },
                       };
 
@@ -275,7 +280,8 @@ namespace atlas::vk {
         };
 
         m_current_command_buffer = p_current;
-		m_current_command_buffer.begin(::vk::command_usage::simulatneous_use_bit);
+        m_current_command_buffer.begin(
+          ::vk::command_usage::simulatneous_use_bit);
 
         VkViewport viewport = {
             .x = 0.0f,
@@ -297,7 +303,7 @@ namespace atlas::vk {
 
         // renderpass_begin_info.framebuffer =
         //   m_main_swapchain.active_framebuffer(m_current_frame);
-		renderpass_begin_info.framebuffer = p_framebuffer;
+        renderpass_begin_info.framebuffer = p_framebuffer;
 
         vkCmdBeginRenderPass(m_current_command_buffer,
                              &renderpass_begin_info,
@@ -310,23 +316,25 @@ namespace atlas::vk {
         // integration merging into dev This is for testing and to hopefully
         // have a global_ubo for globalized uniforms
         global_ubo global_frame_ubo = { .mvp = m_proj_view };
-		std::span<uint8_t> bytes_data(reinterpret_cast<uint8_t*>(&global_frame_ubo), sizeof(global_frame_ubo));
-		// std::span<global_ubo> global_uniform(global_frame_ubo, 1);
-		// m_global_uniforms.update(&global_frame_ubo);
-		m_global_uniforms.update(bytes_data.data());
+        std::span<uint8_t> bytes_data(
+          reinterpret_cast<uint8_t*>(&global_frame_ubo),
+          sizeof(global_frame_ubo));
+        // std::span<global_ubo> global_uniform(global_frame_ubo, 1);
+        // m_global_uniforms.update(&global_frame_ubo);
+        m_global_uniforms.update(bytes_data.data());
 
         ref<world_scope> current_world =
           system_registry::get_world("Editor World");
         ref<scene_scope> current_scene = current_world->get_scene("LevelScene");
 
         //! TODO: Replace rendertarget3d with a material component
-        flecs::query<> query_targets = current_scene->query_builder<material>().build();
+        flecs::query<> query_targets =
+          current_scene->query_builder<material>().build();
         m_main_pipeline.bind(m_current_command_buffer);
         // Bind global camera data here
-		m_global_descriptors.bind(m_current_command_buffer,
-									m_current_frame,
-									m_main_pipeline.layout());
-		query_targets.each([this](flecs::entity p_entity) {
+        m_global_descriptors.bind(
+          m_current_command_buffer, m_current_frame, m_main_pipeline.layout());
+        query_targets.each([this](flecs::entity p_entity) {
             const transform* transform_component = p_entity.get<transform>();
             const material* material_component = p_entity.get<material>();
             m_model = glm::mat4(1.f);

@@ -135,7 +135,7 @@ namespace atlas::vk {
         create(*p_window_ctx,
                p_window_ctx->current_swapchain().image_size(),
                p_window_ctx->current_swapchain().swapchain_renderpass());
-	}
+    }
 
     void imgui_context::create(GLFWwindow* p_window_handler,
                                const uint32_t& p_image_size,
@@ -163,15 +163,16 @@ namespace atlas::vk {
 
         m_current_frame_index = p_frame_index;
 
-        m_viewport_command_buffers[m_current_frame_index].begin(::vk::command_usage::one_time_submit);
-
+        m_viewport_command_buffers[m_current_frame_index].begin(
+          ::vk::command_usage::one_time_submit);
     }
 
     void imgui_context::end() {
         ImGui::Render();
 
         ImDrawData* draw_data = ImGui::GetDrawData();
-        ImGui_ImplVulkan_RenderDrawData(draw_data, m_viewport_command_buffers[m_current_frame_index]);
+        ImGui_ImplVulkan_RenderDrawData(
+          draw_data, m_viewport_command_buffers[m_current_frame_index]);
         m_viewport_command_buffers[m_current_frame_index].end();
 
         ImGuiIO& io = ImGui::GetIO();

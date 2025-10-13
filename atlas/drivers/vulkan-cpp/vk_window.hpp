@@ -14,18 +14,19 @@ namespace atlas::vk {
 
     private:
         [[nodiscard]] window_settings settings() const override;
-        
+
         [[nodiscard]] vk_swapchain window_swapchain() const override {
             return m_swapchain;
         }
-        
+
         [[nodiscard]] uint32_t read_acquired_next_frame() override;
-        
+
         [[nodiscard]] GLFWwindow* native_window() const override;
 
         void presentation_process(const uint32_t& p_current_frame) override;
 
-        [[nodiscard]] ::vk::command_buffer current_active_command(uint32_t p_frame_idx) override {
+        [[nodiscard]] ::vk::command_buffer current_active_command(
+          uint32_t p_frame_idx) override {
             return m_swapchain.active_command(p_frame_idx);
         }
 

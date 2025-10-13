@@ -7,7 +7,8 @@ namespace atlas {
     renderer::renderer(const window_settings& p_window_extent,
                        uint32_t p_image_size,
                        const std::string& p_tag) {
-        m_render_context = initialize_renderer(p_window_extent, p_image_size, p_tag);
+        m_render_context =
+          initialize_renderer(p_window_extent, p_image_size, p_tag);
     }
 
     void renderer::begin(const ::vk::command_buffer& p_current,
@@ -22,7 +23,7 @@ namespace atlas {
     void renderer::end() {
         return m_render_context->end_frame();
     }
-    
+
     void renderer::set_background_color(const std::array<float, 4>& p_color) {
         m_render_context->set_background_color(p_color);
     }

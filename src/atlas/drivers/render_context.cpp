@@ -11,7 +11,8 @@ namespace atlas {
       const std::string& p_tag) {
         switch (application::current_api()) {
             case api::vulkan:
-                return create_scope<vk::vk_renderer>(p_window_extent, p_image_size, p_tag);
+                return create_scope<vk::vk_renderer>(
+                  p_window_extent, p_image_size, p_tag);
             default:
                 return nullptr;
         }

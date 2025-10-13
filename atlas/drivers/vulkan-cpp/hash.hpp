@@ -20,7 +20,8 @@ namespace std {
     //     size_t operator()(const atlas::vk::vertex_input& vertex) const {
     //         size_t seed = 0;
     //         atlas::hash_combine(
-    //           seed, vertex.position, vertex.color, vertex.normals, vertex.uv);
+    //           seed, vertex.position, vertex.color, vertex.normals,
+    //           vertex.uv);
     //         return seed;
     //     }
     // };
@@ -34,5 +35,4 @@ namespace std {
         }
     };
 
-    
 }

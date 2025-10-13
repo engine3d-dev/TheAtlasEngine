@@ -537,7 +537,6 @@ namespace atlas::vk {
         }
     }
 
-
     uint32_t select_images_size(
       const VkSurfaceCapabilitiesKHR& p_surface_capabilities) {
         uint32_t requested_images = p_surface_capabilities.minImageCount + 1;
@@ -554,7 +553,6 @@ namespace atlas::vk {
 
         return final_image_count;
     }
-
 
     void transition_image_layout(VkCommandBuffer& p_command_buffer,
                                  VkImage& p_image,

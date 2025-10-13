@@ -9,29 +9,29 @@
 namespace atlas::vk {
     mesh::mesh(std::span<::vk::vertex_input> p_vertices,
                std::span<uint32_t> p_indices) {
-		m_physical = vk_context::physical_driver();
-		m_device = vk_context::driver_context();
-		::vk::vertex_buffer_settings vbo_settings = {
-			.phsyical_memory_properties = m_physical.memory_properties(),
-			.vertices = p_vertices
-		};
-		::vk::index_buffer_settings ibo_settings = {
-			.phsyical_memory_properties = m_physical.memory_properties(),
-			.indices = p_indices
-		};
+        m_physical = vk_context::physical_driver();
+        m_device = vk_context::driver_context();
+        ::vk::vertex_buffer_settings vbo_settings = {
+            .phsyical_memory_properties = m_physical.memory_properties(),
+            .vertices = p_vertices
+        };
+        ::vk::index_buffer_settings ibo_settings = {
+            .phsyical_memory_properties = m_physical.memory_properties(),
+            .indices = p_indices
+        };
         m_vbo = ::vk::vertex_buffer(m_device, vbo_settings);
         m_ibo = ::vk::index_buffer(m_device, ibo_settings);
     }
 
     mesh::mesh(const std::filesystem::path& p_filename) {
-		m_physical = vk_context::physical_driver();
+        m_physical = vk_context::physical_driver();
         m_device = vk_context::driver_context();
-		reload_mesh(p_filename);
+        reload_mesh(p_filename);
     }
 
     void mesh::reload_mesh(const std::filesystem::path& p_filename) {
-		console_log_info("Loading .obj file!!!");
-		load_obj(p_filename);
+        console_log_info("Loading .obj file!!!");
+        load_obj(p_filename);
     }
 
     void mesh::load_obj(const std::filesystem::path& p_filename) {
@@ -111,24 +111,23 @@ namespace atlas::vk {
             }
         }
 
-		::vk::vertex_buffer_settings vbo_settings = {
-			.phsyical_memory_properties = m_physical.memory_properties(),
-			.vertices = vertices
-		};
-		::vk::index_buffer_settings ibo_settings = {
-			.phsyical_memory_properties = m_physical.memory_properties(),
-			.indices = indices
-		};
+        ::vk::vertex_buffer_settings vbo_settings = {
+            .phsyical_memory_properties = m_physical.memory_properties(),
+            .vertices = vertices
+        };
+        ::vk::index_buffer_settings ibo_settings = {
+            .phsyical_memory_properties = m_physical.memory_properties(),
+            .indices = indices
+        };
         m_vbo = ::vk::vertex_buffer(m_device, vbo_settings);
         m_ibo = ::vk::index_buffer(m_device, ibo_settings);
         m_model_loaded = true;
     }
 
     void mesh::initialize_uniforms(uint32_t p_size_bytes_ubo) {
-		::vk::uniform_buffer_info geo_info = {
-			.phsyical_memory_properties = m_physical.memory_properties(),
-			.size_bytes = p_size_bytes_ubo
-		};
+        ::vk::uniform_buffer_info geo_info = { .phsyical_memory_properties =
+                                                 m_physical.memory_properties(),
+                                               .size_bytes = p_size_bytes_ubo };
         m_geoemtry_ubo = ::vk::uniform_buffer(m_device, geo_info);
     }
 
@@ -137,24 +136,22 @@ namespace atlas::vk {
     }
 
     void mesh::add_texture(const std::filesystem::path& p_path) {
-		::vk::texture_info config_texture = {
-			.phsyical_memory_properties = m_physical.memory_properties(),
-			.filepath = p_path
-		};
-		m_texture = ::vk::texture(m_device, config_texture);
+        ::vk::texture_info config_texture = { .phsyical_memory_properties =
+                                                m_physical.memory_properties(),
+                                              .filepath = p_path };
+        m_texture = ::vk::texture(m_device, config_texture);
 
-		if(!m_texture.loaded()) {
-			console_log_info("Texture {} is NOT loaded!!!", p_path.string());
-			return;
-		}
-
+        if (!m_texture.loaded()) {
+            console_log_info("Texture {} is NOT loaded!!!", p_path.string());
+            return;
+        }
     }
 
     void mesh::draw(const VkCommandBuffer& p_current) {
         m_vbo.bind(p_current);
         if (m_ibo.size() > 0) {
             m_ibo.bind(p_current);
-			vkCmdDrawIndexed(p_current, m_ibo.size(), 1, 0, 0, 0);
+            vkCmdDrawIndexed(p_current, m_ibo.size(), 1, 0, 0, 0);
         }
         else {
             vkCmdDraw(p_current, m_vbo.size(), 1, 0, 0);
@@ -165,7 +162,7 @@ namespace atlas::vk {
         m_vbo.destroy();
         m_ibo.destroy();
 
-		m_texture.destroy();
+        m_texture.destroy();
         m_geoemtry_ubo.destroy();
     }
 };

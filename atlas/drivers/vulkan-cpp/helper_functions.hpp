@@ -30,7 +30,7 @@ namespace atlas::vk {
     uint32_t select_images_size(
       const VkSurfaceCapabilitiesKHR& p_surface_capabilities);
 
-	/**
+    /**
      * @name transition_image_layout
      * @param VkImage is the image we want to transition to
      * @param VkFormat specifying the format in which are image has been set to
