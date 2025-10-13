@@ -17,7 +17,6 @@ namespace atlas {
      */
     class scene_scope {
     public:
-        scene_scope() = default;
         scene_scope(const std::string& p_name)
           : m_name(p_name) {}
 
