@@ -30,7 +30,7 @@ namespace atlas::vk {
                     const uint32_t& p_image_size,
                     const VkRenderPass& p_current_renderpass);
 
-        void begin(const uint32_t& p_current_frame_idx);
+        void begin(const VkCommandBuffer& p_current, const uint32_t& p_current_frame_idx);
 
         void end();
 
@@ -82,6 +82,7 @@ namespace atlas::vk {
         uint32_t m_current_frame_index = 0;
         VkSwapchainKHR m_current_swapchain_handler = nullptr;
         VkDescriptorPool m_desc_pool = nullptr;
+        VkCommandBuffer m_current=nullptr;
         std::vector<::vk::command_buffer> m_viewport_command_buffers;
     };
 };

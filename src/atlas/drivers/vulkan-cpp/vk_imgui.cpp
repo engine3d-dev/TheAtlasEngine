@@ -156,15 +156,13 @@ namespace atlas::vk {
         ImGui_ImplVulkan_Init(&init_info);
     }
 
-    void imgui_context::begin(const uint32_t& p_frame_index) {
+    void imgui_context::begin(const VkCommandBuffer& p_current, const uint32_t& p_frame_index) {
         ImGui_ImplVulkan_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
         m_current_frame_index = p_frame_index;
-
-        m_viewport_command_buffers[m_current_frame_index].begin(
-          ::vk::command_usage::one_time_submit);
+		m_current = p_current;
     }
 
     void imgui_context::end() {
@@ -172,8 +170,7 @@ namespace atlas::vk {
 
         ImDrawData* draw_data = ImGui::GetDrawData();
         ImGui_ImplVulkan_RenderDrawData(
-          draw_data, m_viewport_command_buffers[m_current_frame_index]);
-        m_viewport_command_buffers[m_current_frame_index].end();
+          draw_data, m_current);
 
         ImGuiIO& io = ImGui::GetIO();
         if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
