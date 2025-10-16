@@ -212,7 +212,7 @@ namespace atlas {
 
             // TODO: vk:imgui_context will have its own renderpass, command
             // buffers, and framebuffers specifically for UI-widgets + viewport
-            m_ui_context.begin(m_current_frame_index);
+            m_ui_context.begin(currently_active, m_current_frame_index);
 
             detail::invoke_ui_update();
 
@@ -229,8 +229,7 @@ namespace atlas {
                renderpass onto the final image
             */
 
-            std::array<const VkCommandBuffer, 2> commands = {
-                m_ui_context.imgui_active_command(),
+            std::array<const VkCommandBuffer, 1> commands = {
                 currently_active,
             };
             m_window->current_swapchain().submit(commands);
