@@ -36,7 +36,9 @@ public:
 
     void reset_objects();
 
-    void collision_enter(atlas::event::collision_begin& p_event);
+    void collision_enter(atlas::event::collision_enter& p_event);
+    
+    void collision_persisted(atlas::event::collision_persisted& p_event);
 
 private:
     bool m_blink = false;

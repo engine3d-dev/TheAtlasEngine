@@ -3,7 +3,7 @@
 
 namespace atlas::event {
 
-    struct collision_begin {
+    struct collision_enter {
         uint64_t entity1;
         uint64_t entity2;
     };
