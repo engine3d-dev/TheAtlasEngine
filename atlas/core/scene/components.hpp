@@ -87,7 +87,9 @@ namespace atlas {
         struct editor {};
 
         //! @brief to tag entities to serialize through the serializer
-        struct serialize {};
+        struct serialize {
+            bool enable=false;
+        };
     };
 
     //! TODO: Consider either relocating where this is and how it gets handled.
