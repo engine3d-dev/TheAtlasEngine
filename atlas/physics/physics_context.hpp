@@ -160,5 +160,6 @@ namespace atlas::physics {
     //! with but for now, we assume we only have JoltPhysics as our only physics
     //! backend
     ref<physics_context> initialize_physics_context(
-      const jolt_settings& p_settings, event::event_bus& p_bus);
+      const jolt_settings& p_settings,
+      event::event_bus& p_bus);
 };

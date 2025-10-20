@@ -4,7 +4,8 @@
 #include <drivers/jolt-cpp/jolt_components.hpp>
 #include <physics/physics_engine.hpp>
 
-level_scene::level_scene(const std::string& p_name, atlas::event::event_bus& p_bus)
+level_scene::level_scene(const std::string& p_name,
+                         atlas::event::event_bus& p_bus)
   : atlas::scene_scope(p_name, p_bus) {
     m_camera = create_object("editor camera");
     m_camera->add<flecs::pair<atlas::tag::editor, atlas::projection_view>>();
@@ -123,8 +124,10 @@ level_scene::level_scene(const std::string& p_name, atlas::event::event_bus& p_b
     // 	m_many_objects.emplace_back(obj);
     // }
 
-	subscribe<atlas::event::collision_enter>(this, &level_scene::collision_enter);
-	// subscribe<atlas::event::collision_persisted>(this, &level_scene::collision_persisted);
+    subscribe<atlas::event::collision_enter>(this,
+                                             &level_scene::collision_enter);
+    // subscribe<atlas::event::collision_persisted>(this,
+    // &level_scene::collision_persisted);
 
     console_log_info("Sphere ID = {}", m_viking_room->id());
     console_log_info("Cube ID = {}", m_robot_model->id());
@@ -136,16 +139,18 @@ level_scene::level_scene(const std::string& p_name, atlas::event::event_bus& p_b
     atlas::register_ui(this, &level_scene::on_ui_update);
 }
 
-void level_scene::collision_enter(atlas::event::collision_enter& p_event) {
-	console_log_warn("collision_enter event!!!");
-	console_log_warn("Entity1 ID = {}", p_event.entity1);
-	console_log_warn("Entity2 ID = {}", p_event.entity2);
+void
+level_scene::collision_enter(atlas::event::collision_enter& p_event) {
+    console_log_warn("collision_enter event!!!");
+    console_log_warn("Entity1 ID = {}", p_event.entity1);
+    console_log_warn("Entity2 ID = {}", p_event.entity2);
 }
 
-void level_scene::collision_persisted(atlas::event::collision_persisted& p_event) {
-	console_log_warn("collision_persisted(p_event) invoked!!");
-	console_log_warn("Entity1 ID = {}", p_event.entity1);
-	console_log_warn("Entity2 ID = {}", p_event.entity2);
+void
+level_scene::collision_persisted(atlas::event::collision_persisted& p_event) {
+    console_log_warn("collision_persisted(p_event) invoked!!");
+    console_log_warn("Entity1 ID = {}", p_event.entity1);
+    console_log_warn("Entity2 ID = {}", p_event.entity2);
 }
 
 void
@@ -470,7 +475,7 @@ level_scene::start() {
     flecs::world registry = *this;
     m_physics_engine_handler =
       atlas::physics::physics_engine(settings, registry, *event_handle());
-	
+
     // Note -- just added for temporary
     // ImGuiIO io = ImGui::GetIO();
     // m_font = io.Fonts->AddFontFromFileTTF("assets/OpenSans-Regular.ttf",
@@ -547,7 +552,7 @@ level_scene::physics_update() {
         runtime_start();
     }
 
-	atlas::physics_body* sphere_body =
+    atlas::physics_body* sphere_body =
       m_viking_room->get_mut<atlas::physics_body>();
     // U = +up
     // J = -up

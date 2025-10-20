@@ -6,8 +6,8 @@
 
 namespace atlas::physics {
 
-    contact_listener::contact_listener(event::event_bus& p_bus) : m_bus(&p_bus) {
-    }
+    contact_listener::contact_listener(event::event_bus& p_bus)
+      : m_bus(&p_bus) {}
 
     JPH::ValidateResult contact_listener::OnContactValidate(
       const JPH::Body&,
@@ -26,7 +26,8 @@ namespace atlas::physics {
             .entity2 = static_cast<uint64_t>(p_body2.GetUserData())
         };
 
-        // Publishes to all subscribers that this collision_enter event has occurred
+        // Publishes to all subscribers that this collision_enter event has
+        // occurred
         m_bus->publish(begin_event);
     }
 
