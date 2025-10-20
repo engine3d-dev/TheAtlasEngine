@@ -298,8 +298,6 @@ namespace atlas::physics {
 
             m_cached_body_ids.clear();
         }
-
-        console_log_info("Removed All shapes and bodies...\n");
     }
 
     void jolt_context::linear_velocity(uint64_t p_id,
@@ -337,8 +335,6 @@ namespace atlas::physics {
                                          static_cast<int>(all_body_ids.size()),
                                          state,
                                          JPH::EActivation::Activate);
-        console_log_info("Batch inserted {} bodies successfully.",
-                         all_body_ids.size());
     }
 
     void jolt_context::update_simulation(float p_delta_time) {
