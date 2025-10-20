@@ -27,12 +27,9 @@ namespace atlas {
     enum activation : uint8_t { activate, deactivate };
 
     /**
-     * @name Physics Body
-     * @brief These are one time use calls. They are made to develop settings
-     * for rigid bodies.
+     * @brief physics body data-driven representative
      *
-     * @warning Some of these values should be read only. Meaning it might be
-     * good to think about a read only version of imgui types.
+     * TODO: Add parameters for force, impulse, and torque
      */
     struct physics_body {
         glm::vec3 linear_velocity = glm::vec3(0.0);
