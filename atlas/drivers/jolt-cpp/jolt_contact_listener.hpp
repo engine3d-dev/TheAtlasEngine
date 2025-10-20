@@ -9,8 +9,9 @@
 namespace atlas::physics {
     /**
      * @brief implementation of Jolt's contact listener for collisions
-     * 
-     * contact_listener gets set to Jolt's Physics System to allow for collisions to happen
+     *
+     * contact_listener gets set to Jolt's Physics System to allow for
+     * collisions to happen
      */
     class contact_listener : public JPH::ContactListener {
     public:
