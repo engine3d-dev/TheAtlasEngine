@@ -1,10 +1,11 @@
 #include <boost/ut.hpp>
 #include <core/scene/scene.hpp>
+#include <core/event/event_bus.hpp>
 
 boost::ut::suite<"::scene"> scene_test = []() {
     using namespace boost::ut;
-
-    atlas::scene_scope test_scope = atlas::scene_scope("Mock Scene 1");
+	atlas::event::event_bus test_event_bus;
+    atlas::scene_scope test_scope = atlas::scene_scope("Mock Scene 1", test_event_bus);
 
     "create_object"_test = [&test_scope]() {
         atlas::strong_ref<atlas::scene_object> test_object =
