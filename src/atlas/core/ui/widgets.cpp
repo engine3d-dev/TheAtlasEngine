@@ -15,7 +15,7 @@ namespace atlas::ui {
         // ImGuiIO& io = ImGui::GetIO();
         ImGui::PushID(p_tag.c_str());
 
-        float column_width = 100.0f;
+        float column_width = 125.0f;
 
         ImGui::Columns(2);
         ImGui::SetColumnWidth(0, column_width);
