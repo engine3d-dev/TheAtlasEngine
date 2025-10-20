@@ -34,8 +34,6 @@ namespace atlas::physics {
                                               const JPH::Body& p_body2,
                                               const JPH::ContactManifold&,
                                               JPH::ContactSettings&) {
-        // console_log_info("Collisions Persisted!");
-        // For Event system to handle when collision continues always
         event::collision_persisted persisted_event = {
             .entity1 = static_cast<uint64_t>(p_body1.GetUserData()),
             .entity2 = static_cast<uint64_t>(p_body2.GetUserData())

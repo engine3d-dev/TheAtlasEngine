@@ -8,43 +8,13 @@
 
 namespace atlas::physics {
     /**
-     * @brief This is the glue between contact events and jolts contact
-     * listener. It takes the calls from jolt through virtual functions and
-     * allows users to create children for jolt collision.
-     *
+     * @brief implementation of Jolt's contact listener for collisions
+     * 
+     * contact_listener gets set to Jolt's Physics System to allow for collisions to happen
      */
     class contact_listener : public JPH::ContactListener {
     public:
-        /**
-         * @brief Construct a new contact listener object
-         *
-         */
         contact_listener(event::event_bus& p_bus);
-
-        /**
-         * @brief Deletes all events. Helps reset the collisions on load, etc...
-         *
-         */
-        // void clear_events();
-
-        /**
-         * @brief Calls all events that came into contact this frame
-         *
-         */
-        // void run_events_added();
-
-        /**
-         * @brief Runs all events that came into contact every frame but first
-         * and last.
-         *
-         */
-        // void run_events_persisted();
-
-        /**
-         * @brief Runs all events who stopped contact this frame
-         *
-         */
-        // void run_events_removed();
 
     private:
         /**
@@ -53,10 +23,10 @@ namespace atlas::physics {
          * and saftey gaurd since if collisions were to be wrong you would not
          * want that to crash the whole game.
          *
-         * @param in_body1 This is the object that called it
-         * @param in_body2 This is the object that body1 collided with
-         * @param in_base_offset This tells how apart the center of the objetcs
-         * are
+         * @param in_body1 is ID of the object1 who collided
+         * @param in_body2 is ID of object2 who object1 collided with
+         * @param in_base_offset for telling how far apart the center of the
+         * objects are
          * @param in_collision_result The details about the collision
          * @return JPH::ValidateResult
          */
@@ -108,27 +78,6 @@ namespace atlas::physics {
           const JPH::SubShapeIDPair& in_sub_shape_pair) override;
 
     private:
-        /**
-         * @brief A way to gather all the events and organize them each frame
-         *
-         */
-        // std::vector<contact_event> m_contacts_added;
-
-        /**
-         * @brief FIXME: These two are unused and will be used when
-         * OnContactPersisted and OncontactRemoved get implemented.
-         *
-         */
-        // std::vector<contact_event> m_contacts_persisted;
-        // std::vector<contact_event> m_contacts_removed;
-
-        /**
-         * @brief Access to this scene. Should be replaced with get_scenes()
-         * function. So it can update based on loading and scene changes.
-         *
-         */
-        // ref<scene_scope> m_scene;
-        // flecs::world m_registry;
         event::event_bus* m_bus;
     };
 };
