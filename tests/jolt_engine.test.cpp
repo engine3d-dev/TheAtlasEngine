@@ -13,6 +13,7 @@
 
 #include <drivers/jolt-cpp/types.hpp>
 #include <drivers/jolt-cpp/jolt_components.hpp>
+#include <core/event/event_bus.hpp>
 
 namespace atlas {
 
@@ -26,8 +27,8 @@ namespace atlas {
 
         class test_scene : public scene_scope {
         public:
-            test_scene(const std::string& p_tag)
-              : scene_scope(p_tag) {};
+            test_scene(const std::string& p_tag, event::event_bus& p_bus)
+              : scene_scope(p_tag, p_bus) {};
 
             std::pmr::polymorphic_allocator<> m_object_allocator;
         };
