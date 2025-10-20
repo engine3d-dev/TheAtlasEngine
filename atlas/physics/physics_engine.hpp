@@ -42,7 +42,7 @@ namespace atlas::physics {
     private:
         flecs::world* m_registry;
         ref<physics_context> m_physics_context;
-
+        flecs::query<physics_body> m_physics_bodies;
         flecs::query<transform, physics_body, box_collider>
           m_query_box_collider;
         flecs::query<transform, physics_body, sphere_collider>

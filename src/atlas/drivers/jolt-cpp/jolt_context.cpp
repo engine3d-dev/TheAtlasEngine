@@ -122,7 +122,11 @@ namespace atlas::physics {
         // take a pointer from the physics bodies that are just blocks of
         // data!!!
         body_settings.mUserData = static_cast<uint64_t>(p_entity_id);
-        console_log_info("Entity ID = {}", p_entity_id);
+        body_settings.mFriction = p_body->friction;
+        body_settings.mRestitution = p_body->restitution;
+        body_settings.mLinearVelocity = jolt::to_vec3(p_body->linear_velocity);
+        body_settings.mAngularVelocity =
+          jolt::to_vec3(p_body->angular_velocity);
 
         Body* body = body_interface.CreateBody(body_settings);
         m_cached_body_ids.emplace(p_entity_id, body->GetID());
@@ -170,8 +174,21 @@ namespace atlas::physics {
         // This can be used when the contact listener is given two entities at
         // collision-levels
         body_settings.mUserData = static_cast<uint64_t>(p_entity_id);
+        body_settings.mFriction = p_body->friction;
         body_settings.mRestitution = p_body->restitution;
+        body_settings.mLinearVelocity = jolt::to_vec3(p_body->linear_velocity);
+        body_settings.mAngularVelocity =
+          jolt::to_vec3(p_body->angular_velocity);
         Body* body = body_interface.CreateBody(body_settings);
+
+        // console_log_warn("linear_vel = ({}, {}, {})",
+        // p_body->linear_velocity.x, p_body->linear_velocity.y,
+        // p_body->linear_velocity.z); console_log_warn("angular_vel = ({}, {},
+        // {})", p_body->angular_velocity.x, p_body->angular_velocity.y,
+        // p_body->angular_velocity.z);
+
+        // body_interface.AddForce(body->GetID(),
+        // jolt::to_vec3(p_body->cumulative_force));
         // TODO: Fix this. Resitution increases when making collision contacts
         // here As this is broken (for now, it works, but this does need a
         // change) For now commenting this out because the issue is: When it
@@ -218,17 +235,15 @@ namespace atlas::physics {
           jolt::to_quat(p_transform->quaternion),
           motion_type,
           p_body->body_layer_type);
-        body_settings.mUserData = static_cast<uint64_t>(p_entity_id);
+        body_settings.mFriction = p_body->friction;
         body_settings.mRestitution = p_body->restitution;
+        body_settings.mLinearVelocity = jolt::to_vec3(p_body->linear_velocity);
+        body_settings.mAngularVelocity =
+          jolt::to_vec3(p_body->angular_velocity);
+        body_settings.mUserData = static_cast<uint64_t>(p_entity_id);
 
         Body* body = body_interface.CreateBody(body_settings);
         m_cached_body_ids.emplace(p_entity_id, body->GetID());
-
-        // TODO: Fix this. Resitution increases when making collision contacts
-        // here As this is broken (for now, it works, but this does need a
-        // change) For now commenting this out because the issue is: When it
-        // bounces, it increases. Which is NOT how that is supposed to work
-        // body_interface.SetRestitution(body->GetID(), p_body->restitution);
     }
 
     transform jolt_context::context_read_transform(uint32_t p_id) {
@@ -241,14 +256,8 @@ namespace atlas::physics {
         JPH::Quat rot = body_interface.GetRotation(body_id);
         JPH::Vec3 rot_euler = rot.GetEulerAngles();
 
-        // new_transform.position = glm::vec3(pos.GetX(), pos.GetY(),
-        // pos.GetZ());
         new_transform.position = to_vec3(pos);
-        // new_transform.quaternion =
-        //   glm::vec4(rot.GetX(), rot.GetY(), rot.GetZ(), rot.GetW());
         new_transform.quaternion = to_vec4(rot);
-        // new_transform.rotation =
-        //   glm::vec3(rot_euler.GetX(), rot_euler.GetY(), rot_euler.GetZ());
         new_transform.rotation = to_vec3(rot_euler);
 
         return new_transform;
@@ -264,42 +273,18 @@ namespace atlas::physics {
         }
         auto body_id = m_cached_body_ids.at(p_id);
 
-        physics_body body{};
+        physics_body body = {
+            .linear_velocity =
+              to_vec3(body_interface.GetLinearVelocity(body_id)),
+            .angular_velocity =
+              to_vec3(body_interface.GetAngularVelocity(body_id)),
+            .center_mass_position =
+              to_vec3(body_interface.GetCenterOfMassPosition(body_id)),
+            .gravity_factor = body_interface.GetGravityFactor(body_id),
+            .friction = body_interface.GetFriction(body_id),
+            .restitution = body_interface.GetRestitution(body_id),
+        };
 
-        JPH::Vec3 linear_velocity = JPH::Vec3::sZero();
-        JPH::Vec3 angular_velocity = JPH::Vec3::sZero();
-
-        body_interface.GetLinearAndAngularVelocity(
-          body_id, linear_velocity, angular_velocity);
-
-        if (linear_velocity.IsClose({ 0, 0, 0 }, 0.0001f)) {
-            linear_velocity = { 0, 0, 0 };
-        }
-
-        if (angular_velocity.IsClose({ 0, 0, 0 }, 0.0001f)) {
-            angular_velocity = { 0, 0, 0 };
-        }
-
-        // TODO: Provide read_linear_velocity and read_angular_velocity(uint32_t
-        // p_id);
-        // body.linear_velocity = glm::vec3(linear_velocity.GetX(),
-        //                                  linear_velocity.GetY(),
-        //                                  linear_velocity.GetZ());
-        body.linear_velocity = to_vec3(linear_velocity);
-        // body.angular_velocity = glm::vec3(angular_velocity.GetX(),
-        //                                   angular_velocity.GetY(),
-        //                                   angular_velocity.GetZ());
-        body.angular_velocity = to_vec3(angular_velocity);
-
-        JPH::Vec3 center_mass = body_interface.GetCenterOfMassPosition(body_id);
-        // body.center_mass_position =
-        //   glm::vec3(center_mass.GetX(), center_mass.GetY(),
-        //   center_mass.GetZ());
-        body.center_mass_position = to_vec3(center_mass);
-
-        body.gravity_factor = body_interface.GetGravityFactor(body_id);
-        body.friction = body_interface.GetFriction(body_id);
-        body.restitution = body_interface.GetRestitution(body_id);
         return body;
     }
 
@@ -326,6 +311,25 @@ namespace atlas::physics {
         }
 
         console_log_info("Removed All shapes and bodies...\n");
+    }
+
+    void jolt_context::linear_velocity(uint64_t p_id,
+                                       const glm::vec3& p_linear_velocity) {
+        using namespace JPH;
+        auto& body_interface = m_physics_system->GetBodyInterface();
+
+        body_interface.SetLinearVelocity(m_cached_body_ids.at(p_id),
+                                         jolt::to_vec3(p_linear_velocity));
+    }
+
+    void jolt_context::angular_velocity(uint64_t p_id,
+                                        const glm::vec3& p_angular_velocity) {
+        using namespace JPH;
+        auto& body_interface = m_physics_system->GetBodyInterface();
+        BodyID body_id(p_id);
+
+        body_interface.SetAngularVelocity(m_cached_body_ids.at(p_id),
+                                          jolt::to_vec3(p_angular_velocity));
     }
 
     void jolt_context::prepare_and_finalize() {
@@ -356,8 +360,4 @@ namespace atlas::physics {
                                  m_temp_allocator.get(),
                                  m_thread_system.get());
     }
-
-    // void jolt_context::execute_collisions() {
-    //     // m_contact_listener->run_events_added();
-    // }
 }
