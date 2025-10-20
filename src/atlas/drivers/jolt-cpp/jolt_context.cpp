@@ -28,7 +28,9 @@ namespace atlas::physics {
         return true;
     };
 
-    jolt_context::jolt_context(const jolt_settings& p_settings, event::event_bus& p_bus) : m_contact_listener(p_bus) {
+    jolt_context::jolt_context(const jolt_settings& p_settings,
+                               event::event_bus& p_bus)
+      : m_contact_listener(p_bus) {
         JPH::RegisterDefaultAllocator();
 
         JPH::Trace = trace_impl;
@@ -94,18 +96,15 @@ namespace atlas::physics {
         }
         EMotionType motion_type = EMotionType::Static;
         switch (p_body->body_movement_type) {
-            case body_type::fixed: {
+            case body_type::fixed:
                 motion_type = EMotionType::Static;
-                console_log_info("EMotionType::Static!");
-            } break;
-            case body_type::dynamic: {
+                break;
+            case body_type::dynamic:
                 motion_type = EMotionType::Dynamic;
-                console_log_info("EMotionType::Dynamic!");
-            } break;
-            case body_type::kinematic: {
+                break;
+            case body_type::kinematic:
                 motion_type = EMotionType::Kinematic;
-                console_log_info("EMotionType::Kinematic!");
-            } break;
+                break;
         }
 
         auto& box = result.Get();
@@ -145,7 +144,7 @@ namespace atlas::physics {
         auto result = shape_settings.Create();
 
         if (result.HasError()) {
-            console_log_error("Box shape creation error: {}",
+            console_log_error("Sphere shape creation error: {}",
                               result.GetError());
             return;
         }
@@ -171,8 +170,7 @@ namespace atlas::physics {
           p_body->body_layer_type);
 
         // Assigning the entity ID as the user data
-        // This can be used when the contact listener is given two entities at
-        // collision-levels
+		// Fetched when collision happens
         body_settings.mUserData = static_cast<uint64_t>(p_entity_id);
         body_settings.mFriction = p_body->friction;
         body_settings.mRestitution = p_body->restitution;
@@ -181,19 +179,8 @@ namespace atlas::physics {
           jolt::to_vec3(p_body->angular_velocity);
         Body* body = body_interface.CreateBody(body_settings);
 
-        // console_log_warn("linear_vel = ({}, {}, {})",
-        // p_body->linear_velocity.x, p_body->linear_velocity.y,
-        // p_body->linear_velocity.z); console_log_warn("angular_vel = ({}, {},
-        // {})", p_body->angular_velocity.x, p_body->angular_velocity.y,
-        // p_body->angular_velocity.z);
-
         // body_interface.AddForce(body->GetID(),
         // jolt::to_vec3(p_body->cumulative_force));
-        // TODO: Fix this. Resitution increases when making collision contacts
-        // here As this is broken (for now, it works, but this does need a
-        // change) For now commenting this out because the issue is: When it
-        // bounces, it increases. Which is NOT how that is supposed to work
-        // body_interface.SetRestitution(body->GetID(), p_body->restitution);
         m_cached_body_ids.emplace(p_entity_id, body->GetID());
     }
 
@@ -211,7 +198,7 @@ namespace atlas::physics {
         auto result = shape_settings.Create();
 
         if (result.HasError()) {
-            console_log_error("Box shape creation error: {}",
+            console_log_error("Capsule shape creation error: {}",
                               result.GetError());
             return;
         }
@@ -266,11 +253,13 @@ namespace atlas::physics {
     physics_body jolt_context::context_read_physics_body(uint32_t p_id) {
         using namespace JPH;
         auto& body_interface = m_physics_system->GetBodyInterface();
-        // const JPH::BodyID id = JPH::BodyID(body.body_id);
+
+        // TODO: Will need to change this because if this entity doesn't exist
+        // then it will be set to zeroes, gotta be careful about this
         if (!m_cached_body_ids.contains(p_id)) {
-            console_log_warn("Entity ID = {} was not found!!!", p_id);
             return {};
         }
+
         auto body_id = m_cached_body_ids.at(p_id);
 
         physics_body body = {
