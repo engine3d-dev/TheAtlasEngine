@@ -319,6 +319,15 @@ namespace atlas::physics {
                                           jolt::to_vec3(p_angular_velocity));
     }
 
+    void jolt_context::force(uint64_t p_id, const glm::vec3& p_force) {
+        using namespace JPH;
+        auto& body_interface = m_physics_system->GetBodyInterface();
+        BodyID body_id(p_id);
+
+        body_interface.AddForce(m_cached_body_ids.at(p_id),
+                                jolt::to_vec3(p_force));
+    }
+
     void jolt_context::prepare_and_finalize() {
         using namespace JPH;
 
