@@ -4,6 +4,7 @@
 #include <core/scene/scene_object.hpp>
 #include <string>
 #include <core/scene/types.hpp>
+#include <core/event/event_bus.hpp>
 
 namespace atlas {
 
@@ -17,12 +18,17 @@ namespace atlas {
      */
     class scene_scope {
     public:
-        scene_scope(const std::string& p_name)
-          : m_name(p_name) {}
+        scene_scope(const std::string& p_name, event::event_bus& p_bus)
+          : m_name(p_name), m_bus(&p_bus) {}
 
         strong_ref<scene_object> create_object(const std::string& p_tag) {
             return create_strong_ref<scene_object>(
               m_allocator, &m_registry, p_tag);
+        }
+
+        template<typename UEventType, typename UObject, typename UCallback>
+        void subscribe(UObject* p_instance, const UCallback& p_callback) {
+            m_bus->subscribe<UEventType>(p_instance, p_callback);
         }
 
         // TODO -- come back to this
@@ -57,6 +63,8 @@ namespace atlas {
 
         [[nodiscard]] std::string name() const { return m_name; }
 
+        [[nodiscard]]event::event_bus* event_handle() const { return m_bus; }
+
         // It's required that the flecs::world is returned by reference
         // This prevents corruption onto the flecs::world object
         operator world&() { return m_registry; }
@@ -65,5 +73,6 @@ namespace atlas {
         std::pmr::polymorphic_allocator<> m_allocator;
         world m_registry;
         std::string m_name;
+        event::event_bus* m_bus=nullptr;
     };
 }; // namespace atlas

@@ -1,6 +1,7 @@
 #pragma once
 #include "level_scene.hpp"
 #include <core/scene/world.hpp>
+#include <core/event/event_bus.hpp>
 
 class editor_world {
 public:
@@ -12,4 +13,6 @@ private:
     atlas::ref<atlas::world_scope> m_main_world;
     //! TODO: Would be handled by our system registry
     atlas::ref<level_scene> m_first_scene;
+
+    atlas::event::event_bus m_bus;
 };

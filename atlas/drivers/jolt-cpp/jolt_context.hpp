@@ -18,8 +18,7 @@ namespace atlas::physics {
      */
     class jolt_context : public physics_context {
     public:
-        jolt_context() = default;
-        jolt_context(const jolt_settings& p_settings);
+        jolt_context(const jolt_settings& p_settings, event::event_bus& p_bus);
         ~jolt_context() override = default;
 
     private:

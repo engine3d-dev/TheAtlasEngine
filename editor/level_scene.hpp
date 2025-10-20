@@ -5,6 +5,8 @@
 #include <core/serialize/serializer.hpp>
 #include <imgui.h>
 #include <physics/physics_engine.hpp>
+#include <core/event/event_bus.hpp>
+#include <core/event/types.hpp>
 
 /**
  * @brief Implementation of a custom scene
@@ -16,7 +18,7 @@
 
 class level_scene final : public atlas::scene_scope {
 public:
-    level_scene(const std::string& p_tag);
+    level_scene(const std::string& p_tag, atlas::event::event_bus& p_bus);
 
     ~level_scene() override = default;
 
@@ -33,6 +35,8 @@ public:
     void runtime_stop();
 
     void reset_objects();
+
+    void collision_enter(atlas::event::collision_begin& p_event);
 
 private:
     bool m_blink = false;

@@ -28,7 +28,7 @@ namespace atlas::physics {
         return true;
     };
 
-    jolt_context::jolt_context(const jolt_settings& p_settings) {
+    jolt_context::jolt_context(const jolt_settings& p_settings, event::event_bus& p_bus) : m_contact_listener(p_bus) {
         JPH::RegisterDefaultAllocator();
 
         JPH::Trace = trace_impl;

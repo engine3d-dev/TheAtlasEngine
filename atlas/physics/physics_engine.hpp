@@ -2,6 +2,7 @@
 #include <core/core.hpp>
 #include <drivers/jolt-cpp/jolt_components.hpp>
 #include <physics/physics_context.hpp>
+#include <core/event/event_bus.hpp>
 
 namespace atlas::physics {
 
@@ -15,7 +16,7 @@ namespace atlas::physics {
         // Required by maps but should not be used in anyother circumstance.
         physics_engine() = default;
         physics_engine(const jolt_settings& p_settings,
-                       flecs::world& p_registry);
+                       flecs::world& p_registry, event::event_bus& p_bus);
 
         /**
          * @brief The runtime is specifically the way to start the physics,
@@ -49,5 +50,6 @@ namespace atlas::physics {
           m_query_sphere_collider;
         flecs::query<transform, physics_body, capsule_collider>
           m_query_capsule_collider;
+		event::event_bus* m_bus;
     };
 };

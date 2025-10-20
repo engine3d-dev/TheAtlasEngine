@@ -4,8 +4,8 @@
 #include <drivers/jolt-cpp/jolt_components.hpp>
 #include <physics/physics_engine.hpp>
 
-level_scene::level_scene(const std::string& p_name)
-  : atlas::scene_scope(p_name) {
+level_scene::level_scene(const std::string& p_name, atlas::event::event_bus& p_bus)
+  : atlas::scene_scope(p_name, p_bus) {
     m_camera = create_object("editor camera");
     m_camera->add<flecs::pair<atlas::tag::editor, atlas::projection_view>>();
     m_camera->set<atlas::transform>({
@@ -38,7 +38,7 @@ level_scene::level_scene(const std::string& p_name)
     });
 
     m_viking_room->set<atlas::physics_body>({
-      .friction = 5.f,
+      .friction = 15.f,
       .restitution = 0.3f,
       .body_movement_type = atlas::dynamic,
     });
@@ -131,6 +131,12 @@ level_scene::level_scene(const std::string& p_name)
     atlas::register_physics(this, &level_scene::physics_update);
     atlas::register_update(this, &level_scene::on_update);
     atlas::register_ui(this, &level_scene::on_ui_update);
+}
+
+void level_scene::collision_enter(atlas::event::collision_begin& p_event) {
+	console_log_warn("collision_enter event!!!");
+	console_log_warn("Entity1 ID = {}", p_event.entity1);
+	console_log_warn("Entity2 ID = {}", p_event.entity2);
 }
 
 void
@@ -454,8 +460,9 @@ level_scene::start() {
     atlas::physics::jolt_settings settings = {};
     flecs::world registry = *this;
     m_physics_engine_handler =
-      atlas::physics::physics_engine(settings, registry);
-
+      atlas::physics::physics_engine(settings, registry, *event_handle());
+	
+	subscribe<atlas::event::collision_begin>(this, &level_scene::collision_enter);
     // Note -- just added for temporary
     // ImGuiIO io = ImGui::GetIO();
     // m_font = io.Fonts->AddFontFromFileTTF("assets/OpenSans-Regular.ttf",
@@ -532,11 +539,7 @@ level_scene::physics_update() {
         runtime_start();
     }
 
-    if (m_physics_is_runtime) {
-        m_physics_engine_handler.update(dt);
-    }
-
-    atlas::physics_body* sphere_body =
+	atlas::physics_body* sphere_body =
       m_viking_room->get_mut<atlas::physics_body>();
     // U = +up
     // J = -up
@@ -560,6 +563,10 @@ level_scene::physics_update() {
     if (atlas::event::is_key_pressed(key_l)) {
         glm::vec3 angular_vel = { -0.1f, 0.f, 0.f };
         sphere_body->angular_velocity = angular_vel;
+    }
+
+    if (m_physics_is_runtime) {
+        m_physics_engine_handler.update(dt);
     }
 
     if (atlas::event::is_key_pressed(key_l) and m_physics_is_runtime) {
