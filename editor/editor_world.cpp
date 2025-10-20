@@ -11,6 +11,8 @@ editor_world::editor_world(const std::string& p_tag) {
 
     console_log_trace("m_main_world->get_tag() = {}", m_main_world->name());
 
-    m_first_scene = atlas::create_ref<level_scene>("LevelScene");
+    m_bus.create_listener<atlas::event::collision_begin>();
+
+    m_first_scene = atlas::create_ref<level_scene>("LevelScene", m_bus);
     m_main_world->add_scene(m_first_scene);
 }

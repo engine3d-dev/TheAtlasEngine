@@ -4,6 +4,7 @@
 #include <Jolt/Physics/Collision/ContactListener.h>
 #include <drivers/jolt-cpp/jolt_components.hpp>
 #include <core/scene/scene.hpp>
+#include <core/event/event_bus.hpp>
 
 namespace atlas::physics {
     /**
@@ -18,7 +19,7 @@ namespace atlas::physics {
          * @brief Construct a new contact listener object
          *
          */
-        contact_listener();
+        contact_listener(event::event_bus& p_bus);
 
         /**
          * @brief Deletes all events. Helps reset the collisions on load, etc...
@@ -128,5 +129,6 @@ namespace atlas::physics {
          */
         // ref<scene_scope> m_scene;
         // flecs::world m_registry;
+        event::event_bus* m_bus;
     };
 };
