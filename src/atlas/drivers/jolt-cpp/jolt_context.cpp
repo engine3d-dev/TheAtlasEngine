@@ -170,7 +170,7 @@ namespace atlas::physics {
           p_body->body_layer_type);
 
         // Assigning the entity ID as the user data
-		// Fetched when collision happens
+        // Fetched when collision happens
         body_settings.mUserData = static_cast<uint64_t>(p_entity_id);
         body_settings.mFriction = p_body->friction;
         body_settings.mRestitution = p_body->restitution;

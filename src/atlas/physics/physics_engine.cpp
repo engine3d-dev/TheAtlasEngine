@@ -8,8 +8,10 @@
 namespace atlas::physics {
 
     physics_engine::physics_engine(const jolt_settings& p_settings,
-                                   flecs::world& p_registry, event::event_bus& p_bus)
-      : m_registry(&p_registry), m_bus(&p_bus) {
+                                   flecs::world& p_registry,
+                                   event::event_bus& p_bus)
+      : m_registry(&p_registry)
+      , m_bus(&p_bus) {
         m_physics_context = initialize_physics_context(p_settings, *m_bus);
         // This may change, but for now we want to ensure that we only want to
         // create a single physics body with a specific collider Rather then

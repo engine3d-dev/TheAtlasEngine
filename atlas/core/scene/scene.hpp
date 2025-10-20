@@ -19,7 +19,8 @@ namespace atlas {
     class scene_scope {
     public:
         scene_scope(const std::string& p_name, event::event_bus& p_bus)
-          : m_name(p_name), m_bus(&p_bus) {}
+          : m_name(p_name)
+          , m_bus(&p_bus) {}
 
         strong_ref<scene_object> create_object(const std::string& p_tag) {
             return create_strong_ref<scene_object>(
@@ -63,7 +64,7 @@ namespace atlas {
 
         [[nodiscard]] std::string name() const { return m_name; }
 
-        [[nodiscard]]event::event_bus* event_handle() const { return m_bus; }
+        [[nodiscard]] event::event_bus* event_handle() const { return m_bus; }
 
         // It's required that the flecs::world is returned by reference
         // This prevents corruption onto the flecs::world object
@@ -73,6 +74,6 @@ namespace atlas {
         std::pmr::polymorphic_allocator<> m_allocator;
         world m_registry;
         std::string m_name;
-        event::event_bus* m_bus=nullptr;
+        event::event_bus* m_bus = nullptr;
     };
 }; // namespace atlas
