@@ -38,7 +38,8 @@ level_scene::level_scene(const std::string& p_name)
     });
 
     m_viking_room->set<atlas::physics_body>({
-      .restitution = 1.f,
+      .friction = 5.f,
+      .restitution = 0.3f,
       .body_movement_type = atlas::dynamic,
     });
 
@@ -69,10 +70,6 @@ level_scene::level_scene(const std::string& p_name)
       .texture_path = "assets/models/container_diffuse.png",
     });
 
-    // m_robot_model->set<atlas::collider_body>({
-    //   .shape_type = atlas::collider_shape::box,
-    //   .half_extents = { 1.f, 1.f, 1.f },
-    // });
     m_robot_model->set<atlas::box_collider>({
       .half_extent = { 1.f, 1.f, 1.f },
     });
@@ -537,6 +534,32 @@ level_scene::physics_update() {
 
     if (m_physics_is_runtime) {
         m_physics_engine_handler.update(dt);
+    }
+
+    atlas::physics_body* sphere_body =
+      m_viking_room->get_mut<atlas::physics_body>();
+    // U = +up
+    // J = -up
+    // H = +left
+    // L = -Left
+    if (atlas::event::is_key_pressed(key_space)) {
+        glm::vec3 angular_vel = { 0.f, 10.0f, 0.f };
+        sphere_body->linear_velocity = angular_vel;
+    }
+
+    if (atlas::event::is_key_pressed(key_j)) {
+        glm::vec3 angular_vel = { -10.f, 0.f, 0.f };
+        sphere_body->angular_velocity = angular_vel;
+    }
+
+    if (atlas::event::is_key_pressed(key_h)) {
+        glm::vec3 angular_vel = { 10.f, 0.f, 0.f };
+        sphere_body->angular_velocity = angular_vel;
+    }
+
+    if (atlas::event::is_key_pressed(key_l)) {
+        glm::vec3 angular_vel = { -0.1f, 0.f, 0.f };
+        sphere_body->angular_velocity = angular_vel;
     }
 
     if (atlas::event::is_key_pressed(key_l) and m_physics_is_runtime) {

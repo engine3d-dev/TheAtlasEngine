@@ -27,6 +27,8 @@ namespace atlas::physics {
           m_registry->query_builder<transform, physics_body, capsule_collider>()
             .without<sphere_collider, box_collider>()
             .build();
+
+        m_physics_bodies = m_registry->query_builder<physics_body>().build();
     };
 
     void physics_engine::start() {
@@ -62,6 +64,13 @@ namespace atlas::physics {
     void physics_engine::update(float p_delta_time) {
         using namespace JPH;
 
+        m_physics_bodies.each(
+          [this](flecs::entity p_entity, physics_body& p_body) {
+              m_physics_context->set_linear_velocity(p_entity.id(),
+                                                     p_body.linear_velocity);
+              m_physics_context->set_angular_velocity(p_entity.id(),
+                                                      p_body.angular_velocity);
+          });
         // This will ensure all physics bodies with which colliders they are
         // associated with are update with the simulation, and their parameters
         // are modified
@@ -86,7 +95,8 @@ namespace atlas::physics {
             p_body.center_mass_position = body.center_mass_position;
             p_body.friction = body.friction;
             p_body.restitution = body.restitution;
-            // p_body.body_type = body.body_type;
+            p_body.angular_velocity = body.angular_velocity;
+            p_body.linear_velocity = body.linear_velocity;
         });
 
         // updating sphere collider
@@ -109,7 +119,6 @@ namespace atlas::physics {
             p_body.center_mass_position = body.center_mass_position;
             p_body.friction = body.friction;
             p_body.restitution = body.restitution;
-            // p_body.body_type = body.body_type;
         });
 
         // updating capsule collider
@@ -130,7 +139,6 @@ namespace atlas::physics {
             p_body.center_mass_position = body.center_mass_position;
             p_body.friction = body.friction;
             p_body.restitution = body.restitution;
-            // p_body.body_type = body.body_type;
         });
     }
 

@@ -57,6 +57,12 @@ namespace atlas::physics {
 
         physics_body context_read_physics_body(uint32_t p_id) override;
 
+        void linear_velocity(uint64_t p_id,
+                             const glm::vec3& p_linear_velocity) override;
+
+        void angular_velocity(uint64_t p_id,
+                              const glm::vec3& p_angular_velocity) override;
+
     private:
         //! @note Must be defined before physics can be initialized otherwise
         //! jolt cannot be created properly.

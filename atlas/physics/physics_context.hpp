@@ -103,6 +103,16 @@ namespace atlas::physics {
             return context_read_physics_body(p_id);
         }
 
+        void set_linear_velocity(uint64_t p_id,
+                                 const glm::vec3& p_linear_velocity) {
+            return linear_velocity(p_id, p_linear_velocity);
+        }
+
+        void set_angular_velocity(uint64_t p_id,
+                                  const glm::vec3& p_angular_velocity) {
+            return angular_velocity(p_id, p_angular_velocity);
+        }
+
     private:
         virtual void destroy_bodies() = 0;
 
@@ -139,6 +149,10 @@ namespace atlas::physics {
         virtual void prepare_and_finalize() = 0;
 
         virtual void update_simulation(float p_delta_time) = 0;
+
+        virtual void linear_velocity(uint64_t p_id, const glm::vec3&) = 0;
+
+        virtual void angular_velocity(uint64_t p_id, const glm::vec3&) = 0;
     };
 
     //! @brief initializes the physics backend. SHOULD have an API associated
