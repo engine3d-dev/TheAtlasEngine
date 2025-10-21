@@ -147,7 +147,7 @@ level_scene::collision_enter(atlas::event::collision_enter& p_event) {
 	flecs::entity e2 = registry.entity(p_event.entity2);
 
 	console_log_warn("Entity1 = {}", e1.name().c_str());
-	console_log_warn("Entity1 = {}", e2.name().c_str());
+	console_log_warn("Entity2 = {}", e2.name().c_str());
 }
 
 void
@@ -158,7 +158,7 @@ level_scene::collision_persisted(atlas::event::collision_persisted& p_event) {
 	flecs::entity e2 = registry.entity(p_event.entity2);
 
 	console_log_warn("Entity1 = {}", e1.name().c_str());
-	console_log_warn("Entity1 = {}", e2.name().c_str());
+	console_log_warn("Entity2 = {}", e2.name().c_str());
 }
 
 void
