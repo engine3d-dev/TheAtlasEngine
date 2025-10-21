@@ -75,25 +75,6 @@ namespace YAML {
         }
     };
 
-    // template<>
-    // struct convert<atlas::collider_shape> {
-    //     static Node encode(const atlas::collider_shape& rhs) {
-    //         Node node;
-    //         node.push_back(static_cast<uint8_t>(rhs));
-    //         return node;
-    //     }
-
-    //     static bool decode(const Node& node,
-    //                        atlas::collider_shape& rhs) {
-    //         if (!node.IsScalar()) {
-    //             return false;
-    //         }
-    //         rhs =
-    //           static_cast<atlas::collider_shape>(node.as<uint8_t>());
-    //         return true;
-    //     }
-    // };
-
     // Specialization for body_type enum
     template<>
     struct convert<atlas::body_type> {
@@ -149,8 +130,6 @@ namespace YAML {
             node["Restitution"] = rhs.restitution;
             node["Body Movement Type"] = rhs.body_movement_type;
             node["Body Layer Type"] = rhs.body_layer_type;
-            // node["Body ID"] = rhs.body_id;
-            // node["Count"] = rhs.count;
 
             return node;
         }
@@ -174,8 +153,71 @@ namespace YAML {
             rhs.restitution = node["Restitution"].as<float>();
             rhs.body_movement_type = node["Body Movement Type"].as<uint8_t>();
             rhs.body_layer_type = node["Body Layer Type"].as<uint8_t>();
-            // rhs.body_id = node["Body ID"].as<uint32_t>();
-            // rhs.count = node["Count"].as<int>();
+            return true;
+        }
+    };
+
+    template<>
+    struct convert<atlas::box_collider> {
+
+        static Node encode(const atlas::box_collider& rhs) {
+            Node node;
+            // Encode glm::vec3 members
+            node["Half Extent"] = rhs.half_extent;
+
+            return node;
+        }
+
+        static bool decode(const Node& node, atlas::box_collider& rhs) {
+            if (!node.IsMap()) {
+                return false;
+            }
+
+            rhs.half_extent = node["half Extent"].as<glm::vec3>();
+            return true;
+        }
+    };
+
+    template<>
+    struct convert<atlas::sphere_collider> {
+
+        static Node encode(const atlas::sphere_collider& rhs) {
+            Node node;
+            // Encode glm::vec3 members
+            node["Radius"] = rhs.radius;
+
+            return node;
+        }
+
+        static bool decode(const Node& node, atlas::sphere_collider& rhs) {
+            if (!node.IsMap()) {
+                return false;
+            }
+
+            rhs.radius = node["Radius"].as<float>();
+            return true;
+        }
+    };
+
+    template<>
+    struct convert<atlas::capsule_collider> {
+
+        static Node encode(const atlas::capsule_collider& rhs) {
+            Node node;
+            // Encode glm::vec3 members
+            node["Half Height"] = rhs.half_height;
+            node["Radius"] = rhs.radius;
+
+            return node;
+        }
+
+        static bool decode(const Node& node, atlas::capsule_collider& rhs) {
+            if (!node.IsMap()) {
+                return false;
+            }
+            
+            rhs.radius = node["Radius"].as<float>();
+            rhs.half_height = node["Half height"].as<float>();
             return true;
         }
     };
@@ -200,10 +242,15 @@ namespace atlas {
     YAML::Emitter& operator<<(YAML::Emitter& p_output,
                               const material* p_material);
 
-    // physics-based components
-    // YAML::Emitter& operator<<(YAML::Emitter& p_output,
-    //                           const collider_body* p_collider);
-
     YAML::Emitter& operator<<(YAML::Emitter& p_output,
                               const physics_body* p_body);
+    
+    YAML::Emitter& operator<<(YAML::Emitter& p_output,
+                              const box_collider* p_body);
+
+    YAML::Emitter& operator<<(YAML::Emitter& p_output,
+                              const sphere_collider* p_body);
+
+    YAML::Emitter& operator<<(YAML::Emitter& p_output,
+                              const capsule_collider* p_body);
 };
