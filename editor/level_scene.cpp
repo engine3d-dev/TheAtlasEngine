@@ -20,7 +20,7 @@ level_scene::level_scene(const std::string& p_name,
     });
 
     m_viking_room = create_object("Viking Room Object");
-    // m_viking_room->add<atlas::tag::serialize>();
+    m_viking_room->add<atlas::tag::serialize>();
     m_viking_room->set<atlas::transform>({
       .position = { -2.70f, 2.70, -8.30f },
       .rotation = { 2.30f, 95.90f, 91.80f },
@@ -238,7 +238,7 @@ ui_component_list(flecs::entity& p_selected_entity) {
         //     }
         // }
 
-		if (!p_selected_entity.has<atlas::physics_body>()) {
+        if (!p_selected_entity.has<atlas::physics_body>()) {
             if (ImGui::MenuItem("Physics Body")) {
                 p_selected_entity.add<atlas::physics_body>();
                 ImGui::CloseCurrentPopup();
@@ -252,14 +252,14 @@ ui_component_list(flecs::entity& p_selected_entity) {
             }
         }
 
-		if (!p_selected_entity.has<atlas::sphere_collider>()) {
+        if (!p_selected_entity.has<atlas::sphere_collider>()) {
             if (ImGui::MenuItem("Sphere Collider")) {
                 p_selected_entity.add<atlas::sphere_collider>();
                 ImGui::CloseCurrentPopup();
             }
         }
 
-		if (!p_selected_entity.has<atlas::capsule_collider>()) {
+        if (!p_selected_entity.has<atlas::capsule_collider>()) {
             if (ImGui::MenuItem("Capsule Collider")) {
                 p_selected_entity.add<atlas::capsule_collider>();
                 ImGui::CloseCurrentPopup();
@@ -389,46 +389,76 @@ level_scene::on_ui_update() {
               });
 
             atlas::ui::draw_component<atlas::physics_body>(
-              "Physics Body", m_selected_entity, [](atlas::physics_body* p_body) {
-                  
-                  const char* items[] = { "Static", "Kinematic",
-                  "Dynamic", }; const char* combo_preview =
-                  items[p_body->body_movement_type];
+              "Physics Body",
+              m_selected_entity,
+              [](atlas::physics_body* p_body) {
+                  const char* items[] = {
+                      "Static",
+                      "Kinematic",
+                      "Dynamic",
+                  };
+                  const char* combo_preview = items[p_body->body_movement_type];
 
-					// Begin the combo box
-                    if (ImGui::BeginCombo("Body Type", combo_preview)) {
-                        for (int n = 0; n < 3; n++) {
-                            // Check if the current item is selected
-                            const bool is_selected = (p_body->body_movement_type == n);
-                            if (ImGui::Selectable(items[n], is_selected)) {
-                                // Update the current type when a new item is
-                                // selected
-                                p_body->body_movement_type =
-                                  static_cast<atlas::body_type>(n);
-                            }
+                  // Begin the combo box
+                  if (ImGui::BeginCombo("Body Type", combo_preview)) {
+                      for (int n = 0; n < 3; n++) {
+                          // Check if the current item is selected
+                          const bool is_selected =
+                            (p_body->body_movement_type == n);
+                          if (ImGui::Selectable(items[n], is_selected)) {
+                              // Update the current type when a new item is
+                              // selected
+                              p_body->body_movement_type =
+                                static_cast<atlas::body_type>(n);
+                          }
 
-                            // Set the initial focus when the combo box is first
-                            // opened
-                            if (is_selected) {
-                                ImGui::SetItemDefaultFocus();
-                            }
-                        }
-                        ImGui::EndCombo();
-                    }
+                          // Set the initial focus when the combo box is first
+                          // opened
+                          if (is_selected) {
+                              ImGui::SetItemDefaultFocus();
+                          }
+                      }
+                      ImGui::EndCombo();
+                  }
 
-					// physics body parameters
-					atlas::ui::draw_vec3("Linear Velocity", p_body->linear_velocity);
-					atlas::ui::draw_vec3("Angular Velocity", p_body->angular_velocity);
-					atlas::ui::draw_vec3("Force", p_body->cumulative_force);
-					atlas::ui::draw_vec3("Torque", p_body->cumulative_torque);
-					atlas::ui::draw_vec3("Center Mass", p_body->center_mass_position);
+                  // physics body parameters
+                  atlas::ui::draw_vec3("Linear Velocity",
+                                       p_body->linear_velocity);
+                  atlas::ui::draw_vec3("Angular Velocity",
+                                       p_body->angular_velocity);
+                  atlas::ui::draw_vec3("Force", p_body->cumulative_force);
+                  atlas::ui::draw_vec3("Torque", p_body->cumulative_torque);
+                  atlas::ui::draw_vec3("Center Mass",
+                                       p_body->center_mass_position);
+              });
+
+            atlas::ui::draw_component<atlas::box_collider>(
+              "Box Collider",
+              m_selected_entity,
+              [](atlas::box_collider* p_collider) {
+                  atlas::ui::draw_vec3("Half Extent", p_collider->half_extent);
+              });
+
+            atlas::ui::draw_component<atlas::sphere_collider>(
+              "Box Collider",
+              m_selected_entity,
+              [](atlas::sphere_collider* p_collider) {
+                  atlas::ui::draw_float("Radius", p_collider->radius);
+              });
+
+            atlas::ui::draw_component<atlas::capsule_collider>(
+              "Box Collider",
+              m_selected_entity,
+              [](atlas::capsule_collider* p_collider) {
+                  atlas::ui::draw_float("Half Height", p_collider->half_height);
+                  atlas::ui::draw_float("Radius", p_collider->radius);
               });
 
             atlas::ui::draw_component<atlas::tag::serialize>(
               "Serialize",
               m_selected_entity,
               [](atlas::tag::serialize* p_serialize) {
-				ImGui::Checkbox("Enable", &p_serialize->enable);
+                  ImGui::Checkbox("Enable", &p_serialize->enable);
               });
         }
 
@@ -469,11 +499,11 @@ level_scene::on_ui_update() {
 
 void
 level_scene::start() {
-    // m_deserializer_test = atlas::serializer();
+    m_deserializer_test = atlas::serializer();
 
-    // if (!m_deserializer_test.load("LevelScene", *this)) {
-    //     console_log_error("Could not load yaml file LevelScene!!!");
-    // }
+    if (!m_deserializer_test.load("LevelScene", *this)) {
+        console_log_error("Could not load yaml file LevelScene!!!");
+    }
 
     // Initiating physics system
     atlas::physics::jolt_settings settings = {};
@@ -564,8 +594,8 @@ level_scene::physics_update() {
     // H = +left
     // L = -Left
     if (atlas::event::is_key_pressed(key_space)) {
-        glm::vec3 angular_vel = { 0.f, 10.0f, 0.f };
-        sphere_body->linear_velocity = angular_vel;
+        glm::vec3 linear_velocity = { 0.f, 10.0f, 0.f };
+        sphere_body->linear_velocity = linear_velocity;
     }
 
     if (atlas::event::is_key_pressed(key_j)) {
