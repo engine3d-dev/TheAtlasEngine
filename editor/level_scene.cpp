@@ -142,15 +142,23 @@ level_scene::level_scene(const std::string& p_name,
 void
 level_scene::collision_enter(atlas::event::collision_enter& p_event) {
     console_log_warn("collision_enter event!!!");
-    console_log_warn("Entity1 ID = {}", p_event.entity1);
-    console_log_warn("Entity2 ID = {}", p_event.entity2);
+    flecs::world registry = *this;
+	flecs::entity e1 = registry.entity(p_event.entity1);
+	flecs::entity e2 = registry.entity(p_event.entity2);
+
+	console_log_warn("Entity1 = {}", e1.name().c_str());
+	console_log_warn("Entity1 = {}", e2.name().c_str());
 }
 
 void
 level_scene::collision_persisted(atlas::event::collision_persisted& p_event) {
     console_log_warn("collision_persisted(p_event) invoked!!");
-    console_log_warn("Entity1 ID = {}", p_event.entity1);
-    console_log_warn("Entity2 ID = {}", p_event.entity2);
+	flecs::world registry = *this;
+	flecs::entity e1 = registry.entity(p_event.entity1);
+	flecs::entity e2 = registry.entity(p_event.entity2);
+
+	console_log_warn("Entity1 = {}", e1.name().c_str());
+	console_log_warn("Entity1 = {}", e2.name().c_str());
 }
 
 void
