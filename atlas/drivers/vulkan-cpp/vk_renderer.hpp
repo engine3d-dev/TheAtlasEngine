@@ -78,5 +78,7 @@ namespace atlas::vk {
         bool m_begin_initialize = true;
         uint32_t m_current_frame = 0;
         glm::mat4 m_model = { 1.f };
+
+        ::vk::texture m_white_texture;
     };
 };
