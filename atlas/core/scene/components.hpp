@@ -73,7 +73,6 @@ namespace atlas {
         // Sets camera to be the main camera
         bool is_active = false;
 
-        // Specify camera field of view
         // Defaults to 45.0f in radians
         float field_of_view = glm::radians(45.f);
     };

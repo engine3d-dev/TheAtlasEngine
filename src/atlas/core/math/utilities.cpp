@@ -1,5 +1,6 @@
 #include <core/math/utilities.hpp>
 #include <core/common.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 namespace atlas {
 
@@ -32,5 +33,44 @@ namespace atlas {
           p_values.z,
         });
     }
+
+    namespace math {
+
+        glm::vec3 zeroes() {
+            return glm::vec3(0.f);
+        }
+
+        glm::vec3 ones() {
+            return glm::vec3(1.f);
+        }
+
+        glm::quat identity() {
+            return glm::quat_identity<float, glm::defaultp>();
+        }
+
+        glm::vec3 forward() {
+            return glm::vec3(0.f, 0.f, 1.f);
+        }
+
+        glm::vec3 right() {
+            return glm::vec3(1.f, 0.f, 0.f);
+        }
+
+        glm::vec3 left() {
+            return glm::vec3(-1.f, 0.f, 0.f);
+        }
+
+        glm::vec3 backward() {
+            return glm::vec3(0.f, 0.f, -1.f);
+        }
+
+        glm::vec3 up() {
+            return glm::vec3(0.f, 1.f, 0.f);
+        }
+
+        glm::vec3 down() {
+            return glm::vec3(0.f, -1.f, 0.f);
+        }
+    };
 
 };

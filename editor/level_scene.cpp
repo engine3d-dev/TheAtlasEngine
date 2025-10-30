@@ -511,62 +511,59 @@ level_scene::on_update() {
     auto query_cameras =
       query_builder<atlas::perspective_camera, atlas::transform>().build();
 
-    query_cameras.each(
-      [](atlas::perspective_camera& p_camera, atlas::transform& p_transform) {
-          if (!p_camera.is_active) {
-              return;
-          }
+    query_cameras.each([](atlas::perspective_camera& p_camera,
+                          atlas::transform& p_transform) {
+        if (!p_camera.is_active) {
+            return;
+        }
 
-          // auto camera_transform = p_entity.get_mut<atlas::transform>();
-          float dt = atlas::application::delta_time();
-          float movement_speed = 10.f;
-          float rotation_speed = 1.f;
-          float velocity = movement_speed * dt;
-          float rotation_velocity = rotation_speed * dt;
+        float dt = atlas::application::delta_time();
+        float movement_speed = 10.f;
+        float rotation_speed = 1.f;
+        float velocity = movement_speed * dt;
+        float rotation_velocity = rotation_speed * dt;
 
-          glm::quat to_quaternion = atlas::to_quat(p_transform.quaternion);
+        glm::quat to_quaternion = atlas::to_quat(p_transform.quaternion);
 
-          glm::vec3 up = glm::rotate(to_quaternion, glm::vec3(0.f, 1.f, 0.f));
-          glm::vec3 forward =
-            glm::rotate(to_quaternion, glm::vec3(0.f, 0.f, -1.f));
-          glm::vec3 right =
-            glm::rotate(to_quaternion, glm::vec3(1.0f, 0.0f, 0.0f));
+        glm::vec3 up = glm::rotate(to_quaternion, atlas::math::up());
+        glm::vec3 forward = glm::rotate(to_quaternion, atlas::math::backward());
+        glm::vec3 right = glm::rotate(to_quaternion, atlas::math::right());
 
-          if (atlas::event::is_key_pressed(key_left_shift)) {
-              if (atlas::event::is_mouse_pressed(
-                    atlas::event::Mouse::ButtonMiddle)) {
-                  p_transform.position += up * velocity;
-              }
+        if (atlas::event::is_key_pressed(key_left_shift)) {
+            if (atlas::event::is_mouse_pressed(
+                  atlas::event::Mouse::ButtonMiddle)) {
+                p_transform.position += up * velocity;
+            }
 
-              if (atlas::event::is_mouse_pressed(
-                    atlas::event::Mouse::ButtonRight)) {
-                  p_transform.position -= up * velocity;
-              }
-          }
+            if (atlas::event::is_mouse_pressed(
+                  atlas::event::Mouse::ButtonRight)) {
+                p_transform.position -= up * velocity;
+            }
+        }
 
-          if (atlas::event::is_key_pressed(key_w)) {
-              p_transform.position += forward * velocity;
-          }
-          if (atlas::event::is_key_pressed(key_s)) {
-              p_transform.position -= forward * velocity;
-          }
+        if (atlas::event::is_key_pressed(key_w)) {
+            p_transform.position += forward * velocity;
+        }
+        if (atlas::event::is_key_pressed(key_s)) {
+            p_transform.position -= forward * velocity;
+        }
 
-          if (atlas::event::is_key_pressed(key_d)) {
-              p_transform.position += right * velocity;
-          }
-          if (atlas::event::is_key_pressed(key_a)) {
-              p_transform.position -= right * velocity;
-          }
+        if (atlas::event::is_key_pressed(key_d)) {
+            p_transform.position += right * velocity;
+        }
+        if (atlas::event::is_key_pressed(key_a)) {
+            p_transform.position -= right * velocity;
+        }
 
-          if (atlas::event::is_key_pressed(key_q)) {
-              p_transform.rotation.y += rotation_velocity;
-          }
-          if (atlas::event::is_key_pressed(key_e)) {
-              p_transform.rotation.y -= rotation_velocity;
-          }
+        if (atlas::event::is_key_pressed(key_q)) {
+            p_transform.rotation.y += rotation_velocity;
+        }
+        if (atlas::event::is_key_pressed(key_e)) {
+            p_transform.rotation.y -= rotation_velocity;
+        }
 
-          p_transform.set_rotation(p_transform.rotation);
-      });
+        p_transform.set_rotation(p_transform.rotation);
+    });
 }
 
 void
