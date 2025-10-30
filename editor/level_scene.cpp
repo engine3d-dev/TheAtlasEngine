@@ -26,7 +26,7 @@ level_scene::level_scene(const std::string& p_name,
       .rotation = { 2.30f, 95.90f, 91.80f },
       .scale{ 1.f },
     });
-    m_viking_room->set<atlas::material>({
+    m_viking_room->set<atlas::mesh_source>({
       .color = { 1.f, 1.f, 1.f, 1.f },
       //   .model_path = "assets/models/viking_room.obj",
       //   .texture_path = "assets/models/viking_room.png",
@@ -51,20 +51,21 @@ level_scene::level_scene(const std::string& p_name,
       .scale = { 0.9f, 0.9f, 0.9f },
     });
 
-    m_cube->set<atlas::material>({
+    m_cube->set<atlas::mesh_source>({
       .color = { 1.f, 1.f, 1.f, 1.f },
       .model_path = "assets/models/E 45 Aircraft_obj.obj",
       .texture_path = "assets/models/E-45-steel detail_2_col.jpg",
     });
 
     m_robot_model = create_object("Cube");
+	m_robot_model->add<atlas::tag::serialize>();
     // m_robot_model->add<atlas::tag::serialize>();
     m_robot_model->set<atlas::transform>({
       .position = { -2.70, 3.50f, 4.10f },
       .scale = { 1.f, 1.f, 1.f },
     });
 
-    m_robot_model->set<atlas::material>({
+    m_robot_model->set<atlas::mesh_source>({
       .color = { 1.f, 1.f, 1.f, 1.f },
       .model_path = "assets/models/cube.obj",
       //   .model_path = "assets/robot_model/l2back.obj",
@@ -87,7 +88,7 @@ level_scene::level_scene(const std::string& p_name,
     m_platform->set<atlas::transform>({
       .scale = { 15.f, 0.30f, 10.0f },
     });
-    m_platform->set<atlas::material>({
+    m_platform->set<atlas::mesh_source>({
       .model_path = "assets/models/cube.obj",
       .texture_path = "assets/models/wood.png",
     });
@@ -117,7 +118,7 @@ level_scene::level_scene(const std::string& p_name,
     // 		.rotation = {.3f, 0.0f, 0.0f},
     // 	});
 
-    // 	obj->set<atlas::material>({
+    // 	obj->set<atlas::mesh_source>({
     // 		.model_path = "assets/models/Ball OBJ.obj",
     // 		.texture_path = "assets/models/clear.png",
     // 	});
@@ -204,9 +205,9 @@ ui_component_list(flecs::entity& p_selected_entity) {
             }
         }
 
-        if (!p_selected_entity.has<atlas::material>()) {
-            if (ImGui::MenuItem("Material (Mesh Component)")) {
-                p_selected_entity.add<atlas::material>();
+        if (!p_selected_entity.has<atlas::mesh_source>()) {
+            if (ImGui::MenuItem("atlas::mesh_source (Mesh Component)")) {
+                p_selected_entity.add<atlas::mesh_source>();
                 ImGui::CloseCurrentPopup();
             }
         }
@@ -370,10 +371,12 @@ level_scene::on_ui_update() {
                   ImGui::Checkbox("is_active", &p_camera->is_active);
               });
 
-            atlas::ui::draw_component<atlas::material>(
-              "material", m_selected_entity, [](atlas::material* p_material) {
-                  atlas::ui::draw_input_text(p_material->model_path);
-                  atlas::ui::draw_vec4("Color", p_material->color);
+            atlas::ui::draw_component<atlas::mesh_source>(
+              "atlas::mesh_source",
+              m_selected_entity,
+              [](atlas::mesh_source* p_source) {
+                  atlas::ui::draw_input_text(p_source->model_path);
+                  atlas::ui::draw_vec4("Color", p_source->color);
               });
 
             atlas::ui::draw_component<atlas::physics_body>(

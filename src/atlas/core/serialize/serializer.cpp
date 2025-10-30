@@ -24,8 +24,8 @@ namespace atlas {
             output << p_entity.get<perspective_camera>();
         }
 
-        if (p_entity.has<material>()) {
-            output << p_entity.get<material>();
+        if (p_entity.has<mesh_source>()) {
+            output << p_entity.get<mesh_source>();
         }
 
         if (p_entity.has<physics_body>()) {
@@ -77,9 +77,9 @@ namespace atlas {
         }
 
         // Deserialize atlas::material component
-        if (p_entity_value["Material"]) {
-            auto perspective_camera_data = p_entity_value["Material"];
-            p_deserialize_to_object.set<material>({
+        if (p_entity_value["Mesh Source"]) {
+            auto perspective_camera_data = p_entity_value["Mesh Source"];
+            p_deserialize_to_object.set<mesh_source>({
               .model_path =
                 perspective_camera_data["Model Path"].as<std::string>(),
               .texture_path =

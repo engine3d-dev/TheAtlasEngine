@@ -240,7 +240,7 @@ namespace atlas {
                               const perspective_camera* p_camera);
 
     YAML::Emitter& operator<<(YAML::Emitter& p_output,
-                              const material* p_material);
+                              const mesh_source* p_material);
 
     YAML::Emitter& operator<<(YAML::Emitter& p_output,
                               const physics_body* p_body);

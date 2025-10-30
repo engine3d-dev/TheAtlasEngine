@@ -21,26 +21,6 @@ namespace atlas {
         }
     };
 
-    //! @note Our interpretation of the BoxCollider that will get interpreted
-    //! based on physics API's enabled
-    struct box_collider3d {
-        box_collider3d() = default;
-        box_collider3d(const box_collider3d&) = default;
-
-        float density = 1.0f;
-        float friction = 0.5f;
-        float restitution = 0.0f;
-        float restitutionThreshold = 0.5f;
-
-        glm::vec3 offset = { 0.f, 0.f, 0.f };
-        glm::vec3 size = { 0.5f, 0.5f, 0.5f };
-    };
-
-    //! TODO: Make this better (when we do lighting)
-    struct light {
-        glm::vec3 Position{ 1.f };
-    };
-
     /**
      * @brief Actually might do a query for this along with rendertarget3d
      * @brief This is because we can have multiple things that could be reloaded
@@ -53,10 +33,9 @@ namespace atlas {
     };
 
     /**
-     * @brief material component for specifying a specific type of material for
-     * a scene object
+     * @brief Specify a specific source to a mesh
      */
-    struct material {
+    struct mesh_source {
         glm::vec4 color{ 1.f };
         std::string model_path = "";
         std::string texture_path =

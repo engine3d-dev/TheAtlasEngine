@@ -57,8 +57,8 @@ namespace atlas {
     }
 
     YAML::Emitter& operator<<(YAML::Emitter& p_output,
-                              const material* p_material) {
-        p_output << YAML::Key << "Material";
+                              const mesh_source* p_material) {
+        p_output << YAML::Key << "Mesh Source";
 
         p_output << YAML::BeginMap;
         p_output << YAML::Key << "Model Path" << YAML::Value
