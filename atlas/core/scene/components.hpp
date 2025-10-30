@@ -88,7 +88,7 @@ namespace atlas {
 
         //! @brief to tag entities to serialize through the serializer
         struct serialize {
-            bool enable=false;
+            bool enable = false;
         };
     };
 
