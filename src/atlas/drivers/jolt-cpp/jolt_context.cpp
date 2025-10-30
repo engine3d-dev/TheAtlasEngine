@@ -328,6 +328,25 @@ namespace atlas::physics {
                                 jolt::to_vec3(p_force));
     }
 
+    void jolt_context::add_force_and_torque(uint64_t p_id,
+                                            const glm::vec3& p_force,
+                                            const glm::vec3& p_torque) {
+        using namespace JPH;
+        auto& body_interface = m_physics_system->GetBodyInterface();
+
+        body_interface.AddForceAndTorque(m_cached_body_ids.at(p_id),
+                                         jolt::to_vec3(p_force),
+                                         jolt::to_vec3(p_torque));
+    }
+
+    void jolt_context::add_impulse(uint64_t p_id, const glm::vec3& p_impulse) {
+        using namespace JPH;
+        auto& body_interface = m_physics_system->GetBodyInterface();
+
+        body_interface.AddImpulse(m_cached_body_ids.at(p_id),
+                                  jolt::to_vec3(p_impulse));
+    }
+
     void jolt_context::prepare_and_finalize() {
         using namespace JPH;
 

@@ -119,8 +119,9 @@ namespace YAML {
             // Encode glm::vec3 members
             node["Linear Velocity"] = rhs.linear_velocity;
             node["Angular Velocity"] = rhs.angular_velocity;
-            node["Cumulative Force"] = rhs.cumulative_force;
-            node["Cumulative Torque"] = rhs.cumulative_torque;
+            node["Force"] = rhs.force;
+            node["Impulse"] = rhs.impulse;
+            node["Torque"] = rhs.torque;
             node["Mass Factor"] = rhs.mass_factor;
             node["Center Mass Position"] = rhs.center_mass_position;
             // node["Gravity Enabled"] = rhs.use_gravity;
@@ -141,14 +142,13 @@ namespace YAML {
 
             rhs.linear_velocity = node["Linear Velocity"].as<glm::vec3>();
             rhs.angular_velocity = node["Angular Velocity"].as<glm::vec3>();
-            rhs.cumulative_force = node["Cumulative Force"].as<glm::vec3>();
-            rhs.cumulative_torque = node["Cumulative Torque"].as<glm::vec3>();
+            rhs.force = node["Force"].as<glm::vec3>();
+            rhs.impulse = node["Impulse"].as<glm::vec3>();
+            rhs.torque = node["Torque"].as<glm::vec3>();
             rhs.mass_factor = node["Mass Factor"].as<float>();
             rhs.center_mass_position =
               node["Center Mass Position"].as<glm::vec3>();
-            // rhs.use_gravity = node["Gravity Enabled"].as<bool>();
             rhs.gravity_factor = node["Gravity Factor"].as<float>();
-            // rhs.body_type = node["Body Type"].as<uint8_t>();
             rhs.friction = node["Friction"].as<float>();
             rhs.restitution = node["Restitution"].as<float>();
             rhs.body_movement_type = node["Body Movement Type"].as<uint8_t>();
@@ -215,7 +215,7 @@ namespace YAML {
             if (!node.IsMap()) {
                 return false;
             }
-            
+
             rhs.radius = node["Radius"].as<float>();
             rhs.half_height = node["Half height"].as<float>();
             return true;
@@ -244,7 +244,7 @@ namespace atlas {
 
     YAML::Emitter& operator<<(YAML::Emitter& p_output,
                               const physics_body* p_body);
-    
+
     YAML::Emitter& operator<<(YAML::Emitter& p_output,
                               const box_collider* p_body);
 

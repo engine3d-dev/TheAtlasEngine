@@ -78,10 +78,9 @@ namespace atlas {
                  << p_body->linear_velocity;
         p_output << YAML::Key << "Angular Velocity" << YAML::Value
                  << p_body->angular_velocity;
-        p_output << YAML::Key << "Cumulative Force" << YAML::Value
-                 << p_body->cumulative_force;
-        p_output << YAML::Key << "Cumulative Torque" << YAML::Value
-                 << p_body->cumulative_torque;
+        p_output << YAML::Key << "Force" << YAML::Value << p_body->force;
+        p_output << YAML::Key << "Impulse" << YAML::Value << p_body->impulse;
+        p_output << YAML::Key << "Torque" << YAML::Value << p_body->torque;
         p_output << YAML::Key << "Mass Factor" << YAML::Value
                  << p_body->mass_factor;
         p_output << YAML::Key << "Center Mass Position" << YAML::Value
@@ -103,7 +102,8 @@ namespace atlas {
         p_output << YAML::Key << "Box Collider";
 
         p_output << YAML::BeginMap;
-        p_output << YAML::Key << "Half Extent" << YAML::Value << p_body->half_extent;
+        p_output << YAML::Key << "Half Extent" << YAML::Value
+                 << p_body->half_extent;
         p_output << YAML::EndMap;
 
         return p_output;
@@ -111,7 +111,7 @@ namespace atlas {
 
     YAML::Emitter& operator<<(YAML::Emitter& p_output,
                               const sphere_collider* p_body) {
-        // 
+        //
         p_output << YAML::Key << "Sphere Collider";
 
         p_output << YAML::BeginMap;
@@ -123,14 +123,15 @@ namespace atlas {
     }
 
     YAML::Emitter& operator<<(YAML::Emitter& p_output,
-                              const capsule_collider* p_body){
+                              const capsule_collider* p_body) {
         //
         p_output << YAML::Key << "Capsule Collider";
         p_output << YAML::BeginMap;
         p_output << YAML::Key << "Radius" << YAML::Value << p_body->radius;
-        p_output << YAML::Key << "Half Height" << YAML::Value << p_body->half_height;
+        p_output << YAML::Key << "Half Height" << YAML::Value
+                 << p_body->half_height;
         p_output << YAML::EndMap;
-        
+
         return p_output;
     }
 };

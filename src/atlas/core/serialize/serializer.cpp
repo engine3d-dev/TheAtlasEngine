@@ -32,15 +32,15 @@ namespace atlas {
             output << p_entity.get<physics_body>();
         }
 
-        if(p_entity.has<box_collider>()) {
+        if (p_entity.has<box_collider>()) {
             output << p_entity.get<box_collider>();
         }
 
-        if(p_entity.has<sphere_collider>()) {
+        if (p_entity.has<sphere_collider>()) {
             output << p_entity.get<sphere_collider>();
         }
 
-        if(p_entity.has<capsule_collider>()) {
+        if (p_entity.has<capsule_collider>()) {
             output << p_entity.get<capsule_collider>();
         }
 
@@ -90,38 +90,41 @@ namespace atlas {
         // deserialize physics body
         if (p_entity_value["Physics Body"]) {
             auto body = p_entity_value["Physics Body"];
-            p_deserialize_to_object.set<physics_body>({
-                .linear_velocity = body["Linear Velocity"].as<glm::vec3>(),
+            p_deserialize_to_object.set<physics_body>(
+              { .linear_velocity = body["Linear Velocity"].as<glm::vec3>(),
                 .angular_velocity = body["Angular Velocity"].as<glm::vec3>(),
-                .cumulative_force = body["Cumulative Force"].as<glm::vec3>(),
-                .cumulative_torque = body["Cumulative Torque"].as<glm::vec3>(),
-                .center_mass_position = body["Center Mass Position"].as<glm::vec3>(),
+                .force = body["Force"].as<glm::vec3>(),
+                .impulse = body["Impulse"].as<glm::vec3>(),
+                .torque = body["Torque"].as<glm::vec3>(),
+                .center_mass_position =
+                  body["Center Mass Position"].as<glm::vec3>(),
                 .friction = body["Friction"].as<float>(),
                 .restitution = body["Restitution"].as<float>(),
-                .body_movement_type = static_cast<body_type>(body["Body Movement Type"].as<int>()),
-                .body_layer_type = static_cast<body_layer>(body["Body Layer Type"].as<int>())
-            });
+                .body_movement_type =
+                  static_cast<body_type>(body["Body Movement Type"].as<int>()),
+                .body_layer_type =
+                  static_cast<body_layer>(body["Body Layer Type"].as<int>()) });
         }
 
-        if(p_entity_value["Box Collider"]) {
+        if (p_entity_value["Box Collider"]) {
             auto collider = p_entity_value["Box Collider"];
             p_deserialize_to_object.set<box_collider>({
-                .half_extent = collider["Half Extent"].as<glm::vec3>(),
+              .half_extent = collider["Half Extent"].as<glm::vec3>(),
             });
         }
 
-        if(p_entity_value["Sphere Collider"]) {
+        if (p_entity_value["Sphere Collider"]) {
             auto collider = p_entity_value["Sphere Collider"];
             p_deserialize_to_object.set<sphere_collider>({
-                .radius = collider["Radius"].as<float>(),
+              .radius = collider["Radius"].as<float>(),
             });
         }
 
-        if(p_entity_value["Capsule Collider"]) {
+        if (p_entity_value["Capsule Collider"]) {
             auto collider = p_entity_value["Capsule Collider"];
             p_deserialize_to_object.set<capsule_collider>({
-                .radius = collider["Half Height"].as<float>(),
-                .half_height = collider["Half Height"].as<float>(),
+              .radius = collider["Half Height"].as<float>(),
+              .half_height = collider["Half Height"].as<float>(),
             });
         }
     }

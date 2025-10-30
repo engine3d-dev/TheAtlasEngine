@@ -68,11 +68,13 @@ namespace atlas::physics {
 
         m_physics_bodies.each(
           [this](flecs::entity p_entity, physics_body& p_body) {
-              m_physics_context->set_force(p_entity.id(), p_body.cumulative_force);
+              m_physics_context->set_force_and_torque(
+                p_entity.id(), p_body.force, p_body.torque);
               m_physics_context->set_linear_velocity(p_entity.id(),
                                                      p_body.linear_velocity);
               m_physics_context->set_angular_velocity(p_entity.id(),
                                                       p_body.angular_velocity);
+              m_physics_context->set_impulse(p_entity.id(), p_body.impulse);
           });
         // This will ensure all physics bodies with which colliders they are
         // associated with are update with the simulation, and their parameters
