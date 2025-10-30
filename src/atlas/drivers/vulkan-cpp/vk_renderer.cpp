@@ -16,7 +16,6 @@ namespace atlas::vk {
         console_log_manager::create_new_logger(p_tag);
         m_device = vk_context::driver_context();
         m_physical = vk_context::physical_driver();
-        // m_main_swapchain = p_swapchain;
         m_window_extent = p_settings;
 
         m_image_count = p_image_size;
@@ -40,7 +39,6 @@ namespace atlas::vk {
         };
 #endif
 
-        // m_shader_group = vk_shader_group(shader_sources);
         std::array<::vk::vertex_attribute_entry, 4> attribute_entries = {
             ::vk::vertex_attribute_entry{
               .location = 0,
@@ -169,7 +167,8 @@ namespace atlas::vk {
             ref<scene_scope> current_scene =
               current_world->get_scene("LevelScene");
 
-            flecs::query<> caching = current_scene->query_builder<mesh_source>().build();
+            flecs::query<> caching =
+              current_scene->query_builder<mesh_source>().build();
 
             caching.each([this](flecs::entity p_entity) {
                 const mesh_source* target = p_entity.get<mesh_source>();
@@ -327,7 +326,8 @@ namespace atlas::vk {
         ref<scene_scope> current_scene = current_world->get_scene("LevelScene");
 
         //! TODO: Replace rendertarget3d with a material component
-        flecs::query<> query_targets = current_scene->query_builder<mesh_source>().build();
+        flecs::query<> query_targets =
+          current_scene->query_builder<mesh_source>().build();
         m_main_pipeline.bind(m_current_command_buffer);
         // Bind global camera data here
         m_global_descriptors.bind(

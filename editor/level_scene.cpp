@@ -58,7 +58,7 @@ level_scene::level_scene(const std::string& p_name,
     });
 
     m_robot_model = create_object("Cube");
-	m_robot_model->add<atlas::tag::serialize>();
+    m_robot_model->add<atlas::tag::serialize>();
     // m_robot_model->add<atlas::tag::serialize>();
     m_robot_model->set<atlas::transform>({
       .position = { -2.70, 3.50f, 4.10f },

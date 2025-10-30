@@ -46,7 +46,7 @@ namespace atlas {
     };
 
     struct perspective_camera {
-        // glm::vec2 represented as {near: x, far: y}
+        // represented as {near: x, far: y}
         glm::vec2 plane{ 0.f };
 
         // Sets camera to be the main camera
