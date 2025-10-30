@@ -169,11 +169,10 @@ namespace atlas::vk {
             ref<scene_scope> current_scene =
               current_world->get_scene("LevelScene");
 
-            flecs::query<> caching =
-              current_scene->query_builder<material>().build();
+            flecs::query<> caching = current_scene->query_builder<mesh_source>().build();
 
             caching.each([this](flecs::entity p_entity) {
-                const material* target = p_entity.get<material>();
+                const mesh_source* target = p_entity.get<mesh_source>();
                 mesh new_mesh(std::filesystem::path(target->model_path));
                 new_mesh.initialize_uniforms(sizeof(material_uniform));
                 new_mesh.add_texture(
@@ -328,15 +327,14 @@ namespace atlas::vk {
         ref<scene_scope> current_scene = current_world->get_scene("LevelScene");
 
         //! TODO: Replace rendertarget3d with a material component
-        flecs::query<> query_targets =
-          current_scene->query_builder<material>().build();
+        flecs::query<> query_targets = current_scene->query_builder<mesh_source>().build();
         m_main_pipeline.bind(m_current_command_buffer);
         // Bind global camera data here
         m_global_descriptors.bind(
           m_current_command_buffer, m_current_frame, m_main_pipeline.layout());
         query_targets.each([this](flecs::entity p_entity) {
             const transform* transform_component = p_entity.get<transform>();
-            const material* material_component = p_entity.get<material>();
+            const mesh_source* material_component = p_entity.get<mesh_source>();
             m_model = glm::mat4(1.f);
             m_model = glm::translate(m_model, transform_component->position);
             m_model = glm::scale(m_model, transform_component->scale);
