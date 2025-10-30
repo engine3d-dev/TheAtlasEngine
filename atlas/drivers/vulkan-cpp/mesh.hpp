@@ -57,6 +57,8 @@ namespace atlas::vk {
         //! @return true if mesh geometry model loaded succesfully
         [[nodiscard]] bool loaded() const { return m_model_loaded; }
 
+        [[nodiscard]] bool texture_loaded() const { return m_texture_loaded; }
+
     private:
         void load_obj(const std::filesystem::path& p_filename);
 
@@ -68,5 +70,6 @@ namespace atlas::vk {
         ::vk::index_buffer m_ibo{};
         ::vk::uniform_buffer m_geoemtry_ubo;
         bool m_model_loaded = false;
+        bool m_texture_loaded=false;
     };
 };

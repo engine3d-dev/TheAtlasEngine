@@ -145,6 +145,8 @@ namespace atlas::vk {
             console_log_info("Texture {} is NOT loaded!!!", p_path.string());
             return;
         }
+
+        m_texture_loaded = m_texture.loaded();
     }
 
     void mesh::draw(const VkCommandBuffer& p_current) {

@@ -120,7 +120,15 @@ namespace atlas::vk {
             m_global_descriptors.layout(),
         };
 
+        ::vk::image_extent extent = {
+            .width = 1,
+            .height = 1,
+        };
+        m_white_texture =
+          ::vk::texture(m_device, extent, m_physical.memory_properties());
+
         vk_context::submit_resource_free([this]() {
+            m_white_texture.destroy();
             m_shader_group.destroy();
             m_global_descriptors.destroy();
             m_global_uniforms.destroy();
@@ -227,15 +235,23 @@ namespace atlas::vk {
                           },
                       };
                     // layout(set = 1, binding = 1)
+
+                    // we provide a default white texture if no texture has been
+                    // provided to this mesh
+                    ::vk::sample_image default_write_image =
+                      m_white_texture.image();
+                    if (m_cached_meshes[p_entity.id()].texture_loaded()) {
+                        default_write_image =
+                          m_cached_meshes[p_entity.id()].image();
+                    }
+
+                    // creating our image descriptor to write to the shader
                     std::vector<::vk::write_image_descriptor>
                       material_textures = {
                           ::vk::write_image_descriptor{
                             .dst_binding = 1,
-                            .view = m_cached_meshes[p_entity.id()]
-                                      .image()
-                                      .image_view(),
-                            .sampler =
-                              m_cached_meshes[p_entity.id()].image().sampler(),
+                            .view = default_write_image.image_view(),
+                            .sampler = default_write_image.sampler(),
                           },
                       };
 
