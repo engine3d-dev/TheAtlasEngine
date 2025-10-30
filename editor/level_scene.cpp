@@ -31,7 +31,7 @@ level_scene::level_scene(const std::string& p_name,
       //   .model_path = "assets/models/viking_room.obj",
       //   .texture_path = "assets/models/viking_room.png",
       .model_path = "assets/models/Ball OBJ.obj",
-	  .texture_path = "assets/models/clear.png"
+      .texture_path = "assets/models/clear.png",
     });
 
     m_viking_room->set<atlas::sphere_collider>({
@@ -174,7 +174,7 @@ level_scene::runtime_stop() {
 
 void
 level_scene::reset_objects() {
-	m_deserializer_test = atlas::serializer();
+    m_deserializer_test = atlas::serializer();
 
     if (!m_deserializer_test.load("LevelScene", *this)) {
         console_log_error("Could not load yaml file LevelScene!!!");
@@ -585,7 +585,7 @@ level_scene::physics_update() {
     if (atlas::event::is_key_pressed(key_space)) {
         glm::vec3 linear_velocity = { 0.f, 10.0f, 0.f };
         sphere_body->linear_velocity = linear_velocity;
-		sphere_body->impulse = linear_velocity;
+        sphere_body->impulse = linear_velocity;
     }
 
     if (atlas::event::is_key_pressed(key_j)) {
