@@ -64,6 +64,12 @@ namespace atlas::physics {
 
         void force(uint64_t p_id, const glm::vec3& p_cumulative_force) override;
 
+        void add_force_and_torque(uint64_t p_id,
+                                  const glm::vec3& p_force,
+                                  const glm::vec3& p_torque) override;
+
+        void add_impulse(uint64_t p_id, const glm::vec3& p_impulse) override;
+
     private:
         //! @note Must be defined before physics can be initialized otherwise
         //! jolt cannot be created properly.

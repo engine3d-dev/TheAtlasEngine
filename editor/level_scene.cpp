@@ -7,7 +7,7 @@
 level_scene::level_scene(const std::string& p_name,
                          atlas::event::event_bus& p_bus)
   : atlas::scene_scope(p_name, p_bus) {
-    m_camera = create_object("editor camera");
+    m_camera = create_object("Editor Camera");
     m_camera->add<flecs::pair<atlas::tag::editor, atlas::projection_view>>();
     m_camera->set<atlas::transform>({
       .position = { 3.50f, 4.90f, 36.40f },
@@ -19,7 +19,7 @@ level_scene::level_scene(const std::string& p_name,
       .field_of_view = 45.f,
     });
 
-    m_viking_room = create_object("Viking Room Object");
+    m_viking_room = create_object("Sphere");
     m_viking_room->add<atlas::tag::serialize>();
     m_viking_room->set<atlas::transform>({
       .position = { -2.70f, 2.70, -8.30f },
@@ -31,6 +31,7 @@ level_scene::level_scene(const std::string& p_name,
       //   .model_path = "assets/models/viking_room.obj",
       //   .texture_path = "assets/models/viking_room.png",
       .model_path = "assets/models/Ball OBJ.obj",
+	  .texture_path = "assets/models/clear.png"
     });
 
     m_viking_room->set<atlas::sphere_collider>({
@@ -56,7 +57,7 @@ level_scene::level_scene(const std::string& p_name,
       .texture_path = "assets/models/E-45-steel detail_2_col.jpg",
     });
 
-    m_robot_model = create_object("Robot");
+    m_robot_model = create_object("Cube");
     // m_robot_model->add<atlas::tag::serialize>();
     m_robot_model->set<atlas::transform>({
       .position = { -2.70, 3.50f, 4.10f },
@@ -173,25 +174,11 @@ level_scene::runtime_stop() {
 
 void
 level_scene::reset_objects() {
+	m_deserializer_test = atlas::serializer();
 
-    m_viking_room->set<atlas::transform>({
-      .position = { -2.70f, 2.70, -8.30f },
-      .rotation = { 2.30f, 95.90f, 91.80f },
-      .scale{ 1.f },
-    });
-
-    m_cube->set<atlas::transform>({
-      .position = { 0.f, 2.10f, -7.30f },
-      .scale = { 0.9f, 0.9f, 0.9f },
-    });
-    m_robot_model->set<atlas::transform>({
-      .position = { -2.70, 3.50f, 4.10f },
-      .scale = { 1.f, 1.f, 1.f },
-    });
-
-    m_platform->set<atlas::transform>({
-      .scale = { 15.f, -0.30f, 10.0f },
-    });
+    if (!m_deserializer_test.load("LevelScene", *this)) {
+        console_log_error("Could not load yaml file LevelScene!!!");
+    }
 }
 
 void
@@ -427,8 +414,9 @@ level_scene::on_ui_update() {
                                        p_body->linear_velocity);
                   atlas::ui::draw_vec3("Angular Velocity",
                                        p_body->angular_velocity);
-                  atlas::ui::draw_vec3("Force", p_body->cumulative_force);
-                  atlas::ui::draw_vec3("Torque", p_body->cumulative_torque);
+                  atlas::ui::draw_vec3("Force", p_body->force);
+                  atlas::ui::draw_vec3("Impulse", p_body->impulse);
+                  atlas::ui::draw_vec3("Torque", p_body->torque);
                   atlas::ui::draw_vec3("Center Mass",
                                        p_body->center_mass_position);
               });
@@ -597,6 +585,7 @@ level_scene::physics_update() {
     if (atlas::event::is_key_pressed(key_space)) {
         glm::vec3 linear_velocity = { 0.f, 10.0f, 0.f };
         sphere_body->linear_velocity = linear_velocity;
+		sphere_body->impulse = linear_velocity;
     }
 
     if (atlas::event::is_key_pressed(key_j)) {

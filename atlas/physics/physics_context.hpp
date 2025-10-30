@@ -118,6 +118,16 @@ namespace atlas::physics {
             return force(p_id, p_force);
         }
 
+        void set_force_and_torque(uint64_t p_id,
+                                  const glm::vec3& p_force,
+                                  const glm::vec3& p_torque) {
+            add_force_and_torque(p_id, p_force, p_torque);
+        }
+
+        void set_impulse(uint64_t p_id, const glm::vec3& p_impulse) {
+            add_impulse(p_id, p_impulse);
+        }
+
     private:
         virtual void destroy_bodies() = 0;
 
@@ -161,6 +171,12 @@ namespace atlas::physics {
 
         virtual void force(uint64_t p_id,
                            const glm::vec3& p_cumulative_force) = 0;
+
+        virtual void add_force_and_torque(uint64_t p_id,
+                                          const glm::vec3& p_force,
+                                          const glm::vec3& p_torque) = 0;
+
+        virtual void add_impulse(uint64_t p_id, const glm::vec3& p_impulse) = 0;
     };
 
     //! @brief initializes the physics backend. SHOULD have an API associated

@@ -35,8 +35,9 @@ namespace atlas {
         glm::vec3 linear_velocity = glm::vec3(0.0);
         glm::vec3 angular_velocity = glm::vec3(0.0f);
 
-        glm::vec3 cumulative_force = glm::vec3(0.0f);
-        glm::vec3 cumulative_torque = glm::vec3(0.0f);
+        glm::vec3 force = glm::vec3(0.0f);
+        glm::vec3 impulse = glm::vec3(0.0f);
+        glm::vec3 torque = glm::vec3(0.0f);
 
         float mass_factor = 1.0f;
         glm::vec3 center_mass_position = glm::vec3(0.0f);
