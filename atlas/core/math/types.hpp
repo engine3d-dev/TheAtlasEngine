@@ -4,45 +4,6 @@
 
 namespace atlas {
 
-    /*
-    Will not be handling it like this, my reasons for changing it is within the
-    test cases I made that uses the new approach to doing this template<typename
-    T> concept IsVec2 = requires(T vec2){ { vec2.x } ->
-    std::convertible_to<float>; { vec2.y } -> std::convertible_to<float>;
-    };
-
-    template<typename T>
-    concept IsVec3 = requires(T vec3){
-        { vec3.x } -> std::convertible_to<float>;
-        { vec3.y } -> std::convertible_to<float>;
-        { vec3.z } -> std::convertible_to<float>;
-    };
-
-    template<typename T>
-    concept IsVec4 = requires(T vec4){
-        { vec4.x } -> std::convertible_to<float>;
-        { vec4.y } -> std::convertible_to<float>;
-        { vec4.z } -> std::convertible_to<float>;
-        { vec4.w } -> std::convertible_to<float>;
-    };
-    */
-
-    /**
-     * @note The reason why we do this is because if we have an arbitrary type
-     *       of vec2, vec3, vec4. This allows us to still utilize glm::vec3 as
-     * our default vec3 types
-     * @note The computation would still be of how you can do math can be
-     * implemented by the math library of your choice, the only thing you just
-     * to is make those changes at compile-time to glm::vec2, glm::vec3, or even
-     * glm::vec4.
-     * @note Hence why you override these metadata classes for specifically
-     * vec2, 3, and 4
-     *
-     * @note By doing this we can let the default we define be utilizing glm's
-     * mathematical data types. Then letting users define their own customizable
-     * types if they choose to utilize a different mathematical type
-     */
-
     template<typename T>
     struct vector2;
 
