@@ -14,7 +14,7 @@ namespace atlas::physics {
       const JPH::Body&,
       JPH::RVec3Arg,
       const JPH::CollideShapeResult&) {
-        return JPH::ValidateResult::AcceptContact;
+        return JPH::ValidateResult::AcceptAllContactsForThisBodyPair;
     }
 
     void contact_listener::OnContactAdded(const JPH::Body& p_body1,
