@@ -31,7 +31,6 @@ level_scene::level_scene(const std::string& p_name,
       //   .model_path = "assets/models/viking_room.obj",
       //   .texture_path = "assets/models/viking_room.png",
       .model_path = "assets/models/Ball OBJ.obj",
-      .texture_path = "assets/models/clear.png",
     });
 
     m_viking_room->set<atlas::sphere_collider>({
@@ -126,12 +125,6 @@ level_scene::level_scene(const std::string& p_name,
 
     subscribe<atlas::event::collision_enter>(this,
                                              &level_scene::collision_enter);
-    // subscribe<atlas::event::collision_persisted>(this,
-    // &level_scene::collision_persisted);
-
-    console_log_info("Sphere ID = {}", m_viking_room->id());
-    console_log_info("Cube ID = {}", m_robot_model->id());
-    console_log_info("Platform ID = {}", m_platform->id());
 
     atlas::register_start(this, &level_scene::start);
     atlas::register_physics(this, &level_scene::physics_update);
@@ -143,22 +136,22 @@ void
 level_scene::collision_enter(atlas::event::collision_enter& p_event) {
     console_log_warn("collision_enter event!!!");
     flecs::world registry = *this;
-	flecs::entity e1 = registry.entity(p_event.entity1);
-	flecs::entity e2 = registry.entity(p_event.entity2);
+    flecs::entity e1 = registry.entity(p_event.entity1);
+    flecs::entity e2 = registry.entity(p_event.entity2);
 
-	console_log_warn("Entity1 = {}", e1.name().c_str());
-	console_log_warn("Entity2 = {}", e2.name().c_str());
+    console_log_warn("Entity1 = {}", e1.name().c_str());
+    console_log_warn("Entity2 = {}", e2.name().c_str());
 }
 
 void
 level_scene::collision_persisted(atlas::event::collision_persisted& p_event) {
     console_log_warn("collision_persisted(p_event) invoked!!");
-	flecs::world registry = *this;
-	flecs::entity e1 = registry.entity(p_event.entity1);
-	flecs::entity e2 = registry.entity(p_event.entity2);
+    flecs::world registry = *this;
+    flecs::entity e1 = registry.entity(p_event.entity1);
+    flecs::entity e2 = registry.entity(p_event.entity2);
 
-	console_log_warn("Entity1 = {}", e1.name().c_str());
-	console_log_warn("Entity2 = {}", e2.name().c_str());
+    console_log_warn("Entity1 = {}", e1.name().c_str());
+    console_log_warn("Entity2 = {}", e2.name().c_str());
 }
 
 void
@@ -400,20 +393,20 @@ level_scene::on_ui_update() {
               "Physics Body",
               m_selected_entity,
               [](atlas::physics_body* p_body) {
-                  const char* items[] = {
+                  std::array<std::string, 3> items = {
                       "Static",
                       "Kinematic",
                       "Dynamic",
                   };
-                  const char* combo_preview = items[p_body->body_movement_type];
+                  std::string combo_preview = items[p_body->body_movement_type];
 
                   // Begin the combo box
-                  if (ImGui::BeginCombo("Body Type", combo_preview)) {
+                  if (ImGui::BeginCombo("Body Type", combo_preview.data())) {
                       for (int n = 0; n < 3; n++) {
                           // Check if the current item is selected
                           const bool is_selected =
                             (p_body->body_movement_type == n);
-                          if (ImGui::Selectable(items[n], is_selected)) {
+                          if (ImGui::Selectable(items[n].data(), is_selected)) {
                               // Update the current type when a new item is
                               // selected
                               p_body->body_movement_type =
