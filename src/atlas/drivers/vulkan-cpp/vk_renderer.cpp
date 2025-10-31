@@ -159,7 +159,6 @@ namespace atlas::vk {
                                   const VkFramebuffer& p_framebuffer,
                                   const glm::mat4& p_proj_view) {
         m_proj_view = p_proj_view;
-        // m_main_swapchain = p_swapchain_handler; // ?? This is here to do some
         m_current_frame = application::current_frame();
 
         std::array<VkClearValue, 2> clear_values = {};
@@ -324,17 +323,20 @@ namespace atlas::vk {
                              VK_SUBPASS_CONTENTS_INLINE);
     }
 
+	// This just returns the arbitrary amount of bytes of the object
+	// TODO: Move this into core/utilities.hpp
+	template<typename T>
+	std::span<uint8_t> to_bytes(T p_data) {
+		return std::span<uint8_t>(reinterpret_cast<uint8_t*>(&p_data), sizeof(p_data));
+	}
+
     void vk_renderer::post_frame() {
 
         // For now, using this. Will need to remove this before vulkan
         // integration merging into dev This is for testing and to hopefully
         // have a global_ubo for globalized uniforms
         global_ubo global_frame_ubo = { .mvp = m_proj_view };
-        std::span<uint8_t> bytes_data(
-          reinterpret_cast<uint8_t*>(&global_frame_ubo),
-          sizeof(global_frame_ubo));
-        // std::span<global_ubo> global_uniform(global_frame_ubo, 1);
-        // m_global_uniforms.update(&global_frame_ubo);
+		std::span<uint8_t> bytes_data = to_bytes(global_frame_ubo);
         m_global_uniforms.update(bytes_data.data());
 
         ref<world_scope> current_world =
