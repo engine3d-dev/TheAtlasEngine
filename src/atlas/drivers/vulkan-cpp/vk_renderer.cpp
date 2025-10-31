@@ -323,12 +323,13 @@ namespace atlas::vk {
                              VK_SUBPASS_CONTENTS_INLINE);
     }
 
-	// This just returns the arbitrary amount of bytes of the object
-	// TODO: Move this into core/utilities.hpp
-	template<typename T>
-	std::span<uint8_t> to_bytes(T p_data) {
-		return std::span<uint8_t>(reinterpret_cast<uint8_t*>(&p_data), sizeof(p_data));
-	}
+    // This just returns the arbitrary amount of bytes of the object
+    // TODO: Move this into core/utilities.hpp
+    template<typename T>
+    std::span<uint8_t> to_bytes(T p_data) {
+        return std::span<uint8_t>(reinterpret_cast<uint8_t*>(&p_data),
+                                  sizeof(p_data));
+    }
 
     void vk_renderer::post_frame() {
 
@@ -336,7 +337,7 @@ namespace atlas::vk {
         // integration merging into dev This is for testing and to hopefully
         // have a global_ubo for globalized uniforms
         global_ubo global_frame_ubo = { .mvp = m_proj_view };
-		std::span<uint8_t> bytes_data = to_bytes(global_frame_ubo);
+        std::span<uint8_t> bytes_data = to_bytes(global_frame_ubo);
         m_global_uniforms.update(bytes_data.data());
 
         ref<world_scope> current_world =

@@ -70,6 +70,6 @@ namespace atlas::vk {
         ::vk::index_buffer m_ibo{};
         ::vk::uniform_buffer m_geoemtry_ubo;
         bool m_model_loaded = false;
-        bool m_texture_loaded=false;
+        bool m_texture_loaded = false;
     };
 };
