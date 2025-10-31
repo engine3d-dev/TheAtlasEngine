@@ -31,7 +31,7 @@ level_scene::level_scene(const std::string& p_name,
       //   .model_path = "assets/models/viking_room.obj",
       //   .texture_path = "assets/models/viking_room.png",
       .model_path = "assets/models/Ball OBJ.obj",
-    //   .texture_path = "assets/models/clear.png",
+      //   .texture_path = "assets/models/clear.png",
     });
 
     m_viking_room->set<atlas::sphere_collider>({
