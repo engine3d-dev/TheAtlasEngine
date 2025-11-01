@@ -8,7 +8,8 @@
 #include <vulkan-cpp/uniform_buffer.hpp>
 #include <vulkan-cpp/pipeline.hpp>
 #include <vulkan-cpp/descriptor_resource.hpp>
-#include <vulkan-cpp/shader_resource.hpp>
+// #include <vulkan-cpp/shader_resource.hpp>
+#include <drivers/vulkan-cpp/shader_resource_group.hpp>
 #include <vulkan-cpp/renderpass.hpp>
 
 namespace atlas::vk {
@@ -65,7 +66,8 @@ namespace atlas::vk {
         VkClearColorValue m_color;
 
         uint32_t m_image_count = 0;
-        ::vk::shader_resource m_shader_group;
+        // ::vk::shader_resource m_shader_group;
+        shader_resource_group m_shader_group;
         ::vk::pipeline m_main_pipeline;
         ::vk::descriptor_resource m_global_descriptors;
         std::vector<VkDescriptorSetLayout> m_sets_layouts;

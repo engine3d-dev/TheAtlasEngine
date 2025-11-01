@@ -75,7 +75,7 @@ namespace atlas::vk {
         ::vk::shader_resource_info shader_info = {
             .sources = shader_sources,
         };
-        m_shader_group = ::vk::shader_resource(m_device, shader_info);
+        m_shader_group = shader_resource_group(m_device, shader_info);
         m_shader_group.vertex_attributes(attribute);
 
         // Setting global descriptor set 0
@@ -262,9 +262,11 @@ namespace atlas::vk {
                 }
             });
 
+			std::vector<::vk::shader_handle> modules = m_shader_group.handles();
+
             ::vk::pipeline_settings pipeline_configuration = {
                 .renderpass = p_renderpass,
-                .shader_modules = m_shader_group.handles(),
+                .shader_modules = modules,
                 .vertex_attributes = m_shader_group.vertex_attributes(),
                 .vertex_bind_attributes =
                   m_shader_group.vertex_bind_attributes(),

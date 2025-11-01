@@ -62,6 +62,7 @@ set(
     ${VULKAN_SRC_DIR}/vk_driver.cpp
     ${VULKAN_SRC_DIR}/vk_swapchain.cpp
     ${VULKAN_SRC_DIR}/mesh.cpp
+    ${VULKAN_SRC_DIR}/shader_resource_group.cpp
     ${VULKAN_SRC_DIR}/vk_renderer.cpp
 )
 
