@@ -22,9 +22,9 @@ namespace atlas::vk {
 #ifdef USE_SHADERC
         std::array<::vk::shader_source, 2> shader_sources = {
             ::vk::shader_source{ "experimental-shaders/test.vert",
-                                 shader_stage::vertex },
+                                 ::vk::shader_stage::vertex },
             ::vk::shader_source{ "experimental-shaders/test.frag",
-                                 shader_stage::fragment }
+                                 ::vk::shader_stage::fragment }
         };
 #else
         std::array<::vk::shader_source, 2> shader_sources = {

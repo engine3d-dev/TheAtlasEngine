@@ -3,7 +3,8 @@
 #include <filesystem>
 #include <vulkan-cpp/utilities.hpp>
 #include <ranges>
-#include <algorithm>
+#include <shaderc/shaderc.hpp>
+#include <core/engine_logger.hpp>
 
 namespace atlas::vk {
     // Reading the raw .spv binaries
@@ -34,43 +35,129 @@ namespace atlas::vk {
         return binary_blob;
     }
 
+    static std::string read_shader_source_code(const std::string& p_filename) {
+        std::ifstream ins(p_filename, std::ios::ate | std::ios::binary);
+
+        if (!ins.is_open()) {
+            console_log_warn("Could not open filename = {}", p_filename);
+            return { 'a' };
+        }
+
+        size_t file_size = (size_t)ins.tellg();
+        // std::vector<char> output(file_size);
+        std::string output;
+        output.resize(file_size);
+        ins.seekg(0);
+        ins.read(output.data(), (uint32_t)file_size);
+
+        return output;
+    }
+
+    /**
+     * compiles source code from the shader directly without needing manual recompilation
+     * 
+     * shaderc requires these parameters to compile
+     * text_source_code: the std::string version of the entire source code to compile
+     * type: shader stage this shader corresponds to
+     * filename: input filename text
+     * entry_point: the entry point to this shader
+     * options: compiler-specific options to enable when compiling the shader sources
+    */
+    static std::vector<uint32_t> compile_source_from_file(const ::vk::shader_source& p_shader_source) {
+        shaderc::CompileOptions options;
+        options.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_3);
+        options.SetWarningsAsErrors();
+
+        shaderc_shader_kind type;
+
+        switch (p_shader_source.stage){
+        case ::vk::shader_stage::vertex: type = shaderc_glsl_vertex_shader; break;
+        case ::vk::shader_stage::fragment: type = shaderc_glsl_fragment_shader; break;
+        default:
+            throw std::runtime_error("shader_stage unspecified!~!!");
+        }
+
+        shaderc::Compiler compiler;
+        std::string text_source_code  = read_shader_source_code(p_shader_source.filename);
+
+        console_log_warn("Source Text Code!!!");
+        console_log_info("{}", text_source_code);
+        shaderc::CompilationResult result = compiler.CompileGlslToSpv(text_source_code, type, p_shader_source.filename.c_str(), "main", options);
+
+        std::vector<uint32_t> blob;
+
+        if(result.GetCompilationStatus() != shaderc_compilation_status_success) {
+            console_log_error("Shader Compilation Error! Failed with reason {}", p_shader_source.filename, result.GetErrorMessage());
+            return blob;
+        }
+
+        for(auto blob_chunk : result) {
+            blob.push_back(blob_chunk);
+        }
+
+        return blob;
+    }
+
     shader_resource_group::shader_resource_group(const VkDevice& p_device, const ::vk::shader_resource_info& p_info) : m_device(p_device) {
 
         for(size_t i = 0; i < p_info.sources.size(); i++) {
             const ::vk::shader_source shader_src = p_info.sources[i];
-            std::vector<char> blob = compile_binary_shader_source(shader_src);
+            std::filesystem::path filepath = std::filesystem::path(shader_src.filename);
 
-            if(blob.empty()) {
-                m_resource_valid = false;
-                return;
+
+            if(filepath.extension().string() == ".spv") {
+                std::vector<char> blob = compile_binary_shader_source(shader_src);
+
+                if(blob.empty()) {
+                    m_resource_valid = false;
+                    return;
+                }
+
+                create_module(blob, shader_src);
             }
-
-            std::span<char> binary(blob.begin(), blob.end());
-            VkShaderModuleCreateInfo shader_module_ci = {
-                .sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
-                .pNext = nullptr,
-                .codeSize = static_cast<uint32_t>(binary.size_bytes()),
-                .pCode = (const uint32_t*)binary.data()
-            };
-            
-            // Setting m_shader_module_handlers[i]'s stage and the VkShaderModule handle altogether
-            // construct this beforehand and then we are going set that shader module 
-            m_modules.emplace(shader_src.filename, ::vk::shader_handle{});
-            ::vk::vk_check(vkCreateShaderModule(m_device, &shader_module_ci, nullptr, &m_modules[shader_src.filename].module),"vkCreateShaderModule");
-            m_modules[shader_src.filename].stage = shader_src.stage;
+            else {
+                std::string text_source_code  = read_shader_source_code(filepath.string());
+                std::vector<uint32_t> blob = compile_source_from_file(shader_src);
+                create_module(blob, shader_src);
+            }
         }
 
 
         m_resource_valid = true;
     }
 
+    void shader_resource_group::create_module(std::span<char> p_blob, const ::vk::shader_source& p_source) {
+        VkShaderModuleCreateInfo shader_module_ci = {
+            .sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
+            .pNext = nullptr,
+            .codeSize = p_blob.size(),
+            .pCode = reinterpret_cast<const uint32_t*>(p_blob.data())
+        };
+        
+        // Setting m_shader_module_handlers[i]'s stage and the VkShaderModule handle altogether
+        // construct this beforehand and then we are going set that shader module 
+        m_modules.emplace(p_source.filename, ::vk::shader_handle{});
+        ::vk::vk_check(vkCreateShaderModule(m_device, &shader_module_ci, nullptr, &m_modules[p_source.filename].module),"vkCreateShaderModule");
+        m_modules[p_source.filename].stage = p_source.stage;
+    }
+
+    void shader_resource_group::create_module(std::span<uint32_t> p_blob, const ::vk::shader_source& p_source) {
+        VkShaderModuleCreateInfo shader_module_ci = {
+            .sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
+            .pNext = nullptr,
+            .codeSize = p_blob.size_bytes(),
+            .pCode = p_blob.data()
+        };
+        
+        // Setting m_shader_module_handlers[i]'s stage and the VkShaderModule handle altogether
+        // construct this beforehand and then we are going set that shader module 
+        m_modules.emplace(p_source.filename, ::vk::shader_handle{});
+        ::vk::vk_check(vkCreateShaderModule(m_device, &shader_module_ci, nullptr, &m_modules[p_source.filename].module),"vkCreateShaderModule");
+        m_modules[p_source.filename].stage = p_source.stage;
+    }
+
     std::vector<::vk::shader_handle> shader_resource_group::map_to_vector() const {
-        // return m_modules | std::views::values;
-        // return (m_modules | std::views::values);
-
-        // std::vector<::vk::shader_handle> handle = (m_modules | std::views::values | std::ranges::to<std::span>());
-
-        // return handle;
+        // Using C++'s std::views to extract all of the values in unordered_map<string, vk::shader_handle> to a vector<shader_handle> that gets passed to graphics pipeline
         return (m_modules | std::views::values | std::ranges::to<std::vector>());
     }
 

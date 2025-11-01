@@ -29,6 +29,11 @@ namespace atlas::vk {
         // this just converts unordered_map<string, shader_handle> to vector<shader_handle>
         [[nodiscard]] std::vector<::vk::shader_handle> map_to_vector() const;
 
+
+        void create_module(std::span<char> p_blob, const ::vk::shader_source& p_source);
+
+        void create_module(std::span<uint32_t> p_blob, const ::vk::shader_source& p_source);
+
     private:
         VkDevice m_device=nullptr;
         std::vector<VkVertexInputAttributeDescription> m_vertex_attributes;
