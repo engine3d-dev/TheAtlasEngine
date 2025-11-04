@@ -29,7 +29,7 @@ class AtlasRecipe(ConanFile):
     def requirements(self):
         self.requires("joltphysics/5.2.0")
         if self.options.enable_shaderc:
-            self.requires("shaderc/2024.1")
+            self.requires("shaderc/2025.3")
         self.requires("imguidocking/2.0")
         self.requires("flecs/4.0.4")
         self.requires("glfw/3.4")
