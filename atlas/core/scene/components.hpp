@@ -22,43 +22,46 @@ namespace atlas {
     };
 
     /**
-     * @brief Actually might do a query for this along with rendertarget3d
-     * @brief This is because we can have multiple things that could be reloaded
-     * @brief Such as the single texture and the mesh .obj 3d model as well
-     * @brief
-     */
-    struct reload {
-        bool on_reload = false;
-        bool on_texture_reload = false;
-    };
-
-    /**
-     * @brief Specify a specific source to a mesh
+     * @brief Loads a mesh source
+     *
+     * @param color is the albedo color values
+     * @param model_path is the specified path to the 3d model asset path
+     * @param texture_path is the specified path to the specific texture to load
      */
     struct mesh_source {
         glm::vec4 color{ 1.f };
         std::string model_path = "";
-        std::string texture_path =
-          ""; // This just contains the path to load the texture
-        std::vector<std::string> texture_filepaths;
-        bool model_reload = false;
-        bool texture_reload = false;
+        std::string texture_path = "";
     };
 
+    /**
+     * @brief define a game object to have a perspective camera that can
+     * correspond to it
+     */
     struct perspective_camera {
         // represented as {near: x, far: y}
         glm::vec2 plane{ 0.f };
 
-        // Sets camera to be the main camera
+        // Activate to be the current camera
         bool is_active = false;
 
         // Defaults to 45.0f in radians
         float field_of_view = glm::radians(45.f);
     };
 
-    //! @brief specialized namespace tag to use for specifying operation with
-    //! either flecs::system or tags to handle specific querying of entities
-    // Example Usage: add<flecs::pair<tag::editor, atlas::transform>>();
+    /**
+     * @brief specialized namespace tag to use for specifying operations used
+     * with flecs in using tags
+     *
+     * Tags can be handled for specifying queries for specific archetypes (list
+     * of those entities)
+     *
+     * Example Usage:
+     *
+     * ```C++
+     * m_entity.add<flecs::pair<tag::editor, atlas::transform>>();
+     * ```
+     */
     namespace tag {
 
         //! @brief to indicate which entities are editor-only
@@ -71,6 +74,16 @@ namespace atlas {
     };
 
     //! TODO: Consider either relocating where this is and how it gets handled.
+
+    /**
+     * @brief struct for attaching a projection/view matrix to your game object
+     *
+     * This should only be used if you know your object is going to add
+     * atlas::perspective_camera to work
+     *
+     * TODO: Consider adding this automatically in a way we can represent
+     * multiple cameras in a given scene. Which is something to think about
+     */
     struct projection_view {
         glm::mat4 projection;
         glm::mat4 view;
