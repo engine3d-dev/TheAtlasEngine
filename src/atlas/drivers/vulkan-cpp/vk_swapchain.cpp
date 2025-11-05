@@ -91,7 +91,7 @@ namespace atlas::vk {
         for (uint32_t i = 0; i < m_swapchain_images.size(); i++) {
             ::vk::image_configuration_information color_image_config = {
                 .extent = { m_swapchain_extent.width,
-                            m_swapchain_extent.width },
+                            m_swapchain_extent.height, },
                 .format = m_surface_properties.surface_format.format,
                 .aspect = ::vk::image_aspect_flags::color_bit,
                 .usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
@@ -106,7 +106,7 @@ namespace atlas::vk {
 
             ::vk::image_configuration_information depth_image_config = {
                 .extent = { m_swapchain_extent.width,
-                            m_swapchain_extent.width },
+                            m_swapchain_extent.height, },
                 .format = depth_format,
                 .aspect = ::vk::image_aspect_flags::depth_bit,
                 .usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
