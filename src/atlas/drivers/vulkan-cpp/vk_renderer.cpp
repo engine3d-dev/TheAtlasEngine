@@ -1,11 +1,12 @@
+#include <core/system/registry.hpp>
+#include <core/scene/world.hpp>
 #include <drivers/vulkan-cpp/vk_renderer.hpp>
+
 #include <array>
 #include <drivers/vulkan-cpp/helper_functions.hpp>
 #include <drivers/vulkan-cpp/vk_context.hpp>
 #include <core/application.hpp>
 
-#include <core/system/registry.hpp>
-#include <core/scene/world.hpp>
 #include <drivers/vulkan-cpp/vk_types.hpp>
 
 namespace atlas::vk {
@@ -21,10 +22,14 @@ namespace atlas::vk {
         m_image_count = p_image_size;
 #ifdef USE_SHADERC
         std::array<::vk::shader_source, 2> shader_sources = {
-            ::vk::shader_source{ "experimental-shaders/test.vert",
-                                 shader_stage::vertex },
-            ::vk::shader_source{ "experimental-shaders/test.frag",
-                                 shader_stage::fragment }
+            ::vk::shader_source{
+              "experimental-shaders/test.vert",
+              ::vk::shader_stage::vertex,
+            },
+            ::vk::shader_source{
+              "experimental-shaders/test.frag",
+              ::vk::shader_stage::fragment,
+            }
         };
 #else
         std::array<::vk::shader_source, 2> shader_sources = {
@@ -75,7 +80,7 @@ namespace atlas::vk {
         ::vk::shader_resource_info shader_info = {
             .sources = shader_sources,
         };
-        m_shader_group = ::vk::shader_resource(m_device, shader_info);
+        m_shader_group = shader_resource_group(m_device, shader_info);
         m_shader_group.vertex_attributes(attribute);
 
         // Setting global descriptor set 0
@@ -101,18 +106,19 @@ namespace atlas::vk {
         };
         m_global_descriptors = ::vk::descriptor_resource(m_device, set0_layout);
 
-        ::vk::uniform_buffer_info geo_info = { .phsyical_memory_properties =
-                                                 m_physical.memory_properties(),
-                                               .size_bytes =
-                                                 sizeof(global_ubo) };
+        ::vk::uniform_buffer_info geo_info = {
+            .phsyical_memory_properties = m_physical.memory_properties(),
+            .size_bytes = sizeof(global_ubo),
+        };
         m_global_uniforms = ::vk::uniform_buffer(m_device, geo_info);
 
         std::array<::vk::write_buffer_descriptor, 1> set0_write_buffers = {
-            ::vk::write_buffer_descriptor{ .dst_binding = 0,
-                                           .buffer = m_global_uniforms,
-                                           .offset = 0,
-                                           .range =
-                                             m_global_uniforms.size_bytes() }
+            ::vk::write_buffer_descriptor{
+              .dst_binding = 0,
+              .buffer = m_global_uniforms,
+              .offset = 0,
+              .range = m_global_uniforms.size_bytes(),
+            }
         };
         m_global_descriptors.update(set0_write_buffers);
 
@@ -262,9 +268,11 @@ namespace atlas::vk {
                 }
             });
 
+            std::vector<::vk::shader_handle> modules = m_shader_group.handles();
+
             ::vk::pipeline_settings pipeline_configuration = {
                 .renderpass = p_renderpass,
-                .shader_modules = m_shader_group.handles(),
+                .shader_modules = modules,
                 .vertex_attributes = m_shader_group.vertex_attributes(),
                 .vertex_bind_attributes =
                   m_shader_group.vertex_bind_attributes(),
@@ -274,6 +282,25 @@ namespace atlas::vk {
 
             m_begin_initialize = false;
         }
+
+        // TODO: Fix this when getting shader hot-reloading to workagain.
+        // if (m_shader_group.reload_requested()) {
+        // 	console_log_info("reloading shaders and graphics pipeline!!");
+        // 	m_main_pipeline.destroy();
+        // 	std::vector<::vk::shader_handle> modules =
+        // m_shader_group.handles();
+
+        // 	::vk::pipeline_settings pipeline_configuration = {
+        // 		.renderpass = p_renderpass,
+        // 		.shader_modules = modules,
+        // 		.vertex_attributes = m_shader_group.vertex_attributes(),
+        // 		.vertex_bind_attributes =
+        // 		m_shader_group.vertex_bind_attributes(),
+        // 		.descriptor_layouts = m_sets_layouts
+        // 	};
+        // 	m_main_pipeline.create(pipeline_configuration);
+        // }
+
         VkRenderPassBeginInfo renderpass_begin_info = {
             .sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
 			.pNext = nullptr,
