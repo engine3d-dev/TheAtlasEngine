@@ -54,29 +54,35 @@ namespace atlas::vk {
           const;
 
         /**
-         * @return uint32_t is the index to the presentation index of the specific presentation queue
-        */
+         * @return uint32_t is the index to the presentation index of the
+         * specific presentation queue
+         */
         [[nodiscard]] uint32_t read_presentation_index(
           const VkSurfaceKHR& p_surface);
 
         /**
-         * @brief querying surface properties based on the currently specified VkSurfaceKHR handle created
-        */
+         * @brief querying surface properties based on the currently specified
+         * VkSurfaceKHR handle created
+         */
         [[nodiscard]] surface_properties get_surface_properties(
           const VkSurfaceKHR& p_surface);
 
         /**
-         * @brief Allows for treating vk_physical_device as a VkPhysicalDevice handle
-         * 
-         * Simplifies using this same class for creating other vulkan metaobjects
-        */
+         * @brief Allows for treating vk_physical_device as a VkPhysicalDevice
+         * handle
+         *
+         * Simplifies using this same class for creating other vulkan
+         * metaobjects
+         */
         operator VkPhysicalDevice() { return m_physical_driver; }
 
         /**
-         * @brief Allows for treating vk_physical_device as a VkPhysicalDevice handle
-         * 
-         * Simplifies using this same class for creating other vulkan metaobjects
-        */
+         * @brief Allows for treating vk_physical_device as a VkPhysicalDevice
+         * handle
+         *
+         * Simplifies using this same class for creating other vulkan
+         * metaobjects
+         */
         operator VkPhysicalDevice() const { return m_physical_driver; }
 
     private:

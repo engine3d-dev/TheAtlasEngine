@@ -18,8 +18,8 @@ namespace atlas {
          *
          * Where the state queue will call those arbitrary callbacks at their
          * respective point in each of the frame.
-		 * 
-		 * As thesse are intended for invoking those queue's directly.
+         *
+         * As thesse are intended for invoking those queue's directly.
          *
          */
         void invoke_on_update();

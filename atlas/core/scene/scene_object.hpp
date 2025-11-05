@@ -21,10 +21,10 @@ namespace atlas {
      * atlas::scene_object are represented through the strong_ptr type to ensure
      * for memory safety. Ensuring objects that are being created are not
      * temporary, but also do not invoke default construction.
-     * 
-     * 
+     *
+     *
      * Example Usage:
-     * 
+     *
      * ```C++
      * strong_ptr<scene_object> obj1 = scene->create_object("Cube");
      * obj1->add<atlas::transform>();

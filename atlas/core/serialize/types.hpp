@@ -6,10 +6,12 @@
 
 namespace YAML {
     /**
-     * @brief Custom specialized classes from yaml-cpp to specialize to take in a glm::vec2 specifically
-     * 
-     * Specialization is used for converting glm::vec2 to yaml-cpp syntax when saving glm::vec2 data to disk
-    */
+     * @brief Custom specialized classes from yaml-cpp to specialize to take in
+     * a glm::vec2 specifically
+     *
+     * Specialization is used for converting glm::vec2 to yaml-cpp syntax when
+     * saving glm::vec2 data to disk
+     */
     template<>
     struct convert<glm::vec2> {
         static Node encode(const glm::vec2& rhs) {
@@ -32,10 +34,12 @@ namespace YAML {
     };
 
     /**
-     * @brief Custom specialized classes from yaml-cpp to specialize to take in a glm::vec3 specifically
-     * 
-     * Specialization is used for converting glm::vec3 to yaml-cpp syntax when saving glm::vec3 data to disk
-    */
+     * @brief Custom specialized classes from yaml-cpp to specialize to take in
+     * a glm::vec3 specifically
+     *
+     * Specialization is used for converting glm::vec3 to yaml-cpp syntax when
+     * saving glm::vec3 data to disk
+     */
     template<>
     struct convert<glm::vec3> {
         static Node encode(const glm::vec3& rhs) {
@@ -60,10 +64,12 @@ namespace YAML {
     };
 
     /**
-     * @brief Custom specialized classes from yaml-cpp to specialize to take in a glm::vec4 specifically
-     * 
-     * Specialization is used for converting glm::vec4 to yaml-cpp syntax when saving glm::vec4 data to disk
-    */
+     * @brief Custom specialized classes from yaml-cpp to specialize to take in
+     * a glm::vec4 specifically
+     *
+     * Specialization is used for converting glm::vec4 to yaml-cpp syntax when
+     * saving glm::vec4 data to disk
+     */
     template<>
     struct convert<glm::vec4> {
 
@@ -91,10 +97,12 @@ namespace YAML {
     };
 
     /**
-     * @brief Custom specialized classes from yaml-cpp to specialize to take in a atlas::body_type specifically
-     * 
-     * Specialization is used for converting atlas::body_type to yaml-cpp syntax when saving atlas::body_type data to disk
-    */
+     * @brief Custom specialized classes from yaml-cpp to specialize to take in
+     * a atlas::body_type specifically
+     *
+     * Specialization is used for converting atlas::body_type to yaml-cpp syntax
+     * when saving atlas::body_type data to disk
+     */
     template<>
     struct convert<atlas::body_type> {
         static Node encode(const atlas::body_type& rhs) {
@@ -113,10 +121,12 @@ namespace YAML {
     };
 
     /**
-     * @brief Custom specialized classes from yaml-cpp to specialize to take in a atlas::body_layer specifically
-     * 
-     * Specialization is used for converting atlas::body_layer to yaml-cpp syntax when saving atlas::body_layer data to disk
-    */
+     * @brief Custom specialized classes from yaml-cpp to specialize to take in
+     * a atlas::body_layer specifically
+     *
+     * Specialization is used for converting atlas::body_layer to yaml-cpp
+     * syntax when saving atlas::body_layer data to disk
+     */
     template<>
     struct convert<atlas::body_layer> {
         static Node encode(const atlas::body_layer& rhs) {
@@ -135,10 +145,12 @@ namespace YAML {
     };
 
     /**
-     * @brief Custom specialized classes from yaml-cpp to specialize to take in a atlas::physics_body specifically
-     * 
-     * Specialization is used for converting atlas::physics_body to yaml-cpp syntax when saving atlas::physics_body data to disk
-    */
+     * @brief Custom specialized classes from yaml-cpp to specialize to take in
+     * a atlas::physics_body specifically
+     *
+     * Specialization is used for converting atlas::physics_body to yaml-cpp
+     * syntax when saving atlas::physics_body data to disk
+     */
     template<>
     struct convert<atlas::physics_body> {
 
@@ -186,10 +198,12 @@ namespace YAML {
     };
 
     /**
-     * @brief Custom specialized classes from yaml-cpp to specialize to take in a atlas::box_collider specifically
-     * 
-     * Specialization is used for converting atlas::box_collider to yaml-cpp syntax when saving atlas::box_collider data to disk
-    */
+     * @brief Custom specialized classes from yaml-cpp to specialize to take in
+     * a atlas::box_collider specifically
+     *
+     * Specialization is used for converting atlas::box_collider to yaml-cpp
+     * syntax when saving atlas::box_collider data to disk
+     */
     template<>
     struct convert<atlas::box_collider> {
 
@@ -212,10 +226,12 @@ namespace YAML {
     };
 
     /**
-     * @brief Custom specialized classes from yaml-cpp to specialize to take in a atlas::sphere_collider specifically
-     * 
-     * Specialization is used for converting atlas::sphere_collider to yaml-cpp syntax when saving atlas::sphere_collider data to disk
-    */
+     * @brief Custom specialized classes from yaml-cpp to specialize to take in
+     * a atlas::sphere_collider specifically
+     *
+     * Specialization is used for converting atlas::sphere_collider to yaml-cpp
+     * syntax when saving atlas::sphere_collider data to disk
+     */
     template<>
     struct convert<atlas::sphere_collider> {
 
@@ -238,10 +254,12 @@ namespace YAML {
     };
 
     /**
-     * @brief Custom specialized classes from yaml-cpp to specialize to take in a atlas::capsule_collider specifically
-     * 
-     * Specialization is used for converting atlas::capsule_collider to yaml-cpp syntax when saving atlas::capsule_collider data to disk
-    */
+     * @brief Custom specialized classes from yaml-cpp to specialize to take in
+     * a atlas::capsule_collider specifically
+     *
+     * Specialization is used for converting atlas::capsule_collider to yaml-cpp
+     * syntax when saving atlas::capsule_collider data to disk
+     */
     template<>
     struct convert<atlas::capsule_collider> {
 
@@ -270,11 +288,11 @@ namespace atlas {
     //! @brief from yaml-cpp, saving glm::highp_vec2 values to disk
     YAML::Emitter& operator<<(YAML::Emitter& p_out,
                               const glm::highp_vec2& p_values);
-    
+
     //! @brief from yaml-cpp, saving glm::highp_vec3 values to disk
     YAML::Emitter& operator<<(YAML::Emitter& p_out,
                               const glm::highp_vec3& p_values);
-    
+
     //! @brief from yaml-cpp, saving glm::highp_vec4 values to disk
     YAML::Emitter& operator<<(YAML::Emitter& p_out,
                               const glm::highp_vec4& p_values);
@@ -286,7 +304,7 @@ namespace atlas {
     //! @brief from yaml-cpp, saving perspective_camera values to disk
     YAML::Emitter& operator<<(YAML::Emitter& p_output,
                               const perspective_camera* p_camera);
-    
+
     //! @brief from yaml-cpp, saving mesh_source values to disk
     YAML::Emitter& operator<<(YAML::Emitter& p_output,
                               const mesh_source* p_material);

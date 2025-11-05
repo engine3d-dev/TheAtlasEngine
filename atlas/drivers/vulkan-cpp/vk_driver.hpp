@@ -58,23 +58,25 @@ namespace atlas::vk {
 
         /**
          * @brief gives you the depth format from the logical device
-         * 
+         *
          * @return VkFormat
-        */
+         */
         [[nodiscard]] VkFormat depth_format() const;
 
         /**
          * @brief allows to treat vk_driver as a VkDevice handle
-         * 
-         * For vulkan API's that accept only taking in VKDevice, this simplifies the need to not have a getter API
-        */
+         *
+         * For vulkan API's that accept only taking in VKDevice, this simplifies
+         * the need to not have a getter API
+         */
         operator VkDevice() const { return m_driver; }
 
         /**
          * @brief allows to treat vk_driver as a VkDevice handle
-         * 
-         * For vulkan API's that accept only taking in VKDevice, this simplifies the need to not have a getter API
-        */
+         *
+         * For vulkan API's that accept only taking in VKDevice, this simplifies
+         * the need to not have a getter API
+         */
         operator VkDevice() { return m_driver; }
 
     private:

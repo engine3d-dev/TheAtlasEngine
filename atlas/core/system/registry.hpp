@@ -20,9 +20,9 @@ namespace atlas {
     public:
         /**
          * @brief construct a new system registry
-         * 
+         *
          * @param p_name is for specifying a name to give this registry
-        */
+         */
         system_registry(const std::string& p_name);
 
         ~system_registry();
@@ -36,12 +36,14 @@ namespace atlas {
          * 4. Provide globalized access to other worlds
          */
 
-         /**
-          * @brief constructs a new world_scope
-          * 
-          * Initially this was used to create a world with a specified name associated with it
-          * 
-          * This was used for getting world to be maintained implicitly by system_registry, though this will be changing.
+        /**
+         * @brief constructs a new world_scope
+         *
+         * Initially this was used to create a world with a specified name
+         * associated with it
+         *
+         * This was used for getting world to be maintained implicitly by
+         * system_registry, though this will be changing.
          */
         static ref<world_scope> create_world(const std::string& p_tag);
 
@@ -49,10 +51,12 @@ namespace atlas {
         //! @brief Returns nullptr if world_scope not found
 
         /**
-         * @brief searches in getting the world and looks up based on its specified name
-         * 
-         * @return nullptr if not found, otherwise return shared_ptr<world_scope>
-        */
+         * @brief searches in getting the world and looks up based on its
+         * specified name
+         *
+         * @return nullptr if not found, otherwise return
+         * shared_ptr<world_scope>
+         */
         static ref<world_scope> get_world(const std::string& p_tag);
 
     private:
