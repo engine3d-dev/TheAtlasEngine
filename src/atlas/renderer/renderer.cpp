@@ -2,7 +2,6 @@
 #include <drivers/renderer_context.hpp>
 
 namespace atlas {
-    renderer* renderer::s_instance = nullptr;
 
     renderer::renderer(const window_settings& p_window_extent,
                        uint32_t p_image_size,

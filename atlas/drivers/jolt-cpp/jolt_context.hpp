@@ -1,23 +1,32 @@
 #pragma once
+#include <map>
 #include <core/core.hpp>
 #include <physics/physics_context.hpp>
 #include <drivers/jolt-cpp/jolt_components.hpp>
 #include <physics/components.hpp>
 #include <drivers/jolt-cpp/jolt_contact_listener.hpp>
-#include <drivers/jolt-cpp/interface/jolt_broad_phase.hpp>
+#include <drivers/jolt-cpp/jolt_broad_phase.hpp>
 
 namespace atlas::physics {
     /**
-     * jolt_context is the backend implementation of physics context
+     * @brief jolt_context is the backend implementation of physics context
      *
-     * Which refers to the jolt-specific implementation that should only have
-     * access to jolt-specific types.
+     * This is the jolt specific implementation of the physics context
      *
-     * Any of the external abstraction and interaction should well be defined by
-     * the engine-specific parameters.
+     * Represents the external abstraction that is defined through the the
+     * engine-specific parameters.
      */
     class jolt_context : public physics_context {
     public:
+        /**
+         * @brief construct a new physics context with jolt implemented as its
+         * backend
+         *
+         * @param p_settings are the configuration parameters for initiating
+         * JoltPhysics
+         * @param p_bus is the event::bus that allows for publishing physics
+         * events to the subscribers of those said events
+         */
         jolt_context(const jolt_settings& p_settings, event::event_bus& p_bus);
         ~jolt_context() override = default;
 

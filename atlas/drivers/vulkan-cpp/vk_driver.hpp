@@ -6,10 +6,17 @@
 namespace atlas::vk {
 
     /**
-     * @brief vulkan implementation of extracting a logical device
+     * @brief logical device implementation wrapper around the VkDevice
      *
-     * TODO -- Implement a device manager for managing multiple available
-     * logical devices for potential of multi-viewport support
+     * This class was a wrapper around VKDevice, that provided you with other
+     * API's to do with that particular logical device.
+     *
+     * Logical devices are representation of virtual software ways to interact
+     * with the GPU through Vulkan specifications
+     *
+     * TODO: Out-of-date. Using vulkan-cpp ::vk::device class to provide API's
+     * that allow you to do more queries on specific attributes the logical
+     * device gives you.
      */
     class vk_driver {
         struct device_queue_family {
@@ -20,14 +27,25 @@ namespace atlas::vk {
 
     public:
         vk_driver() = default;
+
+        /**
+         * @brief construct a new logical device
+         * @param p_physical is the physical device required for the creation of
+         * the logical device
+         */
         vk_driver(const vk_physical_driver& p_physical);
         ~vk_driver() = default;
 
+        /**
+         * @brief returns the specified graphics queue from this logical device
+         */
         [[nodiscard]] VkQueue graphics_queue() const {
             return m_device_queues.graphics_queue;
         }
 
-        //! @note Returns -1 if there are no flags available/compatible/valid
+        /**
+         * @return -1 if there are no flags available/compatible/valid
+         */
         uint32_t select_memory_type(uint32_t p_type_filter,
                                     VkMemoryPropertyFlags p_property_flag);
 
@@ -38,14 +56,30 @@ namespace atlas::vk {
 
         void destroy();
 
+        /**
+         * @brief gives you the depth format from the logical device
+         *
+         * @return VkFormat
+         */
         [[nodiscard]] VkFormat depth_format() const;
 
+        /**
+         * @brief allows to treat vk_driver as a VkDevice handle
+         *
+         * For vulkan API's that accept only taking in VKDevice, this simplifies
+         * the need to not have a getter API
+         */
         operator VkDevice() const { return m_driver; }
 
+        /**
+         * @brief allows to treat vk_driver as a VkDevice handle
+         *
+         * For vulkan API's that accept only taking in VKDevice, this simplifies
+         * the need to not have a getter API
+         */
         operator VkDevice() { return m_driver; }
 
     private:
-        static vk_driver* s_instance;
         vk_physical_driver m_physical{};
         VkDevice m_driver = nullptr;
         device_queue_family m_device_queues{};

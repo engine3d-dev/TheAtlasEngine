@@ -219,14 +219,6 @@ ui_component_list(flecs::entity& p_selected_entity) {
             }
         }
 
-        // NOTE -- Add this in later...
-        // if (!p_selected_entity.has<atlas::tag::serialize>()) {
-        //     if (ImGui::MenuItem("Tag::Serialize")) {
-        //         p_selected_entity.add<atlas::tag::serialize>();
-        //         ImGui::CloseCurrentPopup();
-        //     }
-        // }
-
         if (!p_selected_entity.has<atlas::physics_body>()) {
             if (ImGui::MenuItem("Physics Body")) {
                 p_selected_entity.add<atlas::physics_body>();
@@ -326,19 +318,16 @@ level_scene::on_ui_update() {
                 // // Only show children in scene heirarchy panel if there are
                 // children entities
                 if (child_count > 0) {
-                    m_selected_entity.children(
-                      [&](flecs::entity p_child_entity) {
-                          opened = ImGui::TreeNodeEx(
-                            p_child_entity.name().c_str(), flags);
-                          if (opened) {
-                              if (ImGui::IsItemClicked()) {
-                                  m_selected_entity = p_child_entity;
-                                  // m_create_entity =
-                                  // search_entity(p_child_entity.name().c_str());
-                              }
-                              ImGui::TreePop();
-                          }
-                      });
+                    m_selected_entity.children([&](flecs::entity p_child) {
+                        opened =
+                          ImGui::TreeNodeEx(p_child.name().c_str(), flags);
+                        if (opened) {
+                            if (ImGui::IsItemClicked()) {
+                                m_selected_entity = p_child;
+                            }
+                            ImGui::TreePop();
+                        }
+                    });
                 }
 
                 ImGui::TreePop();
