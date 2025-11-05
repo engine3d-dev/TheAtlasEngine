@@ -18,7 +18,7 @@ class AtlasRecipe(ConanFile):
 
     # Specifying our build_type is only Debug and Release
     options = {"shared": [True, False], "fPIC": [True, False], "enable_tests_only": [True, False], "enable_shaderc": [True, False]}
-    default_options = {"shared": False, "fPIC": True, "enable_tests_only": True, "enable_shaderc": False}
+    default_options = {"shared": False, "fPIC": True, "enable_tests_only": True, "enable_shaderc": True}
 
 
     def build_requirements(self):

@@ -1,4 +1,3 @@
 #pragma once
 
-namespace atlas::vk {
-};
+namespace atlas::vk {};

@@ -85,7 +85,7 @@ namespace atlas::vk {
         shaderc::Compiler compiler;
         std::string text_source_code =
           read_shader_source_code(p_shader_source.filename);
-        
+
         // Prints out the text of the shader source code
         // console_log_warn("Source Text Code!!!");
         // console_log_info("{}", text_source_code);
@@ -100,9 +100,11 @@ namespace atlas::vk {
 
         if (result.GetCompilationStatus() !=
             shaderc_compilation_status_success) {
-            throw std::runtime_error(std::format("Shader Compilation Error! Failed with reason {}",
-                              p_shader_source.filename,
-                              result.GetErrorMessage()).c_str());
+            throw std::runtime_error(
+              std::format("Shader Compilation Error! Failed with reason {}",
+                          p_shader_source.filename,
+                          result.GetErrorMessage())
+                .c_str());
         }
 
         for (auto blob_chunk : result) {
