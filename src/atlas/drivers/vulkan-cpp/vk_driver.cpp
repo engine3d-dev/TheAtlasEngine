@@ -47,8 +47,6 @@ namespace atlas::vk {
         return format;
     }
 
-    vk_driver* vk_driver::s_instance = nullptr;
-
     vk_driver::vk_driver(const vk_physical_driver& p_physical)
       : m_physical(p_physical) {
         m_depth_format_selected = search_depth_format(m_physical);
@@ -94,8 +92,6 @@ namespace atlas::vk {
 
         vkGetDeviceQueue(
           m_driver, graphics_index, 0, &m_device_queues.graphics_queue);
-
-        s_instance = this;
     }
 
     //! @note Returns -1 if there are no flags available/compatible/valid

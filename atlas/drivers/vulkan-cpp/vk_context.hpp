@@ -5,18 +5,37 @@
 #include <drivers/vulkan-cpp/vk_driver.hpp>
 
 namespace atlas::vk {
+    /**
+     * @brief vulkan-specific implementation that is the backend of the graphics contextd
+    */
     class vk_context : public graphics_context {
     public:
         vk_context(const std::string& p_tag);
 
+        /**
+         * @brief used for providing a way to submit all vulkan metaobjects before the destruction of the vulkan logical device
+         * 
+         * Per vulkan specification, it is required to have all object handles created with the logical device to be destroyed before the logical device itself gets destroyed during post cleanup
+         * 
+         * This function was a means to ensure that the destruction of those vulkan child objects are handled in that order correctly
+        */
         static void submit_resource_free(std::function<void()>&& p_resource);
 
+        /**
+         * @brief Gives you direct access to the vulkan instance
+        */
         static VkInstance handler();
 
+        /**
+         * @brief direct access to the vulkan physical device
+        */
         static vk_physical_driver physical_driver() {
             return s_instance->m_physical;
         }
 
+        /**
+         * @brief direct access to the vulkan logical device
+        */
         static vk_driver driver_context() { return s_instance->m_driver; }
 
     private:
