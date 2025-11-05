@@ -4,19 +4,26 @@
 
 namespace atlas {
     /**
-     * @name system_registry
-     * @note Utilizing service-locator pattern
-     * @note Registry for storing world properties
-     * @note Enable for scene to grab context from the world they are associated
-     * with
-     * @note Manages the lifetimes of world_scope created by the user
-     * @note World scope is the container of scenes
-     * @note system_registry is allowed to create, search alread-created
-     * world_scope's
+     * @brief system registry acts as a utility for managing creation of game
+     * worlds initially
+     *
+     * Initially utilized to manage lifetimes of worlds and allow for by default
+     * setting to world #0, where we use few functions to get access to specific
+     * contexts
+     *
+     *
+     * TODO: This is going to be replaced with a level streaming manager that
+     * will help manage, maintain, and default creationg of a world and a scene.
+     * With additional responsibilities in how the world context gets created.
      */
     class system_registry {
     public:
-        system_registry(const std::string& p_tag);
+        /**
+         * @brief construct a new system registry
+         * 
+         * @param p_name is for specifying a name to give this registry
+        */
+        system_registry(const std::string& p_name);
 
         ~system_registry();
 
@@ -29,11 +36,23 @@ namespace atlas {
          * 4. Provide globalized access to other worlds
          */
 
-        //! @brief Instantiates new world_scope
+         /**
+          * @brief constructs a new world_scope
+          * 
+          * Initially this was used to create a world with a specified name associated with it
+          * 
+          * This was used for getting world to be maintained implicitly by system_registry, though this will be changing.
+         */
         static ref<world_scope> create_world(const std::string& p_tag);
 
         //! @brief Searches and returns world_scope if found
         //! @brief Returns nullptr if world_scope not found
+
+        /**
+         * @brief searches in getting the world and looks up based on its specified name
+         * 
+         * @return nullptr if not found, otherwise return shared_ptr<world_scope>
+        */
         static ref<world_scope> get_world(const std::string& p_tag);
 
     private:
