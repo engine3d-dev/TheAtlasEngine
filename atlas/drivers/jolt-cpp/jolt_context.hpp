@@ -5,7 +5,7 @@
 #include <drivers/jolt-cpp/jolt_components.hpp>
 #include <physics/components.hpp>
 #include <drivers/jolt-cpp/jolt_contact_listener.hpp>
-#include <drivers/jolt-cpp/interface/jolt_broad_phase.hpp>
+#include <drivers/jolt-cpp/jolt_broad_phase.hpp>
 
 namespace atlas::physics {
     /**
