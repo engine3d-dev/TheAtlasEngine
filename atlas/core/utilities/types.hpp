@@ -4,8 +4,7 @@
 
 namespace atlas {
     /**
-     * @brief Specific settings to the window configuration
-     * @brief Contains window properties for doing things with the windows
+     * @brief settings for specification for atlas::window
      */
     struct window_settings {
         uint32_t width = -1;
