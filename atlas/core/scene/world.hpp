@@ -1,7 +1,8 @@
 #pragma once
+#include <map>
+#include <string>
 #include <core/core.hpp>
 #include <flecs.h>
-#include <string>
 #include <core/scene/scene.hpp>
 
 namespace atlas {
