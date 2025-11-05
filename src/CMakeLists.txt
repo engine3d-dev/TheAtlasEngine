@@ -47,6 +47,7 @@ set(
     # Renderer-stuff
     ${SRC_DIR}/renderer/renderer.cpp
     ${SRC_DIR}/drivers/render_context.cpp
+    ${SRC_DIR}/drivers/graphics_context.cpp
 
     ${SRC_DIR}/core/ui/widgets.cpp
 
