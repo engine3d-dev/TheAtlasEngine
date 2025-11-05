@@ -2,35 +2,53 @@
 #include <core/core.hpp>
 #include <fmt/os.h>
 #include <fmt/ostream.h>
-#include <map>
 #include <memory>
 #include <spdlog/common.h>
 #include <spdlog/spdlog.h>
 
 namespace atlas {
     /**
-     * @name console_log_manager
-     * @note Engine3D's console logger to write to the console instead of
-     * specifying the UI-type of widget to upload logging information to
-     * @note TODO --- Adding a way to indicate to the logger to supply a type of
-     * ui identifier
-     * @note Reason - is if users wanted have a way of knowing to t
+     * @brief logger for logging messages to stdout on the console
+     *
+     * Manages the logger instances and patterns for setting up with the loggers
+     * when writing logs
      */
     class console_log_manager {
     public:
-        //! @note Used for initiating this console logger across engine3d
-        //! supplying the pattern and application to dedicate log messages to
+        /**
+         * @brief initializes the console_log_manager
+         *
+         * TODO: Revisit the logger and do some refactoring because the way this
+         * works should be changed, as I'd prob do this differently now.
+         */
         static void initialize_logger_manager(
           const std::string& pattern = "%^[%T] %n: %v%$");
 
+        /**
+         * @brief sets what the current logger to write to the console with
+         */
         static void set_current_logger(
           const std::string& p_tag = "Undefined g_Tag in console_logger");
+
+        /**
+         * @brief constructs a new spdlog::logger to write to the console
+         */
         static void create_new_logger(
           const std::string& p_tag = "Undefined Tag");
+
+        /**
+         * @brief retrieves that specific logger if it has been constructed
+         *
+         * @return ref<spdlog::logger> if found, otherwise return nullptr
+         *
+         * TODO: Should have this throw an exception rather then returning
+         * nullptr
+         */
         static ref<spdlog::logger> get(const std::string& p_tag);
 
     private:
-        //! @note std::string is the tag of the log's location.
+        // Using an unordered_map to specify through a string what logger to
+        // retrieve to log messages
         static std::unordered_map<std::string, ref<spdlog::logger>> s_loggers;
     };
 };

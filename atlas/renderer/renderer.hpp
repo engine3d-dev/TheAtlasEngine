@@ -38,7 +38,6 @@ namespace atlas {
         void set_background_color(const std::array<float, 4>& p_color);
 
     private:
-        static renderer* s_instance;
-        scope<render_context> m_render_context = nullptr;
+        ref<render_context> m_render_context = nullptr;
     };
 };

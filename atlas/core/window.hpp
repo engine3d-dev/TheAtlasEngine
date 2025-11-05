@@ -8,14 +8,25 @@
 
 namespace atlas {
 
+    /**
+     * @brief Represent an entire window that lives throughout the entire
+     * duration of the application
+     *
+     * There should only be one window that is living throughout the
+     * applications lifetime
+     */
     class window {
     public:
         virtual ~window() = default;
 
-        //! @brief Returns the width dimension of the window
+        /**
+         * @brief Returns the width dimension of the window
+         */
         [[nodiscard]] uint32_t width() const;
 
-        //! @brief Returns the height dimension of the window
+        /**
+         * @brief Returns the height dimension of the window
+         */
         [[nodiscard]] uint32_t height() const;
 
         /**
@@ -23,12 +34,16 @@ namespace atlas {
          */
         [[nodiscard]] bool available() const;
 
-        //! @brief Returns the aspect ratio of the current window
+        /**
+         * @brief Returns the aspect ratio of the current window
+         */
         [[nodiscard]] float aspect_ratio() const;
 
         /**
-         * @brief Returns the available presentable image to use, retrieve index
-         * that image is called
+         * @brief gives you the next presentable image to use and the index to
+         * retrieving that image
+         *
+         * @return uint32_t
          */
         [[nodiscard]] uint32_t acquired_next_frame() {
             return read_acquired_next_frame();
@@ -41,12 +56,27 @@ namespace atlas {
             return window_swapchain();
         }
 
+        /**
+         * @brief retrieves the current command buffer using the current frame
+         * index to ensure we are processing commands to the right command
+         * buffer in our current frame
+         *
+         * @return command buffer to actively record commands to
+         */
         ::vk::command_buffer active_command(uint32_t p_frame_index) {
             return current_active_command(p_frame_index);
         }
 
+        /**
+         * @brief operator overload for treating atlas::window as a GLFWwindow
+         * handle
+         */
         operator GLFWwindow*() const { return native_window(); }
 
+        /**
+         * @brief operator overload for treating atlas::window as a GLFWwindow
+         * handle
+         */
         operator GLFWwindow*() { return native_window(); }
 
         /**
@@ -55,8 +85,11 @@ namespace atlas {
         void close();
 
         /**
-         * @param p_current_frame_idx is the current frame index for the next
-         * available image
+         * @brief does the presentation operation that is operated internally
+         * with the vulkan swapchain
+         *
+         * @param p_current_frame_idx is current frame index to currently
+         * process an image in the current frame
          */
         void present(const uint32_t& p_current_frame_idx);
 
@@ -72,5 +105,15 @@ namespace atlas {
         virtual void presentation_process(const uint32_t& p_current_frame) = 0;
     };
 
+    /**
+     * @brief constructs an atlas::window
+     *
+     * There should only ever be one window constructed throughout the entire
+     * application
+     *
+     * @param p_settings is the window settings to construct the window with
+     *
+     * @return shared_ptr<atlas::window>
+     */
     ref<window> create_window(const window_settings& p_settings);
 };
