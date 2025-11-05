@@ -4,9 +4,36 @@
 
 namespace atlas {
 
+    /**
+     * @brief vector2<T> is to define as a centralized mathematical
+     * representation of types such as glm::vec2, but can be defined based to
+     * the needs of specific mathematical types.
+     *
+     * Representing a 2-component values mathematical type
+     *
+     * @tparam T is the specified vector2 type specific to the mathematical
+     * frameworks representation, such as it can be glm::vec2.
+     *
+     */
     template<typename T>
     struct vector2;
 
+    /**
+     * @brief vector3<T> is to define a centralized wrapper as a mathematical
+     * representaiton for communicating vector3 types from frameworks to
+     * glm::vec3
+     *
+     * Representing a 3-component value mathematical type
+     *
+     * @tparam T is the type of vector2 such as glm::vec3
+     *
+     * Example Usage:
+     *
+     * ```C++
+     * auto jolt_vec3 = RVec3::zeros();
+     * glm::vec3 pos_values = atlas::vector3<RVec3>(jolt_vec3);
+     * ```
+     */
     template<typename T>
     struct vector3 {
         vector3() = default;
@@ -33,6 +60,23 @@ namespace atlas {
         glm::vec3 m_value;
     };
 
+    /**
+     * @brief vector4<T> is to define a centralized wrapper as a mathematical
+     * representaiton for communicating vector3 types from frameworks to
+     * glm::vec3
+     *
+     * vector4<T> is for a 4-component value that represents a vector 4 type
+     *
+     * @tparam T is the type of vector4 that would represent such type as
+     * glm::vec4
+     *
+     * Example Usage:
+     *
+     * ```C++
+     * auto jolt_vec4 = RVec4::zeros();
+     * glm::vec4 pos_values = atlas::vector4<RVec4>(jolt_vec4);
+     * ```
+     */
     template<typename T>
     struct vector4 {
         vector4() = default;
@@ -121,6 +165,8 @@ namespace atlas {
         glm::highp_vec4 m_value;
     };
 
+    //! @brief generics to specialize to their mathematical definition of
+    //! matrices types
     template<typename T>
     struct math_generic;
 
@@ -133,7 +179,8 @@ namespace atlas {
     template<typename T>
     struct matrix4;
 
-    //! @note By default we use glm
+    //! @brief By default we use the glm math types therefore we create all of
+    //! our default math types to glm's mathematical type
     template<size_t Size, typename T>
     using vec = math_generic<glm::vec<Size, T>>;
     using vec2 = vector2<glm::vec2>;
