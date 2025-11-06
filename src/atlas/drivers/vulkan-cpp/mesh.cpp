@@ -135,18 +135,28 @@ namespace atlas::vk {
         m_geoemtry_ubo.update(&p_material_ubo);
     }
 
-    void mesh::add_texture(const std::filesystem::path& p_path) {
+    void mesh::add_diffuse(const std::filesystem::path& p_path) {
         ::vk::texture_info config_texture = { .phsyical_memory_properties =
                                                 m_physical.memory_properties(),
                                               .filepath = p_path };
-        m_texture = ::vk::texture(m_device, config_texture);
+        m_diffuse = ::vk::texture(m_device, config_texture);
 
-        if (!m_texture.loaded()) {
+        if (!m_diffuse.loaded()) {
             console_log_info("Texture {} is NOT loaded!!!", p_path.string());
             return;
         }
+    }
 
-        m_texture_loaded = m_texture.loaded();
+    void mesh::add_specular(const std::filesystem::path& p_path) {
+        ::vk::texture_info config_texture = { .phsyical_memory_properties =
+                                                m_physical.memory_properties(),
+                                              .filepath = p_path };
+        m_specular = ::vk::texture(m_device, config_texture);
+
+        if (!m_specular.loaded()) {
+            console_log_info("Texture {} is NOT loaded!!!", p_path.string());
+            return;
+        }
     }
 
     void mesh::draw(const VkCommandBuffer& p_current) {
@@ -164,7 +174,9 @@ namespace atlas::vk {
         m_vbo.destroy();
         m_ibo.destroy();
 
-        m_texture.destroy();
+        // m_texture.destroy();
+        m_diffuse.destroy();
+        m_specular.destroy();
         m_geoemtry_ubo.destroy();
     }
 };

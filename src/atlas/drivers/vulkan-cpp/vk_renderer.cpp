@@ -180,8 +180,8 @@ namespace atlas::vk {
 			const mesh_source* target = p_entity.get<mesh_source>();
 			mesh new_mesh(std::filesystem::path(target->model_path));
 			new_mesh.initialize_uniforms(sizeof(material_uniform));
-			new_mesh.add_texture(
-				std::filesystem::path(target->texture_path));
+			new_mesh.add_diffuse(std::filesystem::path(target->texture_path));
+			new_mesh.add_specular(std::filesystem::path(""));
 
 			if (new_mesh.loaded()) {
 				m_cached_meshes.emplace(p_entity.id(), new_mesh);
@@ -201,6 +201,15 @@ namespace atlas::vk {
 						.type = ::vk::buffer::combined_image_sampler,
 						.binding_point = {
 							.binding = 1,
+							.stage = ::vk::shader_stage::fragment,
+						},
+						.descriptor_count = 1,
+					},
+					::vk::descriptor_entry{
+						// specifies "layout (set = 1, binding = 1) uniform sampler2D texture1"
+						.type = ::vk::buffer::combined_image_sampler,
+						.binding_point = {
+							.binding = 2,
 							.stage = ::vk::shader_stage::fragment,
 						},
 						.descriptor_count = 1,
@@ -233,23 +242,24 @@ namespace atlas::vk {
 						},
 					};
 				// layout(set = 1, binding = 1)
+				// If the texture loaded successfully then we use that texture, otherwise utilize the default white texture
+				::vk::sample_image write_image = m_cached_meshes[p_entity.id()].diffuse_loaded() ? m_cached_meshes[p_entity.id()].diffuse() : m_white_texture.image();
 
-				// we provide a default white texture if no texture has been
-				// provided to this mesh
-				::vk::sample_image default_write_image =
-					m_white_texture.image();
-				if (m_cached_meshes[p_entity.id()].texture_loaded()) {
-					default_write_image =
-						m_cached_meshes[p_entity.id()].image();
-				}
+				// layout(set = 1, binding = 2)
+
+				::vk::sample_image write_image2 = m_cached_meshes[p_entity.id()].specular_loaded() ? m_cached_meshes[p_entity.id()].specular() : m_white_texture.image();
 
 				// creating our image descriptor to write to the shader
-				std::vector<::vk::write_image_descriptor>
-					material_textures = {
+				std::vector<::vk::write_image_descriptor> material_textures = {
 						::vk::write_image_descriptor{
 						.dst_binding = 1,
-						.view = default_write_image.image_view(),
-						.sampler = default_write_image.sampler(),
+						.view = write_image.image_view(),
+						.sampler = write_image.sampler(),
+						},
+						::vk::write_image_descriptor{
+						.dst_binding = 2,
+						.view = write_image2.image_view(),
+						.sampler = write_image2.sampler(),
 						},
 					};
 
