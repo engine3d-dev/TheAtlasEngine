@@ -21,6 +21,13 @@ namespace atlas {
         }
     };
 
+    struct material_metadata {
+        glm::vec3 ambient{1.f};
+        glm::vec3 diffuse{1.f};
+        glm::vec3 specular{1.f};
+        float shininess = 0.5f;
+    };
+
     struct point_light {
         glm::vec3 position; // this is provided by the transform
         glm::vec4 color={1.f, 1.f, 1.f, 1.f};
@@ -42,6 +49,7 @@ namespace atlas {
      * @param texture_path is the specified path to the specific texture to load
      */
     struct mesh_source {
+        bool flip=false; // this is for flipping the texture coordinates
         glm::vec4 color{ 1.f };
         std::string model_path = "";
         std::string diffuse = "";
