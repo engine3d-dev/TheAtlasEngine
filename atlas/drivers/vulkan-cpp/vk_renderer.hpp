@@ -48,6 +48,8 @@ namespace atlas::vk {
         ~vk_renderer() override = default;
 
     private:
+        void preload_assets(const VkRenderPass& p_renderpass) override;
+        
         void start_frame(const ::vk::command_buffer& p_current,
                          const window_settings& p_settings,
                          const VkRenderPass& p_renderpass,
@@ -61,12 +63,12 @@ namespace atlas::vk {
         VkDevice m_device = nullptr;
         vk_physical_driver m_physical;
         glm::mat4 m_proj_view;
+        VkRenderPass m_final_renderpass=nullptr;
         window_settings m_window_extent;
         ::vk::command_buffer m_current_command_buffer{};
         VkClearColorValue m_color;
 
         uint32_t m_image_count = 0;
-        // ::vk::shader_resource m_shader_group;
         shader_resource_group m_shader_group;
         ::vk::pipeline m_main_pipeline;
         ::vk::descriptor_resource m_global_descriptors;
@@ -76,8 +78,6 @@ namespace atlas::vk {
         ::vk::uniform_buffer m_global_uniforms;
         std::map<uint32_t, std::map<std::string, ::vk::descriptor_resource>>
           m_mesh_descriptors;
-
-        bool m_begin_initialize = true;
         uint32_t m_current_frame = 0;
         glm::mat4 m_model = { 1.f };
 

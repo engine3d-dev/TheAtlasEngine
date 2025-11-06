@@ -10,6 +10,10 @@ namespace atlas {
           initialize_renderer(p_window_extent, p_image_size, p_tag);
     }
 
+    void renderer::preload(const VkRenderPass& p_renderpass) {
+        m_render_context->preload(p_renderpass);
+    }
+
     void renderer::begin(const ::vk::command_buffer& p_current,
                          const window_settings& p_settings,
                          const VkRenderPass& p_renderpass,

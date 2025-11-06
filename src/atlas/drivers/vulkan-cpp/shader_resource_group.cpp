@@ -101,7 +101,7 @@ namespace atlas::vk {
         if (result.GetCompilationStatus() !=
             shaderc_compilation_status_success) {
             throw std::runtime_error(
-              std::format("Shader Compilation Error! Failed with reason {}",
+              std::format("Shader Compilation Error! Failed with reason {}\n{}",
                           p_shader_source.filename,
                           result.GetErrorMessage())
                 .c_str());
