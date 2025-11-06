@@ -50,7 +50,7 @@ level_scene::level_scene(const std::string& p_name,
       .model_path = "assets/backpack/backpack.obj",
       .diffuse = "assets/backpack/diffuse.jpg",
       .specular = "assets/backpack/specular.jpg"
-    //   .diffuse = "assets/models/E-45-steel detail_2_col.jpg",
+      //   .diffuse = "assets/models/E-45-steel detail_2_col.jpg",
     });
 
     m_robot_model = create_object("Cube");
@@ -61,12 +61,11 @@ level_scene::level_scene(const std::string& p_name,
       .scale = { 1.f, 1.f, 1.f },
     });
 
-    m_robot_model->set<atlas::mesh_source>({
-      .color = { 1.f, 1.f, 1.f, 1.f },
-      .model_path = "assets/models/cube.obj",
-      .diffuse = "assets/models/container_diffuse.png",
-      .specular = "assets/models/container_specular.png"
-    });
+    m_robot_model->set<atlas::mesh_source>(
+      { .color = { 1.f, 1.f, 1.f, 1.f },
+        .model_path = "assets/models/cube.obj",
+        .diffuse = "assets/models/container_diffuse.png",
+        .specular = "assets/models/container_specular.png" });
 
     m_robot_model->set<atlas::box_collider>({
       .half_extent = { 1.f, 1.f, 1.f },
@@ -346,21 +345,25 @@ level_scene::on_ui_update() {
                   atlas::ui::draw_vec3("Scale", p_transform->scale);
                   atlas::ui::draw_vec3("Rotation", p_transform->rotation);
               });
-            
-            atlas::ui::draw_component<atlas::material_metadata>("material", m_selected_entity, [](atlas::material_metadata* p_material){
-                atlas::ui::draw_vec3("Ambient", p_material->ambient);
-                atlas::ui::draw_vec3("Diffuse", p_material->diffuse);
-                atlas::ui::draw_vec3("Specular", p_material->specular);
-                atlas::ui::draw_float("Shininess", p_material->shininess);
-            });
+
+            atlas::ui::draw_component<atlas::material_metadata>(
+              "material",
+              m_selected_entity,
+              [](atlas::material_metadata* p_material) {
+                  atlas::ui::draw_vec3("Ambient", p_material->ambient);
+                  atlas::ui::draw_vec3("Diffuse", p_material->diffuse);
+                  atlas::ui::draw_vec3("Specular", p_material->specular);
+                  atlas::ui::draw_float("Shininess", p_material->shininess);
+              });
 
             atlas::ui::draw_component<atlas::perspective_camera>(
               "camera",
               m_selected_entity,
-              [](atlas::perspective_camera* p_camera) {
+              [this](atlas::perspective_camera* p_camera) {
                   atlas::ui::draw_float("field of view",
                                         p_camera->field_of_view);
                   ImGui::Checkbox("is_active", &p_camera->is_active);
+                  ImGui::DragFloat("Speed", &m_movement_speed);
               });
 
             atlas::ui::draw_component<atlas::mesh_source>(
@@ -491,19 +494,17 @@ level_scene::start() {
 
     // testing the flip parameter inside atlas::mesh_source
     m_viking_room->set<atlas::mesh_source>({
-        .flip = true,
-        .color = { 1.f, 1.f, 1.f, 1.f },
-        .model_path = "assets/models/viking_room.obj",
-        .diffuse = "assets/models/viking_room.png",
-        // .model_path = "assets/models/Ball OBJ.obj",
-        // .diffuse = "assets/models/clear.png",
+      .flip = true,
+      .color = { 1.f, 1.f, 1.f, 1.f },
+      .model_path = "assets/models/viking_room.obj",
+      .diffuse = "assets/models/viking_room.png",
+      // .model_path = "assets/models/Ball OBJ.obj",
+      // .diffuse = "assets/models/clear.png",
     });
-    m_platform->set<atlas::material_metadata>({
-        .ambient = {0.2f, 0.2f, 0.2f},
-        .diffuse = {0.5f, 0.5f, 0.5f},
-        .specular = {1.f, 1.f, 1.f},
-        .shininess = 64.f
-    });
+    m_platform->set<atlas::material_metadata>({ .ambient = { 0.2f, 0.2f, 0.2f },
+                                                .diffuse = { 0.5f, 0.5f, 0.5f },
+                                                .specular = { 1.f, 1.f, 1.f },
+                                                .shininess = 64.f });
 
     // Initiating physics system
     atlas::physics::jolt_settings settings = {};
@@ -522,16 +523,19 @@ level_scene::on_update() {
     auto query_cameras =
       query_builder<atlas::perspective_camera, atlas::transform>().build();
 
-    query_cameras.each([](atlas::perspective_camera& p_camera,
-                          atlas::transform& p_transform) {
+    query_cameras.each([this](atlas::perspective_camera& p_camera,
+                              atlas::transform& p_transform) {
         if (!p_camera.is_active) {
             return;
         }
 
         float dt = atlas::application::delta_time();
-        float movement_speed = 10.f;
+        float default_speed = 10.f; // current default movement speed that does not applied modified speed
         float rotation_speed = 1.f;
-        float velocity = movement_speed * dt;
+        float velocity = default_speed * dt;
+        if (atlas::event::is_key_pressed(key_left_shift)) {
+            velocity = m_movement_speed * dt;
+        }
         float rotation_velocity = rotation_speed * dt;
 
         glm::quat to_quaternion = atlas::to_quat(p_transform.quaternion);
@@ -540,16 +544,13 @@ level_scene::on_update() {
         glm::vec3 forward = glm::rotate(to_quaternion, atlas::math::backward());
         glm::vec3 right = glm::rotate(to_quaternion, atlas::math::right());
 
-        if (atlas::event::is_key_pressed(key_left_shift)) {
-            if (atlas::event::is_mouse_pressed(
-                  atlas::event::Mouse::ButtonMiddle)) {
-                p_transform.position += up * velocity;
-            }
 
-            if (atlas::event::is_mouse_pressed(
-                  atlas::event::Mouse::ButtonRight)) {
-                p_transform.position -= up * velocity;
-            }
+        if(atlas::event::is_mouse_pressed(mouse_button_left)) {
+            p_transform.position += up * velocity;
+        }
+
+        if(atlas::event::is_mouse_pressed(mouse_button_right)) {
+            p_transform.position -= up * velocity;
         }
 
         if (atlas::event::is_key_pressed(key_w)) {
