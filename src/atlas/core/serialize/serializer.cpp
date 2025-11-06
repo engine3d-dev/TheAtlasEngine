@@ -82,8 +82,10 @@ namespace atlas {
             p_deserialize_to_object.set<mesh_source>({
               .model_path =
                 perspective_camera_data["Model Path"].as<std::string>(),
-              .texture_path =
-                perspective_camera_data["Texture Path"].as<std::string>(),
+              .diffuse =
+                perspective_camera_data["Diffuse"].as<std::string>(),
+				.specular =
+                perspective_camera_data["Specular"].as<std::string>(),
             });
         }
 

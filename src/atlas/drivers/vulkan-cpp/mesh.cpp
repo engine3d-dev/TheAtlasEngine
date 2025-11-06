@@ -142,7 +142,7 @@ namespace atlas::vk {
         m_diffuse = ::vk::texture(m_device, config_texture);
 
         if (!m_diffuse.loaded()) {
-            console_log_info("Texture {} is NOT loaded!!!", p_path.string());
+            console_log_info("Diffuse Texture {} is NOT loaded!!!", p_path.string());
             return;
         }
     }
@@ -153,9 +153,14 @@ namespace atlas::vk {
                                               .filepath = p_path };
         m_specular = ::vk::texture(m_device, config_texture);
 
+        console_log_warn("Specific PATH TO SPECULAR = {}", p_path.string()); 
+
         if (!m_specular.loaded()) {
-            console_log_info("Texture {} is NOT loaded!!!", p_path.string());
+            console_log_error("Specular Texture {} is NOT loaded!!!", p_path.string());
             return;
+        }
+        else {
+            console_log_info("Loaded Specular Texture = {}", p_path.string());
         }
     }
 

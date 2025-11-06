@@ -63,8 +63,10 @@ namespace atlas {
         p_output << YAML::BeginMap;
         p_output << YAML::Key << "Model Path" << YAML::Value
                  << p_material->model_path;
-        p_output << YAML::Key << "Texture Path" << YAML::Value
-                 << p_material->texture_path;
+        p_output << YAML::Key << "Diffuse" << YAML::Value
+                 << p_material->diffuse;
+        p_output << YAML::Key << "Specular" << YAML::Value
+                 << p_material->specular;
         p_output << YAML::EndMap;
         return p_output;
     }

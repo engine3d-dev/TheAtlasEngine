@@ -180,8 +180,8 @@ namespace atlas::vk {
 			const mesh_source* target = p_entity.get<mesh_source>();
 			mesh new_mesh(std::filesystem::path(target->model_path));
 			new_mesh.initialize_uniforms(sizeof(material_uniform));
-			new_mesh.add_diffuse(std::filesystem::path(target->texture_path));
-			new_mesh.add_specular(std::filesystem::path(""));
+			new_mesh.add_diffuse(std::filesystem::path(target->diffuse));
+			new_mesh.add_specular(std::filesystem::path(target->specular));
 
 			if (new_mesh.loaded()) {
 				m_cached_meshes.emplace(p_entity.id(), new_mesh);
@@ -246,7 +246,6 @@ namespace atlas::vk {
 				::vk::sample_image write_image = m_cached_meshes[p_entity.id()].diffuse_loaded() ? m_cached_meshes[p_entity.id()].diffuse() : m_white_texture.image();
 
 				// layout(set = 1, binding = 2)
-
 				::vk::sample_image write_image2 = m_cached_meshes[p_entity.id()].specular_loaded() ? m_cached_meshes[p_entity.id()].specular() : m_white_texture.image();
 
 				// creating our image descriptor to write to the shader
