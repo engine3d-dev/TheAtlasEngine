@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <drivers/vulkan-cpp/mesh.hpp>
 #include <tiny_obj_loader.h>
 #define STB_IMAGE_IMPLEMENTATION
@@ -62,8 +63,12 @@ namespace atlas::vk {
         std::vector<uint32_t> indices;
         std::unordered_map<::vk::vertex_input, uint32_t> unique_vertices{};
 
-        for (const auto& shape : shapes) {
-            for (const auto& index : shape.mesh.indices) {
+        // for (const auto& shape : shapes) {
+        for(size_t i = 0; i < shapes.size(); i++) {
+            auto shape = shapes[i];
+            // for (const auto& index : shape.mesh.indices) {
+            for(size_t j = 0; j < shape.mesh.indices.size(); j++) {
+                auto index = shape.mesh.indices[j];
                 ::vk::vertex_input vertex{};
 
                 if (!unique_vertices.contains(vertex)) {
@@ -86,18 +91,17 @@ namespace atlas::vk {
                     };
                 }
 
-                if (index.normal_index >= 0) {
+                if (attrib.normals.empty()) {
                     vertex.normals = {
                         attrib.normals[3 * index.normal_index + 0],
                         attrib.normals[3 * index.normal_index + 1],
                         attrib.normals[3 * index.normal_index + 2]
                     };
                 }
-
-                if (index.texcoord_index >= 0) {
+                if(!attrib.texcoords.empty()) {
                     vertex.uv = {
-                        attrib.texcoords[2 * index.texcoord_index + 0],
-                        1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
+                        attrib.texcoords[static_cast<long long>(index.texcoord_index) * 2],
+                        attrib.texcoords[static_cast<long long>(index.texcoord_index) * 2 + 1],
                     };
                 }
 
@@ -131,9 +135,22 @@ namespace atlas::vk {
         m_geoemtry_ubo = ::vk::uniform_buffer(m_device, geo_info);
     }
 
+    void mesh::initialize_material_ubo(uint32_t p_size_bytes) {
+        ::vk::uniform_buffer_info geo_info = { .phsyical_memory_properties =
+                                                 m_physical.memory_properties(),
+                                               .size_bytes = p_size_bytes };
+        m_material_ubo = ::vk::uniform_buffer(m_device, geo_info);
+    }
+
     void mesh::update_uniform(const material_uniform& p_material_ubo) {
         m_geoemtry_ubo.update(&p_material_ubo);
     }
+
+    void mesh::update_material_uniforms(const material_metadata& p_material_data) {
+        m_material_ubo.update(&p_material_data);
+    }
+
+    
 
     void mesh::add_diffuse(const std::filesystem::path& p_path) {
         ::vk::texture_info config_texture = { .phsyical_memory_properties =
@@ -177,5 +194,6 @@ namespace atlas::vk {
         m_diffuse.destroy();
         m_specular.destroy();
         m_geoemtry_ubo.destroy();
+        m_material_ubo.destroy();
     }
 };

@@ -8,6 +8,7 @@
 #include <vulkan-cpp/texture.hpp>
 #include <drivers/vulkan-cpp/vk_types.hpp>
 #include <drivers/vulkan-cpp/vk_physical_driver.hpp>
+#include <core/scene/components.hpp>
 
 namespace atlas::vk {
 
@@ -37,10 +38,18 @@ namespace atlas::vk {
 
         void initialize_uniforms(uint32_t p_size_bytes_ubo);
 
+        //! @brief Initializes uniform buffer specifically for material_src
+        void initialize_material_ubo(uint32_t p_size_bytes);
+
         void update_uniform(const material_uniform& p_material_ubo);
+        void update_material_uniforms(const material_metadata& p_material_data);
+
+        [[nodiscard]] ::vk::uniform_buffer geometry_ubo() const {
+            return m_geoemtry_ubo;
+        }
 
         [[nodiscard]] ::vk::uniform_buffer material_ubo() const {
-            return m_geoemtry_ubo;
+            return m_material_ubo;
         }
 
         void draw(const VkCommandBuffer& p_command_buffer);
@@ -51,10 +60,6 @@ namespace atlas::vk {
         void add_diffuse(const std::filesystem::path& p_path);
 
         void add_specular(const std::filesystem::path& p_path);
-
-        // [[nodiscard]] ::vk::sample_image image() const {
-        //     return m_texture.image();
-        // }
 
         [[nodiscard]] ::vk::sample_image diffuse() const { return m_diffuse.image(); }
         [[nodiscard]] ::vk::sample_image specular() const { return m_specular.image(); }
@@ -78,6 +83,7 @@ namespace atlas::vk {
         ::vk::vertex_buffer m_vbo{};
         ::vk::index_buffer m_ibo{};
         ::vk::uniform_buffer m_geoemtry_ubo;
+        ::vk::uniform_buffer m_material_ubo;
         bool m_model_loaded = false;
     };
 };
