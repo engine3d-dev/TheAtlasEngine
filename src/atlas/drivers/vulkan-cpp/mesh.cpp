@@ -153,14 +153,9 @@ namespace atlas::vk {
                                               .filepath = p_path };
         m_specular = ::vk::texture(m_device, config_texture);
 
-        console_log_warn("Specific PATH TO SPECULAR = {}", p_path.string()); 
-
         if (!m_specular.loaded()) {
             console_log_error("Specular Texture {} is NOT loaded!!!", p_path.string());
             return;
-        }
-        else {
-            console_log_info("Loaded Specular Texture = {}", p_path.string());
         }
     }
 
@@ -179,7 +174,6 @@ namespace atlas::vk {
         m_vbo.destroy();
         m_ibo.destroy();
 
-        // m_texture.destroy();
         m_diffuse.destroy();
         m_specular.destroy();
         m_geoemtry_ubo.destroy();
