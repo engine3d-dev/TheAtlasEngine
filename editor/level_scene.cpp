@@ -29,9 +29,9 @@ level_scene::level_scene(const std::string& p_name,
     m_viking_room->set<atlas::mesh_source>({
       .color = { 1.f, 1.f, 1.f, 1.f },
       //   .model_path = "assets/models/viking_room.obj",
-      //   .texture_path = "assets/models/viking_room.png",
+      //   .diffuse = "assets/models/viking_room.png",
       .model_path = "assets/models/Ball OBJ.obj",
-      //   .texture_path = "assets/models/clear.png",
+      //   .diffuse = "assets/models/clear.png",
     });
 
     m_viking_room->set<atlas::sphere_collider>({
@@ -54,7 +54,7 @@ level_scene::level_scene(const std::string& p_name,
     m_cube->set<atlas::mesh_source>({
       .color = { 1.f, 1.f, 1.f, 1.f },
       .model_path = "assets/models/E 45 Aircraft_obj.obj",
-      .texture_path = "assets/models/E-45-steel detail_2_col.jpg",
+      .diffuse = "assets/models/E-45-steel detail_2_col.jpg",
     });
 
     m_robot_model = create_object("Cube");
@@ -69,7 +69,8 @@ level_scene::level_scene(const std::string& p_name,
       .color = { 1.f, 1.f, 1.f, 1.f },
       .model_path = "assets/models/cube.obj",
       //   .model_path = "assets/robot_model/l2back.obj",
-      .texture_path = "assets/models/container_diffuse.png",
+      .diffuse = "assets/models/container_diffuse.png",
+      .specular = "assets/models/container_specular.png"
     });
 
     m_robot_model->set<atlas::box_collider>({
@@ -90,7 +91,7 @@ level_scene::level_scene(const std::string& p_name,
     });
     m_platform->set<atlas::mesh_source>({
       .model_path = "assets/models/cube.obj",
-      .texture_path = "assets/models/wood.png",
+      .diffuse = "assets/models/wood.png",
     });
     m_platform->set<atlas::physics_body>({
       .body_movement_type = atlas::fixed,
@@ -120,7 +121,7 @@ level_scene::level_scene(const std::string& p_name,
 
     // 	obj->set<atlas::mesh_source>({
     // 		.model_path = "assets/models/Ball OBJ.obj",
-    // 		.texture_path = "assets/models/clear.png",
+    // 		.diffuse = "assets/models/clear.png",
     // 	});
     // 	m_many_objects.emplace_back(obj);
     // }

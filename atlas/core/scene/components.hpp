@@ -21,6 +21,19 @@ namespace atlas {
         }
     };
 
+    struct point_light {
+        glm::vec3 position; // this is provided by the transform
+        glm::vec4 color={1.f, 1.f, 1.f, 1.f};
+        float attenuation=1.f;
+        float constant=1.f;
+        float linear=1.f;
+        float quadratic=1.f;
+
+        glm::vec3 ambient=glm::vec3(1.f);
+        glm::vec3 diffuse=glm::vec3(1.f);
+        glm::vec3 specular=glm::vec3(1.f);
+    };
+
     /**
      * @brief Loads a mesh source
      *
@@ -31,7 +44,8 @@ namespace atlas {
     struct mesh_source {
         glm::vec4 color{ 1.f };
         std::string model_path = "";
-        std::string texture_path = "";
+        std::string diffuse = "";
+        std::string specular = "";
     };
 
     /**
