@@ -250,17 +250,17 @@ namespace atlas::vk {
 
 				// creating our image descriptor to write to the shader
 				std::vector<::vk::write_image_descriptor> material_textures = {
-						::vk::write_image_descriptor{
-							.dst_binding = 1,
-							.view = diffuse.image_view(),
-							.sampler = diffuse.sampler(),
-						},
-						::vk::write_image_descriptor{
-							.dst_binding = 2,
-							.view = specular.image_view(),
-							.sampler = specular.sampler(),
-						},
-					};
+					::vk::write_image_descriptor{
+						.dst_binding = 1,
+						.view = diffuse.image_view(),
+						.sampler = diffuse.sampler(),
+					},
+					::vk::write_image_descriptor{
+						.dst_binding = 2,
+						.view = specular.image_view(),
+						.sampler = specular.sampler(),
+					},
+				};
 
 				m_mesh_descriptors[p_entity.id()]["materials"].update(
 					material_uniforms, material_textures);
