@@ -26,13 +26,6 @@ level_scene::level_scene(const std::string& p_name,
       .rotation = { 2.30f, 95.90f, 91.80f },
       .scale{ 1.f },
     });
-    m_viking_room->set<atlas::mesh_source>({
-      .color = { 1.f, 1.f, 1.f, 1.f },
-      //   .model_path = "assets/models/viking_room.obj",
-      //   .diffuse = "assets/models/viking_room.png",
-      .model_path = "assets/models/Ball OBJ.obj",
-      //   .diffuse = "assets/models/clear.png",
-    });
 
     m_viking_room->set<atlas::sphere_collider>({
       .radius = 1.0f,
@@ -53,8 +46,11 @@ level_scene::level_scene(const std::string& p_name,
 
     m_cube->set<atlas::mesh_source>({
       .color = { 1.f, 1.f, 1.f, 1.f },
-      .model_path = "assets/models/E 45 Aircraft_obj.obj",
-      .diffuse = "assets/models/E-45-steel detail_2_col.jpg",
+      // .model_path = "assets/models/E 45 Aircraft_obj.obj",
+      .model_path = "assets/backpack/backpack.obj",
+      .diffuse = "assets/backpack/diffuse.jpg",
+      .specular = "assets/backpack/specular.jpg"
+    //   .diffuse = "assets/models/E-45-steel detail_2_col.jpg",
     });
 
     m_robot_model = create_object("Cube");
@@ -68,7 +64,6 @@ level_scene::level_scene(const std::string& p_name,
     m_robot_model->set<atlas::mesh_source>({
       .color = { 1.f, 1.f, 1.f, 1.f },
       .model_path = "assets/models/cube.obj",
-      //   .model_path = "assets/robot_model/l2back.obj",
       .diffuse = "assets/models/container_diffuse.png",
       .specular = "assets/models/container_specular.png"
     });
@@ -351,6 +346,13 @@ level_scene::on_ui_update() {
                   atlas::ui::draw_vec3("Scale", p_transform->scale);
                   atlas::ui::draw_vec3("Rotation", p_transform->rotation);
               });
+            
+            atlas::ui::draw_component<atlas::material_metadata>("material", m_selected_entity, [](atlas::material_metadata* p_material){
+                atlas::ui::draw_vec3("Ambient", p_material->ambient);
+                atlas::ui::draw_vec3("Diffuse", p_material->diffuse);
+                atlas::ui::draw_vec3("Specular", p_material->specular);
+                atlas::ui::draw_float("Shininess", p_material->shininess);
+            });
 
             atlas::ui::draw_component<atlas::perspective_camera>(
               "camera",
@@ -486,6 +488,22 @@ level_scene::start() {
     if (!m_deserializer_test.load("LevelScene", *this)) {
         console_log_error("Could not load yaml file LevelScene!!!");
     }
+
+    // testing the flip parameter inside atlas::mesh_source
+    m_viking_room->set<atlas::mesh_source>({
+        .flip = true,
+        .color = { 1.f, 1.f, 1.f, 1.f },
+        .model_path = "assets/models/viking_room.obj",
+        .diffuse = "assets/models/viking_room.png",
+        // .model_path = "assets/models/Ball OBJ.obj",
+        // .diffuse = "assets/models/clear.png",
+    });
+    m_platform->set<atlas::material_metadata>({
+        .ambient = {0.2f, 0.2f, 0.2f},
+        .diffuse = {0.5f, 0.5f, 0.5f},
+        .specular = {1.f, 1.f, 1.f},
+        .shininess = 64.f
+    });
 
     // Initiating physics system
     atlas::physics::jolt_settings settings = {};

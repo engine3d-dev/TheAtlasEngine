@@ -24,7 +24,7 @@ namespace atlas::vk {
         m_ibo = ::vk::index_buffer(m_device, ibo_settings);
     }
 
-    mesh::mesh(const std::filesystem::path& p_filename) {
+    mesh::mesh(const std::filesystem::path& p_filename, bool p_flip) : m_flip(p_flip) {
         m_physical = vk_context::physical_driver();
         m_device = vk_context::driver_context();
         reload_mesh(p_filename);
@@ -63,6 +63,8 @@ namespace atlas::vk {
         std::vector<uint32_t> indices;
         std::unordered_map<::vk::vertex_input, uint32_t> unique_vertices{};
 
+        console_log_error("m_flip = {}", m_flip);
+
         // for (const auto& shape : shapes) {
         for(size_t i = 0; i < shapes.size(); i++) {
             auto shape = shapes[i];
@@ -91,7 +93,7 @@ namespace atlas::vk {
                     };
                 }
 
-                if (attrib.normals.empty()) {
+                if (!attrib.normals.empty()) {
                     vertex.normals = {
                         attrib.normals[3 * index.normal_index + 0],
                         attrib.normals[3 * index.normal_index + 1],
@@ -99,10 +101,26 @@ namespace atlas::vk {
                     };
                 }
                 if(!attrib.texcoords.empty()) {
-                    vertex.uv = {
+                    glm::vec2 flipped_uv = {
+                        attrib.texcoords[static_cast<long long>(index.texcoord_index) * 2],
+                        1.0f - attrib.texcoords[static_cast<long long>(index.texcoord_index) * 2 + 1],
+                    };
+
+                    glm::vec2 original_uv = {
                         attrib.texcoords[static_cast<long long>(index.texcoord_index) * 2],
                         attrib.texcoords[static_cast<long long>(index.texcoord_index) * 2 + 1],
                     };
+
+                    // vertex.uv = m_flip ? flipped_uv : original_uv;
+                    if(m_flip) {
+                        vertex.uv = flipped_uv;
+                    }
+                    else {
+                        vertex.uv = original_uv;
+                    }
+                }
+                else {
+                    vertex.uv = glm::vec2(0.f, 0.f);
                 }
 
                 if (!unique_vertices.contains(vertex)) {

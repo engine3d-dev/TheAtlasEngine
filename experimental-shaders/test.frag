@@ -1,25 +1,28 @@
 #version 460
 
-// layout (binding = 1) uniform sampler2D texSampler;
 layout (location = 0) in vec4 fragColor;
 layout (location = 1) in vec3 fragNormals;
 layout (location = 2) in vec2 fragTexCoords;
 layout (location = 3) in vec4 materialColor;
-// layout(location = 4) in vec3 FragPos;
-// layout (location = 3) in vec4 in_fragColor;
 
 layout(location = 0) out vec4 outColor;
 
 layout (set = 1, binding = 1) uniform sampler2D diffuse_texture;
 layout(set = 1, binding = 2) uniform sampler2D specular_texture;
 
-struct material {
-    float shininess;
-};
+// struct material {
+//     vec3 ambient;
+//     vec3 diffuse;
+//     vec3 specular;
+//     float shininess;
+// };
 
-layout(set = 1, binding = 3) uniform material_data {
-    material material_metadata; 
-} source;
+layout(set = 1, binding = 3) uniform material_ubo {
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+    float shininess;
+} material;
 
 struct point_light {
 	vec3 pos;
@@ -45,10 +48,14 @@ layout(location = 4) in vec3 FragPos;
 void main(){
 
     float shininess = 64.0;
-
     vec3 ambient_value = vec3(0.2, 0.2, 0.2);
     vec3 diffuse_value = vec3(0.5, 0.5, 0.5);
     vec3 specular_value = vec3(1.0, 1.0, 1.0);
+
+    // float shininess = material.shininess;
+    // vec3 ambient_value = material.ambient;
+    // vec3 diffuse_value = material.diffuse;
+    // vec3 specular_value = material.specular;
 
     // apply ambience
     vec3 ambient = ambient_value * texture(diffuse_texture, fragTexCoords).rgb;

@@ -31,7 +31,7 @@ namespace atlas::vk {
         mesh() = default;
         mesh(std::span<::vk::vertex_input> p_vertices,
              std::span<uint32_t> p_indices);
-        mesh(const std::filesystem::path& p_filename);
+        mesh(const std::filesystem::path& p_filename, bool p_flip=false);
 
         //! @brief Reload mesh vertices and indices when requested
         void reload_mesh(const std::filesystem::path& p_path);
@@ -70,6 +70,9 @@ namespace atlas::vk {
         [[nodiscard]] bool diffuse_loaded() const { return m_diffuse.loaded(); }
         [[nodiscard]] bool specular_loaded() const { return m_specular.loaded(); }
 
+        void set_flip(bool p_flip) {
+            m_flip = p_flip;
+        }
 
 
     private:
@@ -85,5 +88,6 @@ namespace atlas::vk {
         ::vk::uniform_buffer m_geoemtry_ubo;
         ::vk::uniform_buffer m_material_ubo;
         bool m_model_loaded = false;
+        bool m_flip = false;
     };
 };

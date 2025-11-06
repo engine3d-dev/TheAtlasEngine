@@ -178,8 +178,10 @@ namespace atlas::vk {
 
 		caching.each([this](flecs::entity p_entity) {
 			const mesh_source* target = p_entity.get<mesh_source>();
-			mesh new_mesh(std::filesystem::path(target->model_path));
+			mesh new_mesh(std::filesystem::path(target->model_path), target->flip);
 			new_mesh.initialize_uniforms(sizeof(material_uniform));
+			new_mesh.initialize_material_ubo(sizeof(material_metadata));
+
 			new_mesh.add_diffuse(std::filesystem::path(target->diffuse));
 			new_mesh.add_specular(std::filesystem::path(target->specular));
 
@@ -188,7 +190,7 @@ namespace atlas::vk {
 
 				std::vector<::vk::descriptor_entry> set1_entries = {
 					::vk::descriptor_entry{
-						// specifies "layout (set = 1, binding = 0) uniform MaterialSource"
+						// specifies "layout (set = 1, binding = 0) uniform geometry_uniform"
 						.type = ::vk::buffer::uniform,
 						.binding_point = {
 							.binding = 0,
@@ -214,6 +216,15 @@ namespace atlas::vk {
 						},
 						.descriptor_count = 1,
 					},
+					::vk::descriptor_entry{
+						// specifies "layout (set = 1, binding = 3) uniform material_ubo"
+						.type = ::vk::buffer::uniform,
+						.binding_point = {
+							.binding = 3,
+							.stage = ::vk::shader_stage::fragment,
+						},
+						.descriptor_count = 1,
+					},
 				};
 
 				::vk::descriptor_layout set1_layout = {
@@ -228,18 +239,28 @@ namespace atlas::vk {
 					"materials",
 					::vk::descriptor_resource(m_device, set1_layout));
 
-				// layout(set=  1, binding = 0)
 				std::vector<::vk::write_buffer_descriptor>
 					material_uniforms = {
+						// layout(set=  1, binding = 0)
 						::vk::write_buffer_descriptor{
-						.dst_binding = 0,
-						.buffer =
-							m_cached_meshes[p_entity.id()].material_ubo(),
-						.offset = 0,
-						.range = m_cached_meshes[p_entity.id()]
-									.material_ubo()
-									.size_bytes(),
+							.dst_binding = 0,
+							.buffer =
+								m_cached_meshes[p_entity.id()].geometry_ubo(),
+							.offset = 0,
+							.range = m_cached_meshes[p_entity.id()]
+										.geometry_ubo()
+										.size_bytes(),
 						},
+						// layout(set=  1, binding = 3)
+						// ::vk::write_buffer_descriptor{
+						// 	.dst_binding = 3,
+						// 	.buffer =
+						// 		m_cached_meshes[p_entity.id()].material_ubo(),
+						// 	.offset = 0,
+						// 	.range = m_cached_meshes[p_entity.id()]
+						// 				.material_ubo()
+						// 				.size_bytes(),
+						// },
 					};
 				// layout(set = 1, binding = 1)
 				// If the texture loaded successfully then we use that texture, otherwise utilize the default white texture
@@ -409,10 +430,17 @@ namespace atlas::vk {
                 .model = m_model, .color = material_component->color
             };
 
+			material_metadata material = {};
+			if(p_entity.has<material_metadata>()) {
+				material = *p_entity.get<material_metadata>();
+			}
+
             if (m_cached_meshes[p_entity.id()].loaded()) {
 
                 m_cached_meshes[p_entity.id()].update_uniform(
                   mesh_material_ubo);
+
+				m_cached_meshes[p_entity.id()].update_material_uniforms(material);
 
                 m_mesh_descriptors[p_entity.id()]["materials"].bind(
                   m_current_command_buffer,
