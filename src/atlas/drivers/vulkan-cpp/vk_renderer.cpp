@@ -197,7 +197,7 @@ namespace atlas::vk {
 						.descriptor_count = 1,
 					},
 					::vk::descriptor_entry{
-						// specifies "layout (set = 1, binding = 1) uniform sampler2D texture1"
+						// specifies "layout (set = 1, binding = 1) uniform sampler2D diffuse_texture"
 						.type = ::vk::buffer::combined_image_sampler,
 						.binding_point = {
 							.binding = 1,
@@ -206,7 +206,7 @@ namespace atlas::vk {
 						.descriptor_count = 1,
 					},
 					::vk::descriptor_entry{
-						// specifies "layout (set = 1, binding = 1) uniform sampler2D texture1"
+						// specifies "layout (set = 1, binding = 2) uniform sampler2D specular_texture"
 						.type = ::vk::buffer::combined_image_sampler,
 						.binding_point = {
 							.binding = 2,
@@ -243,22 +243,22 @@ namespace atlas::vk {
 					};
 				// layout(set = 1, binding = 1)
 				// If the texture loaded successfully then we use that texture, otherwise utilize the default white texture
-				::vk::sample_image write_image = m_cached_meshes[p_entity.id()].diffuse_loaded() ? m_cached_meshes[p_entity.id()].diffuse() : m_white_texture.image();
+				::vk::sample_image diffuse = m_cached_meshes[p_entity.id()].diffuse_loaded() ? m_cached_meshes[p_entity.id()].diffuse() : m_white_texture.image();
 
 				// layout(set = 1, binding = 2)
-				::vk::sample_image write_image2 = m_cached_meshes[p_entity.id()].specular_loaded() ? m_cached_meshes[p_entity.id()].specular() : m_white_texture.image();
+				::vk::sample_image specular = m_cached_meshes[p_entity.id()].specular_loaded() ? m_cached_meshes[p_entity.id()].specular() : m_white_texture.image();
 
 				// creating our image descriptor to write to the shader
 				std::vector<::vk::write_image_descriptor> material_textures = {
 						::vk::write_image_descriptor{
-						.dst_binding = 1,
-						.view = write_image.image_view(),
-						.sampler = write_image.sampler(),
+							.dst_binding = 1,
+							.view = diffuse.image_view(),
+							.sampler = diffuse.sampler(),
 						},
 						::vk::write_image_descriptor{
-						.dst_binding = 2,
-						.view = write_image2.image_view(),
-						.sampler = write_image2.sampler(),
+							.dst_binding = 2,
+							.view = specular.image_view(),
+							.sampler = specular.sampler(),
 						},
 					};
 
