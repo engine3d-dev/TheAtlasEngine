@@ -158,12 +158,23 @@ namespace atlas::vk {
         m_material_ubo = ::vk::uniform_buffer(m_device, geo_info);
     }
 
+    void mesh::initialize_dir_light(uint32_t p_size_bytes) {
+        ::vk::uniform_buffer_info info = { .phsyical_memory_properties =
+                                                 m_physical.memory_properties(),
+                                               .size_bytes = p_size_bytes };
+        m_directional_ubo = ::vk::uniform_buffer(m_device, info);
+    }
+
     void mesh::update_uniform(const material_uniform& p_material_ubo) {
         m_geoemtry_ubo.update(&p_material_ubo);
     }
 
     void mesh::update_material_uniforms(const material_metadata& p_material_data) {
         m_material_ubo.update(&p_material_data);
+    } 
+
+    void mesh::update_dir_light(const directional_light& p_dir_light) {
+        m_directional_ubo.update(&p_dir_light);
     }
 
     
@@ -207,6 +218,7 @@ namespace atlas::vk {
         m_vbo.destroy();
         m_ibo.destroy();
 
+        m_directional_ubo.destroy();
         m_diffuse.destroy();
         m_specular.destroy();
         m_geoemtry_ubo.destroy();

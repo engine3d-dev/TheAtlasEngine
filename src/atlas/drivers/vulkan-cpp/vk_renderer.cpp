@@ -179,10 +179,13 @@ namespace atlas::vk {
 
         caching.each([this](flecs::entity p_entity) {
             const mesh_source* target = p_entity.get<mesh_source>();
-            mesh new_mesh(std::filesystem::path(target->model_path),
-                          target->flip);
+            mesh new_mesh(std::filesystem::path(target->model_path),target->flip);
+
             new_mesh.initialize_uniforms(sizeof(material_uniform));
             new_mesh.initialize_material_ubo(sizeof(material_metadata));
+
+			// TODO: We should probably have an unordered_map<uint32_t, directional_light>, that also contains information on which index is specifically the directional light related to that particular game object.....
+			new_mesh.initialize_dir_light(sizeof(directional_light));
 
             new_mesh.add_diffuse(std::filesystem::path(target->diffuse));
             new_mesh.add_specular(std::filesystem::path(target->specular));
@@ -226,6 +229,15 @@ namespace atlas::vk {
                         },
                         .descriptor_count = 1,
                     },
+					::vk::descriptor_entry{
+						// specifies "layout (set = 1, binding = 0) uniform geometry_uniform"
+						.type = ::vk::buffer::uniform,
+						.binding_point = {
+							.binding = 4,
+							.stage = ::vk::shader_stage::fragment,
+						},
+						.descriptor_count = 1,
+					},
 				};
 
                 ::vk::descriptor_layout set1_layout = {
@@ -238,9 +250,8 @@ namespace atlas::vk {
                   "materials",
                   ::vk::descriptor_resource(m_device, set1_layout));
 
-                // vulkan buffer descriptors are for writing uniforms to the
-                // shader
-
+				
+				// specify to the vk::write_descriptor_buffer
                 std::array<::vk::write_buffer, 1> binding0_buffers = {
                     ::vk::write_buffer{
                       .buffer = m_cached_meshes[p_entity.id()].geometry_ubo(),
@@ -261,14 +272,35 @@ namespace atlas::vk {
                     }
                 };
 
+				std::array<::vk::write_buffer, 1> binding4_buffers = {
+                    ::vk::write_buffer{
+                      .buffer = m_cached_meshes[p_entity.id()].directional_light_ubo(),
+                      .offset = 0,
+                      .range = m_cached_meshes[p_entity.id()]
+                                 .directional_light_ubo()
+                                 .size_bytes(),
+                    }
+                };
+
                 std::vector<::vk::write_buffer_descriptor>
                   material_uniforms = {
                       // layout(set=  1, binding = 0) geometry_ubo
                       ::vk::write_buffer_descriptor{
-                        .dst_binding = 0, .uniforms = binding0_buffers },
-                      ::vk::write_buffer_descriptor{
-                        .dst_binding = 3, .uniforms = binding3_buffers }
-                  };
+                        .dst_binding = 0,
+						.uniforms = binding0_buffers,
+					},
+					// layout(set=  1, binding = 3) material_ubo
+                    ::vk::write_buffer_descriptor{
+                        .dst_binding = 3,
+						.uniforms = binding3_buffers,
+					},
+					// layout(set=  1, binding = 3) directional_light_ubo
+					::vk::write_buffer_descriptor{
+                        .dst_binding = 4,
+						.uniforms = binding4_buffers,
+					},
+
+				};
 
                 // layout(set = 1, binding = 1)
                 // If the texture loaded successfully then we use that texture,
@@ -284,6 +316,7 @@ namespace atlas::vk {
                     ? m_cached_meshes[p_entity.id()].specular()
                     : m_white_texture.image();
 
+				// writes to texture at layout(set = 1, binding = 1)
                 std::array<::vk::write_image, 1> binding1_images = {
                     ::vk::write_image{
                       .sampler = diffuse.sampler(),
@@ -291,6 +324,7 @@ namespace atlas::vk {
                       .image_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL }
                 };
 
+				// writes to texture at layout(set = 1, binding = 2)
                 std::array<::vk::write_image, 1> binding2_images = {
                     ::vk::write_image{
                       .sampler = specular.sampler(),
@@ -472,10 +506,23 @@ namespace atlas::vk {
                 // };
                 material_metadata data = {};
 
+				directional_light dir_light = {};
+
                 if(p_entity.has<material_metadata>()) {
                 	data = *p_entity.get<material_metadata>();
                 }
+
+				if(p_entity.has<directional_light>()) {
+					dir_light = *p_entity.get<directional_light>();
+				}
+
+				// send the bytes of the specified uniform to the glsl shader
+				// m_directional_light_test.update(&dir_light);
+
                 m_cached_meshes[p_entity.id()].update_material_uniforms(data);
+
+				// updating our directional light!!
+				m_cached_meshes[p_entity.id()].update_dir_light(dir_light);
 
                 m_mesh_descriptors[p_entity.id()]["materials"].bind(
                   m_current_command_buffer,

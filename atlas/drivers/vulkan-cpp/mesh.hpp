@@ -40,9 +40,11 @@ namespace atlas::vk {
 
         //! @brief Initializes uniform buffer specifically for material_src
         void initialize_material_ubo(uint32_t p_size_bytes);
+        void initialize_dir_light(uint32_t p_size_bytes);
 
         void update_uniform(const material_uniform& p_material_ubo);
         void update_material_uniforms(const material_metadata& p_material_data);
+        void update_dir_light(const directional_light& p_dir_light);
 
         [[nodiscard]] ::vk::uniform_buffer geometry_ubo() const {
             return m_geoemtry_ubo;
@@ -51,6 +53,8 @@ namespace atlas::vk {
         [[nodiscard]] ::vk::uniform_buffer material_ubo() const {
             return m_material_ubo;
         }
+
+        [[nodiscard]] ::vk::uniform_buffer directional_light_ubo() const { return m_directional_ubo; }
 
         void draw(const VkCommandBuffer& p_command_buffer);
 
@@ -87,6 +91,7 @@ namespace atlas::vk {
         ::vk::index_buffer m_ibo{};
         ::vk::uniform_buffer m_geoemtry_ubo;
         ::vk::uniform_buffer m_material_ubo;
+        ::vk::uniform_buffer m_directional_ubo;
         bool m_model_loaded = false;
         bool m_flip = false;
     };

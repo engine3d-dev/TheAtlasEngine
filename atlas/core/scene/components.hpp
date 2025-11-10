@@ -22,10 +22,17 @@ namespace atlas {
     };
 
     struct material_metadata {
-        glm::vec3 ambient{1.f};
-        glm::vec3 diffuse{1.f};
-        glm::vec3 specular{1.f};
+        glm::vec4 ambient{0.2f};
+        glm::vec4 diffuse{0.5f};
+        glm::vec4 specular{1.f};
         float shininess = 0.5f;
+    };
+    struct directional_light {
+        glm::vec3 direction{0.f};
+        glm::vec3 view_position{0.f};
+        glm::vec4 ambient{1.f};
+        glm::vec4 diffuse{1.f};
+        glm::vec4 specular{1.f};
     };
 
     struct point_light {
