@@ -113,7 +113,7 @@ namespace atlas::vk {
         ::vk::uniform_buffer_info geo_info = {
             .phsyical_memory_properties = m_physical.memory_properties(),
             .size_bytes = sizeof(global_ubo),
-        };
+        };	
         m_global_uniforms = ::vk::uniform_buffer(m_device, geo_info);
 
         std::array<::vk::write_buffer, 1> set0_buffers = {
@@ -515,6 +515,7 @@ namespace atlas::vk {
 				if(p_entity.has<directional_light>()) {
 					dir_light = *p_entity.get<directional_light>();
 				}
+				dir_light.view_position = p_entity.get<transform>()->position;
 
 				// send the bytes of the specified uniform to the glsl shader
 				// m_directional_light_test.update(&dir_light);

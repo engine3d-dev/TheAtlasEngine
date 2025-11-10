@@ -365,11 +365,11 @@ level_scene::on_ui_update() {
               });
             
             atlas::ui::draw_component<atlas::directional_light>("Directional Light", m_selected_entity, [](atlas::directional_light* p_dir_light){
-                atlas::ui::draw_vec3("Direction", p_dir_light->direction);
-                atlas::ui::draw_vec3("View Pos", p_dir_light->view_position);
-                atlas::ui::draw_vec4("Ambient", p_dir_light->ambient);
-                atlas::ui::draw_vec4("Diffuse", p_dir_light->diffuse);
-                atlas::ui::draw_vec4("Specular", p_dir_light->specular);
+                ImGui::DragFloat4("Direction", glm::value_ptr(p_dir_light->direction));
+                ImGui::DragFloat4("View Pos", glm::value_ptr(p_dir_light->view_position));
+                ImGui::DragFloat4("Ambient", glm::value_ptr(p_dir_light->ambient));
+                ImGui::DragFloat4("Diffuse", glm::value_ptr(p_dir_light->diffuse));
+                ImGui::DragFloat4("Specular", glm::value_ptr(p_dir_light->specular));
             });
 
             atlas::ui::draw_component<atlas::mesh_source>(
@@ -384,10 +384,10 @@ level_scene::on_ui_update() {
               "material",
               m_selected_entity,
               [](atlas::material_metadata* p_source) {
-                //   atlas::ui::draw_vec4("Ambient", p_source->ambient);
-                  ImGui::DragFloat4("Ambient", glm::value_ptr(p_source->ambient));
-                  atlas::ui::draw_vec4("Diffuse", p_source->diffuse);
-                  atlas::ui::draw_vec4("Specular", p_source->specular);
+                  float speed = 0.01f;
+                  ImGui::DragFloat4("Ambient", glm::value_ptr(p_source->ambient), speed);
+                  ImGui::DragFloat4("Diffuse", glm::value_ptr(p_source->diffuse), speed);
+                  ImGui::DragFloat4("Specular", glm::value_ptr(p_source->specular), speed);
                   atlas::ui::draw_float("Shininess", p_source->shininess);
             });
 
@@ -519,12 +519,34 @@ level_scene::start() {
       // .model_path = "assets/models/Ball OBJ.obj",
       // .diffuse = "assets/models/clear.png",
     });
-    m_platform->set<atlas::material_metadata>({
-        // .ambient = {0.2f, 0.2f, 0.2f, 0.2f},
-        // .diffuse = {0.5f, 0.5f, 0.5f, 0.5f},
-        // .specular = {1.0f, 1.0f, 1.0f, 1.f},
+
+    // TODO: Make this contain an atlas::directional_light
+    // If the scene opject dooes not have a atlas::directional_light, then we set the default values to 1.0f
+    // m_robot_model sets the cube.obj 3d model and loads it
+    m_robot_model->set<atlas::material_metadata>({
         .shininess = 64.f,
     });
+
+    m_robot_model->set<atlas::directional_light>({
+    });
+
+    m_viking_room->set<atlas::material_metadata>({
+        .shininess = 64.f,
+    });
+    m_viking_room->set<atlas::directional_light>({
+    });
+    m_cube->set<atlas::material_metadata>({
+        .shininess = 64.f,
+    });
+    m_cube->set<atlas::directional_light>({
+    });
+    m_platform->set<atlas::material_metadata>({
+        .shininess = 64.f,
+    });
+    m_platform->set<atlas::directional_light>({
+    });
+
+
 
     // Initiating physics system
     atlas::physics::jolt_settings settings = {};
@@ -540,10 +562,12 @@ level_scene::start() {
 
 void
 level_scene::on_update() {
+    atlas::directional_light* dir_light = m_robot_model->get_mut<atlas::directional_light>();
+
     auto query_cameras =
       query_builder<atlas::perspective_camera, atlas::transform>().build();
 
-    query_cameras.each([this](atlas::perspective_camera& p_camera,
+    query_cameras.each([this, &dir_light](atlas::perspective_camera& p_camera,
                               atlas::transform& p_transform) {
         if (!p_camera.is_active) {
             return;
@@ -593,6 +617,8 @@ level_scene::on_update() {
         if (atlas::event::is_key_pressed(key_e)) {
             p_transform.rotation.y -= rotation_velocity;
         }
+
+        dir_light->view_position = p_transform.position;
 
         p_transform.set_rotation(p_transform.rotation);
     });

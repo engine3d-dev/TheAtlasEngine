@@ -47,6 +47,44 @@ vec3 calc_dir_light(directional_light p_light, vec3 p_normal, vec3 p_view_direct
 }
 */
 
+/*
+vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir) {
+    vec3 lightDir = normalize(-light.direction);
+    // diffuse shading
+    float diff = max(dot(normal, lightDir), 0.0);
+    // specular shading
+    vec3 reflectDir = reflect(-lightDir, normal);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+    // combine results
+    vec3 ambient = light.ambient * vec3(texture(material.diffuse, TexCoords));
+    vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, TexCoords));
+    vec3 specular = light.specular * spec * vec3(texture(material.specular, TexCoords));
+    return (ambient + diffuse + specular);
+}
+*/
+
+vec3 calc_dir_light(directional_light light, vec3 normal, vec3 view_dir) {
+    vec3 light_dir = normalize(-light.direction);
+
+    // diffuse shading
+    float diff = max(dot(normal, light_dir), 0.0);
+
+    // specular shading
+    vec3 reflect_dir = reflect(-light_dir, normal);
+    float spec = pow(max(dot(view_dir, reflect_dir), 0.0), material.shininess);
+
+    // final result computation
+    // because of alignment we set the ambient, diffuse, specular to vec3 and use the 4th channel as the intensity values
+    // at least for ambient strength
+    vec3 ambient_offset = light.ambient.rgb * light.ambient.a;
+    vec3 diffuse_offset = light.diffuse.rgb;
+    vec3 specular_offset = light.specular.rgb;
+    vec3 ambient = ambient_offset * vec3(texture(diffuse_texture, fragTexCoords));
+    vec3 diffuse = diffuse_offset * diff * vec3(texture(diffuse_texture, fragTexCoords));
+    vec3 specular = specular_offset * vec3(texture(specular_texture, fragTexCoords));
+    return (ambient + diffuse + specular);
+}
+
 
 void main(){
 
@@ -59,12 +97,13 @@ void main(){
     // vec3 specular_value = vec3(1.0, 1.0, 1.0);
 
     // TODO: Getting our uniforms specified in vk_renderer.cpp to apply these parameters here
-    vec3 ambient_value = material.ambient.rgb * material.ambient.a;
-    vec3 diffuse_value = material.diffuse.rgb;
-    vec3 specular_value = material.specular.rgb;
-    float shininess = material.shininess;
+    // vec3 ambient_value = material.ambient.rgb * material.ambient.a;
+    // vec3 diffuse_value = material.diffuse.rgb;
+    // vec3 specular_value = material.specular.rgb;
+    // float shininess = material.shininess;
 
     // apply ambience
+    /*
     vec3 ambient = ambient_value * texture(diffuse_texture, fragTexCoords).rgb;
 
     // apply diffuse
@@ -83,16 +122,17 @@ void main(){
     
     // vec4 lighting_result = vec4(ambient + diffuse + specular, 1.0);
     vec3 result = ambient + diffuse + specular;
+    */
     
 
     // vec4 color = texture(diffuse_texture, fragTexCoords) * lighting_result; // working
     // vec4 color = final_texture * lighting_result; // working
 
-    /*
+    
     vec3 norm = normalize(fragNormals);
-    vec3 view_direction = normalize(dir_light_uniform.view_position - FragPos);
+    vec3 view_direction = normalize(dir_light_uniform.light_source.view_position - FragPos);
     vec3 result = calc_dir_light(dir_light_uniform.light_source, view_direction, norm);
-    */
+    
 
     outColor = vec4(result, 1.0);
 }

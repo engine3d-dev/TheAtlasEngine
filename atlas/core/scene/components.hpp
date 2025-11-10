@@ -30,9 +30,11 @@ namespace atlas {
     struct directional_light {
         glm::vec3 direction{0.f};
         glm::vec3 view_position{0.f};
+        // {x, y, z, w: intensity}
         glm::vec4 ambient{1.f};
         glm::vec4 diffuse{1.f};
-        glm::vec4 specular{1.f};
+        // {x, y, z, w: intensity}
+        glm::vec4 specular{1.f, 1.f, 0.f, 0.f};
     };
 
     struct point_light {
