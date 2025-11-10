@@ -63,8 +63,6 @@ namespace atlas::vk {
         std::vector<uint32_t> indices;
         std::unordered_map<::vk::vertex_input, uint32_t> unique_vertices{};
 
-        console_log_error("m_flip = {}", m_flip);
-
         // for (const auto& shape : shapes) {
         for(size_t i = 0; i < shapes.size(); i++) {
             auto shape = shapes[i];
