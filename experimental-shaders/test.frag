@@ -81,7 +81,8 @@ vec3 calc_dir_light(directional_light light, vec3 normal, vec3 view_dir) {
     vec3 specular_offset = light.specular.rgb;
     vec3 ambient = ambient_offset * vec3(texture(diffuse_texture, fragTexCoords));
     vec3 diffuse = diffuse_offset * diff * vec3(texture(diffuse_texture, fragTexCoords));
-    vec3 specular = specular_offset * vec3(texture(specular_texture, fragTexCoords));
+    vec3 specular = specular_offset * spec * vec3(texture(specular_texture, fragTexCoords));
+    
     return (ambient + diffuse + specular);
 }
 
