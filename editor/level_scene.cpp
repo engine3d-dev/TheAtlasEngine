@@ -557,7 +557,7 @@ level_scene::start() {
 
     m_viking_room->set<atlas::point_light>({
         .position = {0.f, 2.10f, -7.30f},
-        .color = {0.f, 0.5f, 0.5f, 1.f}
+        .color = {1.f, 1.f, 1.f, 1.f}
     });
 
     // m_camera->set<atlas::directional_light>({});
