@@ -220,8 +220,15 @@ ui_component_list(flecs::entity& p_selected_entity) {
         }
 
         if (!p_selected_entity.has<atlas::mesh_source>()) {
-            if (ImGui::MenuItem("atlas::mesh_source (Mesh Component)")) {
+            if (ImGui::MenuItem("Mesh Source")) {
                 p_selected_entity.add<atlas::mesh_source>();
+                ImGui::CloseCurrentPopup();
+            }
+        }
+
+        if (!p_selected_entity.has<atlas::point_light>()) {
+            if (ImGui::MenuItem("Point Light")) {
+                p_selected_entity.add<atlas::point_light>();
                 ImGui::CloseCurrentPopup();
             }
         }
@@ -387,7 +394,6 @@ level_scene::on_ui_update() {
             */
             
             atlas::ui::draw_component<atlas::point_light>("Point Light", m_selected_entity, [](atlas::point_light* p_dir_light){
-                ImGui::DragFloat4("Position", glm::value_ptr(p_dir_light->position), 0.01);
                 ImGui::DragFloat4("Color", glm::value_ptr(p_dir_light->color), 0.001);
                 ImGui::DragFloat("Attenuation", &p_dir_light->attenuation, 0.001);
                 ImGui::DragFloat4("Ambient", glm::value_ptr(p_dir_light->ambient), 0.001);
@@ -554,29 +560,6 @@ level_scene::start() {
         .position = {0.f, 2.10f, -7.30f},
         .color = {1.f, 1.f, 1.f, 1.f}
     });
-
-
-    // m_camera->set<atlas::directional_light>({});
-
-    // m_robot_model->set<atlas::directional_light>({
-    // });
-
-    // m_viking_room->set<atlas::material_metadata>({
-    //     .shininess = 64.f,
-    // });
-    // m_viking_room->set<atlas::directional_light>({
-    // });
-    // m_cube->set<atlas::material_metadata>({
-    //     .shininess = 64.f,
-    // });
-    // m_cube->set<atlas::directional_light>({
-    // });
-    // m_platform->set<atlas::material_metadata>({
-    //     .shininess = 64.f,
-    // });
-    // m_platform->set<atlas::directional_light>({
-    // });
-
 
 
     // Initiating physics system
