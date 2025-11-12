@@ -88,11 +88,11 @@ void main(){
     float attenuation_offset = light.attenuation;
     float attenuation = attenuation_offset / dot(dir_to_light, dir_to_light);
 
-    vec3 color = light.color.xyz * light.color.w;
+    vec3 color = light.color.rgb * light.color.a;
     vec3 ambient_offset = light.ambient.rgb * light.ambient.a * attenuation;
     vec3 ambient = ambient_offset * vec3(texture(diffuse_texture, fragTexCoords));
     float diff = max(dot(fragNormals, normalize(dir_to_light)), 0.0);
-    vec3 diffuse = light.diffuse.xyz * color * diff * vec3(texture(diffuse_texture, fragTexCoords));
+    vec3 diffuse = light.diffuse.xyz * diff * vec3(texture(diffuse_texture, fragTexCoords));
     vec3 specular = light.specular.xyz * vec3(texture(specular_texture, fragTexCoords));
 
     // Applied blinn-phongs term (blinn-phong's shading)

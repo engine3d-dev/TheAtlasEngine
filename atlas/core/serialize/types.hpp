@@ -96,6 +96,60 @@ namespace YAML {
         }
     };
 
+    template<>
+    struct convert<atlas::mesh_source> {
+
+        static Node encode(const atlas::mesh_source& rhs) {
+            Node node;
+            // Encode glm::vec3 members
+            node["Model"] = rhs.model_path;
+            node["Color"] = rhs.color;
+            node["Diffuse"] = rhs.diffuse;
+            node["Specular"] = rhs.specular;
+            return node;
+        }
+
+        static bool decode(const Node& node, atlas::mesh_source& rhs) {
+            if (!node.IsMap()) {
+                return false;
+            }
+
+            rhs.model_path = node["Model"].as<std::string>();
+            rhs.color = node["Angular Velocity"].as<glm::vec4>();
+            rhs.diffuse = node["Force"].as<std::string>();
+            rhs.specular = node["Impulse"].as<std::string>();
+            return true;
+        }
+    };
+
+    template<>
+    struct convert<atlas::point_light> {
+
+        static Node encode(const atlas::point_light& rhs) {
+            Node node;
+            // Encode glm::vec3 members
+            node["Color"] = rhs.color;
+            node["Attenuation"] = rhs.attenuation;
+            node["Ambient"] = rhs.ambient;
+            node["Diffuse"] = rhs.diffuse;
+            node["Specular"] = rhs.specular;
+            return node;
+        }
+
+        static bool decode(const Node& node, atlas::point_light& rhs) {
+            if (!node.IsMap()) {
+                return false;
+            }
+
+            rhs.color = node["Color"].as<glm::vec4>();
+            rhs.attenuation = node["Attenuation"].as<float>();
+            rhs.ambient = node["Ambient"].as<glm::vec4>();
+            rhs.diffuse = node["Diffuse"].as<glm::vec4>();
+            rhs.specular = node["Specular"].as<glm::vec4>();
+            return true;
+        }
+    };
+
     /**
      * @brief Custom specialized classes from yaml-cpp to specialize to take in
      * a atlas::body_type specifically
@@ -308,6 +362,10 @@ namespace atlas {
     //! @brief from yaml-cpp, saving mesh_source values to disk
     YAML::Emitter& operator<<(YAML::Emitter& p_output,
                               const mesh_source* p_material);
+
+    //! @brief from yaml-cpp, saving mesh_source values to disk
+    YAML::Emitter& operator<<(YAML::Emitter& p_output,
+                              const point_light* p_material);
 
     //! @brief from yaml-cpp, saving physics_body values to disk
     YAML::Emitter& operator<<(YAML::Emitter& p_output,

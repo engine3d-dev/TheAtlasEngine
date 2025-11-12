@@ -112,6 +112,7 @@ level_scene::level_scene(const std::string& p_name,
       .model_path = "assets/models/cube.obj",
       .diffuse = "assets/models/wood.png",
     });
+    m_point_light->add<atlas::tag::serialize>();
 
     // for(size_t i = 0; i < 26; i++) {
     // 	auto obj = create_object(std::format("Object #{}", i));
@@ -199,9 +200,7 @@ level_scene::reset_objects() {
 void
 ui_component_list(flecs::entity& p_selected_entity) {
     std::string entity_name = p_selected_entity.name().c_str();
-
     atlas::ui::draw_input_text(entity_name);
-    p_selected_entity.set_name(entity_name.c_str());
 
     ImGui::SameLine();
     ImGui::PushItemWidth(-1);
