@@ -44,7 +44,7 @@ namespace atlas::vk {
 
         void update_uniform(const material_uniform& p_material_ubo);
         void update_material_uniforms(const material_metadata& p_material_data);
-        void update_dir_light(const directional_light& p_dir_light);
+        void update_light(const point_light& p_dir_light);
 
         [[nodiscard]] ::vk::uniform_buffer geometry_ubo() const {
             return m_geoemtry_ubo;
@@ -54,7 +54,7 @@ namespace atlas::vk {
             return m_material_ubo;
         }
 
-        [[nodiscard]] ::vk::uniform_buffer directional_light_ubo() const { return m_directional_ubo; }
+        [[nodiscard]] ::vk::uniform_buffer light_ubo() const { return m_directional_ubo; }
 
         void draw(const VkCommandBuffer& p_command_buffer);
 

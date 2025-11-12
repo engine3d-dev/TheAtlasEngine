@@ -173,7 +173,7 @@ namespace atlas::vk {
         m_material_ubo.update(&p_material_data);
     } 
 
-    void mesh::update_dir_light(const directional_light& p_dir_light) {
+    void mesh::update_light(const point_light& p_dir_light) {
         m_directional_ubo.update(&p_dir_light);
     }
 

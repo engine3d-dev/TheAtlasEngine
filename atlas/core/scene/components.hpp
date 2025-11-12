@@ -35,6 +35,7 @@ namespace atlas {
         glm::vec4 diffuse{1.f};
         // {x, y, z, w: intensity}
         glm::vec4 specular{1.f, 1.f, 0.f, 0.f};
+        glm::vec4 color{1.f};
     };
 
     struct point_light {
@@ -45,9 +46,9 @@ namespace atlas {
         float linear=1.f;
         float quadratic=1.f;
 
-        glm::vec3 ambient=glm::vec3(1.f);
-        glm::vec3 diffuse=glm::vec3(1.f);
-        glm::vec3 specular=glm::vec3(1.f);
+        glm::vec4 ambient=glm::vec4(1.f);
+        glm::vec4 diffuse=glm::vec4(1.f);
+        glm::vec4 specular=glm::vec4(1.f);
     };
 
     /**

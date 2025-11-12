@@ -19,7 +19,7 @@ level_scene::level_scene(const std::string& p_name,
       .field_of_view = 45.f,
     });
 
-    m_viking_room = create_object("Sphere");
+    m_viking_room = create_object("Viking Room");
     m_viking_room->add<atlas::tag::serialize>();
     m_viking_room->set<atlas::transform>({
       .position = { -2.70f, 2.70, -8.30f },
@@ -100,6 +100,22 @@ level_scene::level_scene(const std::string& p_name,
     });
     m_platform->set<atlas::box_collider>({
       .half_extent = { 15.f, 0.30f, 10.0f },
+    });
+
+    m_point_light = create_object("Point Light 1");
+    m_point_light->set<atlas::transform>({
+        .position = { 0.f, 2.10f, -7.30f },
+        .scale = { 0.9f, 0.9f, 0.9f },
+    });
+
+    m_point_light->set<atlas::mesh_source>({
+      .model_path = "assets/models/cube.obj",
+      .diffuse = "assets/models/wood.png",
+    });
+
+    m_point_light->set<atlas::point_light>({
+        .position = {0.f, 2.10f, -7.30f},
+        .color = {0.f, 0.5f, 0.5f, 1.f}
     });
 
     // for(size_t i = 0; i < 26; i++) {
@@ -364,12 +380,24 @@ level_scene::on_ui_update() {
                   ImGui::DragFloat("Speed", &m_movement_speed);
               });
             
+            /*
             atlas::ui::draw_component<atlas::directional_light>("Directional Light", m_selected_entity, [](atlas::directional_light* p_dir_light){
                 ImGui::DragFloat4("Direction", glm::value_ptr(p_dir_light->direction));
                 ImGui::DragFloat4("View Pos", glm::value_ptr(p_dir_light->view_position));
+                ImGui::DragFloat4("Color", glm::value_ptr(p_dir_light->color));
                 ImGui::DragFloat4("Ambient", glm::value_ptr(p_dir_light->ambient));
                 ImGui::DragFloat4("Diffuse", glm::value_ptr(p_dir_light->diffuse));
                 ImGui::DragFloat4("Specular", glm::value_ptr(p_dir_light->specular));
+            });
+            */
+            
+            atlas::ui::draw_component<atlas::point_light>("Point Light", m_selected_entity, [](atlas::point_light* p_dir_light){
+                ImGui::DragFloat4("Position", glm::value_ptr(p_dir_light->position), 0.01);
+                ImGui::DragFloat4("Color", glm::value_ptr(p_dir_light->color), 0.001);
+                ImGui::DragFloat("Attenuation", &p_dir_light->attenuation, 0.001);
+                ImGui::DragFloat4("Ambient", glm::value_ptr(p_dir_light->ambient), 0.001);
+                ImGui::DragFloat4("Diffuse", glm::value_ptr(p_dir_light->diffuse), 0.001);
+                ImGui::DragFloat4("Specular", glm::value_ptr(p_dir_light->specular), 0.001);
             });
 
             atlas::ui::draw_component<atlas::mesh_source>(
@@ -527,24 +555,31 @@ level_scene::start() {
         .shininess = 64.f,
     });
 
-    m_robot_model->set<atlas::directional_light>({
+    m_viking_room->set<atlas::point_light>({
+        .position = {0.f, 2.10f, -7.30f},
+        .color = {0.f, 0.5f, 0.5f, 1.f}
     });
 
-    m_viking_room->set<atlas::material_metadata>({
-        .shininess = 64.f,
-    });
-    m_viking_room->set<atlas::directional_light>({
-    });
-    m_cube->set<atlas::material_metadata>({
-        .shininess = 64.f,
-    });
-    m_cube->set<atlas::directional_light>({
-    });
-    m_platform->set<atlas::material_metadata>({
-        .shininess = 64.f,
-    });
-    m_platform->set<atlas::directional_light>({
-    });
+    // m_camera->set<atlas::directional_light>({});
+
+    // m_robot_model->set<atlas::directional_light>({
+    // });
+
+    // m_viking_room->set<atlas::material_metadata>({
+    //     .shininess = 64.f,
+    // });
+    // m_viking_room->set<atlas::directional_light>({
+    // });
+    // m_cube->set<atlas::material_metadata>({
+    //     .shininess = 64.f,
+    // });
+    // m_cube->set<atlas::directional_light>({
+    // });
+    // m_platform->set<atlas::material_metadata>({
+    //     .shininess = 64.f,
+    // });
+    // m_platform->set<atlas::directional_light>({
+    // });
 
 
 
@@ -562,12 +597,11 @@ level_scene::start() {
 
 void
 level_scene::on_update() {
-    atlas::directional_light* dir_light = m_robot_model->get_mut<atlas::directional_light>();
 
     auto query_cameras =
       query_builder<atlas::perspective_camera, atlas::transform>().build();
 
-    query_cameras.each([this, &dir_light](atlas::perspective_camera& p_camera,
+    query_cameras.each([this](atlas::perspective_camera& p_camera,
                               atlas::transform& p_transform) {
         if (!p_camera.is_active) {
             return;
@@ -584,18 +618,18 @@ level_scene::on_update() {
 
         glm::quat to_quaternion = atlas::to_quat(p_transform.quaternion);
 
-        // glm::vec3 up = glm::rotate(to_quaternion, atlas::math::up());
+        glm::vec3 up = glm::rotate(to_quaternion, atlas::math::up());
         glm::vec3 forward = glm::rotate(to_quaternion, atlas::math::backward());
         glm::vec3 right = glm::rotate(to_quaternion, atlas::math::right());
 
 
-        // if(atlas::event::is_mouse_pressed(mouse_button_left)) {
-        //     p_transform.position += up * velocity;
-        // }
+        if(atlas::event::is_key_pressed(key_left_shift)) {
+            p_transform.position += up * velocity;
+        }
 
-        // if(atlas::event::is_mouse_pressed(mouse_button_right)) {
-        //     p_transform.position -= up * velocity;
-        // }
+        if(atlas::event::is_key_pressed(key_space)) {
+            p_transform.position -= up * velocity;
+        }
 
         if (atlas::event::is_key_pressed(key_w)) {
             p_transform.position += forward * velocity;
@@ -618,7 +652,6 @@ level_scene::on_update() {
             p_transform.rotation.y -= rotation_velocity;
         }
 
-        dir_light->view_position = p_transform.position;
 
         p_transform.set_rotation(p_transform.rotation);
     });

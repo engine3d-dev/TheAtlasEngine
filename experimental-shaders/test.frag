@@ -4,6 +4,7 @@ layout (location = 0) in vec4 fragColor;
 layout (location = 1) in vec3 fragNormals;
 layout (location = 2) in vec2 fragTexCoords;
 layout (location = 3) in vec4 materialColor;
+layout(location = 4) in vec3 FragPos;
 
 layout(location = 0) out vec4 outColor;
 
@@ -24,44 +25,25 @@ struct directional_light {
     vec4 ambient;
     vec4 diffuse;
     vec4 specular;
+    vec4 color;
 };
 
-layout(set = 1, binding = 4) uniform directional_light_ubo {
-    directional_light light_source;
-} dir_light_uniform;
+struct point_light {
+    vec3 position;
+    vec4 color;
+    float attenuation;
+    float constant;
+    float linear;
+    float quadratic;
+    // 4th channel is the intensity value
+    vec4 ambient;
+    vec4 diffuse;
+    vec4 specular;
+};
 
-layout(location = 4) in vec3 FragPos;
-
-/*
-vec3 calc_dir_light(directional_light p_light, vec3 p_normal, vec3 p_view_direction) {
-    vec3 light_dir = normalize(-p_light.direction);
-    float diff = max(dot(p_normal, light_dir), 0.0);
-    vec3 reflect_dir = reflect(-light_dir, p_normal);
-    float spec = pow(max(dot(p_view_direction, reflect_dir), 0.0), material.shininess);
-
-    // combine the results
-    vec3 ambient  = light.ambient  * vec3(texture(material.diffuse, fragTexCoords));
-    vec3 diffuse  = light.diffuse  * diff * vec3(texture(material.diffuse.rgb, fragTexCoords));
-    vec3 specular = light.specular * spec * vec3(texture(material.specular.rgb, fragTexCoords));
-    return (ambient + diffuse + specular);
-}
-*/
-
-/*
-vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir) {
-    vec3 lightDir = normalize(-light.direction);
-    // diffuse shading
-    float diff = max(dot(normal, lightDir), 0.0);
-    // specular shading
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-    // combine results
-    vec3 ambient = light.ambient * vec3(texture(material.diffuse, TexCoords));
-    vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, TexCoords));
-    vec3 specular = light.specular * spec * vec3(texture(material.specular, TexCoords));
-    return (ambient + diffuse + specular);
-}
-*/
+layout(set = 0, binding = 1) uniform light_ubo {
+    point_light light_source;
+} light_src;
 
 vec3 calc_dir_light(directional_light light, vec3 normal, vec3 view_dir) {
     vec3 light_dir = normalize(-light.direction);
@@ -77,14 +59,16 @@ vec3 calc_dir_light(directional_light light, vec3 normal, vec3 view_dir) {
     // because of alignment we set the ambient, diffuse, specular to vec3 and use the 4th channel as the intensity values
     // at least for ambient strength
     vec3 ambient_offset = light.ambient.rgb * light.ambient.a;
-    vec3 diffuse_offset = light.diffuse.rgb;
+    vec3 diffuse_offset = light.diffuse.rgb * light.diffuse.a;
     vec3 specular_offset = light.specular.rgb;
     vec3 ambient = ambient_offset * vec3(texture(diffuse_texture, fragTexCoords));
-    vec3 diffuse = diffuse_offset * diff * vec3(texture(diffuse_texture, fragTexCoords));
+    vec3 diffuse = (diffuse_offset * light.color.rgb) * diff * vec3(texture(diffuse_texture, fragTexCoords));
     vec3 specular = specular_offset * spec * vec3(texture(specular_texture, fragTexCoords));
     
     return (ambient + diffuse + specular);
 }
+
+// vec3 calc_point_light()
 
 
 void main(){
@@ -128,12 +112,37 @@ void main(){
 
     // vec4 color = texture(diffuse_texture, fragTexCoords) * lighting_result; // working
     // vec4 color = final_texture * lighting_result; // working
-
     
-    vec3 norm = normalize(fragNormals);
-    vec3 view_direction = normalize(dir_light_uniform.light_source.view_position - FragPos);
-    vec3 result = calc_dir_light(dir_light_uniform.light_source, view_direction, norm);
+    // do some camera and worldspace calculation
     
 
+    // Adding point light code here
+
+    // FragPos = position_to_world.xyz
+    // fragNormal
+    vec3 pos = light_src.light_source.position.xyz;
+    // vec3 pos = vec3(-1.70, 5.58, 1.30);
+    vec3 dir_to_light = pos - FragPos.xyz;
+    float attenuation_offset = light_src.light_source.attenuation;
+    float attenuation = attenuation_offset / dot(dir_to_light, dir_to_light);
+
+    vec3 color = light_src.light_source.color.xyz * light_src.light_source.color.w;
+    vec3 ambient_offset = light_src.light_source.ambient.rgb * light_src.light_source.ambient.a * attenuation;
+    vec3 ambient = ambient_offset * vec3(texture(diffuse_texture, fragTexCoords));
+    float diff = max(dot(fragNormals, normalize(dir_to_light)), 0.0);
+    vec3 diffuse = light_src.light_source.diffuse.xyz * color * diff * vec3(texture(diffuse_texture, fragTexCoords));
+    vec3 specular = light_src.light_source.specular.xyz * vec3(texture(specular_texture, fragTexCoords));
+
+
+
+    // vec3 norm = normalize(fragNormals);
+    // vec3 view_direction = normalize(dir_light_uniform.light_source.view_position - FragPos);
+    // vec3 result = calc_dir_light(dir_light_uniform.light_source, view_direction, norm);
+
+    // TEMPORARY: Adding this until point light work. Really, this should grab both diffuse and specular.
+    // vec3 result = texture(diffuse_texture, fragTexCoords).rgb;
+    // outColor = vec4(result, 1.0);
+    vec3 result = (diffuse + ambient) * color;
     outColor = vec4(result, 1.0);
+    // outColor = vec4(result, 1.0);
 }

@@ -100,6 +100,15 @@ namespace atlas::vk {
 				},
 				.descriptor_count = 1,
 			},
+			::vk::descriptor_entry{
+				// specifies "layout (set = 0, binding = 1) uniform light_ubo"
+				.type = ::vk::buffer::uniform,
+				.binding_point = {
+					.binding = 1,
+					.stage = ::vk::shader_stage::fragment,
+				},
+				.descriptor_count = 1,
+			},
 		};
 
         // uint32_t image_count = image_count;
@@ -113,20 +122,41 @@ namespace atlas::vk {
         ::vk::uniform_buffer_info geo_info = {
             .phsyical_memory_properties = m_physical.memory_properties(),
             .size_bytes = sizeof(global_ubo),
-        };	
+        };
         m_global_uniforms = ::vk::uniform_buffer(m_device, geo_info);
 
-        std::array<::vk::write_buffer, 1> set0_buffers = {
-			::vk::write_buffer{
-				.buffer = m_global_uniforms,
-				.offset = 0,
-				.range = m_global_uniforms.size_bytes(),
-			}
-		};
+        ::vk::uniform_buffer_info light_ubo_params = {
+            .phsyical_memory_properties = m_physical.memory_properties(),
+            .size_bytes = sizeof(point_light),
+        };
+        m_point_light_uniforms =
+          ::vk::uniform_buffer(m_device, light_ubo_params);
 
-        std::array<::vk::write_buffer_descriptor, 1> set0_write_buffers = {
-            ::vk::write_buffer_descriptor{ .dst_binding = 0,
-                                            .uniforms = set0_buffers }
+        std::array<::vk::write_buffer, 1> binding0_uniforms = {
+            ::vk::write_buffer{
+              .buffer = m_global_uniforms,
+              .offset = 0,
+              .range = m_global_uniforms.size_bytes(),
+            },
+        };
+
+		std::array<::vk::write_buffer, 1> binding1_uniforms = {
+            ::vk::write_buffer{
+				.buffer = m_point_light_uniforms,
+                .offset = 0,
+                .range = m_point_light_uniforms.size_bytes(),
+			},
+        };
+
+        std::array<::vk::write_buffer_descriptor, 2> set0_write_buffers = {
+            ::vk::write_buffer_descriptor{
+              .dst_binding = 0,
+              .uniforms = binding0_uniforms,
+            },
+			::vk::write_buffer_descriptor{
+              .dst_binding = 1,
+              .uniforms = binding1_uniforms,
+            }
         };
         m_global_descriptors.update(set0_write_buffers);
 
@@ -146,6 +176,7 @@ namespace atlas::vk {
             m_shader_group.destroy();
             m_global_descriptors.destroy();
             m_global_uniforms.destroy();
+            m_point_light_uniforms.destroy();
             for (auto& [key, value] : m_cached_meshes) {
                 console_log_trace("Entity \"{}\" Destroyed in vk_renderer!!!",
                                   key);
@@ -179,13 +210,17 @@ namespace atlas::vk {
 
         caching.each([this](flecs::entity p_entity) {
             const mesh_source* target = p_entity.get<mesh_source>();
-            mesh new_mesh(std::filesystem::path(target->model_path),target->flip);
+            mesh new_mesh(std::filesystem::path(target->model_path),
+                          target->flip);
 
             new_mesh.initialize_uniforms(sizeof(material_uniform));
             new_mesh.initialize_material_ubo(sizeof(material_metadata));
 
-			// TODO: We should probably have an unordered_map<uint32_t, directional_light>, that also contains information on which index is specifically the directional light related to that particular game object.....
-			new_mesh.initialize_dir_light(sizeof(directional_light));
+            // TODO: We should probably have an unordered_map<uint32_t,
+            // directional_light>, that also contains information on which index
+            // is specifically the directional light related to that particular
+            // game object.....
+            // new_mesh.initialize_dir_light(sizeof(point_light));
 
             new_mesh.add_diffuse(std::filesystem::path(target->diffuse));
             new_mesh.add_specular(std::filesystem::path(target->specular));
@@ -229,15 +264,15 @@ namespace atlas::vk {
                         },
                         .descriptor_count = 1,
                     },
-					::vk::descriptor_entry{
-						// specifies "layout (set = 1, binding = 0) uniform geometry_uniform"
-						.type = ::vk::buffer::uniform,
-						.binding_point = {
-							.binding = 4,
-							.stage = ::vk::shader_stage::fragment,
-						},
-						.descriptor_count = 1,
-					},
+					// ::vk::descriptor_entry{
+					// 	// specifies "layout (set = 1, binding = 4) uniform lighting_ubo"
+					// 	.type = ::vk::buffer::uniform,
+					// 	.binding_point = {
+					// 		.binding = 4,
+					// 		.stage = ::vk::shader_stage::fragment,
+					// 	},
+					// 	.descriptor_count = 1,
+					// },
 				};
 
                 ::vk::descriptor_layout set1_layout = {
@@ -250,8 +285,7 @@ namespace atlas::vk {
                   "materials",
                   ::vk::descriptor_resource(m_device, set1_layout));
 
-				
-				// specify to the vk::write_descriptor_buffer
+                // specify to the vk::write_descriptor_buffer
                 std::array<::vk::write_buffer, 1> binding0_buffers = {
                     ::vk::write_buffer{
                       .buffer = m_cached_meshes[p_entity.id()].geometry_ubo(),
@@ -272,35 +306,34 @@ namespace atlas::vk {
                     }
                 };
 
-				std::array<::vk::write_buffer, 1> binding4_buffers = {
-                    ::vk::write_buffer{
-                      .buffer = m_cached_meshes[p_entity.id()].directional_light_ubo(),
-                      .offset = 0,
-                      .range = m_cached_meshes[p_entity.id()]
-                                 .directional_light_ubo()
-                                 .size_bytes(),
-                    }
-                };
+                // std::array<::vk::write_buffer, 1> binding4_buffers = {
+                //     ::vk::write_buffer{
+                //       .buffer = m_cached_meshes[p_entity.id()].light_ubo(),
+                //       .offset = 0,
+                //       .range = m_cached_meshes[p_entity.id()]
+                //                  .light_ubo()
+                //                  .size_bytes(),
+                //     }
+                // };
 
-                std::vector<::vk::write_buffer_descriptor>
-                  material_uniforms = {
-                      // layout(set=  1, binding = 0) geometry_ubo
-                      ::vk::write_buffer_descriptor{
-                        .dst_binding = 0,
-						.uniforms = binding0_buffers,
-					},
-					// layout(set=  1, binding = 3) material_ubo
+                std::vector<::vk::write_buffer_descriptor> material_uniforms = {
+                    // layout(set=  1, binding = 0) geometry_ubo
                     ::vk::write_buffer_descriptor{
-                        .dst_binding = 3,
-						.uniforms = binding3_buffers,
-					},
-					// layout(set=  1, binding = 3) directional_light_ubo
-					::vk::write_buffer_descriptor{
-                        .dst_binding = 4,
-						.uniforms = binding4_buffers,
-					},
+                      .dst_binding = 0,
+                      .uniforms = binding0_buffers,
+                    },
+                    // layout(set=  1, binding = 3) material_ubo
+                    ::vk::write_buffer_descriptor{
+                      .dst_binding = 3,
+                      .uniforms = binding3_buffers,
+                    },
+                    // layout(set=  1, binding = 3) directional_light_ubo
+                    // ::vk::write_buffer_descriptor{
+                    //     .dst_binding = 4,
+                    // 	.uniforms = binding4_buffers,
+                    // },
 
-				};
+                };
 
                 // layout(set = 1, binding = 1)
                 // If the texture loaded successfully then we use that texture,
@@ -316,7 +349,7 @@ namespace atlas::vk {
                     ? m_cached_meshes[p_entity.id()].specular()
                     : m_white_texture.image();
 
-				// writes to texture at layout(set = 1, binding = 1)
+                // writes to texture at layout(set = 1, binding = 1)
                 std::array<::vk::write_image, 1> binding1_images = {
                     ::vk::write_image{
                       .sampler = diffuse.sampler(),
@@ -324,7 +357,7 @@ namespace atlas::vk {
                       .image_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL }
                 };
 
-				// writes to texture at layout(set = 1, binding = 2)
+                // writes to texture at layout(set = 1, binding = 2)
                 std::array<::vk::write_image, 1> binding2_images = {
                     ::vk::write_image{
                       .sampler = specular.sampler(),
@@ -466,9 +499,19 @@ namespace atlas::vk {
           system_registry::get_world("Editor World");
         ref<scene_scope> current_scene = current_world->get_scene("LevelScene");
 
+        // query all point lights
+        flecs::query<> query_point_lights =
+          current_scene->query_builder<point_light>().build();
+
         //! TODO: Replace rendertarget3d with a material component
         flecs::query<> query_targets =
           current_scene->query_builder<mesh_source>().build();
+
+        query_point_lights.each([this](flecs::entity p_entity) {
+			point_light light = *p_entity.get<point_light>();
+            m_point_light_uniforms.update(&light);
+        });
+
         m_main_pipeline.bind(m_current_command_buffer);
         // Bind global camera data here
         m_global_descriptors.bind(m_current_command_buffer,
@@ -506,24 +549,11 @@ namespace atlas::vk {
                 // };
                 material_metadata data = {};
 
-				directional_light dir_light = {};
-
-                if(p_entity.has<material_metadata>()) {
-                	data = *p_entity.get<material_metadata>();
+                if (p_entity.has<material_metadata>()) {
+                    data = *p_entity.get<material_metadata>();
                 }
 
-				if(p_entity.has<directional_light>()) {
-					dir_light = *p_entity.get<directional_light>();
-				}
-				dir_light.view_position = p_entity.get<transform>()->position;
-
-				// send the bytes of the specified uniform to the glsl shader
-				// m_directional_light_test.update(&dir_light);
-
                 m_cached_meshes[p_entity.id()].update_material_uniforms(data);
-
-				// updating our directional light!!
-				m_cached_meshes[p_entity.id()].update_dir_light(dir_light);
 
                 m_mesh_descriptors[p_entity.id()]["materials"].bind(
                   m_current_command_buffer,

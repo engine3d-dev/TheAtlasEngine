@@ -76,6 +76,7 @@ namespace atlas::vk {
 
         std::map<uint32_t, mesh> m_cached_meshes;
         ::vk::uniform_buffer m_global_uniforms;
+        ::vk::uniform_buffer m_point_light_uniforms;
         std::map<uint32_t, std::map<std::string, ::vk::descriptor_resource>>
           m_mesh_descriptors;
         uint32_t m_current_frame = 0;
