@@ -500,16 +500,17 @@ namespace atlas::vk {
         ref<scene_scope> current_scene = current_world->get_scene("LevelScene");
 
         // query all point lights
-        flecs::query<> query_point_lights =
+        flecs::query<point_light> query_point_lights =
           current_scene->query_builder<point_light>().build();
 
         //! TODO: Replace rendertarget3d with a material component
         flecs::query<> query_targets =
           current_scene->query_builder<mesh_source>().build();
 
-        query_point_lights.each([this](flecs::entity p_entity) {
-			point_light light = *p_entity.get<point_light>();
-            m_point_light_uniforms.update(&light);
+        query_point_lights.each([this](flecs::entity p_entity, point_light& p_light) {
+			const transform* t = p_entity.get<transform>();
+			p_light.position = t->position;
+            m_point_light_uniforms.update(&p_light);
         });
 
         m_main_pipeline.bind(m_current_command_buffer);

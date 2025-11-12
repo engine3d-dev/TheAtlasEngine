@@ -556,11 +556,6 @@ level_scene::start() {
         .shininess = 64.f,
     });
 
-    m_point_light->set<atlas::point_light>({
-        .position = {0.f, 2.10f, -7.30f},
-        .color = {1.f, 1.f, 1.f, 1.f}
-    });
-
 
     // Initiating physics system
     atlas::physics::jolt_settings settings = {};
@@ -576,13 +571,6 @@ level_scene::start() {
 
 void
 level_scene::on_update() {
-
-    atlas::transform* transform = m_point_light->get_mut<atlas::transform>();
-    atlas::point_light* light = m_point_light->get_mut<atlas::point_light>();
-
-    light->position = transform->position;
-
-
 
     auto query_cameras =
       query_builder<atlas::perspective_camera, atlas::transform>().build();
