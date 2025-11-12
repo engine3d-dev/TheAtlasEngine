@@ -113,11 +113,6 @@ level_scene::level_scene(const std::string& p_name,
       .diffuse = "assets/models/wood.png",
     });
 
-    m_point_light->set<atlas::point_light>({
-        .position = {0.f, 2.10f, -7.30f},
-        .color = {0.f, 0.5f, 0.5f, 1.f}
-    });
-
     // for(size_t i = 0; i < 26; i++) {
     // 	auto obj = create_object(std::format("Object #{}", i));
     // 	obj->set<atlas::physics_body>({
@@ -555,10 +550,11 @@ level_scene::start() {
         .shininess = 64.f,
     });
 
-    m_viking_room->set<atlas::point_light>({
+    m_point_light->set<atlas::point_light>({
         .position = {0.f, 2.10f, -7.30f},
         .color = {1.f, 1.f, 1.f, 1.f}
     });
+
 
     // m_camera->set<atlas::directional_light>({});
 
@@ -597,6 +593,13 @@ level_scene::start() {
 
 void
 level_scene::on_update() {
+
+    atlas::transform* transform = m_point_light->get_mut<atlas::transform>();
+    atlas::point_light* light = m_point_light->get_mut<atlas::point_light>();
+
+    light->position = transform->position;
+
+
 
     auto query_cameras =
       query_builder<atlas::perspective_camera, atlas::transform>().build();

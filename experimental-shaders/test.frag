@@ -68,81 +68,46 @@ vec3 calc_dir_light(directional_light light, vec3 normal, vec3 view_dir) {
     return (ambient + diffuse + specular);
 }
 
-// vec3 calc_point_light()
-
+/*
+float shadow_calculation(vec3 fragPosLightSpace) {
+    vec4 pos = vec4(fragPosLightSpace, 1.0);
+}
+*/
 
 void main(){
-
-    // This works! Need to get the TODO working!
-    // float shininess = 64.0;
-    
-    
-    // vec3 ambient_value = vec3(0.2, 0.2, 0.2);
-    // vec3 diffuse_value = vec3(0.5, 0.5, 0.5);
-    // vec3 specular_value = vec3(1.0, 1.0, 1.0);
-
-    // TODO: Getting our uniforms specified in vk_renderer.cpp to apply these parameters here
-    // vec3 ambient_value = material.ambient.rgb * material.ambient.a;
-    // vec3 diffuse_value = material.diffuse.rgb;
-    // vec3 specular_value = material.specular.rgb;
-    // float shininess = material.shininess;
-
-    // apply ambience
-    /*
-    vec3 ambient = ambient_value * texture(diffuse_texture, fragTexCoords).rgb;
-
-    // apply diffuse
-    vec3 norm = normalize(fragNormals);
-    vec3 lightPos = vec3(0, 0, 0); // TODO: Replace this with a uniform that passes in the light position
-    vec3 light_direction = normalize(lightPos - FragPos);
-    float diff = max(dot(norm, light_direction), 0.0);
-    vec3 diffuse = diffuse_value * diff * texture(diffuse_texture, fragTexCoords).rgb;
-
-    // apply specular
-    vec3 viewPos = vec3(0.0, 0.0, 0.0); // TODO: Replace this with a dynamic uniform
-    vec3 view_direction = normalize(viewPos - FragPos);
-    vec3 reflect_direction = reflect(-light_direction, norm);
-    float spec = pow(max(dot(view_direction, reflect_direction), 0.0), shininess);
-    vec3 specular = specular_value * spec * texture(specular_texture, fragTexCoords).rgb;
-    
-    // vec4 lighting_result = vec4(ambient + diffuse + specular, 1.0);
-    vec3 result = ambient + diffuse + specular;
-    */
-    
-
-    // vec4 color = texture(diffuse_texture, fragTexCoords) * lighting_result; // working
-    // vec4 color = final_texture * lighting_result; // working
-    
-    // do some camera and worldspace calculation
-    
-
     // Adding point light code here
+
+    // extracting specific the point light from our objects and updating via the uniforms here
+    point_light light = light_src.light_source;
 
     // FragPos = position_to_world.xyz
     // fragNormal
-    vec3 pos = light_src.light_source.position.xyz;
+    vec3 pos = light.position.xyz;
     // vec3 pos = vec3(-1.70, 5.58, 1.30);
     vec3 dir_to_light = pos - FragPos.xyz;
-    float attenuation_offset = light_src.light_source.attenuation;
+    float attenuation_offset = light.attenuation;
     float attenuation = attenuation_offset / dot(dir_to_light, dir_to_light);
 
-    vec3 color = light_src.light_source.color.xyz * light_src.light_source.color.w;
-    vec3 ambient_offset = light_src.light_source.ambient.rgb * light_src.light_source.ambient.a * attenuation;
+    vec3 color = light.color.xyz * light.color.w;
+    vec3 ambient_offset = light.ambient.rgb * light.ambient.a * attenuation;
     vec3 ambient = ambient_offset * vec3(texture(diffuse_texture, fragTexCoords));
     float diff = max(dot(fragNormals, normalize(dir_to_light)), 0.0);
-    vec3 diffuse = light_src.light_source.diffuse.xyz * color * diff * vec3(texture(diffuse_texture, fragTexCoords));
-    vec3 specular = light_src.light_source.specular.xyz * vec3(texture(specular_texture, fragTexCoords));
+    vec3 diffuse = light.diffuse.xyz * color * diff * vec3(texture(diffuse_texture, fragTexCoords));
+    vec3 specular = light.specular.xyz * vec3(texture(specular_texture, fragTexCoords));
 
+    // Applied blinn-phongs term (blinn-phong's shading)
+    vec3 viewPos = light.position;
+    vec3 view_direction = normalize(viewPos - FragPos);
+    vec3 half_angle = normalize(dir_to_light + view_direction);
+    float blinn_term = dot(fragNormals, half_angle);
+    blinn_term = clamp(blinn_term, 0, 1);
+    blinn_term = pow(blinn_term, 32.0);
+    specular += color.xyz * attenuation * blinn_term;
 
+    // TODO: Implement shadow calculation with the given lighting system implementation
+    // float shadow_bias = shadow_calculation(light.position);
 
-    // vec3 norm = normalize(fragNormals);
-    // vec3 view_direction = normalize(dir_light_uniform.light_source.view_position - FragPos);
-    // vec3 result = calc_dir_light(dir_light_uniform.light_source, view_direction, norm);
-
-    // TEMPORARY: Adding this until point light work. Really, this should grab both diffuse and specular.
-    // vec3 result = texture(diffuse_texture, fragTexCoords).rgb;
-    // outColor = vec4(result, 1.0);
     vec3 result = (diffuse + ambient) * color;
+
     outColor = vec4(result, 1.0);
-    // outColor = vec4(result, 1.0);
 }
