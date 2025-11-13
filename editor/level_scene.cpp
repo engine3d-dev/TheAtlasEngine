@@ -398,6 +398,9 @@ level_scene::on_ui_update() {
                 ImGui::DragFloat4("Ambient", glm::value_ptr(p_dir_light->ambient), 0.001);
                 ImGui::DragFloat4("Diffuse", glm::value_ptr(p_dir_light->diffuse), 0.001);
                 ImGui::DragFloat4("Specular", glm::value_ptr(p_dir_light->specular), 0.001);
+                ImGui::DragFloat("Constant", &p_dir_light->constant, 0.001);
+                ImGui::DragFloat("Linear", &p_dir_light->linear, 0.001);
+                ImGui::DragFloat("Quadratic", &p_dir_light->quadratic, 0.001);
             });
 
             atlas::ui::draw_component<atlas::mesh_source>(
@@ -584,7 +587,7 @@ level_scene::on_update() {
         float default_speed = 10.f; // current default movement speed that does not applied modified speed
         float rotation_speed = 1.f;
         float velocity = default_speed * dt;
-        if (atlas::event::is_key_pressed(key_left_shift)) {
+        if (atlas::event::is_mouse_pressed(mouse_button_middle)) {
             velocity = m_movement_speed * dt;
         }
         float rotation_velocity = rotation_speed * dt;

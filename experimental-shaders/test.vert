@@ -28,7 +28,7 @@ void main() {
 	vec4 pos_to_world = geometry_src.model * vec4(inPosition, 1.0);
 
 	// vec3 normalize_mat = normalize(mat3(ubo.proj_view) * inNormals);
-	mat3 normalize_worldspace = transpose(inverse(mat3(geometry_src.model)));
+	mat3 normalize_worldspace = mat3(transpose(inverse(geometry_src.model)));
 
 
 	vec3 normal = normalize(normalize_worldspace * inNormals);

@@ -8,6 +8,7 @@
 #include <core/application.hpp>
 
 #include <drivers/vulkan-cpp/vk_types.hpp>
+#include <renderer/uniforms.hpp>
 
 namespace atlas::vk {
 
@@ -125,9 +126,16 @@ namespace atlas::vk {
         };
         m_global_uniforms = ::vk::uniform_buffer(m_device, geo_info);
 
-        ::vk::uniform_buffer_info light_ubo_params = {
+        /*
+		::vk::uniform_buffer_info light_ubo_params = {
             .phsyical_memory_properties = m_physical.memory_properties(),
             .size_bytes = sizeof(point_light),
+        };
+		*/
+		/// We set this up beforehand on what to expect
+		::vk::uniform_buffer_info light_ubo_params = {
+            .phsyical_memory_properties = m_physical.memory_properties(),
+            .size_bytes = sizeof(light_scene_ubo),
         };
         m_point_light_uniforms =
           ::vk::uniform_buffer(m_device, light_ubo_params);
@@ -257,6 +265,7 @@ namespace atlas::vk {
 						.descriptor_count = 1,
 					},
                     ::vk::descriptor_entry{
+						// specifies "layout (set = 1, binding = 3) uniform sampler2D material_ubo"
                         .type = ::vk::buffer::uniform,
                         .binding_point = {
                             .binding = 3,
@@ -264,15 +273,6 @@ namespace atlas::vk {
                         },
                         .descriptor_count = 1,
                     },
-					// ::vk::descriptor_entry{
-					// 	// specifies "layout (set = 1, binding = 4) uniform lighting_ubo"
-					// 	.type = ::vk::buffer::uniform,
-					// 	.binding_point = {
-					// 		.binding = 4,
-					// 		.stage = ::vk::shader_stage::fragment,
-					// 	},
-					// 	.descriptor_count = 1,
-					// },
 				};
 
                 ::vk::descriptor_layout set1_layout = {
@@ -306,16 +306,6 @@ namespace atlas::vk {
                     }
                 };
 
-                // std::array<::vk::write_buffer, 1> binding4_buffers = {
-                //     ::vk::write_buffer{
-                //       .buffer = m_cached_meshes[p_entity.id()].light_ubo(),
-                //       .offset = 0,
-                //       .range = m_cached_meshes[p_entity.id()]
-                //                  .light_ubo()
-                //                  .size_bytes(),
-                //     }
-                // };
-
                 std::vector<::vk::write_buffer_descriptor> material_uniforms = {
                     // layout(set=  1, binding = 0) geometry_ubo
                     ::vk::write_buffer_descriptor{
@@ -327,12 +317,6 @@ namespace atlas::vk {
                       .dst_binding = 3,
                       .uniforms = binding3_buffers,
                     },
-                    // layout(set=  1, binding = 3) directional_light_ubo
-                    // ::vk::write_buffer_descriptor{
-                    //     .dst_binding = 4,
-                    // 	.uniforms = binding4_buffers,
-                    // },
-
                 };
 
                 // layout(set = 1, binding = 1)
@@ -410,6 +394,36 @@ namespace atlas::vk {
         clear_values[1].depthStencil = { 1.f, 0 };
         m_window_extent = p_settings;
 
+		// ref<world_scope> current_world =
+        //   system_registry::get_world("Editor World");
+        // ref<scene_scope> current_scene = current_world->get_scene("LevelScene");
+
+		//  // query all point lights
+		// // std::array<point_light, 1000> all_point_light_sources;
+        // flecs::query<point_light> query_point_lights =
+        //   current_scene->query_builder<point_light>().build();
+
+		// uint32_t index = 0;
+		// point_light test_light;
+		// std::vector<point_light> all_point_lights;
+		// point_light point_light_environment;
+		// std::array<point_light, 10> point_lights;
+		// uint32_t index = 0;
+        // query_point_lights.each([&index, &point_lights](flecs::entity p_entity, point_light& p_light) {
+		// 	const transform* t = p_entity.get<transform>();
+		// 	p_light.position = t->position;
+		// 	point_lights[index] = p_light;
+		// 	index += 1;
+        // });
+
+
+		// light_scene_ubo test_light = {
+		// 	.light_sources = point_lights,
+		// 	.num_lights = index,
+		// };
+
+		// m_point_light_uniforms.update(&test_light);
+
         // TODO: Fix this when getting shader hot-reloading to workagain.
         // if (m_shader_group.reload_requested()) {
         // 	console_log_info("reloading shaders and graphics pipeline!!");
@@ -475,6 +489,7 @@ namespace atlas::vk {
         vkCmdBeginRenderPass(m_current_command_buffer,
                              &renderpass_begin_info,
                              VK_SUBPASS_CONTENTS_INLINE);
+
     }
 
     // This just returns the arbitrary amount of bytes of the object
@@ -499,20 +514,28 @@ namespace atlas::vk {
           system_registry::get_world("Editor World");
         ref<scene_scope> current_scene = current_world->get_scene("LevelScene");
 
-        // query all point lights
+		 // query all point lights
         flecs::query<point_light> query_point_lights =
           current_scene->query_builder<point_light>().build();
 
-        //! TODO: Replace rendertarget3d with a material component
-        flecs::query<> query_targets =
-          current_scene->query_builder<mesh_source>().build();
-
-        query_point_lights.each([this](flecs::entity p_entity, point_light& p_light) {
+		// std::array<point_light, 10> point_lights;
+		light_scene_ubo test_light = {};
+		uint32_t index = 0;
+        query_point_lights.each([&index, &test_light](flecs::entity p_entity, point_light& p_light) {
 			const transform* t = p_entity.get<transform>();
 			p_light.position = t->position;
-            m_point_light_uniforms.update(&p_light);
-        });
 
+			test_light.light_sources[index] = p_light;
+			index += 1;
+        });
+		test_light.num_lights = index;
+
+		m_point_light_uniforms.update(&test_light);
+
+		// query all objects with a specified 3d mesh source
+        flecs::query<> query_targets =
+          current_scene->query_builder<mesh_source>().build();
+		
         m_main_pipeline.bind(m_current_command_buffer);
         // Bind global camera data here
         m_global_descriptors.bind(m_current_command_buffer,
@@ -538,16 +561,6 @@ namespace atlas::vk {
                 m_cached_meshes[p_entity.id()].update_uniform(
                   mesh_material_ubo);
 
-                // float shininess = 64.0;
-                // vec3 ambient_value = vec3(0.2, 0.2, 0.2);
-                // vec3 diffuse_value = vec3(0.5, 0.5, 0.5);
-                // vec3 specular_value = vec3(1.0, 1.0, 1.0);
-                // material_metadata data = {
-                // 	.ambient = {0.2f, 0.2f, 0.2f},
-                // 	.diffuse = {0.5f, 0.5f, 0.5f},
-                // 	.specular = {1.0f, 1.0f, 1.0f},
-                // 	.shininess = 64.f,
-                // };
                 material_metadata data = {};
 
                 if (p_entity.has<material_metadata>()) {
