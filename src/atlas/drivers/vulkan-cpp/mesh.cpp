@@ -215,6 +215,7 @@ namespace atlas::vk {
     }
 
     void mesh::destroy() {
+        console_log_warn("mesh::destroy() function called!!!");
         m_vbo.destroy();
         m_ibo.destroy();
 

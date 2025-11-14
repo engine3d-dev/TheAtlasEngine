@@ -525,7 +525,17 @@ namespace atlas::vk {
 			const transform* t = p_entity.get<transform>();
 			p_light.position = t->position;
 
-			test_light.light_sources[index] = p_light;
+			test_light.light_sources[index] = {
+				.position = glm::vec4(p_light.position, 1.f),
+				.color = p_light.color,
+				.attenuation = p_light.attenuation,
+				.constant = p_light.constant,
+				.linear = p_light.linear,
+				.quadratic = p_light.quadratic,
+				.ambient = p_light.ambient,
+				.diffuse = p_light.diffuse,
+				.specular = p_light.specular,
+			};
 			index += 1;
         });
 		test_light.num_lights = index;
