@@ -209,30 +209,16 @@ main() {
 
     // if no point lights are appointed to this. Then we are going to just by
     // default show the mesh without applied meshes
-    vec3 diffuse =
-      vec3(texture(diffuse_texture, fragTexCoords)) * fragColor.rgb;
-    vec3 result = vec3(1.0);
+    vec3 default_ambience =
+      (vec3(texture(diffuse_texture, fragTexCoords)) * fragColor.rgb) * 0.1;
+    vec3 result = default_ambience;
 
-    if (light_src.num_lights > 0) {
-        point_light source_light = light_src.sources[0];
-        vec3 view_pos = source_light.position.xyz;
-        vec3 dir_to_light = normalize(view_pos - FragPos.xyz);
-        result =
-          calc_point_light(source_light, fragNormals, FragPos, dir_to_light);
-    }
-
-    for (int i = 1; i < light_src.num_lights; i++) {
+    for (int i = 0; i < light_src.num_lights; i++) {
         point_light source_light = light_src.sources[i];
         vec3 view_pos = source_light.position.xyz;
         vec3 dir_to_light = normalize(view_pos - FragPos.xyz);
         result +=
           calc_point_light(source_light, fragNormals, FragPos, dir_to_light);
-    }
-
-    // If there are no present light sources provided. Then we will by default
-    // show the diffuse texture provided of those meshes
-    if (light_src.num_lights == 0) {
-        result = diffuse;
     }
 
     // point_light source_light = light_src.sources[0];
