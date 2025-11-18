@@ -24,7 +24,8 @@ namespace atlas::vk {
         m_ibo = ::vk::index_buffer(m_device, ibo_settings);
     }
 
-    mesh::mesh(const std::filesystem::path& p_filename, bool p_flip) : m_flip(p_flip) {
+    mesh::mesh(const std::filesystem::path& p_filename, bool p_flip)
+      : m_flip(p_flip) {
         m_physical = vk_context::physical_driver();
         m_device = vk_context::driver_context();
         reload_mesh(p_filename);
@@ -64,10 +65,10 @@ namespace atlas::vk {
         std::unordered_map<::vk::vertex_input, uint32_t> unique_vertices{};
 
         // for (const auto& shape : shapes) {
-        for(size_t i = 0; i < shapes.size(); i++) {
+        for (size_t i = 0; i < shapes.size(); i++) {
             auto shape = shapes[i];
             // for (const auto& index : shape.mesh.indices) {
-            for(size_t j = 0; j < shape.mesh.indices.size(); j++) {
+            for (size_t j = 0; j < shape.mesh.indices.size(); j++) {
                 auto index = shape.mesh.indices[j];
                 ::vk::vertex_input vertex{};
 
@@ -98,24 +99,22 @@ namespace atlas::vk {
                         attrib.normals[3 * index.normal_index + 2]
                     };
                 }
-                if(!attrib.texcoords.empty()) {
+                if (!attrib.texcoords.empty()) {
                     glm::vec2 flipped_uv = {
-                        attrib.texcoords[static_cast<long long>(index.texcoord_index) * 2],
-                        1.0f - attrib.texcoords[static_cast<long long>(index.texcoord_index) * 2 + 1],
+                        attrib.texcoords
+                          [static_cast<long long>(index.texcoord_index) * 2],
+                        1.0f - attrib.texcoords[static_cast<long long>(
+                                                  index.texcoord_index) *
+                                                  2 +
+                                                1],
                     };
 
                     glm::vec2 original_uv = {
-                        attrib.texcoords[static_cast<long long>(index.texcoord_index) * 2],
-                        attrib.texcoords[static_cast<long long>(index.texcoord_index) * 2 + 1],
+                        attrib.texcoords [static_cast<long long>(index.texcoord_index) * 2],
+                        attrib.texcoords [static_cast<long long>(index.texcoord_index) * 2 + 1],
                     };
 
-                    // vertex.uv = m_flip ? flipped_uv : original_uv;
-                    if(m_flip) {
-                        vertex.uv = flipped_uv;
-                    }
-                    else {
-                        vertex.uv = original_uv;
-                    }
+                    vertex.uv = m_flip ? flipped_uv : original_uv;
                 }
                 else {
                     vertex.uv = glm::vec2(0.f, 0.f);
@@ -145,48 +144,42 @@ namespace atlas::vk {
     }
 
     void mesh::initialize_uniforms(uint32_t p_size_bytes_ubo) {
-        ::vk::uniform_buffer_info geo_info = { .phsyical_memory_properties =
-                                                 m_physical.memory_properties(),
-                                               .size_bytes = p_size_bytes_ubo };
+        ::vk::uniform_buffer_info geo_info = {
+            .phsyical_memory_properties = m_physical.memory_properties(),
+            .size_bytes = p_size_bytes_ubo,
+            .debug_name = "\nm_geometry_ubo\n",
+            .vkSetDebugUtilsObjectNameEXT = vk_context::get_debug_object_name()
+        };
         m_geoemtry_ubo = ::vk::uniform_buffer(m_device, geo_info);
     }
 
     void mesh::initialize_material_ubo(uint32_t p_size_bytes) {
-        ::vk::uniform_buffer_info geo_info = { .phsyical_memory_properties =
-                                                 m_physical.memory_properties(),
-                                               .size_bytes = p_size_bytes };
+        ::vk::uniform_buffer_info geo_info = {
+            .phsyical_memory_properties = m_physical.memory_properties(),
+            .size_bytes = p_size_bytes,
+        };
         m_material_ubo = ::vk::uniform_buffer(m_device, geo_info);
-    }
-
-    void mesh::initialize_dir_light(uint32_t p_size_bytes) {
-        ::vk::uniform_buffer_info info = { .phsyical_memory_properties =
-                                                 m_physical.memory_properties(),
-                                               .size_bytes = p_size_bytes };
-        m_directional_ubo = ::vk::uniform_buffer(m_device, info);
     }
 
     void mesh::update_uniform(const material_uniform& p_material_ubo) {
         m_geoemtry_ubo.update(&p_material_ubo);
     }
 
-    void mesh::update_material_uniforms(const material_metadata& p_material_data) {
+    void mesh::update_material_uniforms(
+      const material_metadata& p_material_data) {
         m_material_ubo.update(&p_material_data);
-    } 
-
-    void mesh::update_light(const point_light& p_dir_light) {
-        m_directional_ubo.update(&p_dir_light);
     }
 
-    
-
     void mesh::add_diffuse(const std::filesystem::path& p_path) {
-        ::vk::texture_info config_texture = { .phsyical_memory_properties =
-                                                m_physical.memory_properties(),
-                                              .filepath = p_path };
+        ::vk::texture_info config_texture = {
+            .phsyical_memory_properties = m_physical.memory_properties(),
+            .filepath = p_path,
+        };
         m_diffuse = ::vk::texture(m_device, config_texture);
 
         if (!m_diffuse.loaded()) {
-            console_log_info("Diffuse Texture {} is NOT loaded!!!", p_path.string());
+            console_log_info("Diffuse Texture {} is NOT loaded!!!",
+                             p_path.string());
             return;
         }
     }
@@ -198,7 +191,8 @@ namespace atlas::vk {
         m_specular = ::vk::texture(m_device, config_texture);
 
         if (!m_specular.loaded()) {
-            console_log_error("Specular Texture {} is NOT loaded!!!", p_path.string());
+            console_log_error("Specular Texture {} is NOT loaded!!!",
+                              p_path.string());
             return;
         }
     }
@@ -215,11 +209,10 @@ namespace atlas::vk {
     }
 
     void mesh::destroy() {
-        console_log_warn("mesh::destroy() function called!!!");
         m_vbo.destroy();
         m_ibo.destroy();
 
-        m_directional_ubo.destroy();
+        // m_directional_ubo.destroy();
         m_diffuse.destroy();
         m_specular.destroy();
         m_geoemtry_ubo.destroy();

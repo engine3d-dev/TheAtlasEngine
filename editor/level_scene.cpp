@@ -393,14 +393,14 @@ level_scene::on_ui_update() {
             */
             
             atlas::ui::draw_component<atlas::point_light>("Point Light", m_selected_entity, [](atlas::point_light* p_dir_light){
-                ImGui::DragFloat4("Color", glm::value_ptr(p_dir_light->color), 0.001);
+                ImGui::DragFloat4("Color", glm::value_ptr(p_dir_light->color), 0.01);
                 ImGui::DragFloat("Attenuation", &p_dir_light->attenuation, 0.001);
-                ImGui::DragFloat4("Ambient", glm::value_ptr(p_dir_light->ambient), 0.001);
-                ImGui::DragFloat4("Diffuse", glm::value_ptr(p_dir_light->diffuse), 0.001);
-                ImGui::DragFloat4("Specular", glm::value_ptr(p_dir_light->specular), 0.001);
-                ImGui::DragFloat("Constant", &p_dir_light->constant, 0.001);
-                ImGui::DragFloat("Linear", &p_dir_light->linear, 0.001);
-                ImGui::DragFloat("Quadratic", &p_dir_light->quadratic, 0.001);
+                ImGui::DragFloat4("Ambient", glm::value_ptr(p_dir_light->ambient), 0.01);
+                ImGui::DragFloat4("Diffuse", glm::value_ptr(p_dir_light->diffuse), 0.01);
+                ImGui::DragFloat4("Specular", glm::value_ptr(p_dir_light->specular), 0.01);
+                ImGui::DragFloat("Constant", &p_dir_light->constant, 0.01);
+                ImGui::DragFloat("Linear", &p_dir_light->linear, 0.01);
+                ImGui::DragFloat("Quadratic", &p_dir_light->quadratic, 0.01);
             });
 
             atlas::ui::draw_component<atlas::mesh_source>(

@@ -123,8 +123,6 @@ namespace atlas::vk {
         ::vk::uniform_buffer_info geo_info = {
             .phsyical_memory_properties = m_physical.memory_properties(),
             .size_bytes = sizeof(global_ubo),
-			.debug_name = "\nm_global_uniforms\n",
-			.vkSetDebugUtilsObjectNameEXT = vk_context::get_debug_object_name()
         };
         m_global_uniforms = ::vk::uniform_buffer(m_device, geo_info);
 
@@ -186,15 +184,16 @@ namespace atlas::vk {
             m_shader_group.destroy();
             m_global_descriptors.destroy();
             m_global_uniforms.destroy();
-			m_point_light_uniforms.destroy();
-            for (auto& [id, mesh] : m_cached_meshes) {
+            m_point_light_uniforms.destroy();
+            for (auto& [key, value] : m_cached_meshes) {
                 console_log_trace("Entity \"{}\" Destroyed in vk_renderer!!!",
-                                  id);
-                mesh.destroy();
+                                  key);
+
+                value.destroy();
             }
             for (auto& [key, descriptor_map] : m_mesh_descriptors) {
                 for (auto& [descriptor_type, descriptor] : descriptor_map) {
-					descriptor.destroy();
+                    descriptor.destroy();
                 }
             }
             m_main_pipeline.destroy();
@@ -339,7 +338,7 @@ namespace atlas::vk {
                     ::vk::write_image{
                       .sampler = diffuse.sampler(),
                       .view = diffuse.image_view(),
-                      .image_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL }
+                      .image_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, }
                 };
 
                 // writes to texture at layout(set = 1, binding = 2)
@@ -347,17 +346,17 @@ namespace atlas::vk {
                     ::vk::write_image{
                       .sampler = specular.sampler(),
                       .view = specular.image_view(),
-                      .image_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL }
+                      .image_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, }
                 };
 
                 // vulkan image descriptors are for writing textures
                 std::vector<::vk::write_image_descriptor> material_textures = {
                     // layout(set = 1, binding = 1) uniform sampler2D
                     ::vk::write_image_descriptor{
-                      .dst_binding = 1, .sample_images = binding1_images },
+                      .dst_binding = 1, .sample_images = binding1_images, },
                     // layout(set = 1, binding = 2) uniform sampler2D
                     ::vk::write_image_descriptor{
-                      .dst_binding = 2, .sample_images = binding2_images },
+                      .dst_binding = 2, .sample_images = binding2_images, },
                 };
 
                 m_mesh_descriptors[p_entity.id()]["materials"].update(
@@ -544,4 +543,3 @@ namespace atlas::vk {
         m_current_command_buffer.end();
     }
 };
-
