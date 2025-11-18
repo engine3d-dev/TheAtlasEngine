@@ -479,11 +479,10 @@ namespace atlas::vk {
           system_registry::get_world("Editor World");
         ref<scene_scope> current_scene = current_world->get_scene("LevelScene");
 
-        // query all point lights
+        // query all entities that have a point light
         flecs::query<point_light> query_point_lights =
           current_scene->query_builder<point_light>().build();
 
-        // std::array<point_light, 10> point_lights;
         light_scene_ubo test_light = {};
         uint32_t index = 0;
         query_point_lights.each(
