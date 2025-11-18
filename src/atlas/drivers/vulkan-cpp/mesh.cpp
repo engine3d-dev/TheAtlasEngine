@@ -110,8 +110,11 @@ namespace atlas::vk {
                     };
 
                     glm::vec2 original_uv = {
-                        attrib.texcoords [static_cast<long long>(index.texcoord_index) * 2],
-                        attrib.texcoords [static_cast<long long>(index.texcoord_index) * 2 + 1],
+                        attrib.texcoords
+                          [static_cast<long long>(index.texcoord_index) * 2],
+                        attrib.texcoords
+                          [static_cast<long long>(index.texcoord_index) * 2 +
+                           1],
                     };
 
                     vertex.uv = m_flip ? flipped_uv : original_uv;

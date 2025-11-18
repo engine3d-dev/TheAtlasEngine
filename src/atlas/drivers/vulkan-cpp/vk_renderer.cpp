@@ -128,7 +128,8 @@ namespace atlas::vk {
         };
         m_global_uniforms = ::vk::uniform_buffer(m_device, global_info);
 
-        // setting up our light uniforms as the global uniforms rather then per-object basis
+        // setting up our light uniforms as the global uniforms rather then
+        // per-object basis
         ::vk::uniform_buffer_info light_ubo_params = {
             .phsyical_memory_properties = m_physical.memory_properties(),
             .size_bytes = sizeof(light_scene_ubo),
@@ -187,13 +188,13 @@ namespace atlas::vk {
                 mesh.destroy();
             }
 
-			for(auto& [id, uniform] : m_mesh_geometry_set) {
-				uniform.destroy();
-			}
+            for (auto& [id, uniform] : m_mesh_geometry_set) {
+                uniform.destroy();
+            }
 
-			for(auto& [id, material_uniform] : m_mesh_material_set) {
-				material_uniform.destroy();
-			}
+            for (auto& [id, material_uniform] : m_mesh_material_set) {
+                material_uniform.destroy();
+            }
 
             for (auto& [key, descriptor_map] : m_mesh_descriptors) {
                 for (auto& [descriptor_type, descriptor] : descriptor_map) {
@@ -222,25 +223,32 @@ namespace atlas::vk {
 
         caching.each([this](flecs::entity p_entity) {
             const mesh_source* target = p_entity.get<mesh_source>();
-            mesh new_mesh(std::filesystem::path(target->model_path), target->flip);
+            mesh new_mesh(std::filesystem::path(target->model_path),
+                          target->flip);
 
-			// we do a check if the geometry uniform associated with this game object is valid
-			if(!m_mesh_geometry_set.contains(p_entity.id())) {
-				::vk::uniform_buffer_info geo_info = {
-					.phsyical_memory_properties = m_physical.memory_properties(),
-					.size_bytes = sizeof(material_uniform),
-				};
-				m_mesh_geometry_set[p_entity.id()] = ::vk::uniform_buffer(m_device, geo_info);
-			}
+            // we do a check if the geometry uniform associated with this game
+            // object is valid
+            if (!m_mesh_geometry_set.contains(p_entity.id())) {
+                ::vk::uniform_buffer_info geo_info = {
+                    .phsyical_memory_properties =
+                      m_physical.memory_properties(),
+                    .size_bytes = sizeof(material_uniform),
+                };
+                m_mesh_geometry_set[p_entity.id()] =
+                  ::vk::uniform_buffer(m_device, geo_info);
+            }
 
-			// check if material is already associated with this particular game object
-			if(!m_mesh_material_set.contains(p_entity.id())) {
-				::vk::uniform_buffer_info mat_info = {
-					.phsyical_memory_properties = m_physical.memory_properties(),
-					.size_bytes = sizeof(material_metadata),
-				};
-				m_mesh_material_set[p_entity.id()] = ::vk::uniform_buffer(m_device, mat_info);
-			}
+            // check if material is already associated with this particular game
+            // object
+            if (!m_mesh_material_set.contains(p_entity.id())) {
+                ::vk::uniform_buffer_info mat_info = {
+                    .phsyical_memory_properties =
+                      m_physical.memory_properties(),
+                    .size_bytes = sizeof(material_metadata),
+                };
+                m_mesh_material_set[p_entity.id()] =
+                  ::vk::uniform_buffer(m_device, mat_info);
+            }
 
             new_mesh.add_diffuse(std::filesystem::path(target->diffuse));
             new_mesh.add_specular(std::filesystem::path(target->specular));
@@ -527,17 +535,15 @@ namespace atlas::vk {
             m_model *= rotation_mat4;
 
             // Mesh used for viking_room - replaced with std::map equivalent
-            geometry_uniform mesh_ubo = {
-                .model = m_model, .color = material_component->color
-            };
-			// m_geometry_uniforms.update(&mesh_ubo);
-			m_mesh_geometry_set[p_entity.id()].update(&mesh_ubo);
+            geometry_uniform mesh_ubo = { .model = m_model,
+                                          .color = material_component->color };
+            // m_geometry_uniforms.update(&mesh_ubo);
+            m_mesh_geometry_set[p_entity.id()].update(&mesh_ubo);
 
             if (m_cached_meshes[p_entity.id()].loaded()) {
 
                 // m_cached_meshes[p_entity.id()].update_uniform(
                 //   mesh_material_ubo);
-				
 
                 material_metadata data = {};
 
@@ -546,8 +552,8 @@ namespace atlas::vk {
                 }
 
                 // m_cached_meshes[p_entity.id()].update_material_uniforms(data);
-				// m_material_uniforms.update(&data);
-				m_mesh_material_set[p_entity.id()].update(&data);
+                // m_material_uniforms.update(&data);
+                m_mesh_material_set[p_entity.id()].update(&data);
 
                 m_mesh_descriptors[p_entity.id()]["materials"].bind(
                   m_current_command_buffer,

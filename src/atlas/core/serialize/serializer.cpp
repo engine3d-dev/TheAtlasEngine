@@ -28,7 +28,7 @@ namespace atlas {
             output << p_entity.get<mesh_source>();
         }
 
-		if (p_entity.has<point_light>()) {
+        if (p_entity.has<point_light>()) {
             output << p_entity.get<point_light>();
         }
 
@@ -86,25 +86,23 @@ namespace atlas {
             p_deserialize_to_object.set<mesh_source>({
               .model_path =
                 perspective_camera_data["Model Path"].as<std::string>(),
-              .diffuse =
-                perspective_camera_data["Diffuse"].as<std::string>(),
-				.specular =
-                perspective_camera_data["Specular"].as<std::string>(),
+              .diffuse = perspective_camera_data["Diffuse"].as<std::string>(),
+              .specular = perspective_camera_data["Specular"].as<std::string>(),
             });
         }
 
-		if (p_entity_value["Point Light"]) {
+        if (p_entity_value["Point Light"]) {
             auto point_light = p_entity_value["Point Light"];
-			p_deserialize_to_object.set<atlas::point_light>({
-				.color = point_light["Color"].as<glm::vec4>(),
-				.attenuation = point_light["Attenuation"].as<float>(),
-				.constant = 1.f,
-				.linear = 1.f,
-				.quadratic = 1.f,
-				.ambient = point_light["Ambient"].as<glm::vec4>(),
-				.diffuse = point_light["Diffuse"].as<glm::vec4>(),
-				.specular = point_light["Specular"].as<glm::vec4>(),
-			});
+            p_deserialize_to_object.set<atlas::point_light>({
+              .color = point_light["Color"].as<glm::vec4>(),
+              .attenuation = point_light["Attenuation"].as<float>(),
+              .constant = 1.f,
+              .linear = 1.f,
+              .quadratic = 1.f,
+              .ambient = point_light["Ambient"].as<glm::vec4>(),
+              .diffuse = point_light["Diffuse"].as<glm::vec4>(),
+              .specular = point_light["Specular"].as<glm::vec4>(),
+            });
         }
 
         // deserialize physics body

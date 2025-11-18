@@ -133,10 +133,14 @@ namespace atlas::vk {
         vk_check(vkCreateInstance(&create_info, nullptr, &m_instance_handler),
                  "vkCreateInstance");
 
-
 #if _DEBUG
-        // This needs to be created after the VkInstance is or else it wont be applied the debug information during validation layer error message execution
-        m_vk_set_debug_utils_object_name_ext = reinterpret_cast<PFN_vkSetDebugUtilsObjectNameEXT>(vkGetInstanceProcAddr(m_instance_handler, "vkSetDebugUtilsObjectNameEXT"));
+        // This needs to be created after the VkInstance is or else it wont be
+        // applied the debug information during validation layer error message
+        // execution
+        m_vk_set_debug_utils_object_name_ext =
+          reinterpret_cast<PFN_vkSetDebugUtilsObjectNameEXT>(
+            vkGetInstanceProcAddr(m_instance_handler,
+                                  "vkSetDebugUtilsObjectNameEXT"));
 #endif
         s_instance = this;
 

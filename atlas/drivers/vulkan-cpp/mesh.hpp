@@ -31,26 +31,10 @@ namespace atlas::vk {
         mesh() = default;
         mesh(std::span<::vk::vertex_input> p_vertices,
              std::span<uint32_t> p_indices);
-        mesh(const std::filesystem::path& p_filename, bool p_flip=false);
+        mesh(const std::filesystem::path& p_filename, bool p_flip = false);
 
         //! @brief Reload mesh vertices and indices when requested
         void reload_mesh(const std::filesystem::path& p_path);
-
-        // void initialize_uniforms(uint32_t p_size_bytes_ubo);
-
-        //! @brief Initializes uniform buffer specifically for material_src
-        // void initialize_material_ubo(uint32_t p_size_bytes);
-
-        // void update_uniform(const geometry_uniform& p_material_ubo);
-        // void update_material_uniforms(const material_metadata& p_material_data);
-
-        // [[nodiscard]] ::vk::uniform_buffer geometry_ubo() const {
-        //     return m_geoemtry_ubo;
-        // }
-
-        // [[nodiscard]] ::vk::uniform_buffer material_ubo() const {
-        //     return m_material_ubo;
-        // }
 
         void draw(const VkCommandBuffer& p_command_buffer);
 
@@ -61,19 +45,22 @@ namespace atlas::vk {
 
         void add_specular(const std::filesystem::path& p_path);
 
-        [[nodiscard]] ::vk::sample_image diffuse() const { return m_diffuse.image(); }
-        [[nodiscard]] ::vk::sample_image specular() const { return m_specular.image(); }
+        [[nodiscard]] ::vk::sample_image diffuse() const {
+            return m_diffuse.image();
+        }
+        [[nodiscard]] ::vk::sample_image specular() const {
+            return m_specular.image();
+        }
 
         //! @return true if mesh geometry model loaded succesfully
         [[nodiscard]] bool loaded() const { return m_model_loaded; }
 
         [[nodiscard]] bool diffuse_loaded() const { return m_diffuse.loaded(); }
-        [[nodiscard]] bool specular_loaded() const { return m_specular.loaded(); }
-
-        void set_flip(bool p_flip) {
-            m_flip = p_flip;
+        [[nodiscard]] bool specular_loaded() const {
+            return m_specular.loaded();
         }
 
+        void set_flip(bool p_flip) { m_flip = p_flip; }
 
     private:
         void load_obj(const std::filesystem::path& p_filename);

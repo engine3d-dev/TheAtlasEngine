@@ -104,8 +104,8 @@ level_scene::level_scene(const std::string& p_name,
 
     m_point_light = create_object("Point Light 1");
     m_point_light->set<atlas::transform>({
-        .position = { 0.f, 2.10f, -7.30f },
-        .scale = { 0.9f, 0.9f, 0.9f },
+      .position = { 0.f, 2.10f, -7.30f },
+      .scale = { 0.9f, 0.9f, 0.9f },
     });
 
     m_point_light->set<atlas::mesh_source>({
@@ -380,28 +380,39 @@ level_scene::on_ui_update() {
                   ImGui::Checkbox("is_active", &p_camera->is_active);
                   ImGui::DragFloat("Speed", &m_movement_speed);
               });
-            
+
             /*
-            atlas::ui::draw_component<atlas::directional_light>("Directional Light", m_selected_entity, [](atlas::directional_light* p_dir_light){
-                ImGui::DragFloat4("Direction", glm::value_ptr(p_dir_light->direction));
-                ImGui::DragFloat4("View Pos", glm::value_ptr(p_dir_light->view_position));
+            atlas::ui::draw_component<atlas::directional_light>("Directional
+            Light", m_selected_entity, [](atlas::directional_light*
+            p_dir_light){ ImGui::DragFloat4("Direction",
+            glm::value_ptr(p_dir_light->direction)); ImGui::DragFloat4("View
+            Pos", glm::value_ptr(p_dir_light->view_position));
                 ImGui::DragFloat4("Color", glm::value_ptr(p_dir_light->color));
-                ImGui::DragFloat4("Ambient", glm::value_ptr(p_dir_light->ambient));
-                ImGui::DragFloat4("Diffuse", glm::value_ptr(p_dir_light->diffuse));
-                ImGui::DragFloat4("Specular", glm::value_ptr(p_dir_light->specular));
+                ImGui::DragFloat4("Ambient",
+            glm::value_ptr(p_dir_light->ambient)); ImGui::DragFloat4("Diffuse",
+            glm::value_ptr(p_dir_light->diffuse)); ImGui::DragFloat4("Specular",
+            glm::value_ptr(p_dir_light->specular));
             });
             */
-            
-            atlas::ui::draw_component<atlas::point_light>("Point Light", m_selected_entity, [](atlas::point_light* p_dir_light){
-                ImGui::DragFloat4("Color", glm::value_ptr(p_dir_light->color), 0.01);
-                ImGui::DragFloat("Attenuation", &p_dir_light->attenuation, 0.001);
-                ImGui::DragFloat4("Ambient", glm::value_ptr(p_dir_light->ambient), 0.01);
-                ImGui::DragFloat4("Diffuse", glm::value_ptr(p_dir_light->diffuse), 0.01);
-                ImGui::DragFloat4("Specular", glm::value_ptr(p_dir_light->specular), 0.01);
-                ImGui::DragFloat("Constant", &p_dir_light->constant, 0.01);
-                ImGui::DragFloat("Linear", &p_dir_light->linear, 0.01);
-                ImGui::DragFloat("Quadratic", &p_dir_light->quadratic, 0.01);
-            });
+
+            atlas::ui::draw_component<atlas::point_light>(
+              "Point Light",
+              m_selected_entity,
+              [](atlas::point_light* p_dir_light) {
+                  ImGui::DragFloat4(
+                    "Color", glm::value_ptr(p_dir_light->color), 0.01);
+                  ImGui::DragFloat(
+                    "Attenuation", &p_dir_light->attenuation, 0.001);
+                  ImGui::DragFloat4(
+                    "Ambient", glm::value_ptr(p_dir_light->ambient), 0.01);
+                  ImGui::DragFloat4(
+                    "Diffuse", glm::value_ptr(p_dir_light->diffuse), 0.01);
+                  ImGui::DragFloat4(
+                    "Specular", glm::value_ptr(p_dir_light->specular), 0.01);
+                  ImGui::DragFloat("Constant", &p_dir_light->constant, 0.01);
+                  ImGui::DragFloat("Linear", &p_dir_light->linear, 0.01);
+                  ImGui::DragFloat("Quadratic", &p_dir_light->quadratic, 0.01);
+              });
 
             atlas::ui::draw_component<atlas::mesh_source>(
               "atlas::mesh_source",
@@ -409,19 +420,21 @@ level_scene::on_ui_update() {
               [](atlas::mesh_source* p_source) {
                   atlas::ui::draw_input_text(p_source->model_path);
                   atlas::ui::draw_vec4("Color", p_source->color);
-            });
+              });
 
             atlas::ui::draw_component<atlas::material_metadata>(
               "material",
               m_selected_entity,
               [](atlas::material_metadata* p_source) {
                   float speed = 0.01f;
-                  ImGui::DragFloat4("Ambient", glm::value_ptr(p_source->ambient), speed);
-                  ImGui::DragFloat4("Diffuse", glm::value_ptr(p_source->diffuse), speed);
-                  ImGui::DragFloat4("Specular", glm::value_ptr(p_source->specular), speed);
+                  ImGui::DragFloat4(
+                    "Ambient", glm::value_ptr(p_source->ambient), speed);
+                  ImGui::DragFloat4(
+                    "Diffuse", glm::value_ptr(p_source->diffuse), speed);
+                  ImGui::DragFloat4(
+                    "Specular", glm::value_ptr(p_source->specular), speed);
                   atlas::ui::draw_float("Shininess", p_source->shininess);
-            });
-
+              });
 
             atlas::ui::draw_component<atlas::physics_body>(
               "Physics Body",
@@ -552,12 +565,12 @@ level_scene::start() {
     });
 
     // TODO: Make this contain an atlas::directional_light
-    // If the scene opject dooes not have a atlas::directional_light, then we set the default values to 1.0f
-    // m_robot_model sets the cube.obj 3d model and loads it
+    // If the scene opject dooes not have a atlas::directional_light, then we
+    // set the default values to 1.0f m_robot_model sets the cube.obj 3d model
+    // and loads it
     m_robot_model->set<atlas::material_metadata>({
-        .shininess = 64.f,
+      .shininess = 64.f,
     });
-
 
     // Initiating physics system
     atlas::physics::jolt_settings settings = {};
@@ -584,7 +597,8 @@ level_scene::on_update() {
         }
 
         float dt = atlas::application::delta_time();
-        float default_speed = 10.f; // current default movement speed that does not applied modified speed
+        float default_speed = 10.f; // current default movement speed that does
+                                    // not applied modified speed
         float rotation_speed = 1.f;
         float velocity = default_speed * dt;
         if (atlas::event::is_mouse_pressed(mouse_button_middle)) {
@@ -598,12 +612,11 @@ level_scene::on_update() {
         glm::vec3 forward = glm::rotate(to_quaternion, atlas::math::backward());
         glm::vec3 right = glm::rotate(to_quaternion, atlas::math::right());
 
-
-        if(atlas::event::is_key_pressed(key_left_shift)) {
+        if (atlas::event::is_key_pressed(key_left_shift)) {
             p_transform.position += up * velocity;
         }
 
-        if(atlas::event::is_key_pressed(key_space)) {
+        if (atlas::event::is_key_pressed(key_space)) {
             p_transform.position -= up * velocity;
         }
 
@@ -627,7 +640,6 @@ level_scene::on_update() {
         if (atlas::event::is_key_pressed(key_e)) {
             p_transform.rotation.y -= rotation_velocity;
         }
-
 
         p_transform.set_rotation(p_transform.rotation);
     });
