@@ -49,7 +49,7 @@ namespace atlas::vk {
 
     private:
         void preload_assets(const VkRenderPass& p_renderpass) override;
-        
+
         void start_frame(const ::vk::command_buffer& p_current,
                          const window_settings& p_settings,
                          const VkRenderPass& p_renderpass,
@@ -63,7 +63,7 @@ namespace atlas::vk {
         VkDevice m_device = nullptr;
         vk_physical_driver m_physical;
         glm::mat4 m_proj_view;
-        VkRenderPass m_final_renderpass=nullptr;
+        VkRenderPass m_final_renderpass = nullptr;
         window_settings m_window_extent;
         ::vk::command_buffer m_current_command_buffer{};
         VkClearColorValue m_color;
@@ -82,7 +82,8 @@ namespace atlas::vk {
         std::map<uint32_t, ::vk::uniform_buffer> m_mesh_geometry_set;
         // TODO: Make this into a material system, eventually
         std::map<uint64_t, ::vk::uniform_buffer> m_mesh_material_set;
-        std::map<uint32_t, std::map<std::string, ::vk::descriptor_resource>> m_mesh_descriptors;
+        std::map<uint32_t, std::map<std::string, ::vk::descriptor_resource>>
+          m_mesh_descriptors;
         uint32_t m_current_frame = 0;
         glm::mat4 m_model = { 1.f };
 
