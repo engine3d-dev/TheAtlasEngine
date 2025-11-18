@@ -120,22 +120,16 @@ namespace atlas::vk {
         };
         m_global_descriptors = ::vk::descriptor_resource(m_device, set0_layout);
 
-        ::vk::uniform_buffer_info geo_info = {
+        ::vk::uniform_buffer_info global_info = {
             .phsyical_memory_properties = m_physical.memory_properties(),
             .size_bytes = sizeof(global_ubo),
-			.debug_name = "\nm_global_uniforms\n",
-			.vkSetDebugUtilsObjectNameEXT = vk_context::get_debug_object_name()
+            .debug_name = "\nm_global_uniforms\n",
+            .vkSetDebugUtilsObjectNameEXT = vk_context::get_debug_object_name()
         };
-        m_global_uniforms = ::vk::uniform_buffer(m_device, geo_info);
+        m_global_uniforms = ::vk::uniform_buffer(m_device, global_info);
 
-        /*
-		::vk::uniform_buffer_info light_ubo_params = {
-            .phsyical_memory_properties = m_physical.memory_properties(),
-            .size_bytes = sizeof(point_light),
-        };
-		*/
-		/// We set this up beforehand on what to expect
-		::vk::uniform_buffer_info light_ubo_params = {
+        // setting up our light uniforms as the global uniforms rather then per-object basis
+        ::vk::uniform_buffer_info light_ubo_params = {
             .phsyical_memory_properties = m_physical.memory_properties(),
             .size_bytes = sizeof(light_scene_ubo),
         };
@@ -150,12 +144,12 @@ namespace atlas::vk {
             },
         };
 
-		std::array<::vk::write_buffer, 1> binding1_uniforms = {
+        std::array<::vk::write_buffer, 1> binding1_uniforms = {
             ::vk::write_buffer{
-				.buffer = m_point_light_uniforms,
-                .offset = 0,
-                .range = m_point_light_uniforms.size_bytes(),
-			},
+              .buffer = m_point_light_uniforms,
+              .offset = 0,
+              .range = m_point_light_uniforms.size_bytes(),
+            },
         };
 
         std::array<::vk::write_buffer_descriptor, 2> set0_write_buffers = {
@@ -163,7 +157,7 @@ namespace atlas::vk {
               .dst_binding = 0,
               .uniforms = binding0_uniforms,
             },
-			::vk::write_buffer_descriptor{
+            ::vk::write_buffer_descriptor{
               .dst_binding = 1,
               .uniforms = binding1_uniforms,
             }
@@ -186,15 +180,24 @@ namespace atlas::vk {
             m_shader_group.destroy();
             m_global_descriptors.destroy();
             m_global_uniforms.destroy();
-			m_point_light_uniforms.destroy();
+            m_point_light_uniforms.destroy();
             for (auto& [id, mesh] : m_cached_meshes) {
                 console_log_trace("Entity \"{}\" Destroyed in vk_renderer!!!",
                                   id);
                 mesh.destroy();
             }
+
+			for(auto& [id, uniform] : m_mesh_geometry_set) {
+				uniform.destroy();
+			}
+
+			for(auto& [id, material_uniform] : m_mesh_material_set) {
+				material_uniform.destroy();
+			}
+
             for (auto& [key, descriptor_map] : m_mesh_descriptors) {
                 for (auto& [descriptor_type, descriptor] : descriptor_map) {
-					descriptor.destroy();
+                    descriptor.destroy();
                 }
             }
             m_main_pipeline.destroy();
@@ -219,17 +222,25 @@ namespace atlas::vk {
 
         caching.each([this](flecs::entity p_entity) {
             const mesh_source* target = p_entity.get<mesh_source>();
-            mesh new_mesh(std::filesystem::path(target->model_path),
-                          target->flip);
+            mesh new_mesh(std::filesystem::path(target->model_path), target->flip);
 
-            new_mesh.initialize_uniforms(sizeof(material_uniform));
-            new_mesh.initialize_material_ubo(sizeof(material_metadata));
+			// we do a check if the geometry uniform associated with this game object is valid
+			if(!m_mesh_geometry_set.contains(p_entity.id())) {
+				::vk::uniform_buffer_info geo_info = {
+					.phsyical_memory_properties = m_physical.memory_properties(),
+					.size_bytes = sizeof(material_uniform),
+				};
+				m_mesh_geometry_set[p_entity.id()] = ::vk::uniform_buffer(m_device, geo_info);
+			}
 
-            // TODO: We should probably have an unordered_map<uint32_t,
-            // directional_light>, that also contains information on which index
-            // is specifically the directional light related to that particular
-            // game object.....
-            // new_mesh.initialize_dir_light(sizeof(point_light));
+			// check if material is already associated with this particular game object
+			if(!m_mesh_material_set.contains(p_entity.id())) {
+				::vk::uniform_buffer_info mat_info = {
+					.phsyical_memory_properties = m_physical.memory_properties(),
+					.size_bytes = sizeof(material_metadata),
+				};
+				m_mesh_material_set[p_entity.id()] = ::vk::uniform_buffer(m_device, mat_info);
+			}
 
             new_mesh.add_diffuse(std::filesystem::path(target->diffuse));
             new_mesh.add_specular(std::filesystem::path(target->specular));
@@ -289,21 +300,17 @@ namespace atlas::vk {
                 // specify to the vk::write_descriptor_buffer
                 std::array<::vk::write_buffer, 1> binding0_buffers = {
                     ::vk::write_buffer{
-                      .buffer = m_cached_meshes[p_entity.id()].geometry_ubo(),
+                      .buffer = m_mesh_geometry_set[p_entity.id()],
                       .offset = 0,
-                      .range = m_cached_meshes[p_entity.id()]
-                                 .geometry_ubo()
-                                 .size_bytes(),
+                      .range = m_mesh_geometry_set[p_entity.id()].size_bytes(),
                     }
                 };
 
                 std::array<::vk::write_buffer, 1> binding3_buffers = {
                     ::vk::write_buffer{
-                      .buffer = m_cached_meshes[p_entity.id()].material_ubo(),
+                      .buffer = m_mesh_material_set[p_entity.id()],
                       .offset = 0,
-                      .range = m_cached_meshes[p_entity.id()]
-                                 .material_ubo()
-                                 .size_bytes(),
+                      .range = m_mesh_material_set[p_entity.id()].size_bytes(),
                     }
                 };
 
@@ -339,7 +346,8 @@ namespace atlas::vk {
                     ::vk::write_image{
                       .sampler = diffuse.sampler(),
                       .view = diffuse.image_view(),
-                      .image_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL }
+                      .image_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                    }
                 };
 
                 // writes to texture at layout(set = 1, binding = 2)
@@ -347,17 +355,22 @@ namespace atlas::vk {
                     ::vk::write_image{
                       .sampler = specular.sampler(),
                       .view = specular.image_view(),
-                      .image_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL }
+                      .image_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                    }
                 };
 
                 // vulkan image descriptors are for writing textures
                 std::vector<::vk::write_image_descriptor> material_textures = {
                     // layout(set = 1, binding = 1) uniform sampler2D
                     ::vk::write_image_descriptor{
-                      .dst_binding = 1, .sample_images = binding1_images },
+                      .dst_binding = 1,
+                      .sample_images = binding1_images,
+                    },
                     // layout(set = 1, binding = 2) uniform sampler2D
                     ::vk::write_image_descriptor{
-                      .dst_binding = 2, .sample_images = binding2_images },
+                      .dst_binding = 2,
+                      .sample_images = binding2_images,
+                    },
                 };
 
                 m_mesh_descriptors[p_entity.id()]["materials"].update(
@@ -442,7 +455,6 @@ namespace atlas::vk {
         vkCmdBeginRenderPass(m_current_command_buffer,
                              &renderpass_begin_info,
                              VK_SUBPASS_CONTENTS_INLINE);
-
     }
 
     // This just returns the arbitrary amount of bytes of the object
@@ -467,38 +479,39 @@ namespace atlas::vk {
           system_registry::get_world("Editor World");
         ref<scene_scope> current_scene = current_world->get_scene("LevelScene");
 
-		 // query all point lights
+        // query all point lights
         flecs::query<point_light> query_point_lights =
           current_scene->query_builder<point_light>().build();
 
-		// std::array<point_light, 10> point_lights;
-		light_scene_ubo test_light = {};
-		uint32_t index = 0;
-        query_point_lights.each([&index, &test_light](flecs::entity p_entity, point_light& p_light) {
-			const transform* t = p_entity.get<transform>();
-			p_light.position = t->position;
+        // std::array<point_light, 10> point_lights;
+        light_scene_ubo test_light = {};
+        uint32_t index = 0;
+        query_point_lights.each(
+          [&index, &test_light](flecs::entity p_entity, point_light& p_light) {
+              const transform* t = p_entity.get<transform>();
+              p_light.position = t->position;
 
-			test_light.light_sources[index] = {
-				.position = glm::vec4(p_light.position, 1.f),
-				.color = p_light.color,
-				.attenuation = p_light.attenuation,
-				.constant = p_light.constant,
-				.linear = p_light.linear,
-				.quadratic = p_light.quadratic,
-				.ambient = p_light.ambient,
-				.diffuse = p_light.diffuse,
-				.specular = p_light.specular,
-			};
-			index += 1;
-        });
-		test_light.num_lights = index;
+              test_light.light_sources[index] = {
+                  .position = glm::vec4(p_light.position, 1.f),
+                  .color = p_light.color,
+                  .attenuation = p_light.attenuation,
+                  .constant = p_light.constant,
+                  .linear = p_light.linear,
+                  .quadratic = p_light.quadratic,
+                  .ambient = p_light.ambient,
+                  .diffuse = p_light.diffuse,
+                  .specular = p_light.specular,
+              };
+              index += 1;
+          });
+        test_light.num_lights = index;
 
-		m_point_light_uniforms.update(&test_light);
+        m_point_light_uniforms.update(&test_light);
 
-		// query all objects with a specified 3d mesh source
+        // query all objects with a specified 3d mesh source
         flecs::query<> query_targets =
           current_scene->query_builder<mesh_source>().build();
-		
+
         m_main_pipeline.bind(m_current_command_buffer);
         // Bind global camera data here
         m_global_descriptors.bind(m_current_command_buffer,
@@ -515,14 +528,17 @@ namespace atlas::vk {
             m_model *= rotation_mat4;
 
             // Mesh used for viking_room - replaced with std::map equivalent
-            material_uniform mesh_material_ubo = {
+            geometry_uniform mesh_ubo = {
                 .model = m_model, .color = material_component->color
             };
+			// m_geometry_uniforms.update(&mesh_ubo);
+			m_mesh_geometry_set[p_entity.id()].update(&mesh_ubo);
 
             if (m_cached_meshes[p_entity.id()].loaded()) {
 
-                m_cached_meshes[p_entity.id()].update_uniform(
-                  mesh_material_ubo);
+                // m_cached_meshes[p_entity.id()].update_uniform(
+                //   mesh_material_ubo);
+				
 
                 material_metadata data = {};
 
@@ -530,7 +546,9 @@ namespace atlas::vk {
                     data = *p_entity.get<material_metadata>();
                 }
 
-                m_cached_meshes[p_entity.id()].update_material_uniforms(data);
+                // m_cached_meshes[p_entity.id()].update_material_uniforms(data);
+				// m_material_uniforms.update(&data);
+				m_mesh_material_set[p_entity.id()].update(&data);
 
                 m_mesh_descriptors[p_entity.id()]["materials"].bind(
                   m_current_command_buffer,
@@ -544,4 +562,3 @@ namespace atlas::vk {
         m_current_command_buffer.end();
     }
 };
-

@@ -143,33 +143,6 @@ namespace atlas::vk {
         m_model_loaded = true;
     }
 
-    void mesh::initialize_uniforms(uint32_t p_size_bytes_ubo) {
-        ::vk::uniform_buffer_info geo_info = {
-            .phsyical_memory_properties = m_physical.memory_properties(),
-            .size_bytes = p_size_bytes_ubo,
-            .debug_name = "\nm_geometry_ubo\n",
-            .vkSetDebugUtilsObjectNameEXT = vk_context::get_debug_object_name()
-        };
-        m_geoemtry_ubo = ::vk::uniform_buffer(m_device, geo_info);
-    }
-
-    void mesh::initialize_material_ubo(uint32_t p_size_bytes) {
-        ::vk::uniform_buffer_info geo_info = {
-            .phsyical_memory_properties = m_physical.memory_properties(),
-            .size_bytes = p_size_bytes,
-        };
-        m_material_ubo = ::vk::uniform_buffer(m_device, geo_info);
-    }
-
-    void mesh::update_uniform(const material_uniform& p_material_ubo) {
-        m_geoemtry_ubo.update(&p_material_ubo);
-    }
-
-    void mesh::update_material_uniforms(
-      const material_metadata& p_material_data) {
-        m_material_ubo.update(&p_material_data);
-    }
-
     void mesh::add_diffuse(const std::filesystem::path& p_path) {
         ::vk::texture_info config_texture = {
             .phsyical_memory_properties = m_physical.memory_properties(),
@@ -212,7 +185,6 @@ namespace atlas::vk {
         m_vbo.destroy();
         m_ibo.destroy();
 
-        // m_directional_ubo.destroy();
         m_diffuse.destroy();
         m_specular.destroy();
         m_geoemtry_ubo.destroy();

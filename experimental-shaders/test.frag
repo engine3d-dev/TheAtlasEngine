@@ -43,8 +43,7 @@ const int max_point_lights = 1000;
 layout(set = 0, binding = 1) uniform light_ubo {
     int num_lights;
     point_light sources[10];
-}
-light_src;
+} light_src;
 
 /*
 
@@ -83,8 +82,7 @@ layout(set = 1, binding = 3) uniform material_ubo {
     vec4 diffuse;
     vec4 specular;
     float shininess;
-}
-material;
+} material;
 
 // TODO: Implement directional lighting at a later time
 vec3
@@ -218,7 +216,7 @@ main() {
         vec3 view_pos = source_light.position.xyz;
         vec3 dir_to_light = normalize(view_pos - FragPos.xyz);
         result +=
-          calc_point_light(source_light, fragNormals, FragPos, dir_to_light);
+          calc_point_light(source_light, fragNormals, FragPos, dir_to_light) * (source_light.color.rgb * source_light.color.a);
     }
 
     // point_light source_light = light_src.sources[0];

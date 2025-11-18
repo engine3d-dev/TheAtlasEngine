@@ -36,21 +36,21 @@ namespace atlas::vk {
         //! @brief Reload mesh vertices and indices when requested
         void reload_mesh(const std::filesystem::path& p_path);
 
-        void initialize_uniforms(uint32_t p_size_bytes_ubo);
+        // void initialize_uniforms(uint32_t p_size_bytes_ubo);
 
         //! @brief Initializes uniform buffer specifically for material_src
-        void initialize_material_ubo(uint32_t p_size_bytes);
+        // void initialize_material_ubo(uint32_t p_size_bytes);
 
-        void update_uniform(const material_uniform& p_material_ubo);
-        void update_material_uniforms(const material_metadata& p_material_data);
+        // void update_uniform(const geometry_uniform& p_material_ubo);
+        // void update_material_uniforms(const material_metadata& p_material_data);
 
-        [[nodiscard]] ::vk::uniform_buffer geometry_ubo() const {
-            return m_geoemtry_ubo;
-        }
+        // [[nodiscard]] ::vk::uniform_buffer geometry_ubo() const {
+        //     return m_geoemtry_ubo;
+        // }
 
-        [[nodiscard]] ::vk::uniform_buffer material_ubo() const {
-            return m_material_ubo;
-        }
+        // [[nodiscard]] ::vk::uniform_buffer material_ubo() const {
+        //     return m_material_ubo;
+        // }
 
         void draw(const VkCommandBuffer& p_command_buffer);
 

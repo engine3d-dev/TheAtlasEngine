@@ -353,7 +353,7 @@ namespace atlas::vk {
      * itself gets rendered
      *
      */
-    struct material_uniform {
+    struct geometry_uniform {
         glm::mat4 model{ 1.f };
         glm::vec4 color{ 1.f };
         // std::vector<std::string> texture_paths;

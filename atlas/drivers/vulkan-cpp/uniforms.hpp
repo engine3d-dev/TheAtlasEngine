@@ -8,5 +8,7 @@ namespace atlas::vk {
      */
     struct material_uniform {
         float shininess = 1.f;
+        ::vk::texture diffuse;
+        ::vk::texture specular;
     };
 };
