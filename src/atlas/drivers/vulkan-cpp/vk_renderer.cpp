@@ -521,7 +521,7 @@ namespace atlas::vk {
           current_scene->query_builder<mesh_source>().build();
 
         m_main_pipeline.bind(m_current_command_buffer);
-		
+
         // Bind global camera data here
         m_global_descriptors.bind(m_current_command_buffer,
                                   m_main_pipeline.layout());
