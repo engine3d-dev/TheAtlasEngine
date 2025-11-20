@@ -34,7 +34,7 @@ const int max_point_lights = 1000;
 
 layout(set = 0, binding = 1) uniform light_ubo {
     int num_lights;
-    point_light sources[1000];
+    point_light sources[max_point_lights];
 } light_src;
 
 

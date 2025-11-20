@@ -456,8 +456,6 @@ namespace atlas::vk {
 
         vkCmdSetScissor(m_current_command_buffer, 0, 1, &scissor);
 
-        // renderpass_begin_info.framebuffer =
-        //   m_main_swapchain.active_framebuffer(m_current_frame);
         renderpass_begin_info.framebuffer = p_framebuffer;
 
         vkCmdBeginRenderPass(m_current_command_buffer,
@@ -479,6 +477,9 @@ namespace atlas::vk {
         // integration merging into dev This is for testing and to hopefully
         // have a global_ubo for globalized uniforms
         global_ubo global_frame_ubo = { .mvp = m_proj_view };
+
+        // TODO: Make to_bytes be part of utilities. This can be useful in
+        // sending the amount of bytes in batches for batch-rendering
         // std::span<uint8_t> bytes_data = to_bytes(global_frame_ubo);
         // m_global_uniforms.update(bytes_data.data());
         m_global_uniforms.update(&global_frame_ubo);
@@ -520,6 +521,7 @@ namespace atlas::vk {
           current_scene->query_builder<mesh_source>().build();
 
         m_main_pipeline.bind(m_current_command_buffer);
+		
         // Bind global camera data here
         m_global_descriptors.bind(m_current_command_buffer,
                                   m_main_pipeline.layout());
@@ -537,28 +539,20 @@ namespace atlas::vk {
             // Mesh used for viking_room - replaced with std::map equivalent
             geometry_uniform mesh_ubo = { .model = m_model,
                                           .color = material_component->color };
-            // m_geometry_uniforms.update(&mesh_ubo);
-            m_mesh_geometry_set[p_entity.id()].update(&mesh_ubo);
 
             if (m_cached_meshes[p_entity.id()].loaded()) {
-
-                // m_cached_meshes[p_entity.id()].update_uniform(
-                //   mesh_material_ubo);
+                m_mesh_geometry_set[p_entity.id()].update(&mesh_ubo);
 
                 material_metadata data = {};
 
                 if (p_entity.has<material_metadata>()) {
                     data = *p_entity.get<material_metadata>();
                 }
-
-                // m_cached_meshes[p_entity.id()].update_material_uniforms(data);
-                // m_material_uniforms.update(&data);
                 m_mesh_material_set[p_entity.id()].update(&data);
 
                 m_mesh_descriptors[p_entity.id()]["materials"].bind(
-                  m_current_command_buffer,
-                  //   m_current_frame,
-                  m_main_pipeline.layout());
+                  m_current_command_buffer, m_main_pipeline.layout());
+
                 m_cached_meshes[p_entity.id()].draw(m_current_command_buffer);
             }
         });
