@@ -6,7 +6,7 @@ import shutil
 
 class AtlasRecipe(ConanFile):
     name = "atlas"
-    version = "0.2"
+    version = "0.3"
     package_type = "library"
     license = "Apache-2.0"
     homepage = "https://github.com/engine3d-dev/TheAtlasEngine"
