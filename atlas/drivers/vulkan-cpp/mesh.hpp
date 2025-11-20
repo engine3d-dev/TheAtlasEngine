@@ -8,6 +8,7 @@
 #include <vulkan-cpp/texture.hpp>
 #include <drivers/vulkan-cpp/vk_types.hpp>
 #include <drivers/vulkan-cpp/vk_physical_driver.hpp>
+#include <core/scene/components.hpp>
 
 namespace atlas::vk {
 
@@ -30,34 +31,36 @@ namespace atlas::vk {
         mesh() = default;
         mesh(std::span<::vk::vertex_input> p_vertices,
              std::span<uint32_t> p_indices);
-        mesh(const std::filesystem::path& p_filename);
+        mesh(const std::filesystem::path& p_filename, bool p_flip = false);
 
         //! @brief Reload mesh vertices and indices when requested
         void reload_mesh(const std::filesystem::path& p_path);
-
-        void initialize_uniforms(uint32_t p_size_bytes_ubo);
-
-        void update_uniform(const material_uniform& p_material_ubo);
-
-        [[nodiscard]] ::vk::uniform_buffer material_ubo() const {
-            return m_geoemtry_ubo;
-        }
 
         void draw(const VkCommandBuffer& p_command_buffer);
 
         void destroy();
 
         //! @brief Loading single texture with specified std::filesystem::path
-        void add_texture(const std::filesystem::path& p_path);
+        void add_diffuse(const std::filesystem::path& p_path);
 
-        [[nodiscard]] ::vk::sample_image image() const {
-            return m_texture.image();
+        void add_specular(const std::filesystem::path& p_path);
+
+        [[nodiscard]] ::vk::sample_image diffuse() const {
+            return m_diffuse.image();
+        }
+        [[nodiscard]] ::vk::sample_image specular() const {
+            return m_specular.image();
         }
 
         //! @return true if mesh geometry model loaded succesfully
         [[nodiscard]] bool loaded() const { return m_model_loaded; }
 
-        [[nodiscard]] bool texture_loaded() const { return m_texture_loaded; }
+        [[nodiscard]] bool diffuse_loaded() const { return m_diffuse.loaded(); }
+        [[nodiscard]] bool specular_loaded() const {
+            return m_specular.loaded();
+        }
+
+        void set_flip(bool p_flip) { m_flip = p_flip; }
 
     private:
         void load_obj(const std::filesystem::path& p_filename);
@@ -65,11 +68,13 @@ namespace atlas::vk {
     private:
         vk_physical_driver m_physical;
         VkDevice m_device = nullptr;
-        ::vk::texture m_texture;
+        ::vk::texture m_diffuse;
+        ::vk::texture m_specular;
         ::vk::vertex_buffer m_vbo{};
         ::vk::index_buffer m_ibo{};
         ::vk::uniform_buffer m_geoemtry_ubo;
+        ::vk::uniform_buffer m_material_ubo;
         bool m_model_loaded = false;
-        bool m_texture_loaded = false;
+        bool m_flip = false;
     };
 };

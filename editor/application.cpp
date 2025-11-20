@@ -18,6 +18,7 @@ namespace atlas {
             .name = "Editor",
             .width = 1200,
             .height = 800,
+            .background_color = { 0.f, 0.f, 0.f, 0.f },
         };
 
         return create_ref<editor_application>(settings);

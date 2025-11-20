@@ -8,6 +8,7 @@ namespace atlas::vk {
         std::vector<const char*> extension_names;
 
         extension_names.emplace_back(VK_KHR_SURFACE_EXTENSION_NAME);
+        extension_names.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 
         // An additional surface extension needs to be loaded. This extension is
         // platform-specific so needs to be selected based on the platform the
@@ -132,6 +133,15 @@ namespace atlas::vk {
         vk_check(vkCreateInstance(&create_info, nullptr, &m_instance_handler),
                  "vkCreateInstance");
 
+#if _DEBUG
+        // This needs to be created after the VkInstance is or else it wont be
+        // applied the debug information during validation layer error message
+        // execution
+        m_vk_set_debug_utils_object_name_ext =
+          reinterpret_cast<PFN_vkSetDebugUtilsObjectNameEXT>(
+            vkGetInstanceProcAddr(m_instance_handler,
+                                  "vkSetDebugUtilsObjectNameEXT"));
+#endif
         s_instance = this;
 
         m_physical = vk_physical_driver(m_instance_handler);

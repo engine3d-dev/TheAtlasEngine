@@ -27,6 +27,22 @@ namespace atlas::vk {
         static void submit_resource_free(std::function<void()>&& p_resource);
 
         /**
+         * @brief returns function pointer to allow for setting debug object
+         * name
+         *
+         *
+         * This allows for utilizing vkSetDebugUtilsObjectNameEXT during debug
+         * builds
+         *
+         * This allows for setting up object names that is useful to the
+         * programmer when a validation layer error message occurs unexpectedly
+         *
+         */
+        static PFN_vkSetDebugUtilsObjectNameEXT get_debug_object_name() {
+            return s_instance->m_vk_set_debug_utils_object_name_ext;
+        }
+
+        /**
          * @brief Gives you direct access to the vulkan instance
          */
         static VkInstance handler();
@@ -55,5 +71,7 @@ namespace atlas::vk {
         vk_physical_driver m_physical{};
         vk_driver m_driver{};
         std::deque<std::function<void()>> m_resources_free{};
+
+        PFN_vkSetDebugUtilsObjectNameEXT m_vk_set_debug_utils_object_name_ext;
     };
 };

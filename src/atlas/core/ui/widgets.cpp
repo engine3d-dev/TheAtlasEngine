@@ -221,10 +221,9 @@ namespace atlas::ui {
     }
 
     void draw_input_text(std::string& p_value) {
-        std::string value = "";
-        if (ImGui::InputText(
-              "##Tag", value.data(), (sizeof(char) * value.size()))) {
-            p_value = value;
+        // std::string value = "";
+        // // ImGui::Text("%s", p_value.c_str());
+        if (ImGui::InputText("##Tag", p_value.data(), p_value.size() + 1)) {
         }
     }
 

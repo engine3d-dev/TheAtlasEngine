@@ -19,6 +19,14 @@ namespace atlas {
         virtual ~render_context() = default;
 
         /**
+         * @brief responsibility is to preload any data that is necessary to be
+         * loaded before being rendered
+         */
+        void preload(const VkRenderPass& p_renderpass) {
+            return preload_assets(p_renderpass);
+        }
+
+        /**
          * @brief indicator of when the start of the frame is
          *
          * Semantically is used to indicate this is when we start recording
@@ -58,6 +66,8 @@ namespace atlas {
         }
 
     private:
+        virtual void preload_assets(const VkRenderPass& p_renderpass) = 0;
+
         virtual void start_frame(const ::vk::command_buffer& p_current,
                                  const window_settings& p_settings,
                                  const VkRenderPass& p_renderpass,

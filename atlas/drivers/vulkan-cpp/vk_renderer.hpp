@@ -8,9 +8,9 @@
 #include <vulkan-cpp/uniform_buffer.hpp>
 #include <vulkan-cpp/pipeline.hpp>
 #include <vulkan-cpp/descriptor_resource.hpp>
-// #include <vulkan-cpp/shader_resource.hpp>
 #include <drivers/vulkan-cpp/shader_resource_group.hpp>
 #include <vulkan-cpp/renderpass.hpp>
+#include <drivers/vulkan-cpp/uniforms.hpp>
 
 namespace atlas::vk {
     /**
@@ -48,6 +48,8 @@ namespace atlas::vk {
         ~vk_renderer() override = default;
 
     private:
+        void preload_assets(const VkRenderPass& p_renderpass) override;
+
         void start_frame(const ::vk::command_buffer& p_current,
                          const window_settings& p_settings,
                          const VkRenderPass& p_renderpass,
@@ -61,12 +63,12 @@ namespace atlas::vk {
         VkDevice m_device = nullptr;
         vk_physical_driver m_physical;
         glm::mat4 m_proj_view;
+        VkRenderPass m_final_renderpass = nullptr;
         window_settings m_window_extent;
         ::vk::command_buffer m_current_command_buffer{};
         VkClearColorValue m_color;
 
         uint32_t m_image_count = 0;
-        // ::vk::shader_resource m_shader_group;
         shader_resource_group m_shader_group;
         ::vk::pipeline m_main_pipeline;
         ::vk::descriptor_resource m_global_descriptors;
@@ -74,10 +76,14 @@ namespace atlas::vk {
 
         std::map<uint32_t, mesh> m_cached_meshes;
         ::vk::uniform_buffer m_global_uniforms;
+        ::vk::uniform_buffer m_point_light_uniforms;
+
+        // game object-specific meshes
+        std::map<uint32_t, ::vk::uniform_buffer> m_mesh_geometry_set;
+        // TODO: Make this into a material system, eventually
+        std::map<uint64_t, ::vk::uniform_buffer> m_mesh_material_set;
         std::map<uint32_t, std::map<std::string, ::vk::descriptor_resource>>
           m_mesh_descriptors;
-
-        bool m_begin_initialize = true;
         uint32_t m_current_frame = 0;
         glm::mat4 m_model = { 1.f };
 

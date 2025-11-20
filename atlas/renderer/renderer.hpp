@@ -20,6 +20,8 @@ namespace atlas {
         renderer(const window_settings& p_window_extent,
                  uint32_t p_image_size,
                  const std::string& p_tag = "Renderer");
+
+        void preload(const VkRenderPass& p_renderpass);
         /**
          * @brief Indicates to the renderer is at the start of the next frame to
          * prepare workloads before next frame is processeed
