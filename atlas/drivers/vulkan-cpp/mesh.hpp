@@ -6,7 +6,6 @@
 #include <vulkan-cpp/vertex_buffer.hpp>
 #include <vulkan-cpp/index_buffer.hpp>
 #include <vulkan-cpp/texture.hpp>
-#include <drivers/vulkan-cpp/vk_types.hpp>
 #include <drivers/vulkan-cpp/vk_physical_driver.hpp>
 #include <core/scene/components.hpp>
 

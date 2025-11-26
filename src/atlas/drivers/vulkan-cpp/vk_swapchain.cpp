@@ -2,7 +2,6 @@
 #include <drivers/vulkan-cpp/vk_context.hpp>
 #include <core/engine_logger.hpp>
 #include <drivers/vulkan-cpp/utilities.hpp>
-#include <drivers/vulkan-cpp/vk_types.hpp>
 #include <array>
 #include <vulkan-cpp/types.hpp>
 

@@ -1,7 +1,6 @@
 #pragma once
 #include <vulkan/vulkan.h>
 #include <drivers/vulkan-cpp/vk_physical_driver.hpp>
-#include <drivers/vulkan-cpp/vk_types.hpp>
 
 namespace atlas::vk {
 

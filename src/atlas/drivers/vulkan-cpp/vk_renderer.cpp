@@ -7,7 +7,6 @@
 #include <drivers/vulkan-cpp/vk_context.hpp>
 #include <core/application.hpp>
 
-#include <drivers/vulkan-cpp/vk_types.hpp>
 #include <renderer/uniforms.hpp>
 
 namespace atlas::vk {

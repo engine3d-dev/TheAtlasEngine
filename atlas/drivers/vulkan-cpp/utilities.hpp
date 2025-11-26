@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
 #include <vulkan/vulkan_core.h>
-#include <drivers/vulkan-cpp/vk_types.hpp>
 #include <source_location>
 
 namespace atlas::vk {
