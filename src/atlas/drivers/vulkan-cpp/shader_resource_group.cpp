@@ -328,7 +328,7 @@ namespace atlas::vk {
                 const ::vk::vertex_attribute_entry entry = attribute.entries[j];
                 m_vertex_attributes[j] = { .location = entry.location,
                                            .binding = attribute.binding,
-                                           .format = to_format(entry.format),
+                                           .format = static_cast<VkFormat>(entry.format),
                                            .offset = entry.stride };
             }
         }

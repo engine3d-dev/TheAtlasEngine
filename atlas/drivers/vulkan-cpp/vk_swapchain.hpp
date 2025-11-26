@@ -73,6 +73,8 @@ namespace atlas::vk {
         void invalidate();
         void create();
 
+        uint32_t select_images_size(const VkSurfaceCapabilitiesKHR&);
+
     private:
         vk_physical_driver m_physical{};
         vk_driver m_driver{};

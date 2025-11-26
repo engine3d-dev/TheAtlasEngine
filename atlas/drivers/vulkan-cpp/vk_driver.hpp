@@ -49,11 +49,6 @@ namespace atlas::vk {
         uint32_t select_memory_type(uint32_t p_type_filter,
                                     VkMemoryPropertyFlags p_property_flag);
 
-        // This is just for specifically getting presentation queue
-        // Now that I think about this, I may as well use this to get our
-        // specific queue family from this logical device
-        VkQueue get_queue(const vk_queue_options& p_present_queue);
-
         void destroy();
 
         /**
