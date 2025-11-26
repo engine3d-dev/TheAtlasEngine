@@ -39,7 +39,7 @@ namespace atlas::vk {
         glm::vec4 color{ 1.f };
         // std::vector<std::string> texture_paths;
     };
-    
+
     /**
      * @brief Represents a vulkan specific mateiral to pass in two textures and
      * offset for handling shininess
