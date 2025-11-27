@@ -275,6 +275,8 @@ ui_component_list(flecs::entity& p_selected_entity) {
 void
 level_scene::on_ui_update() {
 
+    m_editor_dockspace.begin(atlas::application::get_window());
+
     if (ImGui::Begin("Viewport")) {
         glm::vec2 viewport_panel_size =
           glm::vec2{ atlas::application::get_window().width(),
@@ -544,6 +546,8 @@ level_scene::on_ui_update() {
         // 	ImGui::End();
         // }
     }
+
+    m_editor_dockspace.end();
 }
 
 void
