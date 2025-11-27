@@ -1,5 +1,5 @@
 #pragma once
-#include <drivers/vulkan-cpp/vk_types.hpp>
+#include <drivers/vulkan-cpp/uniforms.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
 #include <vulkan-cpp/types.hpp>

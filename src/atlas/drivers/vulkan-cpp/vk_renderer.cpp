@@ -3,11 +3,10 @@
 #include <drivers/vulkan-cpp/vk_renderer.hpp>
 
 #include <array>
-#include <drivers/vulkan-cpp/helper_functions.hpp>
+#include <drivers/vulkan-cpp/utilities.hpp>
 #include <drivers/vulkan-cpp/vk_context.hpp>
 #include <core/application.hpp>
 
-#include <drivers/vulkan-cpp/vk_types.hpp>
 #include <renderer/uniforms.hpp>
 
 namespace atlas::vk {
@@ -120,7 +119,7 @@ namespace atlas::vk {
         };
         m_global_descriptors = ::vk::descriptor_resource(m_device, set0_layout);
 
-        ::vk::uniform_buffer_info global_info = {
+        ::vk::uniform_params global_info = {
             .phsyical_memory_properties = m_physical.memory_properties(),
             .size_bytes = sizeof(global_ubo),
             .debug_name = "\nm_global_uniforms\n",
@@ -130,7 +129,7 @@ namespace atlas::vk {
 
         // setting up our light uniforms as the global uniforms rather then
         // per-object basis
-        ::vk::uniform_buffer_info light_ubo_params = {
+        ::vk::uniform_params light_ubo_params = {
             .phsyical_memory_properties = m_physical.memory_properties(),
             .size_bytes = sizeof(light_scene_ubo),
         };
@@ -229,7 +228,7 @@ namespace atlas::vk {
             // we do a check if the geometry uniform associated with this game
             // object is valid
             if (!m_mesh_geometry_set.contains(p_entity.id())) {
-                ::vk::uniform_buffer_info geo_info = {
+                ::vk::uniform_params geo_info = {
                     .phsyical_memory_properties =
                       m_physical.memory_properties(),
                     .size_bytes = sizeof(material_uniform),
@@ -241,7 +240,7 @@ namespace atlas::vk {
             // check if material is already associated with this particular game
             // object
             if (!m_mesh_material_set.contains(p_entity.id())) {
-                ::vk::uniform_buffer_info mat_info = {
+                ::vk::uniform_params mat_info = {
                     .phsyical_memory_properties =
                       m_physical.memory_properties(),
                     .size_bytes = sizeof(material_metadata),
@@ -350,22 +349,22 @@ namespace atlas::vk {
                     : m_white_texture.image();
 
                 // writes to texture at layout(set = 1, binding = 1)
-                std::array<::vk::write_image, 1> binding1_images = {
-                    ::vk::write_image{
-                      .sampler = diffuse.sampler(),
-                      .view = diffuse.image_view(),
-                      .image_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-                    }
-                };
+                std::array<::vk::write_image, 1>
+                  binding1_images = { ::vk::write_image{
+                    .sampler = diffuse.sampler(),
+                    .view = diffuse.image_view(),
+                    // .image_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                    .layout = ::vk::image_layout::shader_read_only_optimal,
+                  } };
 
                 // writes to texture at layout(set = 1, binding = 2)
-                std::array<::vk::write_image, 1> binding2_images = {
-                    ::vk::write_image{
-                      .sampler = specular.sampler(),
-                      .view = specular.image_view(),
-                      .image_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-                    }
-                };
+                std::array<::vk::write_image, 1>
+                  binding2_images = { ::vk::write_image{
+                    .sampler = specular.sampler(),
+                    .view = specular.image_view(),
+                    // .image_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                    .layout = ::vk::image_layout::shader_read_only_optimal,
+                  } };
 
                 // vulkan image descriptors are for writing textures
                 std::vector<::vk::write_image_descriptor> material_textures = {

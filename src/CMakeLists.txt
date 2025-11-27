@@ -56,7 +56,7 @@ set(
 
     ## Vulkan Driver stuff
     ${VULKAN_SRC_DIR}/vk_window.cpp
-    ${VULKAN_SRC_DIR}/helper_functions.cpp
+    ${VULKAN_SRC_DIR}/utilities.cpp
     ${VULKAN_SRC_DIR}/vk_context.cpp
     ${VULKAN_SRC_DIR}/vk_physical_driver.cpp
     ${VULKAN_SRC_DIR}/vk_driver.cpp

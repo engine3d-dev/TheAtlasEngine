@@ -12,14 +12,12 @@ namespace atlas::vk {
                std::span<uint32_t> p_indices) {
         m_physical = vk_context::physical_driver();
         m_device = vk_context::driver_context();
-        ::vk::vertex_buffer_settings vbo_settings = {
-            .phsyical_memory_properties = m_physical.memory_properties(),
-            .vertices = p_vertices
-        };
-        ::vk::index_buffer_settings ibo_settings = {
-            .phsyical_memory_properties = m_physical.memory_properties(),
-            .indices = p_indices
-        };
+        ::vk::vertex_params vbo_settings = { .phsyical_memory_properties =
+                                               m_physical.memory_properties(),
+                                             .vertices = p_vertices };
+        ::vk::index_params ibo_settings = { .phsyical_memory_properties =
+                                              m_physical.memory_properties(),
+                                            .indices = p_indices };
         m_vbo = ::vk::vertex_buffer(m_device, vbo_settings);
         m_ibo = ::vk::index_buffer(m_device, ibo_settings);
     }
@@ -133,14 +131,12 @@ namespace atlas::vk {
             }
         }
 
-        ::vk::vertex_buffer_settings vbo_settings = {
-            .phsyical_memory_properties = m_physical.memory_properties(),
-            .vertices = vertices
-        };
-        ::vk::index_buffer_settings ibo_settings = {
-            .phsyical_memory_properties = m_physical.memory_properties(),
-            .indices = indices
-        };
+        ::vk::vertex_params vbo_settings = { .phsyical_memory_properties =
+                                               m_physical.memory_properties(),
+                                             .vertices = vertices };
+        ::vk::index_params ibo_settings = { .phsyical_memory_properties =
+                                              m_physical.memory_properties(),
+                                            .indices = indices };
         m_vbo = ::vk::vertex_buffer(m_device, vbo_settings);
         m_ibo = ::vk::index_buffer(m_device, ibo_settings);
         m_model_loaded = true;

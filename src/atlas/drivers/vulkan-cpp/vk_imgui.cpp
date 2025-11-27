@@ -1,6 +1,6 @@
 #include <drivers/vulkan-cpp/vk_imgui.hpp>
 #include <drivers/vulkan-cpp/vk_context.hpp>
-#include <drivers/vulkan-cpp/helper_functions.hpp>
+#include <drivers/vulkan-cpp/utilities.hpp>
 #include <core/engine_logger.hpp>
 #include <imgui.h>
 #include <imgui/backends/imgui_impl_glfw.h>
@@ -83,7 +83,7 @@ namespace atlas::vk {
           p_window_ctx->current_swapchain().image_size());
 
         for (size_t i = 0; i < m_viewport_command_buffers.size(); i++) {
-            ::vk::command_enumeration settings = {
+            ::vk::command_params settings = {
                 .levels = ::vk::command_levels::primary,
                 // .queue_index = enumerate_swapchain_settings.present_index,
                 .queue_index = 0,

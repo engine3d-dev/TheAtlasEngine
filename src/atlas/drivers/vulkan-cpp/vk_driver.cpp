@@ -2,7 +2,7 @@
 #include <drivers/vulkan-cpp/vk_context.hpp>
 #include <span>
 #include <core/engine_logger.hpp>
-#include <drivers/vulkan-cpp/helper_functions.hpp>
+#include <drivers/vulkan-cpp/utilities.hpp>
 
 namespace atlas::vk {
     static VkFormat search_supported_depth_format(
@@ -110,16 +110,6 @@ namespace atlas::vk {
         }
 
         return -1;
-    }
-
-    VkQueue vk_driver::get_queue(const vk_queue_options& p_present_queue) {
-        VkQueue queue_handler = nullptr;
-        vkGetDeviceQueue(m_driver,
-                         p_present_queue.family_index,
-                         p_present_queue.queue_index,
-                         &queue_handler);
-
-        return queue_handler;
     }
 
     VkFormat vk_driver::depth_format() const {

@@ -1,8 +1,7 @@
 #include <drivers/vulkan-cpp/vk_swapchain.hpp>
 #include <drivers/vulkan-cpp/vk_context.hpp>
 #include <core/engine_logger.hpp>
-#include <drivers/vulkan-cpp/helper_functions.hpp>
-#include <drivers/vulkan-cpp/vk_types.hpp>
+#include <drivers/vulkan-cpp/utilities.hpp>
 #include <array>
 #include <vulkan-cpp/types.hpp>
 
@@ -42,8 +41,6 @@ namespace atlas::vk {
         uint32_t present_index =
           m_physical.read_presentation_index(m_current_surface_handler);
 
-        vk_queue_options present_properties = { .family_index = present_index };
-
         VkSwapchainCreateInfoKHR swapchain_ci = {
             .sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
             .surface = m_current_surface_handler,
@@ -57,7 +54,7 @@ namespace atlas::vk {
             .imageUsage = (VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT |
                            VK_IMAGE_USAGE_TRANSFER_DST_BIT),
             .queueFamilyIndexCount = 1,
-            .pQueueFamilyIndices = &present_properties.family_index,
+            .pQueueFamilyIndices = &present_index,
             .preTransform =
               m_surface_properties.surface_capabilities.currentTransform,
             .compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
@@ -89,7 +86,7 @@ namespace atlas::vk {
         VkFormat depth_format = m_driver.depth_format();
 
         for (uint32_t i = 0; i < m_swapchain_images.size(); i++) {
-            ::vk::image_configuration_information color_image_config = {
+            ::vk::image_params color_image_config = {
                 .extent = { m_swapchain_extent.width,
                             m_swapchain_extent.height, },
                 .format = m_surface_properties.surface_format.format,
@@ -104,7 +101,7 @@ namespace atlas::vk {
             m_swapchain_images[i] =
               ::vk::sample_image(m_driver, images[i], color_image_config);
 
-            ::vk::image_configuration_information depth_image_config = {
+            ::vk::image_params depth_image_config = {
                 .extent = { m_swapchain_extent.width,
                             m_swapchain_extent.height, },
                 .format = depth_format,
@@ -124,7 +121,7 @@ namespace atlas::vk {
         m_swapchain_command_buffers.resize(image_count);
 
         for (size_t i = 0; i < m_swapchain_command_buffers.size(); i++) {
-            ::vk::command_enumeration settings = {
+            ::vk::command_params settings = {
                 .levels = ::vk::command_levels::primary,
                 // .queue_index = enumerate_swapchain_settings.present_index,
                 .queue_index = 0,
@@ -170,7 +167,7 @@ namespace atlas::vk {
               image_attachments = { m_swapchain_images[i].image_view(),
                                     m_swapchain_depth_images[i].image_view() };
 
-            ::vk::framebuffer_settings framebuffer_info = {
+            ::vk::framebuffer_params framebuffer_info = {
                 .renderpass = m_final_renderpass,
                 .views = image_attachments,
                 .extent = m_swapchain_extent
@@ -179,7 +176,7 @@ namespace atlas::vk {
               ::vk::framebuffer(m_driver, framebuffer_info);
         }
 
-        ::vk::queue_enumeration present_queue_params{
+        ::vk::queue_params present_queue_params{
             .family = 0,
             .index = 0,
         };
@@ -190,6 +187,23 @@ namespace atlas::vk {
     void vk_swapchain::invalidate() {
         destroy();
         create();
+    }
+
+    uint32_t vk_swapchain::select_images_size(
+      const VkSurfaceCapabilitiesKHR& p_surface_capabilities) {
+        uint32_t requested_images = p_surface_capabilities.minImageCount + 1;
+
+        uint32_t final_image_count = 0;
+
+        if ((p_surface_capabilities.maxImageCount > 0) and
+            (requested_images > p_surface_capabilities.maxImageCount)) {
+            final_image_count = p_surface_capabilities.maxImageCount;
+        }
+        else {
+            final_image_count = requested_images;
+        }
+
+        return final_image_count;
     }
 
     uint32_t vk_swapchain::read_acquired_image() {
