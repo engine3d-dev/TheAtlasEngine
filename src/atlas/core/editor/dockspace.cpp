@@ -3,7 +3,7 @@
 
 namespace atlas::ui {
 
-    void dockspace::begin(GLFWwindow* p_window) {
+    void dockspace::begin() {
 
         ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
         ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
@@ -29,14 +29,6 @@ namespace atlas::ui {
         if(io.ConfigFlags & ImGuiConfigFlags_DockingEnable){
             ImGuiID dockspace_id = ImGui::GetID("MyDockspace");
             ImGui::DockSpace(dockspace_id, ImVec2(0.f, 0.f), dockspace_flags);
-        }
-
-        if(ImGui::BeginMenuBar()){
-            if(ImGui::MenuItem("Exit")){
-                glfwSetWindowShouldClose(p_window, true);
-            }
-
-            ImGui::EndMenuBar();
         }
 
     }

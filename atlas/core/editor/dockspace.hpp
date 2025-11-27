@@ -14,7 +14,7 @@ namespace atlas::ui {
 
         void dockspace_open(bool p_dockspace_open) { m_is_dockspace_open = p_dockspace_open; }
 
-        void begin(GLFWwindow* p_window);
+        void begin();
 
         void end();
 
