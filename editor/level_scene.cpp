@@ -285,7 +285,7 @@ level_scene::on_ui_update() {
     }
 
     // specify the label and the state to execute when this specific widget has been triggered
-    m_editor_menu.add_child_menu("Exit", []() {
+    m_editor_menu.add_child("Exit", []() {
         glfwSetWindowShouldClose(atlas::application::get_window(), true);
     });
     m_editor_menu.end();

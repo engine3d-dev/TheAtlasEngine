@@ -1,6 +1,5 @@
 #include <core/editor/menu_item.hpp>
 #include <imgui.h>
-#include <exception>
 
 namespace atlas::ui {
 
