@@ -53,6 +53,7 @@ set(
 
     # editor-level stuff
     ${SRC_DIR}/core/editor/dockspace.cpp
+    ${SRC_DIR}/core/editor/menu_item.cpp
 
 
     # imgui stuff

@@ -8,6 +8,7 @@
 #include <core/event/event_bus.hpp>
 #include <core/event/types.hpp>
 #include <core/editor/dockspace.hpp>
+#include <core/editor/menu_item.hpp>
 
 
 /**
@@ -66,6 +67,7 @@ private:
     bool m_physics_is_runtime = false;
 
     atlas::ui::dockspace m_editor_dockspace;
+    atlas::ui::menu_item m_editor_menu;
 
     // Note -- Added this temporarily
     // ImFont* m_font;

@@ -275,7 +275,20 @@ ui_component_list(flecs::entity& p_selected_entity) {
 void
 level_scene::on_ui_update() {
 
-    m_editor_dockspace.begin(atlas::application::get_window());
+    // setting up the dockspace UI widgets at the window toolbar
+    m_editor_dockspace.begin();
+
+    try{
+    m_editor_menu.begin();
+    }
+    catch(const atlas::ui::menu_bar_exception& e) {
+    }
+
+    // specify the label and the state to execute when this specific widget has been triggered
+    m_editor_menu.add_child_menu("Exit", []() {
+        glfwSetWindowShouldClose(atlas::application::get_window(), true);
+    });
+    m_editor_menu.end();
 
     if (ImGui::Begin("Viewport")) {
         glm::vec2 viewport_panel_size =
