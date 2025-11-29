@@ -17,5 +17,6 @@ namespace atlas::ui {
         if(ImGui::MenuItem(p_name.c_str())) {
             p_callback();
         }
+        ImGui::Separator();
     }
 };
