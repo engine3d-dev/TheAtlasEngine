@@ -23,18 +23,18 @@ namespace atlas {
      * helps manages these scenes and consider them as contexts that can be
      * switched/toggled based on users transforms.
      */
-    class scene_scope {
+    class scene {
     public:
         /**
          * @param p_name is the name given to this scene
          * @param p_bus is the globalized event bus that is given access to the
          * scene to subscribe events to it.
          */
-        scene_scope(const std::string& p_name, event::event_bus& p_bus)
+        scene(const std::string& p_name, event::event_bus& p_bus)
           : m_name(p_name)
           , m_bus(&p_bus) {}
 
-        virtual ~scene_scope() = default;
+        virtual ~scene() = default;
 
         /**
          * @brief Used to creating a game object

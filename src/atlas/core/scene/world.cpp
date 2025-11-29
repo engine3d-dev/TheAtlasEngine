@@ -16,7 +16,7 @@ namespace atlas {
      * TODO: Have a way of allowing creation and management of those
      * created-scenes be done through world_scope
      */
-    void world_scope::add_scene(const ref<scene_scope>& p_scene_context) {
+    void world_scope::add_scene(const ref<scene>& p_scene_context) {
         m_scene_container.emplace(p_scene_context->name(), p_scene_context);
     }
 };

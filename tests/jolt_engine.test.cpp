@@ -25,10 +25,10 @@ namespace atlas {
     boost::ut::suite<"physics_engine_integration"> engine_test = [] {
         using namespace boost::ut;
 
-        class test_scene : public scene_scope {
+        class test_scene : public scene {
         public:
             test_scene(const std::string& p_tag, event::event_bus& p_bus)
-              : scene_scope(p_tag, p_bus) {};
+              : scene(p_tag, p_bus) {};
 
             std::pmr::polymorphic_allocator<> m_object_allocator;
         };
@@ -50,7 +50,7 @@ namespace atlas {
 
             /**
              * @bug FIXME: This does not work because the operator in
-             * scene_scope:
+             * scene:
              * operator flecs::world() { return m_registry; }
              *
              * Returns a copy of the flecs world. This can be an invalid

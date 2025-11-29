@@ -18,7 +18,7 @@
  *
  */
 
-class level_scene final : public atlas::scene_scope {
+class level_scene final : public atlas::scene {
 public:
     level_scene(const std::string& p_tag, atlas::event::event_bus& p_bus);
 

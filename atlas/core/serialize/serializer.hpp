@@ -24,7 +24,7 @@ namespace atlas {
          * @param p_scene_ctx is the current scene to perform
          * serialization/deserialization to
          */
-        serializer(const ref<scene_scope>& p_scene_ctx);
+        serializer(const ref<scene>& p_scene_ctx);
 
         /**
          * @param p_filepath is the specified path to save the file
@@ -42,7 +42,7 @@ namespace atlas {
                   const flecs::world& p_registry);
 
     private:
-        ref<scene_scope> m_current_scene_ctx;
+        ref<scene> m_current_scene_ctx;
     };
 
 }; // namespace atlas

@@ -215,7 +215,7 @@ namespace atlas::vk {
         // set 1 -- material uniforms
         ref<world_scope> current_world =
           system_registry::get_world("Editor World");
-        ref<scene_scope> current_scene = current_world->get_scene("LevelScene");
+        ref<scene> current_scene = current_world->get_scene("LevelScene");
 
         flecs::query<> caching =
           current_scene->query_builder<mesh_source>().build();
@@ -485,7 +485,7 @@ namespace atlas::vk {
 
         ref<world_scope> current_world =
           system_registry::get_world("Editor World");
-        ref<scene_scope> current_scene = current_world->get_scene("LevelScene");
+        ref<scene> current_scene = current_world->get_scene("LevelScene");
 
         // query all entities that have a point light
         flecs::query<point_light> query_point_lights =

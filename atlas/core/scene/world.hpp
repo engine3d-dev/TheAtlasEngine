@@ -45,13 +45,13 @@ namespace atlas {
          * scenes as this is quite problematic. Should direct attention to this
          * soon.
          */
-        void add_scene(const ref<scene_scope>& p_scene_context);
+        void add_scene(const ref<scene>& p_scene_context);
 
         template<typename T>
-        ref<scene_scope> create_custom_scene(const std::string& p_name) {
+        ref<scene> create_custom_scene(const std::string& p_name) {
             static_assert(
-              std::is_base_of_v<scene_scope, T>,
-              "Must be a scene that inherits from scene_scope as a base class");
+              std::is_base_of_v<scene, T>,
+              "Must be a scene that inherits from scene as a base class");
             m_scene_container[p_name] = create_ref<T>(p_name);
             return m_scene_container[p_name];
         }
@@ -64,17 +64,17 @@ namespace atlas {
          * the player is in within the world, then provide the current scene
          * based on that information
          */
-        ref<scene_scope> get_scene(const std::string& p_tag) {
+        ref<scene> get_scene(const std::string& p_tag) {
             if (!m_scene_container.contains(p_tag)) {
                 throw std::runtime_error(
-                  "Could not access ref<scene_scope> from "
+                  "Could not access ref<scene> from "
                   "world_scope::get_scene(const string& p_tag)!!!");
             }
             return m_scene_container[p_tag];
         }
 
     private:
-        std::map<std::string, ref<scene_scope>> m_scene_container;
+        std::map<std::string, ref<scene>> m_scene_container;
         ref<world_scope> m_world_shared_instance;
         std::string m_name = "Undefined Tag";
     };

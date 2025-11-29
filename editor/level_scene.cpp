@@ -6,7 +6,7 @@
 
 level_scene::level_scene(const std::string& p_name,
                          atlas::event::event_bus& p_bus)
-  : atlas::scene_scope(p_name, p_bus) {
+  : atlas::scene(p_name, p_bus) {
     m_camera = create_object("Editor Camera");
     m_camera->add<flecs::pair<atlas::tag::editor, atlas::projection_view>>();
     m_camera->set<atlas::transform>({
