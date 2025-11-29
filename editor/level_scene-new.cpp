@@ -19,6 +19,10 @@ level_scene::level_scene(const std::string& p_name,
       .field_of_view = 45.f,
     });
 
+    m_object = create("Bob");
+
+    m_object2 = create2("Bob2");
+
     m_viking_room = create_object("Viking Room");
     m_viking_room->add<atlas::tag::serialize>();
     m_viking_room->set<atlas::transform>({
@@ -142,9 +146,12 @@ level_scene::level_scene(const std::string& p_name,
 
     // Just adding this here, for testing purposes
     // Basic serialization for testing to conform how the editor may work
-    // TODO -- have a stream writer/reader that can take a given scene structure
-    // for serialization
+    // TODO -- this would be done through either a stream_writer that can
+    // look at the structure of the graph and serialize according
+    // m_post_serializer_test = serializer(current_scene);
+    // m_post_serializer_test.save("LevelScene");
     m_deserializer_test = atlas::serializer();
+    m_current_selected_file = "LevelScene";
 
     subscribe<atlas::event::collision_enter>(this,
                                              &level_scene::collision_enter);

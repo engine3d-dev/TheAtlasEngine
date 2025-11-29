@@ -11,9 +11,9 @@ namespace atlas::filesystem {
      */
     std::string load_from_file_dialog(
       const std::string& p_filter,
-      const std::filesystem::path& p_default_path = "assets/models");
+      const std::filesystem::path& p_default_path = "Untitled.engine");
 
     std::string save_to_file(
       const std::string& p_filter,
-      const std::filesystem::path& p_default_path = "assets/models");
+      const std::filesystem::path& p_default_path = "Untitled.engine");
 }; // namespace atlas::filesystem

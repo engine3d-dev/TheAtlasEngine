@@ -4,7 +4,6 @@
 #include <string>
 #include <renderer/renderer.hpp>
 #include <drivers/vulkan-cpp/vk_imgui.hpp>
-#include <core/serialize/serializer.hpp>
 
 namespace atlas {
 
@@ -128,7 +127,6 @@ namespace atlas {
         void set_current_api(api api);
 
     private:
-        serializer m_post_serializer_test;
         float m_delta_time = 0.f;
         ref<window> m_window;
         scope<renderer> m_renderer = nullptr;

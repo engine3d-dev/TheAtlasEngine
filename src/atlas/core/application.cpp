@@ -240,13 +240,6 @@ namespace atlas {
             // m_renderer->present(m_current_frame_index);
             m_window->present(m_current_frame_index);
         }
-
-        // Just adding this here, for testing purposes
-        // Basic serialization for testing to conform how the editor may work
-        // TODO -- this would be done through either a stream_writer that can
-        // look at the structure of the graph and serialize according
-        m_post_serializer_test = serializer(current_scene);
-        m_post_serializer_test.save("LevelScene");
     }
 
     void application::post_destroy() {

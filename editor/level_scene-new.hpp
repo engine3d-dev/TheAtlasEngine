@@ -56,6 +56,8 @@ private:
     std::pmr::polymorphic_allocator<> m_allocator;
     atlas::optional_ref<atlas::scene_object> m_camera;
     atlas::optional_ref<atlas::scene_object> m_point_light;
+    atlas::scene_object_view m_object;
+    flecs::atlas_entity m_object2;
     float m_movement_speed = 10.f;
     // std::vector<atlas::strong_ref<atlas::scene_object>> m_many_objects;
 
@@ -70,4 +72,6 @@ private:
 
     // Note -- Added this temporarily
     // ImFont* m_font;
+
+    std::filesystem::path m_current_selected_file;
 };
