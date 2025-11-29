@@ -4,7 +4,7 @@
 namespace atlas::ui {
 
     void menu_item::begin() {
-        if(!ImGui::BeginMenuBar()) {
+        if (!ImGui::BeginMenuBar()) {
             throw menu_bar_exception("ImGui::BeginMenuBar failed!");
         }
     }
@@ -13,8 +13,9 @@ namespace atlas::ui {
         ImGui::EndMenuBar();
     }
 
-    void menu_item::add_child(const std::string& p_name, const std::function<void()>& p_callback) {
-        if(ImGui::MenuItem(p_name.c_str())) {
+    void menu_item::add_child(const std::string& p_name,
+                              const std::function<void()>& p_callback) {
+        if (ImGui::MenuItem(p_name.c_str())) {
             p_callback();
         }
         ImGui::Separator();

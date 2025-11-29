@@ -1,0 +1,77 @@
+#pragma once
+#include <core/core.hpp>
+#include <core/scene/scene.hpp>
+#include <core/scene/scene_object.hpp>
+#include <core/serialize/serializer.hpp>
+#include <imgui.h>
+#include <physics/physics_engine.hpp>
+#include <core/event/event_bus.hpp>
+#include <core/event/types.hpp>
+#include <core/editor/dockspace.hpp>
+#include <core/editor/menu_item.hpp>
+
+/**
+ * @brief Implementation of a custom scene
+ *
+ * Represent a scene with an associated game objects that correspond to this
+ * game object.
+ *
+ */
+
+class level_scene final : public atlas::scene_scope {
+public:
+    level_scene(const std::string& p_tag, atlas::event::event_bus& p_bus);
+
+    ~level_scene() override = default;
+
+    void start();
+
+    void on_update();
+
+    void on_ui_update();
+
+    void physics_update();
+
+    void runtime_start();
+
+    void runtime_stop();
+
+    void reset_objects();
+
+    void collision_enter(atlas::event::collision_enter& p_event);
+
+    void collision_persisted(atlas::event::collision_persisted& p_event);
+
+private:
+    bool m_blink = false;
+    atlas::serializer m_deserializer_test;
+    flecs::entity m_selected_entity;
+    // TEMP: this is only for when creating an entity in the editor-space
+    atlas::optional_ref<atlas::scene_object> m_create_entity;
+    atlas::optional_ref<atlas::scene_object> m_child_object;
+    atlas::optional_ref<atlas::scene_object> m_viking_room;
+    atlas::optional_ref<atlas::scene_object> m_cube;
+    atlas::optional_ref<atlas::scene_object> m_robot_model;
+    atlas::optional_ref<atlas::scene_object> m_platform;
+    std::pmr::polymorphic_allocator<> m_allocator;
+    atlas::optional_ref<atlas::scene_object> m_camera;
+    atlas::optional_ref<atlas::scene_object> m_point_light;
+    atlas::scene_object_view m_object;
+    flecs::atlas_entity m_object2;
+    float m_movement_speed = 10.f;
+    // std::vector<atlas::strong_ref<atlas::scene_object>> m_many_objects;
+
+    // Setting physics system
+    // TODO -- when refactoring this would be at atlas::world layer
+    atlas::physics::physics_engine m_physics_engine_handler;
+
+    bool m_physics_is_runtime = false;
+
+    atlas::ui::dockspace m_editor_dockspace;
+    atlas::ui::menu_item m_editor_menu;
+
+    // Note -- Added this temporarily
+    // ImFont* m_font;
+
+    std::filesystem::path m_current_selected_file;
+};
