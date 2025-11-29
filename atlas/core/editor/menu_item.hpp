@@ -45,9 +45,6 @@ namespace atlas::ui {
 
         void end();
 
-        /**
-         * 
-        */
         void add_child(const std::string& p_name, const std::function<void()>& p_callback);
     };
 };

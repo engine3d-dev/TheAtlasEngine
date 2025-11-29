@@ -140,6 +140,11 @@ level_scene::level_scene(const std::string& p_name,
     // 	m_many_objects.emplace_back(obj);
     // }
 
+    // Just adding this here, for testing purposes
+    // Basic serialization for testing to conform how the editor may work
+    // TODO -- have a stream writer/reader that can take a given scene structure for serialization
+    m_deserializer_test = atlas::serializer();
+
     subscribe<atlas::event::collision_enter>(this,
                                              &level_scene::collision_enter);
 
@@ -190,7 +195,6 @@ level_scene::runtime_stop() {
 
 void
 level_scene::reset_objects() {
-    m_deserializer_test = atlas::serializer();
 
     if (!m_deserializer_test.load("LevelScene", *this)) {
         console_log_error("Could not load yaml file LevelScene!!!");
