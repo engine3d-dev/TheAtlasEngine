@@ -278,13 +278,14 @@ level_scene::on_ui_update() {
     // setting up the dockspace UI widgets at the window toolbar
     m_editor_dockspace.begin();
 
-    try{
-    m_editor_menu.begin();
+    try {
+        m_editor_menu.begin();
     }
-    catch(const atlas::ui::menu_bar_exception& e) {
+    catch (const atlas::ui::menu_bar_exception& e) {
     }
 
-    // specify the label and the state to execute when this specific widget has been triggered
+    // specify the label and the state to execute when this specific widget has
+    // been triggered
     m_editor_menu.add_child("Exit", []() {
         glfwSetWindowShouldClose(atlas::application::get_window(), true);
     });

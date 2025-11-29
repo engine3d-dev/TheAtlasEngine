@@ -10,7 +10,6 @@
 #include <core/editor/dockspace.hpp>
 #include <core/editor/menu_item.hpp>
 
-
 /**
  * @brief Implementation of a custom scene
  *

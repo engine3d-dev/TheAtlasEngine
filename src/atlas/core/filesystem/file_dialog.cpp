@@ -21,18 +21,16 @@ namespace atlas::filesystem {
     }
 
     std::string save_to_file(const std::string& p_filter,
-                             const std::filesystem::path& p_default_path) {
+                             const std::filesystem::path& p_default) {
         char* output_path = nullptr;
+        nfdresult_t result = NFD_SaveDialog(p_filter.c_str(), p_default.string().c_str(), &output_path);
 
-        nfdresult_t result = NFD_SaveDialog(
-          p_filter.c_str(), p_default_path.string().c_str(), &output_path);
+		// if(result == NFD_ERROR){
+		// 	return std::string();
+		// }
 
-        // if (result == NFD_OKAY) {
-        //     return std::string(output_path);
-        // }
+		// return std::string(output_path);
 
-        // console_log_trace("Error Loading == {}", output_path);
-        // return "";
-        return (result == NFD_OKAY) ? std::string(output_path) : "";
+        return (result == NFD_OKAY) ? std::string(output_path) : std::string();
     }
 };
