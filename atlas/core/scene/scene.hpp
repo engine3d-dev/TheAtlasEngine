@@ -5,6 +5,7 @@
 #include <string>
 #include <core/scene/types.hpp>
 #include <core/event/event_bus.hpp>
+#include <core/scene/game_object.hpp>
 
 namespace atlas {
 
@@ -30,9 +31,7 @@ namespace atlas {
          * @param p_bus is the globalized event bus that is given access to the
          * scene to subscribe events to it.
          */
-        scene(const std::string& p_name, event::event_bus& p_bus)
-          : m_name(p_name)
-          , m_bus(&p_bus) {}
+        scene(const std::string& p_name, event::event_bus& p_bus);
 
         virtual ~scene() = default;
 
@@ -43,10 +42,11 @@ namespace atlas {
          *
          * @return strong_ptr<atlas::scene_object>
          */
-        strong_ref<scene_object> create_object(const std::string& p_name) {
-            return create_strong_ref<scene_object>(
-              m_allocator, &m_registry, p_name);
-        }
+        // strong_ref<scene_object> create_object(const std::string& p_name);
+
+        scene_object_exp create(const std::string& p_name);
+
+
 
         /**
          * @brief subscribes an event to the event::bus to get invoked when
@@ -134,7 +134,7 @@ namespace atlas {
         operator world&() { return m_registry; }
 
     private:
-        std::pmr::polymorphic_allocator<> m_allocator;
+        // std::pmr::polymorphic_allocator<> m_allocator;
         world m_registry;
         std::string m_name;
         event::event_bus* m_bus = nullptr;

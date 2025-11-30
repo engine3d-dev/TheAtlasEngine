@@ -19,6 +19,8 @@ set(
     ${SRC_DIR}/core/platforms/win32.cpp
 
     # System-related stuff
+    ${SRC_DIR}/core/scene/scene.cpp
+    ${SRC_DIR}/core/scene/game_object.cpp
     ${SRC_DIR}/core/scene/scene_object.cpp
     ${SRC_DIR}/core/system/registry.cpp
 

@@ -7,7 +7,7 @@
 level_scene::level_scene(const std::string& p_name,
                          atlas::event::event_bus& p_bus)
   : atlas::scene(p_name, p_bus) {
-    m_camera = create_object("Editor Camera");
+    m_camera = create("Editor Camera");
     m_camera->add<flecs::pair<atlas::tag::editor, atlas::projection_view>>();
     m_camera->set<atlas::transform>({
       .position = { 3.50f, 4.90f, 36.40f },
@@ -19,7 +19,10 @@ level_scene::level_scene(const std::string& p_name,
       .field_of_view = 45.f,
     });
 
-    m_viking_room = create_object("Viking Room");
+    m_bob_object = create("Bob");
+    m_bob_object->add<atlas::point_light>();
+
+    m_viking_room = create("Viking Room");
     m_viking_room->add<atlas::tag::serialize>();
     m_viking_room->set<atlas::transform>({
       .position = { -2.70f, 2.70, -8.30f },
@@ -37,7 +40,7 @@ level_scene::level_scene(const std::string& p_name,
       .body_movement_type = atlas::dynamic,
     });
 
-    m_cube = create_object("Aircraft");
+    m_cube = create("Aircraft");
 
     m_cube->set<atlas::transform>({
       .position = { 0.f, 2.10f, -7.30f },
@@ -53,15 +56,7 @@ level_scene::level_scene(const std::string& p_name,
       //   .diffuse = "assets/models/E-45-steel detail_2_col.jpg",
     });
 
-    // atlas::material_metadata data = {
-    //     .ambient = {0.2f, 0.2f, 0.2f},
-    //     .diffuse = {0.5f, 0.5f, 0.5f},
-    //     .specular = {1.0f, 1.0f, 1.0f},
-    //     .shininess = 64.f,
-    // };
-    // m_cube->set<atlas::material_metadata>(data);
-
-    m_robot_model = create_object("Cube");
+    m_robot_model = create("Cube");
     m_robot_model->add<atlas::tag::serialize>();
     // m_robot_model->add<atlas::tag::serialize>();
     m_robot_model->set<atlas::transform>({
@@ -83,10 +78,7 @@ level_scene::level_scene(const std::string& p_name,
       .body_movement_type = atlas::dynamic,
     });
 
-    m_child_object = create_object("Child");
-    m_child_object->child_of(m_robot_model);
-
-    m_platform = create_object("Platform");
+    m_platform = create("Platform");
 
     m_platform->set<atlas::transform>({
       .scale = { 15.f, 0.30f, 10.0f },
@@ -102,7 +94,7 @@ level_scene::level_scene(const std::string& p_name,
       .half_extent = { 15.f, 0.30f, 10.0f },
     });
 
-    m_point_light = create_object("Point Light 1");
+    m_point_light = create("Point Light 1");
     m_point_light->set<atlas::transform>({
       .position = { 0.f, 2.10f, -7.30f },
       .scale = { 0.9f, 0.9f, 0.9f },
@@ -115,7 +107,7 @@ level_scene::level_scene(const std::string& p_name,
     m_point_light->add<atlas::tag::serialize>();
 
     // for(size_t i = 0; i < 26; i++) {
-    // 	auto obj = create_object(std::format("Object #{}", i));
+    // 	auto obj = create(std::format("Object #{}", i));
     // 	obj->set<atlas::physics_body>({
     // 		.restitution = 1.25f,
     // 		.body_movement_type = atlas::dynamic,
@@ -140,10 +132,7 @@ level_scene::level_scene(const std::string& p_name,
     // 	m_many_objects.emplace_back(obj);
     // }
 
-    // Just adding this here, for testing purposes
-    // Basic serialization for testing to conform how the editor may work
-    // TODO -- have a stream writer/reader that can take a given scene structure
-    // for serialization
+    // TODO: Move this outside of level_scene
     m_deserializer_test = atlas::serializer();
 
     subscribe<atlas::event::collision_enter>(this,
@@ -315,7 +304,8 @@ level_scene::on_ui_update() {
             if (ImGui::MenuItem("Create Empty Entity")) {
                 // TODO -- Converting the operation to use strong_ptr to make
                 // these operation more conformed
-                m_create_entity = create_object("Empty Entity");
+                // m_create_entity = create("Empty Entity");
+                m_current_entity = create("Empty Entity");
             }
             ImGui::EndPopup();
         }
