@@ -1,11 +1,9 @@
 #pragma once
 #include <core/core.hpp>
-#include <core/engine_logger.hpp>
-#include <core/scene/scene_object.hpp>
 #include <string>
 #include <core/scene/types.hpp>
 #include <core/event/event_bus.hpp>
-#include <core/scene/game_object.hpp>
+#include <core/scene/scene_object.hpp>
 
 namespace atlas {
 
@@ -36,17 +34,9 @@ namespace atlas {
         virtual ~scene() = default;
 
         /**
-         * @brief Used to creating a game object
-         *
-         * @param p_name is specified when creating or searching the object
-         *
-         * @return strong_ptr<atlas::scene_object>
-         */
-        // strong_ref<scene_object> create_object(const std::string& p_name);
-
-        scene_object_exp create(const std::string& p_name);
-
-
+         * @brief create a new entity (game object)
+        */
+        scene_object create(const std::string& p_name);
 
         /**
          * @brief subscribes an event to the event::bus to get invoked when

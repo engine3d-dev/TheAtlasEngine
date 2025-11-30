@@ -7,10 +7,6 @@ namespace atlas {
     world_scope::world_scope(const std::string& p_name)
       : m_name(p_name) {}
 
-    world_scope::~world_scope() {
-        console_log_trace("~world_scope called!!!");
-    }
-
     /**
      * @brief Currently how to pass in the scene context to the world
      * TODO: Have a way of allowing creation and management of those

@@ -13,8 +13,8 @@ namespace atlas {
     //     return custom_entity(e);
     // }
 
-    scene_object_exp scene::create(const std::string& p_name) {
-        return scene_object_exp(m_registry.entity(p_name.c_str()));
+    scene_object scene::create(const std::string& p_name) {
+        return scene_object(m_registry.entity(p_name.c_str()));
     }
 
 };

@@ -1,12 +1,8 @@
-#include <core/system/registry.hpp>
-#include <core/scene/world.hpp>
-#include <drivers/vulkan-cpp/vk_renderer.hpp>
-
+#include <core/common.hpp>
 #include <array>
+#include <drivers/vulkan-cpp/vk_renderer.hpp>
 #include <drivers/vulkan-cpp/utilities.hpp>
 #include <drivers/vulkan-cpp/vk_context.hpp>
-#include <core/application.hpp>
-
 #include <renderer/uniforms.hpp>
 
 namespace atlas::vk {

@@ -47,16 +47,16 @@ private:
     atlas::serializer m_deserializer_test;
     flecs::entity m_selected_entity;
 
-    atlas::scene_object_exp m_viking_room;
-    atlas::scene_object_exp m_cube;
-    atlas::scene_object_exp m_robot_model;
-    atlas::scene_object_exp m_platform;
+    atlas::scene_object m_viking_room;
+    atlas::scene_object m_cube;
+    atlas::scene_object m_robot_model;
+    atlas::scene_object m_platform;
     std::pmr::polymorphic_allocator<> m_allocator;
-    atlas::scene_object_exp m_camera;
-    atlas::scene_object_exp m_point_light;
-    // atlas::scene_object_exp  m_bob_object;
-    atlas::scene_object_exp m_bob_object;
-    atlas::scene_object_exp m_current_entity;
+    atlas::scene_object m_camera;
+    atlas::scene_object m_point_light;
+    // atlas::scene_object  m_bob_object;
+    atlas::scene_object m_bob_object;
+    atlas::scene_object m_current_entity;
     float m_movement_speed = 10.f;
     // std::vector<atlas::strong_ref<atlas::scene_object>> m_many_objects;
 

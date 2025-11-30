@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>
 #include <GLFW/glfw3.h>
 #include <core/filesystem/file_dialog.hpp>
-#include <core/scene/scene_object.hpp>
+#include <core/scene/components.hpp>
 
 namespace atlas::ui {
 
