@@ -35,7 +35,7 @@ namespace atlas {
 
         /**
          * @brief create a new entity (game object)
-        */
+         */
         scene_object create(const std::string& p_name);
 
         /**
@@ -87,10 +87,37 @@ namespace atlas {
         }
 
         /**
+         * @return the number of children entities
+         *
+         * Example Usage:
+         *
+         *
+         * ```C++
+         *
+         * atlas::scene scene("New Scene");
+         *
+         * // creating obj1 (parent) and obj2 (child)
+         * atlas::scene_object obj1 = scene.create("Parent");
+         *
+         * atlas::scene_object obj2 = scene.create("Chlid");
+         *
+         * // obj2 is the child of obj1
+         * // As obj1 is a parent node
+         *
+         * obj2.child_of(obj1);
+         *
+         * // Returns 1
+         * uint32_t obj1_children = scene.children_count(obj1);
+         *
+         * ```
+         */
+        uint32_t children_count(scene_object p_parent);
+
+        /**
          * @brief Defer operations until end of frame.
-         * When this operation is invoked while iterating, operations inbetween
-         * the defer_begin() and defer_end() operations are executed at the end
-         * of the frame.
+         * When this operation is invoked while iterating, operations
+         * inbetween the defer_begin() and defer_end() operations are executed
+         * at the end of the frame.
          *
          * This operation is thread safe.
          *
@@ -110,11 +137,10 @@ namespace atlas {
          */
         bool defer_end() { return m_registry.defer_end(); }
 
-        //! @return the name of atlas::scene_object
+        //! @return the name of the scene
         [[nodiscard]] std::string name() const { return m_name; }
 
-        //! @return the event::bus handle to do the subscription operation of
-        //! events
+        //! @return the event::bus handle for subscribing events
         [[nodiscard]] event::event_bus* event_handle() const { return m_bus; }
 
         /**
@@ -124,7 +150,6 @@ namespace atlas {
         operator world&() { return m_registry; }
 
     private:
-        // std::pmr::polymorphic_allocator<> m_allocator;
         world m_registry;
         std::string m_name;
         event::event_bus* m_bus = nullptr;
