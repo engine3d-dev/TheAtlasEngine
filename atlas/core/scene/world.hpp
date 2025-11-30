@@ -33,7 +33,8 @@ namespace atlas {
          * with it
          */
         world_scope(const std::string& p_name);
-        ~world_scope();
+        
+        virtual ~world_scope() = default;
 
         //! @return the name of world_scope
         [[nodiscard]] std::string name() const { return m_name; }

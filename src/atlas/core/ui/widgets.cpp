@@ -220,11 +220,59 @@ namespace atlas::ui {
         ImGui::PopID();
     }
 
-    void draw_input_text(std::string& p_value) {
-        // std::string value = "";
-        // // ImGui::Text("%s", p_value.c_str());
-        if (ImGui::InputText("##Tag", p_value.data(), p_value.size() + 1)) {
+    void draw_input_text(std::string&) {
+        // 1. Define the buffer constraints
+        // This size is critical: it defines the maximum length ImGui will allow.
+        /*
+        constexpr size_t max_string_length = 255;
+        
+        // 2. Get the current entity name
+        // std::string current_name = p_selected_entity.name();
+
+        // 3. Create a temporary, mutable std::string for ImGui's buffer
+        // This string must be pre-sized to hold the entity name AND the extra space 
+        // ImGui will use for new input, plus the null terminator.
+        std::string input_buffer = p_value;
+
+        // Pad the string with null terminators to guarantee the maximum size for ImGui.
+        // This is the cleanest way to create a fixed-size 'char*' buffer using only std::string.
+        // We add one extra for safety, but ImGui will respect max_string_length.
+        input_buffer.resize(max_string_length + 1, '\0'); 
+
+        // 4. Use ImGui::InputText
+        // We pass the raw mutable pointer to the start of the string's buffer.
+        // .data() returns a non-const char* for non-const std::string in C++17+.
+        ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue;
+        
+        if (ImGui::InputText(
+            "##Name", 
+            input_buffer.data(), // Crucial: Mutable char* access
+            max_string_length + 1, // Crucial: The fixed buffer size
+            flags)
+        ) {
+            // 5. Trim the std::string to the actual user input
+            // The buffer contains the new name followed by a null-terminator.
+            // We find the null-terminator and resize the string to that point.
+            // C++23: std::string::resize_and_overwrite could be used here, but 
+            // a standard find and resize is clearer for this context.
+            
+            // Find the first null character, which marks the end of the user's input
+            size_t new_len = input_buffer.find('\0');
+            
+            if (new_len != std::string::npos) {
+                input_buffer.resize(new_len); // Resize to the actual name length
+            }
+            else {
+                // Should not happen if ImGui works correctly, but safe guard against non-terminated string
+                input_buffer.resize(max_string_length);
+            }
+
+            // 6. Commit the change to the flecs entity's name
+            // Use the newly resized and managed std::string.
+            // UNCOMMENT THIS TO GET DIS TO WORK!
+            // p_selected_entity.set_name(input_buffer.c_str());
         }
+        */
     }
 
     void draw_text(const std::string& p_value) {
