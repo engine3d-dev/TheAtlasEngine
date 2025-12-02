@@ -23,39 +23,6 @@ namespace atlas {
         explicit scene_object(flecs::entity& p_base);
 
         /**
-         * @brief Adds multiple components with no values assigned to them
-         *
-         * Ideally this would be a shorthand for adding in multiple components
-         * onto a single given entity
-         *
-         * Example:
-         *
-         *
-         * ```C++
-         *
-         * atlas::scene_object entity_example = create("New Entity");
-         *
-         * // adds both transform and rigidbody to "entity_example"
-         * entity_example->add<atlas::transform, atlas::rigidbody>();
-         *
-         * ```
-         */
-        template<typename... Args>
-        void add() {
-            using tuple_variadic = std::tuple<Args...>;
-            std::variant<tuple_variadic> conditions;
-            std::visit(
-              [&](const auto& p_component) {
-                  std::apply(
-                    [&](auto&... p_placeholder) {
-                        (add<std::decay_t<decltype(p_placeholder)>>(), ...);
-                    },
-                    p_component);
-              },
-              conditions);
-        }
-
-        /**
          * @brief sets the entity to be a parent of the specified entity
          *
          * @param p_entity is the specified entity to specify as the parent.
