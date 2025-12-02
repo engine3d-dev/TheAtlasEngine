@@ -64,11 +64,13 @@ namespace atlas::ui {
                     float p_reset_value = 0.f);
 
     /**
-     * @brief For UI rendering text as input
+     * @brief UI rendering input text
+     * 
      *
-     * @param p_value is specified string for drawing input text to imgui's
+     * @param p_dst is the destination string to be changed
+     * @param p_src is the original string that was previously given
      */
-    void draw_input_text(std::string& p_value);
+    void draw_input_text(std::string& p_dst, std::string& p_src);
 
     /**
      * @brief For UI rendering text to display and not input
