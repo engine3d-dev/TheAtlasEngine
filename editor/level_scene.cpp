@@ -3,6 +3,7 @@
 #include <core/application.hpp>
 #include <drivers/jolt-cpp/jolt_components.hpp>
 #include <physics/physics_engine.hpp>
+#include <string>
 
 level_scene::level_scene(const std::string& p_name,
                          atlas::event::event_bus& p_bus)
@@ -194,7 +195,10 @@ level_scene::reset_objects() {
 void
 ui_component_list(flecs::entity& p_selected_entity) {
     std::string entity_name = p_selected_entity.name().c_str();
-    atlas::ui::draw_input_text(entity_name);
+    std::string new_entity_name = "";
+    atlas::ui::draw_input_text(new_entity_name, entity_name);
+
+    p_selected_entity.set_name(new_entity_name.c_str());
 
     ImGui::SameLine();
     ImGui::PushItemWidth(-1);
@@ -302,9 +306,6 @@ level_scene::on_ui_update() {
         // @param popup_flags - will be the mouse flag (0=right, 1=left)
         if (atlas::ui::begin_popup_context_window(nullptr, 1, false)) {
             if (ImGui::MenuItem("Create Empty Entity")) {
-                // TODO -- Converting the operation to use strong_ptr to make
-                // these operation more conformed
-                // m_create_entity = create("Empty Entity");
                 m_current_entity = create("Empty Entity");
             }
             ImGui::EndPopup();
@@ -320,10 +321,13 @@ level_scene::on_ui_update() {
               ImGuiTreeNodeFlags_OpenOnArrow;
             flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
             flags |= ImGuiWindowFlags_Popup;
+            flags |= ImGuiTreeNodeFlags_AllowItemOverlap;
+
+            // std::string fmt = std::format("{} ({})", p_entity.name().c_str(), p_entity.id());
             bool opened = ImGui::TreeNodeEx(p_entity.name().c_str(), flags);
+
             if (ImGui::IsItemClicked()) {
                 m_selected_entity = p_entity;
-                // m_create_entity = search_entity(p_entity.name().c_str());
             }
 
             bool delete_entity = false;
@@ -338,6 +342,9 @@ level_scene::on_ui_update() {
                 // _context->destroyEntity(entity);
                 m_selected_entity.destruct();
             }
+
+            ImGui::SameLine();
+            ImGui::TextDisabled("(%llu)", p_entity.id());
 
             if (opened) {
                 flags = ImGuiTreeNodeFlags_OpenOnArrow |
@@ -429,7 +436,7 @@ level_scene::on_ui_update() {
               "atlas::mesh_source",
               m_selected_entity,
               [](atlas::mesh_source* p_source) {
-                  atlas::ui::draw_input_text(p_source->model_path);
+                //   atlas::ui::draw_input_text(p_source->model_path, p_source->model_path);
                   atlas::ui::draw_vec4("Color", p_source->color);
               });
 
