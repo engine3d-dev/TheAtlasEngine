@@ -54,7 +54,6 @@ private:
     std::pmr::polymorphic_allocator<> m_allocator;
     atlas::scene_object m_camera;
     atlas::scene_object m_point_light;
-    // atlas::scene_object  m_bob_object;
     atlas::scene_object m_bob_object;
     atlas::scene_object m_current_entity;
     float m_movement_speed = 10.f;
