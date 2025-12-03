@@ -37,7 +37,7 @@ namespace atlas {
          */
 
         /**
-         * @brief constructs a new world_scope
+         * @brief constructs a new world
          *
          * Initially this was used to create a world with a specified name
          * associated with it
@@ -45,30 +45,30 @@ namespace atlas {
          * This was used for getting world to be maintained implicitly by
          * system_registry, though this will be changing.
          */
-        static ref<world_scope> create_world(const std::string& p_tag);
+        static ref<world> create_world(const std::string& p_tag);
 
-        //! @brief Searches and returns world_scope if found
-        //! @brief Returns nullptr if world_scope not found
+        //! @brief Searches and returns world if found
+        //! @brief Returns nullptr if world not found
 
         /**
          * @brief searches in getting the world and looks up based on its
          * specified name
          *
          * @return nullptr if not found, otherwise return
-         * shared_ptr<world_scope>
+         * shared_ptr<world>
          */
-        static ref<world_scope> get_world(const std::string& p_tag);
+        static ref<world> get_world(const std::string& p_tag);
 
     private:
-        ref<world_scope> search_world(const std::string& p_tag);
+        ref<world> search_world(const std::string& p_tag);
 
-        void append_world(const ref<world_scope>& p_world);
+        // void append_world(const ref<world>& p_world);
 
-        ref<world_scope> append_world_scope(const ref<world_scope>& p_world);
+        ref<world> append_world_and_get(const ref<world>& p_world);
 
     private:
         static system_registry* s_instance;
         std::string m_tag = "Undefined";
-        std::map<std::string, ref<world_scope>> m_world_registered;
+        std::map<std::string, ref<world>> m_world_registered;
     };
 };

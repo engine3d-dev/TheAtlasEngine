@@ -81,7 +81,7 @@ namespace atlas {
         m_renderer->preload(
           m_window->current_swapchain().swapchain_renderpass());
 
-        ref<world_scope> current_world =
+        ref<world> current_world =
           system_registry::get_world("Editor World");
         ref<scene> current_scene = current_world->get_scene("LevelScene");
 

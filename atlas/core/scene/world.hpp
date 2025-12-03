@@ -24,19 +24,19 @@ namespace atlas {
      *
      *
      */
-    class world_scope {
+    class world {
     public:
-        world_scope() = delete;
+        world() = delete;
 
         /**
-         * @brief construct a new world_scope with a specified name associated
+         * @brief construct a new world with a specified name associated
          * with it
          */
-        world_scope(const std::string& p_name);
+        world(const std::string& p_name);
         
-        virtual ~world_scope() = default;
+        virtual ~world() = default;
 
-        //! @return the name of world_scope
+        //! @return the name of world
         [[nodiscard]] std::string name() const { return m_name; }
 
         /**
@@ -69,14 +69,14 @@ namespace atlas {
             if (!m_scene_container.contains(p_tag)) {
                 throw std::runtime_error(
                   "Could not access ref<scene> from "
-                  "world_scope::get_scene(const string& p_tag)!!!");
+                  "world::get_scene(const string& p_tag)!!!");
             }
             return m_scene_container[p_tag];
         }
 
     private:
         std::map<std::string, ref<scene>> m_scene_container;
-        ref<world_scope> m_world_shared_instance;
+        ref<world> m_world_shared_instance;
         std::string m_name = "Undefined Tag";
     };
 }; // namespace atlas

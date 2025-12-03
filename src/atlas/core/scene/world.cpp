@@ -4,15 +4,15 @@
 
 namespace atlas {
 
-    world_scope::world_scope(const std::string& p_name)
+    world::world(const std::string& p_name)
       : m_name(p_name) {}
 
     /**
      * @brief Currently how to pass in the scene context to the world
      * TODO: Have a way of allowing creation and management of those
-     * created-scenes be done through world_scope
+     * created-scenes be done through world
      */
-    void world_scope::add_scene(const ref<scene>& p_scene_context) {
+    void world::add_scene(const ref<scene>& p_scene_context) {
         m_scene_container.emplace(p_scene_context->name(), p_scene_context);
     }
 };

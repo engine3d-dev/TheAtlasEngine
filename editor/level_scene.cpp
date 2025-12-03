@@ -8,7 +8,7 @@
 level_scene::level_scene(const std::string& p_name,
                          atlas::event::event_bus& p_bus)
   : atlas::scene(p_name, p_bus) {
-    m_camera = create("Editor Camera");
+    m_camera = entity("Editor Camera");
     m_camera->add<flecs::pair<atlas::tag::editor, atlas::projection_view>>();
     m_camera->set<atlas::transform>({
       .position = { 3.50f, 4.90f, 36.40f },
@@ -20,10 +20,10 @@ level_scene::level_scene(const std::string& p_name,
       .field_of_view = 45.f,
     });
 
-    m_bob_object = create("Bob");
+    m_bob_object = entity("Bob");
     m_bob_object->add<atlas::point_light>();
 
-    m_viking_room = create("Viking Room");
+    m_viking_room = entity("Viking Room");
     m_viking_room->add<atlas::tag::serialize>();
     m_viking_room->set<atlas::transform>({
       .position = { -2.70f, 2.70, -8.30f },
@@ -41,7 +41,7 @@ level_scene::level_scene(const std::string& p_name,
       .body_movement_type = atlas::dynamic,
     });
 
-    m_cube = create("Aircraft");
+    m_cube = entity("Aircraft");
 
     m_cube->set<atlas::transform>({
       .position = { 0.f, 2.10f, -7.30f },
@@ -57,7 +57,7 @@ level_scene::level_scene(const std::string& p_name,
       //   .diffuse = "assets/models/E-45-steel detail_2_col.jpg",
     });
 
-    m_robot_model = create("Cube");
+    m_robot_model = entity("Cube");
     m_robot_model->add<atlas::tag::serialize>();
     // m_robot_model->add<atlas::tag::serialize>();
     m_robot_model->set<atlas::transform>({
@@ -79,7 +79,7 @@ level_scene::level_scene(const std::string& p_name,
       .body_movement_type = atlas::dynamic,
     });
 
-    m_platform = create("Platform");
+    m_platform = entity("Platform");
 
     m_platform->set<atlas::transform>({
       .scale = { 15.f, 0.30f, 10.0f },
@@ -95,7 +95,7 @@ level_scene::level_scene(const std::string& p_name,
       .half_extent = { 15.f, 0.30f, 10.0f },
     });
 
-    m_point_light = create("Point Light 1");
+    m_point_light = entity("Point Light 1");
     m_point_light->set<atlas::transform>({
       .position = { 0.f, 2.10f, -7.30f },
       .scale = { 0.9f, 0.9f, 0.9f },
@@ -170,16 +170,16 @@ level_scene::collision_persisted(atlas::event::collision_persisted& p_event) {
 void
 level_scene::runtime_start() {
     // runs the physics simulation
-    m_physics_is_runtime = true;
+    m_physics_runtime = true;
 
-    m_physics_engine_handler.start();
+    m_physics_engine.start();
 }
 
 void
 level_scene::runtime_stop() {
-    m_physics_is_runtime = false;
+    m_physics_runtime = false;
 
-    m_physics_engine_handler.stop();
+    m_physics_engine.stop();
 
     reset_objects();
 }
@@ -306,7 +306,7 @@ level_scene::on_ui_update() {
         // @param popup_flags - will be the mouse flag (0=right, 1=left)
         if (atlas::ui::begin_popup_context_window(nullptr, 1, false)) {
             if (ImGui::MenuItem("Create Empty Entity")) {
-                m_current_entity = create("Empty Entity");
+                m_current_entity = entity("Empty Entity");
             }
             ImGui::EndPopup();
         }
@@ -595,7 +595,7 @@ level_scene::start() {
     // Initiating physics system
     atlas::physics::jolt_settings settings = {};
     flecs::world registry = *this;
-    m_physics_engine_handler =
+    m_physics_engine =
       atlas::physics::physics_engine(settings, registry, *event_handle());
 
     // Note -- just added for temporary
@@ -668,7 +668,7 @@ level_scene::on_update() {
 void
 level_scene::physics_update() {
     float dt = atlas::application::delta_time();
-    if (atlas::event::is_key_pressed(key_r) and !m_physics_is_runtime) {
+    if (atlas::event::is_key_pressed(key_r) and !m_physics_runtime) {
         runtime_start();
     }
 
@@ -699,11 +699,11 @@ level_scene::physics_update() {
         sphere_body->angular_velocity = angular_vel;
     }
 
-    if (m_physics_is_runtime) {
-        m_physics_engine_handler.update(dt);
+    if (m_physics_runtime) {
+        m_physics_engine.update(dt);
     }
 
-    if (atlas::event::is_key_pressed(key_l) and m_physics_is_runtime) {
+    if (atlas::event::is_key_pressed(key_l) and m_physics_runtime) {
         runtime_stop();
     }
 }

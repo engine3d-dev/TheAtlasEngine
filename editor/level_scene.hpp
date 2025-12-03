@@ -38,6 +38,7 @@ public:
 
     void reset_objects();
 
+private:
     void collision_enter(atlas::event::collision_enter& p_event);
 
     void collision_persisted(atlas::event::collision_persisted& p_event);
@@ -51,7 +52,6 @@ private:
     atlas::scene_object m_cube;
     atlas::scene_object m_robot_model;
     atlas::scene_object m_platform;
-    std::pmr::polymorphic_allocator<> m_allocator;
     atlas::scene_object m_camera;
     atlas::scene_object m_point_light;
     atlas::scene_object m_bob_object;
@@ -61,9 +61,9 @@ private:
 
     // Setting physics system
     // TODO -- when refactoring this would be at atlas::world layer
-    atlas::physics::physics_engine m_physics_engine_handler;
+    atlas::physics::physics_engine m_physics_engine;
 
-    bool m_physics_is_runtime = false;
+    bool m_physics_runtime = false;
 
     atlas::ui::dockspace m_editor_dockspace;
     atlas::ui::menu_item m_editor_menu;
