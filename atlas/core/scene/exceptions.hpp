@@ -1,17 +1,20 @@
 #pragma once
+#include <exception>
 
 namespace atlas {
     struct exception_block {
         const char* data=nullptr;
     };
 
-    class object_accessor_exception {
+    class invalid_access_exception : public std::exception {
     public:
-        object_accessor_exception(const char* p_data) : m_data(p_data) {}
+        invalid_access_exception() = default;
+        invalid_access_exception(const char* p_data) : m_block(p_data) {}
 
-        [[nodiscard]] const char* what() const { return m_data.data; }
+        //! @return message given when this exception gets triggered
+        [[nodiscard]] const char* what() const override { return m_block.data; }
 
     private:
-        exception_block m_data;
+        exception_block m_block;
     };
 };

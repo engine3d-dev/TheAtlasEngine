@@ -1,12 +1,13 @@
 #pragma once
 #include <flecs.h>
-#include <variant>
-#include <tuple>
 
 namespace atlas {
 
     /**
-     * @brief Creates a game object that extends the flecs::entity
+     * @brief Creates a pointer wrapper which extends capabilities of
+     * flecs::entity
+     *
+     * Wrapper that provides
      *
      * Provides our own construct of API's that handles any workload around some
      * of the raw flecs API's that can still be used by other flecs API's
@@ -73,6 +74,17 @@ namespace atlas {
             children(p_callback);
         }
 
+        /**
+         * @brief Since we do not have a way to ensure that the access point to
+         * this object is invalid, we use the -> operator to ensure the object
+         * is valid.
+         * 
+         * Including cannot overload the `.` operator, to ensure object if it is valid.
+         *
+         * The `->` operator will throw std::runtime_error exception if object's
+         * invalid or return the object
+         *
+         */
         flecs::entity* operator->();
     };
 
