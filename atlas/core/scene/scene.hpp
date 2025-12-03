@@ -1,7 +1,6 @@
 #pragma once
 #include <core/core.hpp>
 #include <string>
-#include <core/scene/types.hpp>
 #include <core/event/event_bus.hpp>
 #include <core/scene/scene_object.hpp>
 
@@ -35,8 +34,11 @@ namespace atlas {
 
         /**
          * @brief create a new entity (game object)
+         *
+         * Will create an entity (game object) or retrieve existing entity if
+         * the name for that entity exists within the ecs registry.
          */
-        scene_object create(const std::string& p_name);
+        scene_object entity(const std::string& p_name);
 
         /**
          * @brief subscribes an event to the event::bus to get invoked when
@@ -147,10 +149,10 @@ namespace atlas {
          * @brief Requires to return flecs::world is returned by reference to
          * prevent making copies of flecs::world
          */
-        operator world&() { return m_registry; }
+        operator flecs::world&() { return m_registry; }
 
     private:
-        world m_registry;
+        flecs::world m_registry;
         std::string m_name;
         event::event_bus* m_bus = nullptr;
     };
