@@ -1,20 +1,17 @@
 #include <boost/ut.hpp>
 #include <core/scene/scene.hpp>
 #include <core/event/event_bus.hpp>
+#include <core/scene/components.hpp>
 
 boost::ut::suite<"::scene"> scene_test = []() {
     using namespace boost::ut;
     atlas::event::event_bus test_event_bus;
-    atlas::scene test_scope = atlas::scene("Mock Scene 1", test_event_bus);
+    atlas::scene test_scene = atlas::scene("Mock Scene 1", test_event_bus);
 
-    "create_object"_test = [&test_scope]() {
-        atlas::strong_ref<atlas::scene_object> test_object =
-          test_scope.create_object("Entity 1");
+    "create_object"_test = [&test_scene]() {
+        atlas::uscene_object test_object = test_scene.entity("Entity 1");
+        test_object->add<atlas::transform>();
 
-        test_object->set<atlas::transform>({ .position{ 1.f } });
-        glm::vec3 mock_pos{ 1.f };
-
-        const atlas::transform* t = test_object->get<atlas::transform>();
-        expect(mock_pos == t->position);
+        expect(test_object->has<atlas::transform>());
     };
 };

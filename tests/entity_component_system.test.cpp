@@ -4,7 +4,7 @@
 
 #include <Jolt/Jolt.h>
 #include <Jolt/Math/Vec4.h>
-#include <core/scene/scene_object.hpp>
+#include <core/scene/scene.hpp>
 
 namespace atlas {
 
@@ -82,39 +82,39 @@ namespace atlas {
 
         //! @note Each scene will define flecs::world typically
         //! @note flecs::world is how flecs (ECS) stores entities and components
-        flecs::world scene_registry;
+        atlas::event::event_bus test_event_bus;
+        atlas::scene test_scene = atlas::scene("Mock Scene", test_event_bus);
 
-        "create_entity::add<T>"_test = [&scene_registry] {
+        "create_entity::add<T>"_test = [&test_scene] {
             // flecs::entity entity = scene_registry.entity("Mock Entity");
-            atlas::scene_object entity =
-              atlas::scene_object(&scene_registry, "Mock Entity");
+            atlas::uscene_object entity = test_scene.entity("Mock Entity");
 
             // expect(entity.is_alive());
 
-            entity.add<test_tag_component>();
-            expect(entity.has<test_tag_component>());
+            entity->add<test_tag_component>();
+            expect(entity->has<test_tag_component>());
         };
 
-        "create_entity::get"_test = [&scene_registry]() {
-            atlas::scene_object entity =
-              atlas::scene_object(&scene_registry, "Mock Entity2");
-            entity.add<test_tag_component>();
-            //! @note Flecs require you to get the component for the use of only
-            //! reading the data from component
-            //! @note To actually set values to that component you use the set
-            //! usnig their API they specify
-            entity.set<test_tag_component>({ .tag = "New Entity" });
+        "create_entity::get"_test = [&test_scene]() {
+            atlas::uscene_object entity = test_scene.entity("Mock Entity 2");
+            entity->add<test_tag_component>();
+            // flecs requires reading only operations are through the get<T> API
+            // to write or set new parameters you can use get_mut<T> or
+            // set<T>(T&&); in this case, I use set<T> in this test case
+            entity->set<test_tag_component>({ .tag = "New Entity" });
 
             const test_tag_component* get_tag =
-              entity.get<test_tag_component>();
+              entity->get<test_tag_component>();
             expect(get_tag->tag == "New Entity");
         };
 
-        "create_entity::set"_test = [&scene_registry]() {
-            atlas::scene_object entity =
-              atlas::scene_object(&scene_registry, "New Entity");
+        "create_entity::set"_test = [&test_scene]() {
+            atlas::uscene_object entity = test_scene.entity("New Entity");
             mock_projectile projectile;
             projectile.on_update();
+            entity->set<mock_projectile>(projectile);
+
+            expect(entity->has<mock_projectile>());
 
             // test_transform transform;
             // transform.position = projectile.position();
