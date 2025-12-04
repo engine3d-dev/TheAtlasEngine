@@ -398,6 +398,29 @@ level_scene::on_ui_update() {
                   ImGui::DragFloat("Speed", &m_movement_speed);
               });
 
+            atlas::ui::draw_component<atlas::mesh_source>(
+              "atlas::mesh_source",
+              m_selected_entity,
+              [](atlas::mesh_source* p_source) {
+                  std::string mesh_src = p_source->model_path;
+                  atlas::ui::draw_input_text(p_source->model_path, mesh_src);
+                  atlas::ui::draw_vec4("Color", p_source->color);
+              });
+
+            atlas::ui::draw_component<atlas::material_metadata>(
+              "material",
+              m_selected_entity,
+              [](atlas::material_metadata* p_source) {
+                  float speed = 0.01f;
+                  ImGui::DragFloat4(
+                    "Ambient", glm::value_ptr(p_source->ambient), speed);
+                  ImGui::DragFloat4(
+                    "Diffuse", glm::value_ptr(p_source->diffuse), speed);
+                  ImGui::DragFloat4(
+                    "Specular", glm::value_ptr(p_source->specular), speed);
+                  atlas::ui::draw_float("Shininess", p_source->shininess);
+              });
+
             /*
             atlas::ui::draw_component<atlas::directional_light>("Directional
             Light", m_selected_entity, [](atlas::directional_light*
@@ -429,28 +452,6 @@ level_scene::on_ui_update() {
                   ImGui::DragFloat("Constant", &p_dir_light->constant, 0.01);
                   ImGui::DragFloat("Linear", &p_dir_light->linear, 0.01);
                   ImGui::DragFloat("Quadratic", &p_dir_light->quadratic, 0.01);
-              });
-
-            atlas::ui::draw_component<atlas::mesh_source>(
-              "atlas::mesh_source",
-              m_selected_entity,
-              [](atlas::mesh_source* p_source) {
-                //   atlas::ui::draw_input_text(p_source->model_path, p_source->model_path);
-                  atlas::ui::draw_vec4("Color", p_source->color);
-              });
-
-            atlas::ui::draw_component<atlas::material_metadata>(
-              "material",
-              m_selected_entity,
-              [](atlas::material_metadata* p_source) {
-                  float speed = 0.01f;
-                  ImGui::DragFloat4(
-                    "Ambient", glm::value_ptr(p_source->ambient), speed);
-                  ImGui::DragFloat4(
-                    "Diffuse", glm::value_ptr(p_source->diffuse), speed);
-                  ImGui::DragFloat4(
-                    "Specular", glm::value_ptr(p_source->specular), speed);
-                  atlas::ui::draw_float("Shininess", p_source->shininess);
               });
 
             atlas::ui::draw_component<atlas::physics_body>(
