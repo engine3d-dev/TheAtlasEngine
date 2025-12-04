@@ -123,7 +123,7 @@ namespace atlas {
          *
          * ```
          */
-        uint32_t children_count(const scene_object& p_parent);
+        uint32_t children_count(const uscene_object& p_parent);
 
         /**
          * @brief Defer operations until end of frame.

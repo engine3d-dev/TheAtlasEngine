@@ -19,7 +19,7 @@ namespace atlas {
         add<transform>();
     }
 
-    void scene_object::child_of(const scene_object& p_parent) {
-        add(flecs::ChildOf, p_parent);
+    void scene_object::child_of(const std::optional<scene_object>& p_parent) {
+        add(flecs::ChildOf, p_parent.value());
     }
 };

@@ -14,7 +14,8 @@ namespace atlas {
      */
     class scene_object : public flecs::entity {
     public:
-        //! @brief Should not construct a scene object not created through flecs::world
+        //! @brief Should not construct a scene object not created through
+        //! flecs::world
         scene_object() = delete;
 
         scene_object(flecs::world_t* p_registry, flecs::entity_t p_id);
@@ -44,14 +45,14 @@ namespace atlas {
          * ```
          *
          */
-        void child_of(const scene_object& p_parent);
+        void child_of(const std::optional<scene_object>& p_parent);
 
         /**
          * @brief iterates through all children entities if the given entity is
          * a parent of any given entities
          *
          * Example Usage:
-         * 
+         *
          *
          * ```C++
          * atlas::uscene_object obj1 = entity("Parent Node");
@@ -64,7 +65,7 @@ namespace atlas {
          * obj1.children([](flecs::entity p_child){
          *     // do stuff with the child entity
          * });
-         * 
+         *
          * ```
          */
         template<typename UFunction>
@@ -74,7 +75,10 @@ namespace atlas {
     };
 
     /**
-     * @brief game object type exposed to the user as an alias to game objects
-    */
+     * @brief Alias to std::optional<scene_object>
+     *
+     * Restrict from enabling creating empty game objects that is not valid to
+     * access its members to perform operations with
+     */
     using uscene_object = std::optional<scene_object>;
 };

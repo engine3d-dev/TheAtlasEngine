@@ -13,8 +13,8 @@ namespace atlas {
         return scene_object(m_registry.entity(p_entity_id));
     }
 
-    uint32_t scene::children_count(const scene_object& p_parent) {
-        return query_builder().with(flecs::ChildOf, p_parent).build().count();
+    uint32_t scene::children_count(const uscene_object& p_parent) {
+        return query_builder().with(flecs::ChildOf, p_parent.value()).build().count();
     }
 
 };
