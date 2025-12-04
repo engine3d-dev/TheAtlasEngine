@@ -8,7 +8,7 @@
 level_scene::level_scene(const std::string& p_name,
                          atlas::event::event_bus& p_bus)
   : atlas::scene(p_name, p_bus) {
-    m_camera = entity_optional("Editor Camera");
+    m_camera = entity("Editor Camera");
     m_camera->add<flecs::pair<atlas::tag::editor, atlas::projection_view>>();
     m_camera->set<atlas::transform>({
       .position = { 3.50f, 4.90f, 36.40f },
@@ -20,10 +20,10 @@ level_scene::level_scene(const std::string& p_name,
       .field_of_view = 45.f,
     });
 
-    m_bob_object = entity_optional("Bob");
+    m_bob_object = entity("Bob");
     m_bob_object->add<atlas::point_light>();
 
-    m_viking_room = entity_optional("Viking Room");
+    m_viking_room = entity("Viking Room");
     m_viking_room->add<atlas::tag::serialize>();
     m_viking_room->set<atlas::transform>({
       .position = { -2.70f, 2.70, -8.30f },
@@ -41,7 +41,7 @@ level_scene::level_scene(const std::string& p_name,
       .body_movement_type = atlas::dynamic,
     });
 
-    m_cube = entity_optional("Aircraft");
+    m_cube = entity("Aircraft");
 
     m_cube->set<atlas::transform>({
       .position = { 0.f, 2.10f, -7.30f },
@@ -57,7 +57,7 @@ level_scene::level_scene(const std::string& p_name,
       //   .diffuse = "assets/models/E-45-steel detail_2_col.jpg",
     });
 
-    m_robot_model = entity_optional("Cube");
+    m_robot_model = entity("Cube");
     m_robot_model->add<atlas::tag::serialize>();
     // m_robot_model->add<atlas::tag::serialize>();
     m_robot_model->set<atlas::transform>({
@@ -79,7 +79,7 @@ level_scene::level_scene(const std::string& p_name,
       .body_movement_type = atlas::dynamic,
     });
 
-    m_platform = entity_optional("Platform");
+    m_platform = entity("Platform");
 
     m_platform->set<atlas::transform>({
       .scale = { 15.f, 0.30f, 10.0f },
@@ -95,7 +95,7 @@ level_scene::level_scene(const std::string& p_name,
       .half_extent = { 15.f, 0.30f, 10.0f },
     });
 
-    m_point_light = entity_optional("Point Light 1");
+    m_point_light = entity("Point Light 1");
     m_point_light->set<atlas::transform>({
       .position = { 0.f, 2.10f, -7.30f },
       .scale = { 0.9f, 0.9f, 0.9f },
@@ -133,6 +133,9 @@ level_scene::level_scene(const std::string& p_name,
     // 	m_many_objects.emplace_back(obj);
     // }
 
+    atlas::uscene_object gerald = entity("Gerald");
+    gerald->add<atlas::point_light>();
+
     // TODO: Move this outside of level_scene
     m_deserializer_test = atlas::serializer();
 
@@ -148,21 +151,21 @@ level_scene::level_scene(const std::string& p_name,
 void
 level_scene::collision_enter(atlas::event::collision_enter& p_event) {
     console_log_warn("collision_enter event!!!");
-    atlas::scene_object e1 = entity(p_event.entity1);
-    atlas::scene_object e2 = entity(p_event.entity2);
+    atlas::uscene_object e1 = entity(p_event.entity1);
+    atlas::uscene_object e2 = entity(p_event.entity2);
 
-    console_log_warn("Entity1 = {}", e1.name().c_str());
-    console_log_warn("Entity2 = {}", e2.name().c_str());
+    console_log_warn("Entity1 = {}", e1->name().c_str());
+    console_log_warn("Entity2 = {}", e2->name().c_str());
 }
 
 void
 level_scene::collision_persisted(atlas::event::collision_persisted& p_event) {
     console_log_warn("collision_persisted(p_event) invoked!!");
-    atlas::scene_object e1 = entity(p_event.entity1);
-    atlas::scene_object e2 = entity(p_event.entity2);
+    atlas::uscene_object e1 = entity(p_event.entity1);
+    atlas::uscene_object e2 = entity(p_event.entity2);
 
-    console_log_warn("Entity1 = {}", e1.name().c_str());
-    console_log_warn("Entity2 = {}", e2.name().c_str());
+    console_log_warn("Entity1 = {}", e1->name().c_str());
+    console_log_warn("Entity2 = {}", e2->name().c_str());
 }
 
 void

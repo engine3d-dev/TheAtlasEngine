@@ -40,7 +40,7 @@ namespace atlas {
          *
          * @param p_name is the name of the entity
          */
-        scene_object entity(const std::string& p_name);
+        uscene_object entity(const std::string& p_name);
 
         /**
          * @brief create a new entity or retrieve already-existent entity by ID
@@ -48,9 +48,7 @@ namespace atlas {
          * @param p_entity_id is the entity ID to retrieve if it exists, if not
          * create it.
          */
-        scene_object entity(uint64_t p_entity_id);
-
-        std::optional<scene_object> entity_optional(const std::string& p_name);
+        uscene_object entity(uint64_t p_entity_id);
 
         /**
          * @brief subscribes an event to the event::bus to get invoked when

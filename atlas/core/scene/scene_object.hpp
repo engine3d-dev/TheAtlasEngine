@@ -1,5 +1,6 @@
 #pragma once
 #include <flecs.h>
+#include <optional>
 
 namespace atlas {
 
@@ -13,6 +14,7 @@ namespace atlas {
      */
     class scene_object : public flecs::entity {
     public:
+        //! @brief Should not construct a scene object not created through flecs::world
         scene_object() = delete;
 
         scene_object(flecs::world_t* p_registry, flecs::entity_t p_id);
@@ -31,9 +33,9 @@ namespace atlas {
          *
          * ```C++
          *
-         * atlas::scene_object obj1 = create("Parent");
+         * atlas::uscene_object obj1 = entity("Parent");
          *
-         * atlas::scene_object obj2 = create("Chlid");
+         * atlas::uscene_object obj2 = entity("Chlid");
          *
          * // obj2 is the child of obj1
          * // As obj1 is a parent node
@@ -52,8 +54,8 @@ namespace atlas {
          * 
          *
          * ```C++
-         * atlas::scene_object obj1 = create("Parent Node");
-         * atlas::scene_object obj2 = create("Chlid Node");
+         * atlas::uscene_object obj1 = entity("Parent Node");
+         * atlas::uscene_object obj2 = entity("Chlid Node");
          *
          * // obj1 is the parent of obj2.
          * obj2.child_of(parent);
@@ -69,19 +71,10 @@ namespace atlas {
         void children(UFunction&& p_callback) {
             children(p_callback);
         }
-
-        /**
-         * @brief Since we do not have a way to ensure that the access point to
-         * this object is invalid, we use the -> operator to ensure the object
-         * is valid.
-         * 
-         * Including cannot overload the `.` operator, to ensure object if it is valid.
-         *
-         * The `->` operator will throw std::runtime_error exception if object's
-         * invalid or return the object
-         *
-         */
-        flecs::entity* operator->();
     };
 
+    /**
+     * @brief game object type exposed to the user as an alias to game objects
+    */
+    using uscene_object = std::optional<scene_object>;
 };

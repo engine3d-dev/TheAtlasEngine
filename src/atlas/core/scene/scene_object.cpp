@@ -22,18 +22,4 @@ namespace atlas {
     void scene_object::child_of(const scene_object& p_parent) {
         add(flecs::ChildOf, p_parent);
     }
-
-    flecs::entity* scene_object::operator->() {
-        // We want to check if this game object is accessible or else throw an
-        // exception if invalid or nullptr
-        flecs::entity* e = this;
-
-        // We only want to access this entity if it is alive and valid!
-        if (!e->is_valid() and !e->is_alive()) {
-            throw invalid_access_exception(
-              "Invalid access to an invalid pointer to game object");
-        }
-
-        return e;
-    }
 };
