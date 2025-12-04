@@ -48,15 +48,6 @@ namespace atlas {
          */
         void add_scene(const ref<scene>& p_scene_context);
 
-        template<typename T>
-        ref<scene> create_custom_scene(const std::string& p_name) {
-            static_assert(
-              std::is_base_of_v<scene, T>,
-              "Must be a scene that inherits from scene as a base class");
-            m_scene_container[p_name] = create_ref<T>(p_name);
-            return m_scene_container[p_name];
-        }
-
         /**
          * @brief get_scene allows for specifically querying for current scenes
          *

@@ -1,15 +1,29 @@
 #include <core/application.hpp>
 #include "editor_world.hpp"
+#include <core/core.hpp>
+#include <core/common.hpp>
 
+/**
+ * This represents our editor's application
+ *
+ * TODO: Add a preload API to preload the application. For providing user
+ * preferences, project settings, or other configuration settings that are
+ * projects-related
+ */
 class editor_application : public atlas::application {
 public:
     editor_application(const atlas::application_settings& p_settings)
       : application(p_settings) {
-        m_world = atlas::create_ref<editor_world>("Editor World");
+        std::pmr::monotonic_buffer_resource resource{ 4096 };
+        m_allocator.construct(&resource);
+
+        m_world =
+          atlas::create_strong_ref<editor_world>(m_allocator, "Editor World");
     }
 
 private:
-    atlas::ref<editor_world> m_world;
+    std::pmr::polymorphic_allocator<uint8_t> m_allocator;
+    atlas::optional_ref<editor_world> m_world;
 };
 
 namespace atlas {
