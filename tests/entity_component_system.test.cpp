@@ -87,7 +87,7 @@ namespace atlas {
 
         "create_entity::add<T>"_test = [&test_scene] {
             // flecs::entity entity = scene_registry.entity("Mock Entity");
-            atlas::uscene_object entity = test_scene.entity("Mock Entity");
+            atlas::game_object entity = test_scene.entity("Mock Entity");
 
             // expect(entity.is_alive());
 
@@ -96,7 +96,7 @@ namespace atlas {
         };
 
         "create_entity::get"_test = [&test_scene]() {
-            atlas::uscene_object entity = test_scene.entity("Mock Entity 2");
+            atlas::game_object entity = test_scene.entity("Mock Entity 2");
             entity->add<test_tag_component>();
             // flecs requires reading only operations are through the get<T> API
             // to write or set new parameters you can use get_mut<T> or
@@ -109,7 +109,7 @@ namespace atlas {
         };
 
         "create_entity::set"_test = [&test_scene]() {
-            atlas::uscene_object entity = test_scene.entity("New Entity");
+            atlas::game_object entity = test_scene.entity("New Entity");
             mock_projectile projectile;
             projectile.on_update();
             entity->set<mock_projectile>(projectile);

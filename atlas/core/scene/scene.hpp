@@ -40,15 +40,15 @@ namespace atlas {
          *
          * @param p_name is the name of the entity
          */
-        uscene_object entity(const std::string& p_name);
+        game_object entity(const std::string& p_name);
 
         /**
          * @brief create a new entity or retrieve already-existent entity by ID
-         * 
+         *
          * @param p_entity_id is the entity ID to retrieve if it exists, if not
          * create it.
          */
-        uscene_object entity(uint64_t p_entity_id);
+        game_object entity(uint64_t p_entity_id);
 
         /**
          * @brief subscribes an event to the event::bus to get invoked when
@@ -123,7 +123,7 @@ namespace atlas {
          *
          * ```
          */
-        uint32_t children_count(const uscene_object& p_parent);
+        uint32_t children_count(const game_object& p_parent);
 
         /**
          * @brief Defer operations until end of frame.

@@ -34,9 +34,9 @@ namespace atlas {
          *
          * ```C++
          *
-         * atlas::uscene_object obj1 = entity("Parent");
+         * atlas::game_object obj1 = entity("Parent");
          *
-         * atlas::uscene_object obj2 = entity("Chlid");
+         * atlas::game_object obj2 = entity("Chlid");
          *
          * // obj2 is the child of obj1
          * // As obj1 is a parent node
@@ -55,8 +55,8 @@ namespace atlas {
          *
          *
          * ```C++
-         * atlas::uscene_object obj1 = entity("Parent Node");
-         * atlas::uscene_object obj2 = entity("Chlid Node");
+         * atlas::game_object obj1 = entity("Parent Node");
+         * atlas::game_object obj2 = entity("Chlid Node");
          *
          * // obj1 is the parent of obj2.
          * obj2.child_of(parent);
@@ -80,5 +80,5 @@ namespace atlas {
      * Restrict from enabling creating empty game objects that is not valid to
      * access its members to perform operations with
      */
-    using uscene_object = std::optional<scene_object>;
+    using game_object = std::optional<scene_object>;
 };

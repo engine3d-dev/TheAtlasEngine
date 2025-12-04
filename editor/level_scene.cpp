@@ -133,7 +133,7 @@ level_scene::level_scene(const std::string& p_name,
     // 	m_many_objects.emplace_back(obj);
     // }
 
-    atlas::uscene_object gerald = entity("Gerald");
+    atlas::game_object gerald = entity("Gerald");
     gerald->add<atlas::point_light>();
 
     // TODO: Move this outside of level_scene
@@ -151,8 +151,8 @@ level_scene::level_scene(const std::string& p_name,
 void
 level_scene::collision_enter(atlas::event::collision_enter& p_event) {
     console_log_warn("collision_enter event!!!");
-    atlas::uscene_object e1 = entity(p_event.entity1);
-    atlas::uscene_object e2 = entity(p_event.entity2);
+    atlas::game_object e1 = entity(p_event.entity1);
+    atlas::game_object e2 = entity(p_event.entity2);
 
     console_log_warn("Entity1 = {}", e1->name().c_str());
     console_log_warn("Entity2 = {}", e2->name().c_str());
@@ -161,8 +161,8 @@ level_scene::collision_enter(atlas::event::collision_enter& p_event) {
 void
 level_scene::collision_persisted(atlas::event::collision_persisted& p_event) {
     console_log_warn("collision_persisted(p_event) invoked!!");
-    atlas::uscene_object e1 = entity(p_event.entity1);
-    atlas::uscene_object e2 = entity(p_event.entity2);
+    atlas::game_object e1 = entity(p_event.entity1);
+    atlas::game_object e2 = entity(p_event.entity2);
 
     console_log_warn("Entity1 = {}", e1->name().c_str());
     console_log_warn("Entity2 = {}", e2->name().c_str());

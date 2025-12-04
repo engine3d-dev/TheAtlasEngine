@@ -5,16 +5,19 @@ namespace atlas {
       : m_name(p_name)
       , m_bus(&p_bus) {}
 
-    uscene_object scene::entity(const std::string& p_name) {
+    game_object scene::entity(const std::string& p_name) {
         return scene_object(m_registry.entity(p_name.c_str()));
     }
- 
-    uscene_object scene::entity(uint64_t p_entity_id) {
+
+    game_object scene::entity(uint64_t p_entity_id) {
         return scene_object(m_registry.entity(p_entity_id));
     }
 
-    uint32_t scene::children_count(const uscene_object& p_parent) {
-        return query_builder().with(flecs::ChildOf, p_parent.value()).build().count();
+    uint32_t scene::children_count(const game_object& p_parent) {
+        return query_builder()
+          .with(flecs::ChildOf, p_parent.value())
+          .build()
+          .count();
     }
 
 };

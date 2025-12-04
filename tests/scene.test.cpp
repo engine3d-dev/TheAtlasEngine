@@ -9,7 +9,7 @@ boost::ut::suite<"::scene"> scene_test = []() {
     atlas::scene test_scene = atlas::scene("Mock Scene 1", test_event_bus);
 
     "create_object"_test = [&test_scene]() {
-        atlas::uscene_object test_object = test_scene.entity("Entity 1");
+        atlas::game_object test_object = test_scene.entity("Entity 1");
         test_object->add<atlas::transform>();
 
         expect(test_object->has<atlas::transform>());

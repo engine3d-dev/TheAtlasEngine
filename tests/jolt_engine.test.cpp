@@ -26,8 +26,8 @@ namespace atlas {
         atlas::scene test_environment_scene = atlas::scene("Mock 1", bus);
 
         // Do some testing if these two collides or something like that
-        // atlas::uscene_object obj1 = test_environment_scene.entity("Entity
-        // 1"); atlas::uscene_object obj2 =
+        // atlas::game_object obj1 = test_environment_scene.entity("Entity
+        // 1"); atlas::game_object obj2 =
         // test_environment_scene.entity("Entity 2");
 
         "on_collision_enter"_test = [] {};
