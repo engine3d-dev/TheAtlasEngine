@@ -7,15 +7,13 @@ namespace atlas {
      * @brief Creates a pointer wrapper which extends capabilities of
      * flecs::entity
      *
-     * Wrapper that provides
-     *
      * Provides our own construct of API's that handles any workload around some
      * of the raw flecs API's that can still be used by other flecs API's
      * without completely interacting touching raw flecs API
      */
     class scene_object : public flecs::entity {
     public:
-        scene_object() = default;
+        scene_object() = delete;
 
         scene_object(flecs::world_t* p_registry, flecs::entity_t p_id);
 
@@ -50,11 +48,10 @@ namespace atlas {
          * @brief iterates through all children entities if the given entity is
          * a parent of any given entities
          *
-         *
          * Example Usage:
+         * 
          *
          * ```C++
-         *
          * atlas::scene_object obj1 = create("Parent Node");
          * atlas::scene_object obj2 = create("Chlid Node");
          *
@@ -65,9 +62,8 @@ namespace atlas {
          * obj1.children([](flecs::entity p_child){
          *     // do stuff with the child entity
          * });
-         *
+         * 
          * ```
-         *
          */
         template<typename UFunction>
         void children(UFunction&& p_callback) {

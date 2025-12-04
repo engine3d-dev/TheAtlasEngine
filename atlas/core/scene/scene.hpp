@@ -35,10 +35,22 @@ namespace atlas {
         /**
          * @brief create a new entity (game object)
          *
-         * Will create an entity (game object) or retrieve existing entity if
-         * the name for that entity exists within the ecs registry.
+         * If entity with the specified name exists, retrieve that specific
+         * entity. If entity does not exist, create that entity
+         *
+         * @param p_name is the name of the entity
          */
         scene_object entity(const std::string& p_name);
+
+        /**
+         * @brief create a new entity or retrieve already-existent entity by ID
+         * 
+         * @param p_entity_id is the entity ID to retrieve if it exists, if not
+         * create it.
+         */
+        scene_object entity(uint64_t p_entity_id);
+
+        std::optional<scene_object> entity_optional(const std::string& p_name);
 
         /**
          * @brief subscribes an event to the event::bus to get invoked when
@@ -113,7 +125,7 @@ namespace atlas {
          *
          * ```
          */
-        uint32_t children_count(scene_object p_parent);
+        uint32_t children_count(const scene_object& p_parent);
 
         /**
          * @brief Defer operations until end of frame.
