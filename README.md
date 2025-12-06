@@ -7,34 +7,45 @@
 
 Open-source game engine for making games, building cool projects, and doing cool work in building features with the satisfaction of using them during game jams and other purposes.
 
-## How to build the engine
+## Setup Development Environment
+
+TheAtlasEngine uses Conan the C++ package manager to manage our dependencies.
+
+To setup the development environment, check the [getting start](https://engine3d-dev.github.io/0.1/getting_started/) page.
+
+### How to Build the Editor
+
+Since there is not a way to set for building the editor. In the CMakeLists.txt file.
+
+Just add `editor` into your CMakeLists.txt file as shown in this example to build the editor.
+
+```Cmake
+build_core_library(
+    DIRECTORIES src editor
+    # ...
+)
+```
+
+### Building the Project
 
 > [!TIP]
-> Before you build the project make sure to follow the setup instruction in the [getting start](https://engine3d-dev.github.io/0.1/getting_started/) page.
-
-To get started in contributing here are the steps to do so. Follow these instructions.
-
-### Clone the repository
+> `-b missing` is to install any missing dependencies necessary to build TheAtlasEngine successfully.
+> `-s build_type=Debug` is to compile as a debug build when developing on the project.
 
 ```
-git clone https://github.com/engine3d-dev/TheAtlasEngine
-cd TheAtlasEngine
+conan build . -b missing -s build_type=Debug
 ```
 
-### Building using Conan
+### Executable Location
 
-To build the project, run the following command below.
+After building TheAtlasEngine and the dependencies have been built successful. These are three locations where the editor executable is located at.
 
-> [!TIP]
-> `-b missing` is used to get the dependency's the project uses before building the project itself. To load that into conan cache for reusability.
+Debug build will follow with, `./build/Debug/<exe path>`
+Release build will follow with, `./build/Release/<exe path>`
 
+Example on Windows, you'd execute the executable in the terminal as:
+
+```Powershell
+.\build\Debug\editor\editor.exe
 ```
-conan build . -b missing
-```
 
-
-The compiled executable to run the editor to run is
-
-```
-./build/editor/editor
-```
