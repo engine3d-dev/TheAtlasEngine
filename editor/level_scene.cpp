@@ -8,47 +8,47 @@
 level_scene::level_scene(const std::string& p_name,
                          atlas::event::event_bus& p_bus)
   : atlas::scene(p_name, p_bus) {
-    m_camera = entity("Editor Camera");
-    m_camera->add<flecs::pair<atlas::tag::editor, atlas::projection_view>>();
-    m_camera->set<atlas::transform>({
+    atlas::game_object camera = entity("Editor Camera");
+    camera->add<flecs::pair<atlas::tag::editor, atlas::projection_view>>();
+    camera->set<atlas::transform>({
       .position = { 3.50f, 4.90f, 36.40f },
       .scale{ 1.f },
     });
-    m_camera->set<atlas::perspective_camera>({
+    camera->set<atlas::perspective_camera>({
       .plane = { 0.1f, 5000.f },
       .is_active = true,
       .field_of_view = 45.f,
     });
 
-    m_bob_object = entity("Bob");
-    m_bob_object->add<atlas::point_light>();
+    atlas::game_object bob_object = entity("Bob");
+    bob_object->add<atlas::point_light>();
 
-    m_viking_room = entity("Viking Room");
-    m_viking_room->add<atlas::tag::serialize>();
-    m_viking_room->set<atlas::transform>({
+    atlas::game_object viking_room = entity("Viking Room");
+    viking_room->add<atlas::tag::serialize>();
+    viking_room->set<atlas::transform>({
       .position = { -2.70f, 2.70, -8.30f },
       .rotation = { 2.30f, 95.90f, 91.80f },
       .scale{ 1.f },
     });
 
-    m_viking_room->set<atlas::sphere_collider>({
+    viking_room->set<atlas::sphere_collider>({
       .radius = 1.0f,
     });
 
-    m_viking_room->set<atlas::physics_body>({
+    viking_room->set<atlas::physics_body>({
       .friction = 15.f,
       .restitution = 0.3f,
       .body_movement_type = atlas::dynamic,
     });
 
-    m_cube = entity("Aircraft");
+    atlas::game_object cube = entity("Aircraft");
 
-    m_cube->set<atlas::transform>({
+    cube->set<atlas::transform>({
       .position = { 0.f, 2.10f, -7.30f },
       .scale = { 0.9f, 0.9f, 0.9f },
     });
 
-    m_cube->set<atlas::mesh_source>({
+    cube->set<atlas::mesh_source>({
       .color = { 1.f, 1.f, 1.f, 1.f },
       // .model_path = "assets/models/E 45 Aircraft_obj.obj",
       .model_path = "assets/backpack/backpack.obj",
@@ -57,58 +57,75 @@ level_scene::level_scene(const std::string& p_name,
       //   .diffuse = "assets/models/E-45-steel detail_2_col.jpg",
     });
 
-    m_robot_model = entity("Cube");
-    m_robot_model->add<atlas::tag::serialize>();
-    // m_robot_model->add<atlas::tag::serialize>();
-    m_robot_model->set<atlas::transform>({
+    atlas::game_object robot_model = entity("Cube");
+    robot_model->add<atlas::tag::serialize>();
+    // robot_model->add<atlas::tag::serialize>();
+    robot_model->set<atlas::transform>({
       .position = { -2.70, 3.50f, 4.10f },
       .scale = { 1.f, 1.f, 1.f },
     });
 
-    m_robot_model->set<atlas::mesh_source>(
+    robot_model->set<atlas::mesh_source>(
       { .color = { 1.f, 1.f, 1.f, 1.f },
         .model_path = "assets/models/cube.obj",
         .diffuse = "assets/models/container_diffuse.png",
         .specular = "assets/models/container_specular.png" });
 
-    m_robot_model->set<atlas::box_collider>({
+    robot_model->set<atlas::box_collider>({
       .half_extent = { 1.f, 1.f, 1.f },
     });
-    m_robot_model->set<atlas::physics_body>({
+    robot_model->set<atlas::physics_body>({
       //   .restitution = 1.f,
       .body_movement_type = atlas::dynamic,
     });
 
-    m_platform = entity("Platform");
+    atlas::game_object platform = entity("Platform");
 
-    m_platform->set<atlas::transform>({
+    platform->set<atlas::transform>({
       .scale = { 15.f, 0.30f, 10.0f },
     });
-    m_platform->set<atlas::mesh_source>({
+    platform->set<atlas::mesh_source>({
       .model_path = "assets/models/cube.obj",
       .diffuse = "assets/models/wood.png",
     });
-    m_platform->set<atlas::physics_body>({
+    platform->set<atlas::physics_body>({
       .body_movement_type = atlas::fixed,
     });
-    m_platform->set<atlas::box_collider>({
+    platform->set<atlas::box_collider>({
       .half_extent = { 15.f, 0.30f, 10.0f },
     });
 
-    m_point_light = entity("Point Light 1");
-    m_point_light->set<atlas::transform>({
+    atlas::game_object point_light = entity("Point Light 1");
+    point_light->set<atlas::transform>({
       .position = { 0.f, 2.10f, -7.30f },
       .scale = { 0.9f, 0.9f, 0.9f },
     });
 
-    m_point_light->set<atlas::mesh_source>({
+    point_light->set<atlas::mesh_source>({
       .model_path = "assets/models/cube.obj",
       .diffuse = "assets/models/wood.png",
     });
-    m_point_light->add<atlas::tag::serialize>();
+    point_light->add<atlas::tag::serialize>();
+
+
+    // benchmark
+
+    // auto start = std::chrono::high_resolution_clock::now();
+    // TEMP Code
+    // [[maybe_unused]] atlas::game_object point_light_test = entity("Point Light 1");
+    // auto end = std::chrono::high_resolution_clock::now();
+    // auto duration = (end - start);
+
+    // auto seconds = std::chrono::duration_cast<std::chrono::seconds>(duration).count();
+    // auto nanoseconds = std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
+    // auto microseconds = std::chrono::duration_cast<std::chrono::microseconds>(duration).count();
+
+    // console_log_fatal("Seconds = {:.1f}", static_cast<float>(seconds));
+    // console_log_fatal("Nanoseconds = {:.1f}", static_cast<float>(nanoseconds));
+    // console_log_fatal("Microseconds = {:.1f}", static_cast<float>(microseconds));
 
     // for(size_t i = 0; i < 26; i++) {
-    // 	auto obj = create(std::format("Object #{}", i));
+    // 	auto obj = entity(std::format("Object #{}", i));
     // 	obj->set<atlas::physics_body>({
     // 		.restitution = 1.25f,
     // 		.body_movement_type = atlas::dynamic,
@@ -130,7 +147,6 @@ level_scene::level_scene(const std::string& p_name,
     // 		.model_path = "assets/models/Ball OBJ.obj",
     // 		.diffuse = "assets/models/clear.png",
     // 	});
-    // 	m_many_objects.emplace_back(obj);
     // }
 
     atlas::game_object gerald = entity("Gerald");
@@ -574,24 +590,6 @@ level_scene::start() {
         console_log_error("Could not load yaml file LevelScene!!!");
     }
 
-    // testing the flip parameter inside atlas::mesh_source
-    m_viking_room->set<atlas::mesh_source>({
-      .flip = true,
-      .color = { 1.f, 1.f, 1.f, 1.f },
-      .model_path = "assets/models/viking_room.obj",
-      .diffuse = "assets/models/viking_room.png",
-      // .model_path = "assets/models/Ball OBJ.obj",
-      // .diffuse = "assets/models/clear.png",
-    });
-
-    // TODO: Make this contain an atlas::directional_light
-    // If the scene opject dooes not have a atlas::directional_light, then we
-    // set the default values to 1.0f m_robot_model sets the cube.obj 3d model
-    // and loads it
-    m_robot_model->set<atlas::material_metadata>({
-      .shininess = 64.f,
-    });
-
     // Initiating physics system
     atlas::physics::jolt_settings settings = {};
     flecs::world registry = *this;
@@ -672,8 +670,10 @@ level_scene::physics_update() {
         runtime_start();
     }
 
+    atlas::game_object viking_room = entity("Viking Room").value();
+
     atlas::physics_body* sphere_body =
-      m_viking_room->get_mut<atlas::physics_body>();
+      viking_room->get_mut<atlas::physics_body>();
     // U = +up
     // J = -up
     // H = +left

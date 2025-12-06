@@ -48,13 +48,13 @@ private:
     atlas::serializer m_deserializer_test;
     flecs::entity m_selected_entity;
 
-    atlas::game_object m_viking_room;
-    atlas::game_object m_cube;
-    atlas::game_object m_robot_model;
-    atlas::game_object m_platform;
-    atlas::game_object m_camera;
-    atlas::game_object m_point_light;
-    atlas::game_object m_bob_object;
+    // atlas::game_object m_viking_room;
+    // atlas::game_object m_cube;
+    // atlas::game_object m_robot_model;
+    // atlas::game_object m_platform;
+    // atlas::game_object m_camera;
+    // atlas::game_object m_point_light;
+    // atlas::game_object m_bob_object;
     atlas::game_object m_current_entity;
     float m_movement_speed = 10.f;
     // std::vector<atlas::strong_ref<atlas::scene_object>> m_many_objects;
