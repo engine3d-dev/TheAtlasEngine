@@ -69,7 +69,7 @@ This was the first game that we made with TheAtlasEngine when the project first 
 ### Description
 Part of the SFSU Game Dev Club's Game Jam of Spring 2025. We developed a flappy-bird-like game mechanic rocket game. This is inspired by a few youtubers who also made a similar game. One of the YouTuber's named TheCherno.
 
-* [link](https://niccoll-dyson.itch.io/wallace-and-grommit-spaceship-game) to our itch.io submission
-* [link](https://github.com/SpinnerX/3d-rocket-game) to the GitHub repository
+* [itch.io link](https://niccoll-dyson.itch.io/wallace-and-grommit-spaceship-game) to out game jam submission
+* GitHub [repository link](https://github.com/SpinnerX/3d-rocket-game)
 
 ![Screenshot 2025-03-03 010511](https://github.com/user-attachments/assets/f3758e33-8d4b-4fa8-af08-167bca14037f)
