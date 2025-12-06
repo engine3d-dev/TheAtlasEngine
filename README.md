@@ -49,7 +49,7 @@ Example on Windows, you'd execute the executable in the terminal as:
 .\build\Debug\editor\editor.exe
 ```
 
-# Games Built with TheAtlasEngine
+# Games Built using TheAtlasEngine
 
 These are games that have been built by me and others to showcase the capabilities of the game engine. Demonstrating capabilities and progression made by the team.
 
