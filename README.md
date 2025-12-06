@@ -40,8 +40,8 @@ conan build . -b missing -s build_type=Debug
 
 After building TheAtlasEngine and the dependencies have been built successful. These are three locations where the editor executable is located at.
 
-Debug build will follow with, `./build/Debug/<exe path>`
-Release build will follow with, `./build/Release/<exe path>`
+* Debug build will follow with, `./build/Debug/<exe path>`
+* Release build will follow with, `./build/Release/<exe path>`
 
 Example on Windows, you'd execute the executable in the terminal as:
 
