@@ -4,8 +4,6 @@
 #include <drivers/jolt-cpp/jolt_components.hpp>
 #include <physics/physics_engine.hpp>
 #include <string>
-#include <stacktrace>
-#include <iostream>
 
 level_scene::level_scene(const std::string& p_name,
                          atlas::event::event_bus& p_bus)
