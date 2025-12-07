@@ -13,7 +13,9 @@ namespace atlas {
           : m_block(p_data) {}
 
         //! @return message given when this exception gets triggered
-        [[nodiscard]] const char* what() const noexcept override { return m_block.data; }
+        [[nodiscard]] const char* what() const noexcept override {
+            return m_block.data;
+        }
 
     private:
         exception_block m_block;
