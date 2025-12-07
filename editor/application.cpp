@@ -14,16 +14,15 @@ class editor_application : public atlas::application {
 public:
     editor_application(const atlas::application_settings& p_settings)
       : application(p_settings) {
-        std::pmr::monotonic_buffer_resource resource{ 4096 };
-        m_allocator.construct(&resource);
+        // std::pmr::monotonic_buffer_resource resource{ 4096 };
+        // m_allocator.construct(&resource);
 
-        m_world =
-          atlas::create_strong_ref<editor_world>(m_allocator, "Editor World");
+        m_world = editor_world("Editor World");
     }
 
 private:
     std::pmr::polymorphic_allocator<uint8_t> m_allocator;
-    atlas::optional_ref<editor_world> m_world;
+    editor_world m_world;
 };
 
 namespace atlas {
