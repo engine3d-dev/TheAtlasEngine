@@ -4,6 +4,8 @@
 #include <drivers/jolt-cpp/jolt_components.hpp>
 #include <physics/physics_engine.hpp>
 #include <string>
+#include <stacktrace>
+#include <iostream>
 
 level_scene::level_scene(const std::string& p_name,
                          atlas::event::event_bus& p_bus)
@@ -299,11 +301,21 @@ level_scene::on_ui_update() {
     catch (const atlas::ui::menu_bar_exception& e) {
     }
 
-    // specify the label and the state to execute when this specific widget has
-    // been triggered
-    m_editor_menu.add_child("Exit", []() {
-        glfwSetWindowShouldClose(atlas::application::get_window(), true);
-    });
+    if(ImGui::BeginMenu("File")) {
+        if(ImGui::MenuItem("Save")) {
+            // m_deserializer_test.save("LevelScene");
+        }
+
+        ImGui::Separator();
+
+        if(ImGui::MenuItem("Exit")) {
+            glfwSetWindowShouldClose(atlas::application::get_window(), true);
+        }
+        
+        ImGui::EndMenu();
+    }
+
+
     m_editor_menu.end();
 
     if (ImGui::Begin("Viewport")) {

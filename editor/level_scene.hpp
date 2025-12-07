@@ -44,7 +44,7 @@ private:
     void collision_persisted(atlas::event::collision_persisted& p_event);
 
 private:
-    bool m_blink = false;
+    // bool m_blink = false;
     atlas::serializer m_deserializer_test;
     flecs::entity m_selected_entity;
 
