@@ -65,7 +65,7 @@ namespace atlas::ui {
 
     /**
      * @brief UI rendering input text
-     * 
+     *
      *
      * @param p_dst is the destination string to be changed
      * @param p_src is the original string that was previously given

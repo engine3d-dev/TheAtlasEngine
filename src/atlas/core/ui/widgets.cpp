@@ -226,18 +226,22 @@ namespace atlas::ui {
         std::string input_buffer = p_src;
 
         ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue;
-        input_buffer.resize(255); // resize to allocate for 255 in the char array since this should be long enough
+        input_buffer.resize(255); // resize to allocate for 255 in the char
+                                  // array since this should be long enough
 
-        if(ImGui::InputText("##Name", (char*)input_buffer.c_str(), input_buffer.size() + 1, flags)) {
+        if (ImGui::InputText("##Name",
+                             (char*)input_buffer.c_str(),
+                             input_buffer.size() + 1,
+                             flags)) {
             p_dst = input_buffer;
         }
 
-        if(p_dst.empty()) {
+        if (p_dst.empty()) {
             p_dst = p_src;
             return;
         }
 
-        if(p_dst == p_src) {
+        if (p_dst == p_src) {
             p_dst = p_src;
             return;
         }

@@ -209,8 +209,7 @@ namespace atlas::vk {
     void vk_renderer::preload_assets(const VkRenderPass& p_renderpass) {
         m_final_renderpass = p_renderpass;
         // set 1 -- material uniforms
-        ref<world> current_world =
-          system_registry::get_world("Editor World");
+        ref<world> current_world = system_registry::get_world("Editor World");
         ref<scene> current_scene = current_world->get_scene("LevelScene");
 
         flecs::query<> caching =
@@ -479,8 +478,7 @@ namespace atlas::vk {
         // m_global_uniforms.update(bytes_data.data());
         m_global_uniforms.update(&global_frame_ubo);
 
-        ref<world> current_world =
-          system_registry::get_world("Editor World");
+        ref<world> current_world = system_registry::get_world("Editor World");
         ref<scene> current_scene = current_world->get_scene("LevelScene");
 
         // query all entities that have a point light

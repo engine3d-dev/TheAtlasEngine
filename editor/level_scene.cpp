@@ -109,22 +109,25 @@ level_scene::level_scene(const std::string& p_name,
     });
     point_light->add<atlas::tag::serialize>();
 
-
     // benchmark
 
     // auto start = std::chrono::high_resolution_clock::now();
     // TEMP Code
-    // [[maybe_unused]] atlas::game_object point_light_test = entity("Point Light 1");
-    // auto end = std::chrono::high_resolution_clock::now();
-    // auto duration = (end - start);
+    // [[maybe_unused]] atlas::game_object point_light_test = entity("Point
+    // Light 1"); auto end = std::chrono::high_resolution_clock::now(); auto
+    // duration = (end - start);
 
-    // auto seconds = std::chrono::duration_cast<std::chrono::seconds>(duration).count();
-    // auto nanoseconds = std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
-    // auto microseconds = std::chrono::duration_cast<std::chrono::microseconds>(duration).count();
+    // auto seconds =
+    // std::chrono::duration_cast<std::chrono::seconds>(duration).count(); auto
+    // nanoseconds =
+    // std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
+    // auto microseconds =
+    // std::chrono::duration_cast<std::chrono::microseconds>(duration).count();
 
     // console_log_fatal("Seconds = {:.1f}", static_cast<float>(seconds));
-    // console_log_fatal("Nanoseconds = {:.1f}", static_cast<float>(nanoseconds));
-    // console_log_fatal("Microseconds = {:.1f}", static_cast<float>(microseconds));
+    // console_log_fatal("Nanoseconds = {:.1f}",
+    // static_cast<float>(nanoseconds)); console_log_fatal("Microseconds =
+    // {:.1f}", static_cast<float>(microseconds));
 
     // for(size_t i = 0; i < 26; i++) {
     // 	auto obj = entity(std::format("Object #{}", i));
@@ -301,20 +304,19 @@ level_scene::on_ui_update() {
     catch (const atlas::ui::menu_bar_exception& e) {
     }
 
-    if(ImGui::BeginMenu("File")) {
-        if(ImGui::MenuItem("Save")) {
+    if (ImGui::BeginMenu("File")) {
+        if (ImGui::MenuItem("Save")) {
             // m_deserializer_test.save("LevelScene");
         }
 
         ImGui::Separator();
 
-        if(ImGui::MenuItem("Exit")) {
+        if (ImGui::MenuItem("Exit")) {
             glfwSetWindowShouldClose(atlas::application::get_window(), true);
         }
-        
+
         ImGui::EndMenu();
     }
-
 
     m_editor_menu.end();
 

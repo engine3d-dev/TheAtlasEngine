@@ -33,7 +33,7 @@ namespace atlas {
          * with it
          */
         world(const std::string& p_name);
-        
+
         virtual ~world() = default;
 
         //! @return the name of world
