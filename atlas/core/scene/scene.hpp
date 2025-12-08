@@ -33,20 +33,19 @@ namespace atlas {
         virtual ~scene() = default;
 
         /**
-         * @brief create a new entity (game object)
+         * @brief Retrieves if an entity already exists within the registry,
+         * create new entity otherwise
          *
-         * If entity with the specified name exists, retrieve that specific
-         * entity. If entity does not exist, create that entity
-         *
-         * @param p_name is the name of the entity
+         * @param p_name is a string to set the name of the entity
          */
         game_object entity(const std::string& p_name);
 
         /**
-         * @brief create a new entity or retrieve already-existent entity by ID
+         * @brief Retrieves if an entity already exists within the registry,
+         * create new entity otherwise
          *
-         * @param p_entity_id is the entity ID to retrieve if it exists, if not
-         * create it.
+         * @param p_entity_id is the ID to retrieve an entity if it exists,
+         * otherwise returns a new entity.
          */
         game_object entity(uint64_t p_entity_id);
 
@@ -61,6 +60,7 @@ namespace atlas {
          * callback belongs to
          * @param p_callback is the callback that contains an arbitrary task
          * that gets invoked when incoming updates occur from the publisher
+         * 
          */
         template<typename UEventType, typename UObject, typename UCallback>
         void subscribe(UObject* p_instance, const UCallback& p_callback) {
