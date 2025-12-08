@@ -60,7 +60,7 @@ namespace atlas {
          * callback belongs to
          * @param p_callback is the callback that contains an arbitrary task
          * that gets invoked when incoming updates occur from the publisher
-         * 
+         *
          */
         template<typename UEventType, typename UObject, typename UCallback>
         void subscribe(UObject* p_instance, const UCallback& p_callback) {
