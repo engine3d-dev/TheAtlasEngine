@@ -77,8 +77,8 @@ namespace atlas {
     /**
      * @brief Alias to std::optional<scene_object>
      *
-     * Restrict from enabling creating empty game objects that is not valid to
-     * access its members to perform operations with
+     * This alias serves as a representation of game objects users can create
+     * and manage components with
      */
     using game_object = std::optional<scene_object>;
 };
