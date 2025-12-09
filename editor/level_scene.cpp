@@ -602,6 +602,10 @@ level_scene::start() {
         console_log_error("Could not load yaml file LevelScene!!!");
     }
 
+    atlas::game_object viking_room = entity("Viking Room");
+    atlas::mesh_source* src = viking_room->get_mut<atlas::mesh_source>();
+    src->flip = true;
+
     // Initiating physics system
     atlas::physics::jolt_settings settings = {};
     flecs::world registry = *this;
