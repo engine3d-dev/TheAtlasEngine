@@ -39,20 +39,15 @@ build_core_library(
     tests/scene.test.cpp
     tests/jolt_type_conversion.test.cpp
     tests/jolt_engine.test.cpp
-    # tests/object.test.cpp
 
     PACKAGES
     tinyobjloader
-    TinyGLTF
-    # shaderc # uncomment to use shaderc
     ${SHADERC_PACKAGE}
     watcher
     vulkan-cpp
 
     LINK_PACKAGES
     tinyobjloader::tinyobjloader
-    TinyGLTF::TinyGLTF
-    # shaderc::shaderc # uncomment to use shaderc
     ${SHADERC_LINK_PACKAGE}
     watcher::watcher
     vulkan-cpp::vulkan-cpp

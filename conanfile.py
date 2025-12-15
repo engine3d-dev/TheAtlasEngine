@@ -33,7 +33,7 @@ class AtlasRecipe(ConanFile):
         self.requires("imguidocking/2.0")
         self.requires("flecs/4.0.4")
         self.requires("glfw/3.4")
-        self.requires("spdlog/1.15.1")
+        self.requires("spdlog/1.16.0")
         self.requires("glm/1.0.1")
         self.requires("yaml-cpp/0.8.0")
 
@@ -41,7 +41,6 @@ class AtlasRecipe(ConanFile):
         self.requires("vulkan-headers/1.3.290.0")
         self.requires("vulkan-cpp/3.0")
         self.requires("tinyobjloader/2.0.0-rc10")
-        self.requires("tinygltf/2.9.0")
         self.requires("stb/cci.20230920")
 
         self.requires("nfd/1.0")
