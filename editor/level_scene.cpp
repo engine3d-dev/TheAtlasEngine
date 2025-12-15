@@ -8,34 +8,36 @@
 level_scene::level_scene(const std::string& p_name,
                          atlas::event::event_bus& p_bus)
   : atlas::scene(p_name, p_bus) {
-    atlas::game_object camera = entity("Editor Camera");
-    camera->add<flecs::pair<atlas::tag::editor, atlas::projection_view>>();
-    camera->set<atlas::transform>({
+    auto editor_camera = entity("Editor Camera");
+    editor_camera.add<flecs::pair<atlas::tag::editor, atlas::projection_view>>();
+    editor_camera.set<atlas::transform>({
       .position = { 3.50f, 4.90f, 36.40f },
       .scale{ 1.f },
     });
-    camera->set<atlas::perspective_camera>({
+    editor_camera.set<atlas::perspective_camera>({
       .plane = { 0.1f, 5000.f },
       .is_active = true,
       .field_of_view = 45.f,
     });
 
+
     atlas::game_object bob_object = entity("Bob");
-    bob_object->add<atlas::point_light>();
+
+    bob_object.add<atlas::point_light>();
 
     atlas::game_object viking_room = entity("Viking Room");
-    viking_room->add<atlas::tag::serialize>();
-    viking_room->set<atlas::transform>({
+    viking_room.add<atlas::tag::serialize>();
+    viking_room.set<atlas::transform>({
       .position = { -2.70f, 2.70, -8.30f },
       .rotation = { 2.30f, 95.90f, 91.80f },
       .scale{ 1.f },
     });
 
-    viking_room->set<atlas::sphere_collider>({
+    viking_room.set<atlas::sphere_collider>({
       .radius = 1.0f,
     });
 
-    viking_room->set<atlas::physics_body>({
+    viking_room.set<atlas::physics_body>({
       .friction = 15.f,
       .restitution = 0.3f,
       .body_movement_type = atlas::dynamic,
@@ -43,12 +45,12 @@ level_scene::level_scene(const std::string& p_name,
 
     atlas::game_object cube = entity("Aircraft");
 
-    cube->set<atlas::transform>({
+    cube.set<atlas::transform>({
       .position = { 0.f, 2.10f, -7.30f },
       .scale = { 0.9f, 0.9f, 0.9f },
     });
 
-    cube->set<atlas::mesh_source>({
+    cube.set<atlas::mesh_source>({
       .color = { 1.f, 1.f, 1.f, 1.f },
       // .model_path = "assets/models/E 45 Aircraft_obj.obj",
       .model_path = "assets/backpack/backpack.obj",
@@ -58,54 +60,56 @@ level_scene::level_scene(const std::string& p_name,
     });
 
     atlas::game_object robot_model = entity("Cube");
-    robot_model->add<atlas::tag::serialize>();
-    // robot_model->add<atlas::tag::serialize>();
-    robot_model->set<atlas::transform>({
+    robot_model.add<atlas::tag::serialize>();
+    // robot_model.add<atlas::tag::serialize>();
+    robot_model.set<atlas::transform>({
       .position = { -2.70, 3.50f, 4.10f },
       .scale = { 1.f, 1.f, 1.f },
     });
 
-    robot_model->set<atlas::mesh_source>(
+    robot_model.set<atlas::mesh_source>(
       { .color = { 1.f, 1.f, 1.f, 1.f },
         .model_path = "assets/models/cube.obj",
         .diffuse = "assets/models/container_diffuse.png",
         .specular = "assets/models/container_specular.png" });
 
-    robot_model->set<atlas::box_collider>({
+    robot_model.set<atlas::box_collider>({
       .half_extent = { 1.f, 1.f, 1.f },
     });
-    robot_model->set<atlas::physics_body>({
+    robot_model.set<atlas::physics_body>({
       //   .restitution = 1.f,
       .body_movement_type = atlas::dynamic,
     });
 
     atlas::game_object platform = entity("Platform");
 
-    platform->set<atlas::transform>({
+    platform.set<atlas::transform>({
       .scale = { 15.f, 0.30f, 10.0f },
     });
-    platform->set<atlas::mesh_source>({
+    platform.set<atlas::mesh_source>({
       .model_path = "assets/models/cube.obj",
       .diffuse = "assets/models/wood.png",
     });
-    platform->set<atlas::physics_body>({
+    platform.set<atlas::physics_body>({
       .body_movement_type = atlas::fixed,
     });
-    platform->set<atlas::box_collider>({
+    platform.set<atlas::box_collider>({
       .half_extent = { 15.f, 0.30f, 10.0f },
     });
 
     atlas::game_object point_light = entity("Point Light 1");
-    point_light->set<atlas::transform>({
+    point_light.set<atlas::transform>({
       .position = { 0.f, 2.10f, -7.30f },
       .scale = { 0.9f, 0.9f, 0.9f },
     });
 
-    point_light->set<atlas::mesh_source>({
+    point_light.set<atlas::mesh_source>({
       .model_path = "assets/models/cube.obj",
       .diffuse = "assets/models/wood.png",
     });
-    point_light->add<atlas::tag::serialize>();
+    point_light.add<atlas::tag::serialize>();
+
+
 
     // benchmark
 
@@ -153,7 +157,7 @@ level_scene::level_scene(const std::string& p_name,
     // }
 
     atlas::game_object gerald = entity("Gerald");
-    gerald->add<atlas::point_light>();
+    gerald.add<atlas::point_light>();
 
     // TODO: Move this outside of level_scene
     m_deserializer_test = atlas::serializer();
@@ -173,8 +177,8 @@ level_scene::collision_enter(atlas::event::collision_enter& p_event) {
     atlas::game_object e1 = entity(p_event.entity1);
     atlas::game_object e2 = entity(p_event.entity2);
 
-    console_log_warn("Entity1 = {}", e1->name().c_str());
-    console_log_warn("Entity2 = {}", e2->name().c_str());
+    console_log_warn("Entity1 = {}", e1.name().c_str());
+    console_log_warn("Entity2 = {}", e2.name().c_str());
 }
 
 void
@@ -183,8 +187,8 @@ level_scene::collision_persisted(atlas::event::collision_persisted& p_event) {
     atlas::game_object e1 = entity(p_event.entity1);
     atlas::game_object e2 = entity(p_event.entity2);
 
-    console_log_warn("Entity1 = {}", e1->name().c_str());
-    console_log_warn("Entity2 = {}", e2->name().c_str());
+    console_log_warn("Entity1 = {}", e1.name().c_str());
+    console_log_warn("Entity2 = {}", e2.name().c_str());
 }
 
 void
@@ -603,7 +607,7 @@ level_scene::start() {
     }
 
     atlas::game_object viking_room = entity("Viking Room");
-    atlas::mesh_source* src = viking_room->get_mut<atlas::mesh_source>();
+    atlas::mesh_source* src = viking_room.get_mut<atlas::mesh_source>();
     src->flip = true;
 
     // Initiating physics system
@@ -686,10 +690,9 @@ level_scene::physics_update() {
         runtime_start();
     }
 
-    atlas::game_object viking_room = entity("Viking Room").value();
+    auto viking_room = entity("Viking Room");
 
-    atlas::physics_body* sphere_body =
-      viking_room->get_mut<atlas::physics_body>();
+    atlas::physics_body* sphere_body = viking_room.get_mut<atlas::physics_body>();
     // U = +up
     // J = -up
     // H = +left

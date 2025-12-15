@@ -2,7 +2,7 @@
 #include <core/core.hpp>
 #include <string>
 #include <core/event/event_bus.hpp>
-#include <core/scene/scene_object.hpp>
+#include <core/scene/game_object.hpp>
 
 namespace atlas {
 
@@ -38,7 +38,7 @@ namespace atlas {
          *
          * @param p_name is a string to set the name of the entity
          */
-        game_object entity(const std::string& p_name);
+        game_object entity(std::string_view p_name);
 
         /**
          * @brief Retrieves if an entity already exists within the registry,
@@ -47,7 +47,7 @@ namespace atlas {
          * @param p_entity_id is the ID to retrieve an entity if it exists,
          * otherwise returns a new entity.
          */
-        game_object entity(uint64_t p_entity_id);
+        game_object entity(uint64_t p_id);
 
         /**
          * @brief subscribes an event to the event::bus to get invoked when
@@ -109,9 +109,9 @@ namespace atlas {
          * atlas::scene scene("New Scene");
          *
          * // creating obj1 (parent) and obj2 (child)
-         * atlas::scene_object obj1 = scene.create("Parent");
+         * atlas::game_object obj1 = scene.create("Parent");
          *
-         * atlas::scene_object obj2 = scene.create("Chlid");
+         * atlas::game_object obj2 = scene.create("Chlid");
          *
          * // obj2 is the child of obj1
          * // As obj1 is a parent node

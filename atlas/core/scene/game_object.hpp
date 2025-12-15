@@ -12,17 +12,17 @@ namespace atlas {
      * of the raw flecs API's that can still be used by other flecs API's
      * without completely interacting touching raw flecs API
      */
-    class scene_object : public flecs::entity {
+    class game_object : public flecs::entity {
     public:
         //! @brief Should not construct a scene object not created through
         //! flecs::world
-        scene_object() = delete;
+        game_object() = delete;
 
-        scene_object(flecs::world_t* p_registry, flecs::entity_t p_id);
+        game_object(flecs::world_t* p_registry, flecs::entity_t p_id);
 
-        scene_object(const flecs::entity& p_base);
+        game_object(const flecs::entity& p_base);
 
-        explicit scene_object(flecs::entity& p_base);
+        explicit game_object(flecs::entity& p_base);
 
         /**
          * @brief sets the entity to be a parent of the specified entity
@@ -45,7 +45,7 @@ namespace atlas {
          * ```
          *
          */
-        void child_of(const std::optional<scene_object>& p_parent);
+        void child_of(const std::optional<game_object>& p_parent);
 
         /**
          * @brief iterates through all children entities if the given entity is
@@ -75,10 +75,10 @@ namespace atlas {
     };
 
     /**
-     * @brief Alias to std::optional<scene_object>
+     * @brief Alias to std::optional<game_object>
      *
      * This alias serves as a representation of game objects users can create
      * and manage components with
      */
-    using game_object = std::optional<scene_object>;
+    using game_object_optional = std::optional<game_object>;
 };

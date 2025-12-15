@@ -1,7 +1,6 @@
 #pragma once
 #include <core/core.hpp>
 #include <core/scene/scene.hpp>
-#include <core/scene/scene_object.hpp>
 #include <core/serialize/serializer.hpp>
 #include <imgui.h>
 #include <physics/physics_engine.hpp>
@@ -47,7 +46,7 @@ private:
     atlas::serializer m_deserializer_test;
     flecs::entity m_selected_entity;
 
-    atlas::game_object m_current_entity;
+    atlas::game_object_optional m_current_entity;
     float m_movement_speed = 10.f;
 
     // Setting physics system
