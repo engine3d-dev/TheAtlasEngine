@@ -91,20 +91,20 @@ namespace atlas {
 
             // expect(entity.is_alive());
 
-            entity->add<test_tag_component>();
-            expect(entity->has<test_tag_component>());
+            entity.add<test_tag_component>();
+            expect(entity.has<test_tag_component>());
         };
 
         "create_entity::get"_test = [&test_scene]() {
             atlas::game_object entity = test_scene.entity("Mock Entity 2");
-            entity->add<test_tag_component>();
+            entity.add<test_tag_component>();
             // flecs requires reading only operations are through the get<T> API
             // to write or set new parameters you can use get_mut<T> or
             // set<T>(T&&); in this case, I use set<T> in this test case
-            entity->set<test_tag_component>({ .tag = "New Entity" });
+            entity.set<test_tag_component>({ .tag = "New Entity" });
 
             const test_tag_component* get_tag =
-              entity->get<test_tag_component>();
+              entity.get<test_tag_component>();
             expect(get_tag->tag == "New Entity");
         };
 
@@ -112,9 +112,9 @@ namespace atlas {
             atlas::game_object entity = test_scene.entity("New Entity");
             mock_projectile projectile;
             projectile.on_update();
-            entity->set<mock_projectile>(projectile);
+            entity.set<mock_projectile>(projectile);
 
-            expect(entity->has<mock_projectile>());
+            expect(entity.has<mock_projectile>());
 
             // test_transform transform;
             // transform.position = projectile.position();
@@ -125,7 +125,7 @@ namespace atlas {
             // expect(transform.position == projectile.position());
 
             // expect(mock_velocity.position ==
-            //        entity.get<test_velocity>()->position);
+            //        entity.get<test_velocity>().position);
         };
     };
 }; // namespace atlas
