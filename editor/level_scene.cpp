@@ -9,7 +9,8 @@ level_scene::level_scene(const std::string& p_name,
                          atlas::event::event_bus& p_bus)
   : atlas::scene(p_name, p_bus) {
     auto editor_camera = entity("Editor Camera");
-    editor_camera.add<flecs::pair<atlas::tag::editor, atlas::projection_view>>();
+    editor_camera
+      .add<flecs::pair<atlas::tag::editor, atlas::projection_view>>();
     editor_camera.set<atlas::transform>({
       .position = { 3.50f, 4.90f, 36.40f },
       .scale{ 1.f },
@@ -19,7 +20,6 @@ level_scene::level_scene(const std::string& p_name,
       .is_active = true,
       .field_of_view = 45.f,
     });
-
 
     atlas::game_object bob_object = entity("Bob");
 
@@ -108,8 +108,6 @@ level_scene::level_scene(const std::string& p_name,
       .diffuse = "assets/models/wood.png",
     });
     point_light.add<atlas::tag::serialize>();
-
-
 
     // benchmark
 
@@ -692,7 +690,8 @@ level_scene::physics_update() {
 
     auto viking_room = entity("Viking Room");
 
-    atlas::physics_body* sphere_body = viking_room.get_mut<atlas::physics_body>();
+    atlas::physics_body* sphere_body =
+      viking_room.get_mut<atlas::physics_body>();
     // U = +up
     // J = -up
     // H = +left
