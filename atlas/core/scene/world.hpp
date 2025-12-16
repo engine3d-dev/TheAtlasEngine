@@ -24,18 +24,19 @@ namespace atlas {
      *
      *
      */
-    class world_scope {
+    class world {
     public:
-        world_scope() = delete;
+        world() = delete;
 
         /**
-         * @brief construct a new world_scope with a specified name associated
+         * @brief construct a new world with a specified name associated
          * with it
          */
-        world_scope(const std::string& p_name);
-        ~world_scope();
+        world(const std::string& p_name);
 
-        //! @return the name of world_scope
+        virtual ~world() = default;
+
+        //! @return the name of world
         [[nodiscard]] std::string name() const { return m_name; }
 
         /**
@@ -45,16 +46,7 @@ namespace atlas {
          * scenes as this is quite problematic. Should direct attention to this
          * soon.
          */
-        void add_scene(const ref<scene_scope>& p_scene_context);
-
-        template<typename T>
-        ref<scene_scope> create_custom_scene(const std::string& p_name) {
-            static_assert(
-              std::is_base_of_v<scene_scope, T>,
-              "Must be a scene that inherits from scene_scope as a base class");
-            m_scene_container[p_name] = create_ref<T>(p_name);
-            return m_scene_container[p_name];
-        }
+        void add_scene(const ref<scene>& p_scene_context);
 
         /**
          * @brief get_scene allows for specifically querying for current scenes
@@ -64,18 +56,18 @@ namespace atlas {
          * the player is in within the world, then provide the current scene
          * based on that information
          */
-        ref<scene_scope> get_scene(const std::string& p_tag) {
+        ref<scene> get_scene(const std::string& p_tag) {
             if (!m_scene_container.contains(p_tag)) {
                 throw std::runtime_error(
-                  "Could not access ref<scene_scope> from "
-                  "world_scope::get_scene(const string& p_tag)!!!");
+                  "Could not access ref<scene> from "
+                  "world::get_scene(const string& p_tag)!!!");
             }
             return m_scene_container[p_tag];
         }
 
     private:
-        std::map<std::string, ref<scene_scope>> m_scene_container;
-        ref<world_scope> m_world_shared_instance;
+        std::map<std::string, ref<scene>> m_scene_container;
+        ref<world> m_world_shared_instance;
         std::string m_name = "Undefined Tag";
     };
 }; // namespace atlas

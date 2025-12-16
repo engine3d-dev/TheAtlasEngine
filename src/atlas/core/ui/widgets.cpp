@@ -2,6 +2,8 @@
 #include <imgui_internal.h> // Used to include "PushMultiItemsWidths"
 
 namespace atlas::ui {
+    using ::ImGui::InputText;
+
     bool begin_popup_context_window(const char* str_id,
                                     ImGuiMouseButton mb,
                                     bool over_items) {
@@ -220,10 +222,28 @@ namespace atlas::ui {
         ImGui::PopID();
     }
 
-    void draw_input_text(std::string& p_value) {
-        // std::string value = "";
-        // // ImGui::Text("%s", p_value.c_str());
-        if (ImGui::InputText("##Tag", p_value.data(), p_value.size() + 1)) {
+    void draw_input_text(std::string& p_dst, std::string& p_src) {
+        std::string input_buffer = p_src;
+
+        ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue;
+        input_buffer.resize(255); // resize to allocate for 255 in the char
+                                  // array since this should be long enough
+
+        if (ImGui::InputText("##Name",
+                             (char*)input_buffer.c_str(),
+                             input_buffer.size() + 1,
+                             flags)) {
+            p_dst = input_buffer;
+        }
+
+        if (p_dst.empty()) {
+            p_dst = p_src;
+            return;
+        }
+
+        if (p_dst == p_src) {
+            p_dst = p_src;
+            return;
         }
     }
 

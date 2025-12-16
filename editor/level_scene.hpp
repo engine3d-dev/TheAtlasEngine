@@ -1,7 +1,6 @@
 #pragma once
 #include <core/core.hpp>
 #include <core/scene/scene.hpp>
-#include <core/scene/scene_object.hpp>
 #include <core/serialize/serializer.hpp>
 #include <imgui.h>
 #include <physics/physics_engine.hpp>
@@ -18,7 +17,7 @@
  *
  */
 
-class level_scene final : public atlas::scene_scope {
+class level_scene final : public atlas::scene {
 public:
     level_scene(const std::string& p_tag, atlas::event::event_bus& p_bus);
 
@@ -38,32 +37,23 @@ public:
 
     void reset_objects();
 
+private:
     void collision_enter(atlas::event::collision_enter& p_event);
 
     void collision_persisted(atlas::event::collision_persisted& p_event);
 
 private:
-    bool m_blink = false;
     atlas::serializer m_deserializer_test;
     flecs::entity m_selected_entity;
-    // TEMP: this is only for when creating an entity in the editor-space
-    atlas::optional_ref<atlas::scene_object> m_create_entity;
-    atlas::optional_ref<atlas::scene_object> m_child_object;
-    atlas::optional_ref<atlas::scene_object> m_viking_room;
-    atlas::optional_ref<atlas::scene_object> m_cube;
-    atlas::optional_ref<atlas::scene_object> m_robot_model;
-    atlas::optional_ref<atlas::scene_object> m_platform;
-    std::pmr::polymorphic_allocator<> m_allocator;
-    atlas::optional_ref<atlas::scene_object> m_camera;
-    atlas::optional_ref<atlas::scene_object> m_point_light;
+
+    atlas::game_object_optional m_current_entity;
     float m_movement_speed = 10.f;
-    // std::vector<atlas::strong_ref<atlas::scene_object>> m_many_objects;
 
     // Setting physics system
-    // TODO -- when refactoring this would be at atlas::world layer
-    atlas::physics::physics_engine m_physics_engine_handler;
+    // TODO -- when refactoring this would be at atlas::world level
+    atlas::physics::physics_engine m_physics_engine;
 
-    bool m_physics_is_runtime = false;
+    bool m_physics_runtime = false;
 
     atlas::ui::dockspace m_editor_dockspace;
     atlas::ui::menu_item m_editor_menu;

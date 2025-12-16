@@ -5,7 +5,6 @@
 #include <Jolt/Math/Vec3.h>
 #include <Jolt/Math/Quat.h>
 #include <core/scene/scene.hpp>
-#include <core/scene/scene_object.hpp>
 
 #include <drivers/jolt-cpp/types.hpp>
 #include <drivers/jolt-cpp/jolt_components.hpp>

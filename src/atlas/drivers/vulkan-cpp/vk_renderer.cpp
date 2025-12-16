@@ -1,12 +1,8 @@
-#include <core/system/registry.hpp>
-#include <core/scene/world.hpp>
-#include <drivers/vulkan-cpp/vk_renderer.hpp>
-
+#include <core/common.hpp>
 #include <array>
+#include <drivers/vulkan-cpp/vk_renderer.hpp>
 #include <drivers/vulkan-cpp/utilities.hpp>
 #include <drivers/vulkan-cpp/vk_context.hpp>
-#include <core/application.hpp>
-
 #include <renderer/uniforms.hpp>
 
 namespace atlas::vk {
@@ -213,9 +209,8 @@ namespace atlas::vk {
     void vk_renderer::preload_assets(const VkRenderPass& p_renderpass) {
         m_final_renderpass = p_renderpass;
         // set 1 -- material uniforms
-        ref<world_scope> current_world =
-          system_registry::get_world("Editor World");
-        ref<scene_scope> current_scene = current_world->get_scene("LevelScene");
+        ref<world> current_world = system_registry::get_world("Editor World");
+        ref<scene> current_scene = current_world->get_scene("LevelScene");
 
         flecs::query<> caching =
           current_scene->query_builder<mesh_source>().build();
@@ -483,9 +478,8 @@ namespace atlas::vk {
         // m_global_uniforms.update(bytes_data.data());
         m_global_uniforms.update(&global_frame_ubo);
 
-        ref<world_scope> current_world =
-          system_registry::get_world("Editor World");
-        ref<scene_scope> current_scene = current_world->get_scene("LevelScene");
+        ref<world> current_world = system_registry::get_world("Editor World");
+        ref<scene> current_scene = current_world->get_scene("LevelScene");
 
         // query all entities that have a point light
         flecs::query<point_light> query_point_lights =

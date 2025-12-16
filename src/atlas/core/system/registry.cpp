@@ -12,24 +12,20 @@ namespace atlas {
 
     system_registry::~system_registry() = default;
 
-    ref<world_scope> system_registry::create_world(const std::string& p_tag) {
-        return s_instance->append_world_scope(create_ref<world_scope>(p_tag));
+    ref<world> system_registry::create_world(const std::string& p_tag) {
+        return s_instance->append_world_and_get(create_ref<world>(p_tag));
     }
 
-    ref<world_scope> system_registry::get_world(const std::string& p_tag) {
+    ref<world> system_registry::get_world(const std::string& p_tag) {
         return s_instance->search_world(p_tag);
     }
 
-    ref<world_scope> system_registry::search_world(const std::string& p_tag) {
+    ref<world> system_registry::search_world(const std::string& p_tag) {
         return m_world_registered[p_tag];
     }
 
-    void system_registry::append_world(const ref<world_scope>& p_world) {
-        m_world_registered.emplace(p_world->name(), p_world);
-    }
-
-    ref<world_scope> system_registry::append_world_scope(
-      const ref<world_scope>& p_world) {
+    ref<world> system_registry::append_world_and_get(
+      const ref<world>& p_world) {
         m_world_registered.emplace(p_world->name(), p_world);
         return m_world_registered[p_world->name()];
     }

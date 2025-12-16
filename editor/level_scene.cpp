@@ -3,48 +3,54 @@
 #include <core/application.hpp>
 #include <drivers/jolt-cpp/jolt_components.hpp>
 #include <physics/physics_engine.hpp>
+#include <string>
 
 level_scene::level_scene(const std::string& p_name,
                          atlas::event::event_bus& p_bus)
-  : atlas::scene_scope(p_name, p_bus) {
-    m_camera = create_object("Editor Camera");
-    m_camera->add<flecs::pair<atlas::tag::editor, atlas::projection_view>>();
-    m_camera->set<atlas::transform>({
+  : atlas::scene(p_name, p_bus) {
+    auto editor_camera = entity("Editor Camera");
+    editor_camera
+      .add<flecs::pair<atlas::tag::editor, atlas::projection_view>>();
+    editor_camera.set<atlas::transform>({
       .position = { 3.50f, 4.90f, 36.40f },
       .scale{ 1.f },
     });
-    m_camera->set<atlas::perspective_camera>({
+    editor_camera.set<atlas::perspective_camera>({
       .plane = { 0.1f, 5000.f },
       .is_active = true,
       .field_of_view = 45.f,
     });
 
-    m_viking_room = create_object("Viking Room");
-    m_viking_room->add<atlas::tag::serialize>();
-    m_viking_room->set<atlas::transform>({
+    atlas::game_object bob_object = entity("Bob");
+
+    bob_object.add<atlas::point_light>();
+
+    atlas::game_object viking_room = entity("Viking Room");
+    viking_room.add<atlas::tag::serialize>();
+    viking_room.set<atlas::transform>({
       .position = { -2.70f, 2.70, -8.30f },
       .rotation = { 2.30f, 95.90f, 91.80f },
       .scale{ 1.f },
     });
 
-    m_viking_room->set<atlas::sphere_collider>({
+    viking_room.set<atlas::sphere_collider>({
       .radius = 1.0f,
     });
 
-    m_viking_room->set<atlas::physics_body>({
+    viking_room.set<atlas::physics_body>({
       .friction = 15.f,
       .restitution = 0.3f,
       .body_movement_type = atlas::dynamic,
     });
 
-    m_cube = create_object("Aircraft");
+    atlas::game_object cube = entity("Aircraft");
 
-    m_cube->set<atlas::transform>({
+    cube.set<atlas::transform>({
       .position = { 0.f, 2.10f, -7.30f },
       .scale = { 0.9f, 0.9f, 0.9f },
     });
 
-    m_cube->set<atlas::mesh_source>({
+    cube.set<atlas::mesh_source>({
       .color = { 1.f, 1.f, 1.f, 1.f },
       // .model_path = "assets/models/E 45 Aircraft_obj.obj",
       .model_path = "assets/backpack/backpack.obj",
@@ -53,69 +59,78 @@ level_scene::level_scene(const std::string& p_name,
       //   .diffuse = "assets/models/E-45-steel detail_2_col.jpg",
     });
 
-    // atlas::material_metadata data = {
-    //     .ambient = {0.2f, 0.2f, 0.2f},
-    //     .diffuse = {0.5f, 0.5f, 0.5f},
-    //     .specular = {1.0f, 1.0f, 1.0f},
-    //     .shininess = 64.f,
-    // };
-    // m_cube->set<atlas::material_metadata>(data);
-
-    m_robot_model = create_object("Cube");
-    m_robot_model->add<atlas::tag::serialize>();
-    // m_robot_model->add<atlas::tag::serialize>();
-    m_robot_model->set<atlas::transform>({
+    atlas::game_object robot_model = entity("Cube");
+    robot_model.add<atlas::tag::serialize>();
+    // robot_model.add<atlas::tag::serialize>();
+    robot_model.set<atlas::transform>({
       .position = { -2.70, 3.50f, 4.10f },
       .scale = { 1.f, 1.f, 1.f },
     });
 
-    m_robot_model->set<atlas::mesh_source>(
+    robot_model.set<atlas::mesh_source>(
       { .color = { 1.f, 1.f, 1.f, 1.f },
         .model_path = "assets/models/cube.obj",
         .diffuse = "assets/models/container_diffuse.png",
         .specular = "assets/models/container_specular.png" });
 
-    m_robot_model->set<atlas::box_collider>({
+    robot_model.set<atlas::box_collider>({
       .half_extent = { 1.f, 1.f, 1.f },
     });
-    m_robot_model->set<atlas::physics_body>({
+    robot_model.set<atlas::physics_body>({
       //   .restitution = 1.f,
       .body_movement_type = atlas::dynamic,
     });
 
-    m_child_object = create_object("Child");
-    m_child_object->child_of(m_robot_model);
+    atlas::game_object platform = entity("Platform");
 
-    m_platform = create_object("Platform");
-
-    m_platform->set<atlas::transform>({
+    platform.set<atlas::transform>({
       .scale = { 15.f, 0.30f, 10.0f },
     });
-    m_platform->set<atlas::mesh_source>({
+    platform.set<atlas::mesh_source>({
       .model_path = "assets/models/cube.obj",
       .diffuse = "assets/models/wood.png",
     });
-    m_platform->set<atlas::physics_body>({
+    platform.set<atlas::physics_body>({
       .body_movement_type = atlas::fixed,
     });
-    m_platform->set<atlas::box_collider>({
+    platform.set<atlas::box_collider>({
       .half_extent = { 15.f, 0.30f, 10.0f },
     });
 
-    m_point_light = create_object("Point Light 1");
-    m_point_light->set<atlas::transform>({
+    atlas::game_object point_light = entity("Point Light 1");
+    point_light.set<atlas::transform>({
       .position = { 0.f, 2.10f, -7.30f },
       .scale = { 0.9f, 0.9f, 0.9f },
     });
 
-    m_point_light->set<atlas::mesh_source>({
+    point_light.set<atlas::mesh_source>({
       .model_path = "assets/models/cube.obj",
       .diffuse = "assets/models/wood.png",
     });
-    m_point_light->add<atlas::tag::serialize>();
+    point_light.add<atlas::tag::serialize>();
+
+    // benchmark
+
+    // auto start = std::chrono::high_resolution_clock::now();
+    // TEMP Code
+    // [[maybe_unused]] atlas::game_object point_light_test = entity("Point
+    // Light 1"); auto end = std::chrono::high_resolution_clock::now(); auto
+    // duration = (end - start);
+
+    // auto seconds =
+    // std::chrono::duration_cast<std::chrono::seconds>(duration).count(); auto
+    // nanoseconds =
+    // std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
+    // auto microseconds =
+    // std::chrono::duration_cast<std::chrono::microseconds>(duration).count();
+
+    // console_log_fatal("Seconds = {:.1f}", static_cast<float>(seconds));
+    // console_log_fatal("Nanoseconds = {:.1f}",
+    // static_cast<float>(nanoseconds)); console_log_fatal("Microseconds =
+    // {:.1f}", static_cast<float>(microseconds));
 
     // for(size_t i = 0; i < 26; i++) {
-    // 	auto obj = create_object(std::format("Object #{}", i));
+    // 	auto obj = entity(std::format("Object #{}", i));
     // 	obj->set<atlas::physics_body>({
     // 		.restitution = 1.25f,
     // 		.body_movement_type = atlas::dynamic,
@@ -137,13 +152,12 @@ level_scene::level_scene(const std::string& p_name,
     // 		.model_path = "assets/models/Ball OBJ.obj",
     // 		.diffuse = "assets/models/clear.png",
     // 	});
-    // 	m_many_objects.emplace_back(obj);
     // }
 
-    // Just adding this here, for testing purposes
-    // Basic serialization for testing to conform how the editor may work
-    // TODO -- have a stream writer/reader that can take a given scene structure
-    // for serialization
+    atlas::game_object gerald = entity("Gerald");
+    gerald.add<atlas::point_light>();
+
+    // TODO: Move this outside of level_scene
     m_deserializer_test = atlas::serializer();
 
     subscribe<atlas::event::collision_enter>(this,
@@ -158,9 +172,8 @@ level_scene::level_scene(const std::string& p_name,
 void
 level_scene::collision_enter(atlas::event::collision_enter& p_event) {
     console_log_warn("collision_enter event!!!");
-    flecs::world registry = *this;
-    flecs::entity e1 = registry.entity(p_event.entity1);
-    flecs::entity e2 = registry.entity(p_event.entity2);
+    atlas::game_object e1 = entity(p_event.entity1);
+    atlas::game_object e2 = entity(p_event.entity2);
 
     console_log_warn("Entity1 = {}", e1.name().c_str());
     console_log_warn("Entity2 = {}", e2.name().c_str());
@@ -169,9 +182,8 @@ level_scene::collision_enter(atlas::event::collision_enter& p_event) {
 void
 level_scene::collision_persisted(atlas::event::collision_persisted& p_event) {
     console_log_warn("collision_persisted(p_event) invoked!!");
-    flecs::world registry = *this;
-    flecs::entity e1 = registry.entity(p_event.entity1);
-    flecs::entity e2 = registry.entity(p_event.entity2);
+    atlas::game_object e1 = entity(p_event.entity1);
+    atlas::game_object e2 = entity(p_event.entity2);
 
     console_log_warn("Entity1 = {}", e1.name().c_str());
     console_log_warn("Entity2 = {}", e2.name().c_str());
@@ -180,16 +192,16 @@ level_scene::collision_persisted(atlas::event::collision_persisted& p_event) {
 void
 level_scene::runtime_start() {
     // runs the physics simulation
-    m_physics_is_runtime = true;
+    m_physics_runtime = true;
 
-    m_physics_engine_handler.start();
+    m_physics_engine.start();
 }
 
 void
 level_scene::runtime_stop() {
-    m_physics_is_runtime = false;
+    m_physics_runtime = false;
 
-    m_physics_engine_handler.stop();
+    m_physics_engine.stop();
 
     reset_objects();
 }
@@ -205,7 +217,10 @@ level_scene::reset_objects() {
 void
 ui_component_list(flecs::entity& p_selected_entity) {
     std::string entity_name = p_selected_entity.name().c_str();
-    atlas::ui::draw_input_text(entity_name);
+    std::string new_entity_name = "";
+    atlas::ui::draw_input_text(new_entity_name, entity_name);
+
+    p_selected_entity.set_name(new_entity_name.c_str());
 
     ImGui::SameLine();
     ImGui::PushItemWidth(-1);
@@ -289,11 +304,20 @@ level_scene::on_ui_update() {
     catch (const atlas::ui::menu_bar_exception& e) {
     }
 
-    // specify the label and the state to execute when this specific widget has
-    // been triggered
-    m_editor_menu.add_child("Exit", []() {
-        glfwSetWindowShouldClose(atlas::application::get_window(), true);
-    });
+    if (ImGui::BeginMenu("File")) {
+        if (ImGui::MenuItem("Save")) {
+            // m_deserializer_test.save("LevelScene");
+        }
+
+        ImGui::Separator();
+
+        if (ImGui::MenuItem("Exit")) {
+            glfwSetWindowShouldClose(atlas::application::get_window(), true);
+        }
+
+        ImGui::EndMenu();
+    }
+
     m_editor_menu.end();
 
     if (ImGui::Begin("Viewport")) {
@@ -313,9 +337,7 @@ level_scene::on_ui_update() {
         // @param popup_flags - will be the mouse flag (0=right, 1=left)
         if (atlas::ui::begin_popup_context_window(nullptr, 1, false)) {
             if (ImGui::MenuItem("Create Empty Entity")) {
-                // TODO -- Converting the operation to use strong_ptr to make
-                // these operation more conformed
-                m_create_entity = create_object("Empty Entity");
+                m_current_entity = entity("Empty Entity");
             }
             ImGui::EndPopup();
         }
@@ -330,10 +352,12 @@ level_scene::on_ui_update() {
               ImGuiTreeNodeFlags_OpenOnArrow;
             flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
             flags |= ImGuiWindowFlags_Popup;
+            flags |= ImGuiTreeNodeFlags_AllowItemOverlap;
+
             bool opened = ImGui::TreeNodeEx(p_entity.name().c_str(), flags);
+
             if (ImGui::IsItemClicked()) {
                 m_selected_entity = p_entity;
-                // m_create_entity = search_entity(p_entity.name().c_str());
             }
 
             bool delete_entity = false;
@@ -345,9 +369,11 @@ level_scene::on_ui_update() {
             }
 
             if (delete_entity) {
-                // _context->destroyEntity(entity);
                 m_selected_entity.destruct();
             }
+
+            ImGui::SameLine();
+            ImGui::TextDisabled("(%llu)", p_entity.id());
 
             if (opened) {
                 flags = ImGuiTreeNodeFlags_OpenOnArrow |
@@ -402,6 +428,29 @@ level_scene::on_ui_update() {
                   ImGui::DragFloat("Speed", &m_movement_speed);
               });
 
+            atlas::ui::draw_component<atlas::mesh_source>(
+              "atlas::mesh_source",
+              m_selected_entity,
+              [](atlas::mesh_source* p_source) {
+                  std::string mesh_src = p_source->model_path;
+                  atlas::ui::draw_input_text(p_source->model_path, mesh_src);
+                  atlas::ui::draw_vec4("Color", p_source->color);
+              });
+
+            atlas::ui::draw_component<atlas::material_metadata>(
+              "material",
+              m_selected_entity,
+              [](atlas::material_metadata* p_source) {
+                  float speed = 0.01f;
+                  ImGui::DragFloat4(
+                    "Ambient", glm::value_ptr(p_source->ambient), speed);
+                  ImGui::DragFloat4(
+                    "Diffuse", glm::value_ptr(p_source->diffuse), speed);
+                  ImGui::DragFloat4(
+                    "Specular", glm::value_ptr(p_source->specular), speed);
+                  atlas::ui::draw_float("Shininess", p_source->shininess);
+              });
+
             /*
             atlas::ui::draw_component<atlas::directional_light>("Directional
             Light", m_selected_entity, [](atlas::directional_light*
@@ -433,28 +482,6 @@ level_scene::on_ui_update() {
                   ImGui::DragFloat("Constant", &p_dir_light->constant, 0.01);
                   ImGui::DragFloat("Linear", &p_dir_light->linear, 0.01);
                   ImGui::DragFloat("Quadratic", &p_dir_light->quadratic, 0.01);
-              });
-
-            atlas::ui::draw_component<atlas::mesh_source>(
-              "atlas::mesh_source",
-              m_selected_entity,
-              [](atlas::mesh_source* p_source) {
-                  atlas::ui::draw_input_text(p_source->model_path);
-                  atlas::ui::draw_vec4("Color", p_source->color);
-              });
-
-            atlas::ui::draw_component<atlas::material_metadata>(
-              "material",
-              m_selected_entity,
-              [](atlas::material_metadata* p_source) {
-                  float speed = 0.01f;
-                  ImGui::DragFloat4(
-                    "Ambient", glm::value_ptr(p_source->ambient), speed);
-                  ImGui::DragFloat4(
-                    "Diffuse", glm::value_ptr(p_source->diffuse), speed);
-                  ImGui::DragFloat4(
-                    "Specular", glm::value_ptr(p_source->specular), speed);
-                  atlas::ui::draw_float("Shininess", p_source->shininess);
               });
 
             atlas::ui::draw_component<atlas::physics_body>(
@@ -577,28 +604,14 @@ level_scene::start() {
         console_log_error("Could not load yaml file LevelScene!!!");
     }
 
-    // testing the flip parameter inside atlas::mesh_source
-    m_viking_room->set<atlas::mesh_source>({
-      .flip = true,
-      .color = { 1.f, 1.f, 1.f, 1.f },
-      .model_path = "assets/models/viking_room.obj",
-      .diffuse = "assets/models/viking_room.png",
-      // .model_path = "assets/models/Ball OBJ.obj",
-      // .diffuse = "assets/models/clear.png",
-    });
-
-    // TODO: Make this contain an atlas::directional_light
-    // If the scene opject dooes not have a atlas::directional_light, then we
-    // set the default values to 1.0f m_robot_model sets the cube.obj 3d model
-    // and loads it
-    m_robot_model->set<atlas::material_metadata>({
-      .shininess = 64.f,
-    });
+    atlas::game_object viking_room = entity("Viking Room");
+    atlas::mesh_source* src = viking_room.get_mut<atlas::mesh_source>();
+    src->flip = true;
 
     // Initiating physics system
     atlas::physics::jolt_settings settings = {};
     flecs::world registry = *this;
-    m_physics_engine_handler =
+    m_physics_engine =
       atlas::physics::physics_engine(settings, registry, *event_handle());
 
     // Note -- just added for temporary
@@ -671,12 +684,14 @@ level_scene::on_update() {
 void
 level_scene::physics_update() {
     float dt = atlas::application::delta_time();
-    if (atlas::event::is_key_pressed(key_r) and !m_physics_is_runtime) {
+    if (atlas::event::is_key_pressed(key_r) and !m_physics_runtime) {
         runtime_start();
     }
 
+    auto viking_room = entity("Viking Room");
+
     atlas::physics_body* sphere_body =
-      m_viking_room->get_mut<atlas::physics_body>();
+      viking_room.get_mut<atlas::physics_body>();
     // U = +up
     // J = -up
     // H = +left
@@ -702,11 +717,11 @@ level_scene::physics_update() {
         sphere_body->angular_velocity = angular_vel;
     }
 
-    if (m_physics_is_runtime) {
-        m_physics_engine_handler.update(dt);
+    if (m_physics_runtime) {
+        m_physics_engine.update(dt);
     }
 
-    if (atlas::event::is_key_pressed(key_l) and m_physics_is_runtime) {
+    if (atlas::event::is_key_pressed(key_l) and m_physics_runtime) {
         runtime_stop();
     }
 }

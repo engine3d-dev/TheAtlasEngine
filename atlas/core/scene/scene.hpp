@@ -1,10 +1,8 @@
 #pragma once
 #include <core/core.hpp>
-#include <core/engine_logger.hpp>
-#include <core/scene/scene_object.hpp>
 #include <string>
-#include <core/scene/types.hpp>
 #include <core/event/event_bus.hpp>
+#include <core/scene/game_object.hpp>
 
 namespace atlas {
 
@@ -23,30 +21,33 @@ namespace atlas {
      * helps manages these scenes and consider them as contexts that can be
      * switched/toggled based on users transforms.
      */
-    class scene_scope {
+    class scene {
     public:
         /**
          * @param p_name is the name given to this scene
          * @param p_bus is the globalized event bus that is given access to the
          * scene to subscribe events to it.
          */
-        scene_scope(const std::string& p_name, event::event_bus& p_bus)
-          : m_name(p_name)
-          , m_bus(&p_bus) {}
+        scene(const std::string& p_name, event::event_bus& p_bus);
 
-        virtual ~scene_scope() = default;
+        virtual ~scene() = default;
 
         /**
-         * @brief Used to creating a game object
+         * @brief Retrieves if an entity already exists within the registry,
+         * create new entity otherwise
          *
-         * @param p_name is specified when creating or searching the object
-         *
-         * @return strong_ptr<atlas::scene_object>
+         * @param p_name is a string to set the name of the entity
          */
-        strong_ref<scene_object> create_object(const std::string& p_name) {
-            return create_strong_ref<scene_object>(
-              m_allocator, &m_registry, p_name);
-        }
+        game_object entity(std::string_view p_name);
+
+        /**
+         * @brief Retrieves if an entity already exists within the registry,
+         * create new entity otherwise
+         *
+         * @param p_entity_id is the ID to retrieve an entity if it exists,
+         * otherwise returns a new entity.
+         */
+        game_object entity(uint64_t p_id);
 
         /**
          * @brief subscribes an event to the event::bus to get invoked when
@@ -59,6 +60,7 @@ namespace atlas {
          * callback belongs to
          * @param p_callback is the callback that contains an arbitrary task
          * that gets invoked when incoming updates occur from the publisher
+         *
          */
         template<typename UEventType, typename UObject, typename UCallback>
         void subscribe(UObject* p_instance, const UCallback& p_callback) {
@@ -97,10 +99,37 @@ namespace atlas {
         }
 
         /**
+         * @return the number of children entities
+         *
+         * Example Usage:
+         *
+         *
+         * ```C++
+         *
+         * atlas::scene scene("New Scene");
+         *
+         * // creating obj1 (parent) and obj2 (child)
+         * atlas::game_object obj1 = scene.create("Parent");
+         *
+         * atlas::game_object obj2 = scene.create("Chlid");
+         *
+         * // obj2 is the child of obj1
+         * // As obj1 is a parent node
+         *
+         * obj2.child_of(obj1);
+         *
+         * // Returns 1
+         * uint32_t obj1_children = scene.children_count(obj1);
+         *
+         * ```
+         */
+        uint32_t children_count(const game_object& p_parent);
+
+        /**
          * @brief Defer operations until end of frame.
-         * When this operation is invoked while iterating, operations inbetween
-         * the defer_begin() and defer_end() operations are executed at the end
-         * of the frame.
+         * When this operation is invoked while iterating, operations
+         * inbetween the defer_begin() and defer_end() operations are executed
+         * at the end of the frame.
          *
          * This operation is thread safe.
          *
@@ -120,22 +149,20 @@ namespace atlas {
          */
         bool defer_end() { return m_registry.defer_end(); }
 
-        //! @return the name of atlas::scene_object
+        //! @return the name of the scene
         [[nodiscard]] std::string name() const { return m_name; }
 
-        //! @return the event::bus handle to do the subscription operation of
-        //! events
+        //! @return the event::bus handle for subscribing events
         [[nodiscard]] event::event_bus* event_handle() const { return m_bus; }
 
         /**
          * @brief Requires to return flecs::world is returned by reference to
          * prevent making copies of flecs::world
          */
-        operator world&() { return m_registry; }
+        operator flecs::world&() { return m_registry; }
 
     private:
-        std::pmr::polymorphic_allocator<> m_allocator;
-        world m_registry;
+        flecs::world m_registry;
         std::string m_name;
         event::event_bus* m_bus = nullptr;
     };

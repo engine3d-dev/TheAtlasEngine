@@ -147,7 +147,7 @@ namespace atlas {
         }
     }
 
-    serializer::serializer(const ref<scene_scope>& p_scene_ctx)
+    serializer::serializer(const ref<scene>& p_scene_ctx)
       : m_current_scene_ctx(p_scene_ctx) {}
 
     void serializer::save(const std::filesystem::path& p_filepath) {
@@ -161,7 +161,7 @@ namespace atlas {
         //! entities that the engine (user creates through our API)
         // ref<world_scope> world_object =
         //   system_registry::get_world("Editor World");
-        // ref<scene_scope> current_scene =
+        // ref<scene> current_scene =
         // world_object->get_scene("LevelScene");
 
         // flecs::query<> q =

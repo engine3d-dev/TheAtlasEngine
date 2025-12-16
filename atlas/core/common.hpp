@@ -2,6 +2,7 @@
 
 // core includes
 #include <core/core.hpp>
+#include <core/application.hpp>
 #include <core/engine_logger.hpp>
 #include <core/utilities/state.hpp>
 #include <core/event/event.hpp>
