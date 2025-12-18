@@ -1,5 +1,6 @@
 #include "level_scene.hpp"
 #include <core/common.hpp>
+#include <core/utilities/state.hpp>
 #include <core/application.hpp>
 #include <drivers/jolt-cpp/jolt_components.hpp>
 #include <physics/physics_engine.hpp>

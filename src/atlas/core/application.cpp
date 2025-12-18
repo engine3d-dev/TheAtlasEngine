@@ -1,5 +1,6 @@
 #include <core/application.hpp>
 #include <core/common.hpp>
+#include <core/utilities/state.hpp>
 #include <drivers/vulkan-cpp/vk_swapchain.hpp>
 #include <drivers/vulkan-cpp/vk_context.hpp>
 
