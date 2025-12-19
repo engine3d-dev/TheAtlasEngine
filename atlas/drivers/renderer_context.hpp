@@ -2,6 +2,7 @@
 #include <string>
 #include <core/core.hpp>
 #include <drivers/vulkan-cpp/vk_swapchain.hpp>
+#include <core/scene/scene.hpp>
 
 namespace atlas {
     /**
@@ -65,6 +66,10 @@ namespace atlas {
             return background_color(p_color);
         }
 
+        void current_scene_context(ref<scene> p_scene) {
+            return current_scene(std::move(p_scene));
+        }
+
     private:
         virtual void preload_assets(const VkRenderPass& p_renderpass) = 0;
 
@@ -76,6 +81,8 @@ namespace atlas {
         virtual void post_frame() = 0;
 
         virtual void background_color(const std::array<float, 4>& p_color) = 0;
+
+        virtual void current_scene(ref<scene>) = 0;
     };
 
     ref<render_context> initialize_renderer(

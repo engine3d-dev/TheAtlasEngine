@@ -20,7 +20,7 @@ public:
         // TODO -- this is going to be changed with the use of the level
         // streamer API
         m_world =
-          atlas::create_strong_ref<editor_world>(m_allocator, "Editor World");
+          atlas::create_strong_ref<editor_world>(m_allocator, "Editor World", renderer_instance());
     }
 
 private:

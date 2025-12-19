@@ -200,6 +200,10 @@ namespace atlas::vk {
         });
     }
 
+    void vk_renderer::current_scene(ref<scene> p_scene) {
+        m_current_scene = p_scene;
+    }
+
     void vk_renderer::background_color(const std::array<float, 4>& p_color) {
         m_color = {
             { p_color.at(0), p_color.at(1), p_color.at(2), p_color.at(3) }
@@ -209,11 +213,11 @@ namespace atlas::vk {
     void vk_renderer::preload_assets(const VkRenderPass& p_renderpass) {
         m_final_renderpass = p_renderpass;
         // set 1 -- material uniforms
-        ref<world> current_world = system_registry::get_world("Editor World");
-        ref<scene> current_scene = current_world->get_scene("LevelScene");
+        // ref<world> current_world = system_registry::get_world("Editor World");
+        // ref<scene> current_scene = current_world->get_scene("LevelScene");
 
         flecs::query<> caching =
-          current_scene->query_builder<mesh_source>().build();
+          m_current_scene->query_builder<mesh_source>().build();
 
         caching.each([this](flecs::entity p_entity) {
             const mesh_source* target = p_entity.get<mesh_source>();

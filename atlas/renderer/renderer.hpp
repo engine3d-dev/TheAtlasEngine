@@ -22,6 +22,9 @@ namespace atlas {
                  const std::string& p_tag = "Renderer");
 
         void preload(const VkRenderPass& p_renderpass);
+
+        void current_scene(ref<scene>);
+
         /**
          * @brief Indicates to the renderer is at the start of the next frame to
          * prepare workloads before next frame is processeed
