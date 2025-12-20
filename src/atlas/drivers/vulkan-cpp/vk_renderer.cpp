@@ -213,8 +213,9 @@ namespace atlas::vk {
     void vk_renderer::preload_assets(const VkRenderPass& p_renderpass) {
         m_final_renderpass = p_renderpass;
         // set 1 -- material uniforms
-        // ref<world> current_world = system_registry::get_world("Editor World");
-        // ref<scene> current_scene = current_world->get_scene("LevelScene");
+        // ref<world> current_world = system_registry::get_world("Editor
+        // World"); ref<scene> current_scene =
+        // current_world->get_scene("LevelScene");
 
         flecs::query<> caching =
           m_current_scene->query_builder<mesh_source>().build();

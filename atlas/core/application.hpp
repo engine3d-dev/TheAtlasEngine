@@ -124,7 +124,9 @@ namespace atlas {
         static uint32_t image_size();
 
     protected:
-        [[nodiscard]] ref<renderer> renderer_instance() const { return m_renderer; }
+        [[nodiscard]] ref<renderer> renderer_instance() const {
+            return m_renderer;
+        }
 
     private:
         void set_current_api(api api);

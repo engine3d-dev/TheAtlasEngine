@@ -6,7 +6,8 @@
 
 class editor_world {
 public:
-    editor_world(const std::string& p_tag, atlas::ref<atlas::renderer> p_renderer_instance);
+    editor_world(const std::string& p_tag,
+                 atlas::ref<atlas::renderer> p_renderer_instance);
 
 private:
     atlas::ref<atlas::world> m_main_world;

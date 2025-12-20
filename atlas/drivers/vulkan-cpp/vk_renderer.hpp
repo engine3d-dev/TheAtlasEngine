@@ -91,7 +91,6 @@ namespace atlas::vk {
 
         ::vk::texture m_white_texture;
 
-
         ref<scene> m_current_scene;
     };
 };

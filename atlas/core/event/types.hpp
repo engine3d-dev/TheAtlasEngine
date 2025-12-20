@@ -20,10 +20,10 @@ namespace atlas::event {
 
     /**
      * @brief event to trigger when to transition specific scenes
-     * 
+     *
      * @param from_scene is the current scene that is being transitioned from
      * @param to_scene is the new scene that is going to be transitioned to
-    */
+     */
     struct scene_transition {
         const void* from_scene;
         const void* to_scene;

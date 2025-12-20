@@ -43,8 +43,9 @@ namespace atlas {
 
         void poll_start(void* p_address,
                         const std::function<void()>& p_callback);
-        
-        // TEMP: This is a temporary solution, should look into doing this differently
+
+        // TEMP: This is a temporary solution, should look into doing this
+        // differently
         void remove_update(void* p_address);
 
         void remove_defer_update(void* p_address);
