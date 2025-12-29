@@ -59,6 +59,8 @@ namespace atlas::vk {
 
         void post_frame() override;
 
+        void current_scene(ref<scene>) override;
+
     private:
         VkDevice m_device = nullptr;
         vk_physical_driver m_physical;
@@ -88,5 +90,7 @@ namespace atlas::vk {
         glm::mat4 m_model = { 1.f };
 
         ::vk::texture m_white_texture;
+
+        ref<scene> m_current_scene;
     };
 };

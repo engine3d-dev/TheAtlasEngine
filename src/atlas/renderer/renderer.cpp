@@ -30,4 +30,8 @@ namespace atlas {
     void renderer::set_background_color(const std::array<float, 4>& p_color) {
         m_render_context->set_background_color(p_color);
     }
+
+    void renderer::current_scene(ref<scene> p_scene) {
+        m_render_context->current_scene_context(std::move(p_scene));
+    }
 };

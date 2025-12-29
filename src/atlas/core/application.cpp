@@ -1,5 +1,6 @@
 #include <core/application.hpp>
 #include <core/common.hpp>
+#include <core/utilities/state.hpp>
 #include <drivers/vulkan-cpp/vk_swapchain.hpp>
 #include <drivers/vulkan-cpp/vk_context.hpp>
 
@@ -20,7 +21,7 @@ namespace atlas {
         };
         m_window = create_window(settings);
 
-        m_renderer = create_scope<renderer>(
+        m_renderer = create_ref<renderer>(
           settings, m_window->current_swapchain().image_size(), "Renderer");
         m_renderer->set_background_color({
           p_settings.background_color.x,

@@ -28,15 +28,33 @@ namespace atlas {
         void invoke_ui_update();
         void invoke_start();
 
-        void poll_update(const std::function<void()>& p_callback);
+        // TODO: Look into a different way of doing this
+        void poll_update(void* p_address,
+                         const std::function<void()>& p_callback);
 
-        void poll_defer_update(const std::function<void()>& p_callback);
+        void poll_defer_update(void* p_address,
+                               const std::function<void()>& p_callback);
 
-        void poll_physics_update(const std::function<void()>& p_callback);
+        void poll_physics_update(void* p_address,
+                                 const std::function<void()>& p_callback);
 
-        void poll_ui_update(const std::function<void()>& p_callback);
+        void poll_ui_update(void* p_address,
+                            const std::function<void()>& p_callback);
 
-        void poll_start(const std::function<void()>& p_callback);
+        void poll_start(void* p_address,
+                        const std::function<void()>& p_callback);
+
+        // TEMP: This is a temporary solution, should look into doing this
+        // differently
+        void remove_update(void* p_address);
+
+        void remove_defer_update(void* p_address);
+
+        void remove_physics_update(void* p_address);
+
+        void remove_ui_update(void* p_address);
+
+        void remove_start(void* p_address);
 
     };
 
@@ -70,8 +88,9 @@ namespace atlas {
         static_assert(std::is_member_pointer_v<UCallback>,
                       "Cannot register a function that is not a member "
                       "function of a class object");
-        detail::poll_start(
-          [p_instance, p_callable]() { (p_instance->*p_callable)(); });
+        detail::poll_start(p_instance, [p_instance, p_callable]() {
+            (p_instance->*p_callable)();
+        });
     }
 
     /**
@@ -101,8 +120,9 @@ namespace atlas {
         static_assert(std::is_member_pointer_v<UCallback>,
                       "Cannot register a function that is not a member "
                       "function of a class object");
-        detail::poll_update(
-          [p_instance, p_callable]() { (p_instance->*p_callable)(); });
+        detail::poll_update(p_instance, [p_instance, p_callable]() {
+            (p_instance->*p_callable)();
+        });
     }
 
     /**
@@ -130,8 +150,9 @@ namespace atlas {
         static_assert(std::is_member_pointer_v<UCallback>,
                       "Cannot register a function that is not a member "
                       "function of a class object");
-        detail::poll_physics_update(
-          [p_instance, p_callable]() { (p_instance->*p_callable)(); });
+        detail::poll_physics_update(p_instance, [p_instance, p_callable]() {
+            (p_instance->*p_callable)();
+        });
     }
 
     /**
@@ -161,8 +182,9 @@ namespace atlas {
         static_assert(std::is_member_pointer_v<UCallback>,
                       "Cannot register a function that is not a member "
                       "function of a class object");
-        detail::poll_defer_update(
-          [p_instance, p_callable]() { (p_instance->*p_callable)(); });
+        detail::poll_defer_update(p_instance, [p_instance, p_callable]() {
+            (p_instance->*p_callable)();
+        });
     }
 
     /**
@@ -194,8 +216,9 @@ namespace atlas {
         static_assert(std::is_member_pointer_v<UCallback>,
                       "Cannot register a function that is not a member "
                       "function of a class object");
-        detail::poll_ui_update(
-          [p_instance, p_callable]() { (p_instance->*p_callable)(); });
+        detail::poll_ui_update(p_instance, [p_instance, p_callable]() {
+            (p_instance->*p_callable)();
+        });
     }
 
 };
