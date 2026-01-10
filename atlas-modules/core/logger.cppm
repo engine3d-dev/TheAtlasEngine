@@ -6,6 +6,7 @@ module;
 #include <unordered_map>
 
 #include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 #include <memory>
 
 export module core:logger;
@@ -28,28 +29,28 @@ export namespace atlas {
          * TODO: Revisit the logger and do some refactoring because the way this
          * works should be changed, as I'd prob do this differently now.
          */
-        static void initialize_logger_manager(const std::string& pattern = "%^[%T] %n: %v%$") {
+        static void initialize_logger_manager(const std::string& pattern = "%^[%n] [%T]: %v%$") {
             g_current_pattern_for_logs = pattern;
 
             //! @note Setting up logs for different log stdout's
             //! @note Logs for p_tag is logs specific to the game.
-            // s_loggers.insert({ "engine3d", spdlog::stdout_color_mt("atlas") });
-            // s_loggers.insert({ "physics", spdlog::stdout_color_mt("physics") });
-            // s_loggers.insert({ "vulkan", spdlog::stdout_color_mt("vulkan") });
-            // s_loggers.insert(
-            // { "assert", spdlog::stdout_color_mt("core assertion") });
+            s_loggers.insert({ "atlas", spdlog::stdout_color_mt("atlas") });
+            s_loggers.insert({ "physics", spdlog::stdout_color_mt("physics") });
+            s_loggers.insert({ "vulkan", spdlog::stdout_color_mt("vulkan") });
+            s_loggers.insert(
+            { "assert", spdlog::stdout_color_mt("core assertion") });
 
-            // s_loggers["engine3d"]->set_pattern(pattern);
-            // s_loggers["engine3d"]->set_level(spdlog::level::trace);
+            s_loggers["atlas"]->set_pattern(pattern);
+            s_loggers["atlas"]->set_level(spdlog::level::trace);
 
-            // s_loggers["physics"]->set_level(spdlog::level::trace);
-            // s_loggers["physics"]->set_pattern(pattern);
+            s_loggers["physics"]->set_level(spdlog::level::trace);
+            s_loggers["physics"]->set_pattern(pattern);
 
-            // s_loggers["vulkan"]->set_level(spdlog::level::trace);
-            // s_loggers["vulkan"]->set_pattern(pattern);
+            s_loggers["vulkan"]->set_level(spdlog::level::trace);
+            s_loggers["vulkan"]->set_pattern(pattern);
 
-            // s_loggers["assert"]->set_level(spdlog::level::trace);
-            // s_loggers["assert"]->set_pattern(pattern);
+            s_loggers["assert"]->set_level(spdlog::level::trace);
+            s_loggers["assert"]->set_pattern(pattern);
         }
 
         /**
@@ -59,9 +60,9 @@ export namespace atlas {
             #ifndef ENABLE_TESTS_ONLY
                 //! @note Setting up logs for different log stdout's
                 //! @note Logs for p_tag is logs specific to the game
-                // s_loggers[p_tag] = spdlog::stdout_color_mt(p_tag);
-                // s_loggers[p_tag]->set_level(spdlog::level::trace);
-                // s_loggers[p_tag]->set_pattern(g_current_pattern_for_logs);
+                s_loggers[p_tag] = spdlog::stdout_color_mt(p_tag);
+                s_loggers[p_tag]->set_level(spdlog::level::trace);
+                s_loggers[p_tag]->set_pattern(g_current_pattern_for_logs);
             #endif
         }
 
@@ -70,9 +71,9 @@ export namespace atlas {
          */
         static void create_new_logger(const std::string& p_tag = "Undefined Tag") {
             #ifndef ENABLE_TESTS_ONLY
-                // s_loggers[p_tag] = spdlog::stdout_color_mt(p_tag);
-                // s_loggers[p_tag]->set_level(spdlog::level::trace);
-                // s_loggers[p_tag]->set_pattern(g_current_pattern_for_logs);
+                s_loggers[p_tag] = spdlog::stdout_color_mt(p_tag);
+                s_loggers[p_tag]->set_level(spdlog::level::trace);
+                s_loggers[p_tag]->set_pattern(g_current_pattern_for_logs);
             #endif
         }
 
@@ -93,19 +94,19 @@ export namespace atlas {
         // retrieve to log messages
         static std::unordered_map<std::string, std::shared_ptr<spdlog::logger>> s_loggers;
     };
+
+    std::unordered_map<std::string, ref<spdlog::logger>> console_log_manager::s_loggers;
 };
 
 export {
 //! @note Console Loggers (These are loggers that write specifically to the
 //! console, terminal console)
-//! @note TODO --- Specify that engine3d will have it's own console terminal
-//! that these will be written to.
 template<typename... T>
 inline void
 console_log_trace([[maybe_unused]] spdlog::format_string_t<T...> fmt,
                   [[maybe_unused]] T&&... args) {
 #ifndef ENABLE_TESTS_ONLY
-    atlas::console_log_manager::get("engine3d")
+    atlas::console_log_manager::get("atlas")
       ->trace(fmt, std::forward<T>(args)...);
 #endif
 }
@@ -115,7 +116,7 @@ inline void
 console_log_warn([[maybe_unused]] spdlog::format_string_t<T...> fmt,
                  [[maybe_unused]] T&&... args) {
 #ifndef ENABLE_TESTS_ONLY
-    atlas::console_log_manager::get("engine3d")
+    atlas::console_log_manager::get("atlas")
       ->warn(fmt, std::forward<T>(args)...);
 #endif
 }
@@ -125,7 +126,7 @@ inline void
 console_log_info([[maybe_unused]] spdlog::format_string_t<T...> fmt,
                  [[maybe_unused]] T&&... args) {
 #ifndef ENABLE_TESTS_ONLY
-    atlas::console_log_manager::get("engine3d")
+    atlas::console_log_manager::get("atlas")
       ->info(fmt, std::forward<T>(args)...);
 #endif
 }
@@ -135,7 +136,7 @@ inline void
 console_log_error([[maybe_unused]] spdlog::format_string_t<T...> fmt,
                   [[maybe_unused]] T&&... args) {
 #ifndef ENABLE_TESTS_ONLY
-    atlas::console_log_manager::get("engine3d")
+    atlas::console_log_manager::get("atlas")
       ->error(fmt, std::forward<T>(args)...);
 #endif
 }
@@ -145,7 +146,7 @@ inline void
 console_log_fatal([[maybe_unused]] spdlog::format_string_t<T...> fmt,
                   [[maybe_unused]] T&&... args) {
 #ifndef ENABLE_TESTS_ONLY
-    atlas::console_log_manager::get("engine3d")
+    atlas::console_log_manager::get("atlas")
       ->critical(fmt, std::forward<T>(args)...);
 #endif
 }

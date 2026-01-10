@@ -71,34 +71,34 @@ set_packages(
     Vulkan
     glm
     spdlog
-    # imguidocking
-    # Jolt
-    # yaml-cpp
-    # stb
-    # flecs
+    imguidocking
+    Jolt
+    yaml-cpp
+    stb
+    flecs
 
-    # tinyobjloader
-    # ${SHADERC_PACKAGE}
-    # watcher
-    # vulkan-cpp
-    # nfd
+    tinyobjloader
+    ${SHADERC_PACKAGE}
+    watcher
+    vulkan-cpp
+    nfd
 
     LINK_PACKAGES
     glfw
     Vulkan::Vulkan
     glm::glm
     spdlog::spdlog
-    # imguidocking::imguidocking
+    imguidocking::imguidocking
 
-    # Jolt::Jolt
-    # yaml-cpp
-    # stb::stb
-    # flecs::flecs_static
-    # tinyobjloader::tinyobjloader
-    # ${SHADERC_LINK_PACKAGE}
-    # watcher::watcher
-    # vulkan-cpp
-    # nfd::nfd
+    Jolt::Jolt
+    yaml-cpp
+    stb::stb
+    flecs::flecs_static
+    tinyobjloader::tinyobjloader
+    ${SHADERC_LINK_PACKAGE}
+    watcher::watcher
+    vulkan-cpp
+    nfd::nfd
 )
 
 target_sources(${PROJECT_NAME} PUBLIC
@@ -109,9 +109,9 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas-modules/core/api.cppm
     atlas-modules/core/common.cppm
     atlas-modules/core/core.cppm
+    atlas-modules/core/logger.cppm
     atlas-modules/core/application.cppm
     atlas-modules/core/window.cppm
-    atlas-modules/core/logger.cppm
 )
 
 # target_sources(${PROJECT_NAME} PUBLIC
