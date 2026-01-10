@@ -22,15 +22,15 @@ class AtlasRecipe(ConanFile):
 
 
     def build_requirements(self):
-        self.tool_requires("make/4.4.1")
         self.tool_requires("cmake/4.1.1")
+        self.tool_requires("ninja/1.13.1")
         self.tool_requires("engine3d-cmake-utils/4.0")
 
     def requirements(self):
         self.requires("joltphysics/5.2.0")
         if self.options.enable_shaderc:
             self.requires("shaderc/2025.3")
-        self.requires("imguidocking/2.0")
+        self.requires("imguidocking/3.0")
         self.requires("flecs/4.0.4")
         self.requires("glfw/3.4")
         self.requires("spdlog/1.16.0")
@@ -38,12 +38,11 @@ class AtlasRecipe(ConanFile):
         self.requires("yaml-cpp/0.8.0")
 
         # Vulkan-related headers and includes packages
-        self.requires("vulkan-headers/1.3.290.0")
-        self.requires("vulkan-cpp/3.0")
+        self.requires("vulkan-cpp/4.0")
         self.requires("tinyobjloader/2.0.0-rc10")
         self.requires("stb/cci.20230920")
 
-        self.requires("nfd/1.0")
+        self.requires("nfd/2.0")
         self.requires("watcher/0.12.0")
         self.requires("boost-ext-ut/2.3.1")
     
@@ -51,8 +50,6 @@ class AtlasRecipe(ConanFile):
         copy(self,"CMakeLists.txt", self.recipe_folder, self.export_sources_folder)
         copy(self,"src/CMakeLists.txt", self.recipe_folder, self.export_sources_folder)
         copy(self,"*.hpp", self.recipe_folder, self.export_sources_folder)
-        copy(self,"*.h", self.recipe_folder, self.export_sources_folder)
-        copy(self,"*.h", self.recipe_folder, self.export_sources_folder)
         copy(self,"*.cpp", self.recipe_folder, self.export_sources_folder)
         copy(self, "shader_ubo_tutorial", self.recipe_folder, self.export_sources_folder)
 

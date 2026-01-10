@@ -1,5 +1,10 @@
-cmake_minimum_required(VERSION 3.27)
-project(atlas C CXX)
+cmake_minimum_required(VERSION 4.0)
+
+# Generate compile commands for anyone using our libraries.
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_COLOR_DIAGNOSTICS ON)
+
+project(atlas LANGUAGES CXX)
 set(ENGINE_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/atlas)
 
 # TODO: Remove this once shaderc in the github CI is fixed
@@ -25,32 +30,111 @@ else()
     message(STATUS "ENABLE_TESTS_ONLY macro not enabled")
 endif()
 
-build_core_library(
-    DIRECTORIES src
+# build_core_library(
+#     DIRECTORIES src editor
 
-    ENABLE_TESTS ${ENABLE_TESTS_ONLY}
+#     ENABLE_TESTS ${ENABLE_TESTS_ONLY}
 
-    UNIT_TEST_SOURCES
+#     UNIT_TEST_SOURCES
 
-    tests/main.test.cpp
-    tests/basic_add.test.cpp
-    tests/entity_component_system.test.cpp
-    tests/math.test.cpp
-    tests/scene.test.cpp
-    tests/jolt_type_conversion.test.cpp
-    tests/jolt_engine.test.cpp
+#     tests/main.test.cpp
+#     tests/basic_add.test.cpp
+#     tests/entity_component_system.test.cpp
+#     tests/math.test.cpp
+#     tests/scene.test.cpp
+#     tests/jolt_type_conversion.test.cpp
+#     tests/jolt_engine.test.cpp
+
+#     PACKAGES
+#     tinyobjloader
+#     ${SHADERC_PACKAGE}
+#     watcher
+#     vulkan-cpp`
+#     nfd
+
+#     LINK_PACKAGES
+#     tinyobjloader::tinyobjloader
+#     ${SHADERC_LINK_PACKAGE}
+#     watcher::watcher
+#     vulkan-cpp
+#     nfd::nfd
+# )
+
+add_library(${PROJECT_NAME} STATIC)
+add_subdirectory(editor_modules)
+
+set_packages(
+    ENABLE_TESTS OFF
 
     PACKAGES
-    tinyobjloader
-    ${SHADERC_PACKAGE}
-    watcher
-    vulkan-cpp
+    glfw3
+    Vulkan
+    glm
+    spdlog
+    # imguidocking
+    # Jolt
+    # yaml-cpp
+    # stb
+    # flecs
+
+    # tinyobjloader
+    # ${SHADERC_PACKAGE}
+    # watcher
+    # vulkan-cpp
+    # nfd
 
     LINK_PACKAGES
-    tinyobjloader::tinyobjloader
-    ${SHADERC_LINK_PACKAGE}
-    watcher::watcher
-    vulkan-cpp::vulkan-cpp
+    glfw
+    Vulkan::Vulkan
+    glm::glm
+    spdlog::spdlog
+    # imguidocking::imguidocking
+
+    # Jolt::Jolt
+    # yaml-cpp
+    # stb::stb
+    # flecs::flecs_static
+    # tinyobjloader::tinyobjloader
+    # ${SHADERC_LINK_PACKAGE}
+    # watcher::watcher
+    # vulkan-cpp
+    # nfd::nfd
 )
 
-install(TARGETS ${PROJECT_NAME})
+target_sources(${PROJECT_NAME} PUBLIC
+    FILE_SET CXX_MODULES
+    TYPE CXX_MODULES
+    FILES
+    atlas-modules/atlas.cppm
+    atlas-modules/core/api.cppm
+    atlas-modules/core/common.cppm
+    atlas-modules/core/core.cppm
+    atlas-modules/core/application.cppm
+    atlas-modules/core/window.cppm
+    atlas-modules/core/logger.cppm
+)
+
+# target_sources(${PROJECT_NAME} PUBLIC
+#     FILE_SET CXX_MODULES
+#     TYPE CXX_MODULES
+#     PRIVATE atlas-modules/core/main.cpp
+# )
+
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)
+
+# install(TARGETS ${PROJECT_NAME})
+install(
+    TARGETS ${PROJECT_NAME}
+    EXPORT atlas_targets
+    FILE_SET CXX_MODULES DESTINATION "."
+    LIBRARY DESTINATION "lib"
+    ARCHIVE DESTINATION "lib"
+    CXX_MODULES_BMI DESTINATION "bmi"
+)
+
+install(
+    EXPORT atlas_targets
+    FILE "atlas-config.cmake"
+    DESTINATION "lib/cmake"
+    CXX_MODULES_DIRECTORY "cxx-modules"
+)
