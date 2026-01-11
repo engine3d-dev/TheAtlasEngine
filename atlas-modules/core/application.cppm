@@ -5,12 +5,13 @@ module;
 #include <vulkan/vulkan.h>
 #include <string>
 #include <print>
+#include <optional>
 
 export module core:application;
 
-export import :common;
-export import :api;
-export import :window;
+import atlas.common;
+import atlas.graphics_api;
+import atlas.window;
 
 export namespace atlas {
 
@@ -49,6 +50,8 @@ export namespace atlas {
                 std::println("m_window == nullptr!");
             }
 
+            // m_instance_handle_test = std::make_optional<vulkan::instance_context>();
+
             s_instance = this;
         }
 
@@ -61,7 +64,7 @@ export namespace atlas {
          * frame
          */
         static float delta_time() {
-            // return s_instance->m_delta_time;
+            return s_instance->m_delta_time;
         }
 
         /**
@@ -173,6 +176,8 @@ export namespace atlas {
     private:
         float m_delta_time = 0.f;
         ref<window> m_window;
+        // vulkan::instance_context m_instance_handle_test;
+        // std::optional<vulkan::instance_context> m_instance_handle_test;
         // ref<renderer> m_renderer = nullptr;
         glm::mat4 m_proj_view;
         uint32_t m_current_frame_index = -1;

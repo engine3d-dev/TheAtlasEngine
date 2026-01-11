@@ -112,6 +112,11 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas-modules/core/logger.cppm
     atlas-modules/core/application.cppm
     atlas-modules/core/window.cppm
+
+    atlas-modules/drivers/vulkan/vulkan.cppm
+    atlas-modules/drivers/vulkan/utilities.cppm
+    atlas-modules/drivers/vulkan/instance_context.cppm
+    atlas-modules/drivers/vulkan/window_context.cppm
 )
 
 # target_sources(${PROJECT_NAME} PUBLIC

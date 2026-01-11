@@ -3,7 +3,7 @@ module;
 #include <spdlog/common.h>
 #include <memory>
 
-export module core:common;
+export module atlas.common;
 
 
 export namespace atlas {

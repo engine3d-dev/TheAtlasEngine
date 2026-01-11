@@ -2,7 +2,7 @@ module;
 
 #include <cstdint>
 
-export module core:api;
+export module atlas.graphics_api;
 
 
 export namespace atlas {

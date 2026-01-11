@@ -4,10 +4,12 @@ module;
 #include <string>
 #include <cstdint>
 
-export module core:window;
+export module atlas.window;
 
-export import :common;
-export import :api;
+// export import :common;
+import atlas.common;
+import atlas.graphics_api;
+
 
 export namespace atlas {
     struct window_params {
@@ -20,25 +22,23 @@ export namespace atlas {
     public:
         virtual ~window() = default;
 
-        /**
-         * @brief Returns the width dimension of the window
-         */
-        [[nodiscard]] uint32_t width() const;
-
-        /**
-         * @brief Returns the height dimension of the window
-         */
-        [[nodiscard]] uint32_t height() const;
+        [[nodiscard]] window_params data() const {
+            return get_params();
+        }
 
         /**
          * @brief Checks if window is available to close
          */
-        [[nodiscard]] bool available() const;
+        [[nodiscard]] bool available() const {
+            return !glfwWindowShouldClose(native_window());
+        }
 
         /**
          * @brief Returns the aspect ratio of the current window
          */
-        [[nodiscard]] float aspect_ratio() const;
+        // [[nodiscard]] float aspect_ratio() const {
+        //     (float)get_params().width / (float)get_params().height;
+        // }
 
         /**
          * @brief gives you the next presentable image to use and the index to
@@ -83,7 +83,9 @@ export namespace atlas {
         /**
          * @brief Closing the window operation
          */
-        void close();
+        void close() {
+            glfwSetWindowShouldClose(native_window(), true);
+        }
 
         /**
          * @brief does the presentation operation that is operated internally
@@ -95,7 +97,7 @@ export namespace atlas {
         void present(const uint32_t& p_current_frame_idx);
 
     protected:
-        // [[nodiscard]] virtual window_settings settings() const = 0;
+        [[nodiscard]] virtual window_params get_params() const = 0;
         [[nodiscard]] virtual GLFWwindow* native_window() const = 0;
         [[nodiscard]] virtual uint32_t read_acquired_next_frame() = 0;
         // [[nodiscard]] virtual vk::vk_swapchain window_swapchain() const = 0;
@@ -115,7 +117,12 @@ export namespace atlas {
      *
      * @return shared_ptr<atlas::window>
      */
-    ref<window> create_window(const window_params& p_params, graphics_api p_api) {
-        return nullptr;
-    }
+    // ref<window> create_window(const window_params& p_params, graphics_api p_api) {
+    //     switch(p_api) {
+    //         case graphics_api::vulkan:
+    //             return nullptr;
+    //         default:
+    //             return nullptr;
+    //     }
+    // }
 };

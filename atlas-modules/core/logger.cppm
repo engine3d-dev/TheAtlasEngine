@@ -9,8 +9,8 @@ module;
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <memory>
 
-export module core:logger;
-export import :common;
+export module atlas.logger;
+export import atlas.common;
 
 static std::string g_current_pattern_for_logs = "Undefined Pattern Specified";
 
