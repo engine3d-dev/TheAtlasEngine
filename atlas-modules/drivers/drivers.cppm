@@ -7,11 +7,11 @@ export module atlas.drivers;
 
 import atlas.common;
 // import atlas.vulkan.window_context;
-import atlas.drivers.vulkan;
+// import atlas.drivers.vulkan;
 import atlas.graphics_api;
+import atlas.logger;
 import atlas.drivers.vulkan.window_context;
 import atlas.drivers.vulkan.instance_context;
-import atlas.logger;
 
 /**
  * @brief This drivers.cppm will contain API-agnostic implementation that may be widely implemented differently.
@@ -30,7 +30,7 @@ export namespace atlas {
      *
      * @return shared_ptr<atlas::window>
      */
-    ref<window> create_window(const window_params& p_params, graphics_api p_api) {
+    ref<window> initialize_window(const window_params& p_params, graphics_api p_api) {
         switch(p_api) {
             case graphics_api::vulkan:
                 return create_ref<vulkan::window_context>(p_params);

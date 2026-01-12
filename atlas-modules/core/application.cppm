@@ -9,9 +9,12 @@ module;
 
 export module core:application;
 
-import atlas.common;
 import atlas.graphics_api;
+import atlas.logger;
+import atlas.common;
+// import atlas.drivers.vulkan.window_context;
 import atlas.window;
+import atlas.drivers;
 
 export namespace atlas {
 
@@ -43,14 +46,15 @@ export namespace atlas {
          * @param p_settings is the specific application settings to configure
          * how the application may be setup
          */
-        application(const application_settings& p_settings) {
-            std::println("application(const application_settings&) initialized!!!");
+        application(const application_settings& p_params) {
+            console_log_info("application(const application_settings&) initialized!!!");
 
-            if(m_window == nullptr) {
-                std::println("m_window == nullptr!");
-            }
-
-            // m_instance_handle_test = std::make_optional<vulkan::instance_context>();
+            window_params params = {
+                .width = p_params.width,
+                .height = p_params.height,
+                .name = p_params.name,
+            };
+            m_window = initialize_window(params, graphics_api::vulkan);
 
             s_instance = this;
         }

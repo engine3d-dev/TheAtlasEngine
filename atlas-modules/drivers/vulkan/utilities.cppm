@@ -6,8 +6,6 @@ module;
 export module atlas.drivers.vulkan.utilities;
 
 import atlas.logger;
-import core;
-
 export namespace atlas {
     namespace vulkan {
 

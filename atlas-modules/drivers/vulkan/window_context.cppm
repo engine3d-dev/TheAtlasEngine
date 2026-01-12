@@ -1,11 +1,21 @@
 module;
 
-#include <GLFW/glfw3.h>
 #include <cstdint>
+
+#define GLFW_INCLUDE_VULKAN
+#if _WIN32
+#define VK_USE_PLATFORM_WIN32_KHR
+#include <GLFW/glfw3.h>
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <GLFW/glfw3native.h>
+#include <vulkan/vulkan.h>
+#else
+#include <GLFW/glfw3.h>
+#include <vulkan/vulkan.h>
+#endif
 
 export module atlas.drivers.vulkan.window_context;
 
-import core;
 import atlas.logger;
 export import atlas.window;
 
@@ -17,8 +27,12 @@ export namespace atlas {
         class window_context : public window {
         public:
             window_context(const window_params& p_params) : m_params(p_params) {
+
+                console_log_info("window_context constructed!!!");
+
                 if(!glfwVulkanSupported()) {
                     console_log_error("GLFW: Vulkan is not supported!!!");
+                    console_log_error("GLFW: Vulkan Supported = {}", static_cast<bool>(glfwVulkanSupported()));
                     return;
                 }
 
