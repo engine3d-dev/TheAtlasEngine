@@ -3,6 +3,9 @@ import core;
 import atlas.common;
 import atlas.logger;
 import atlas.graphics_api;
+
+import atlas.core.utilities.state;
+
 import atlas.drivers.graphics_context;
 import atlas.drivers;
 #include <print>
@@ -14,6 +17,7 @@ import atlas.drivers;
 class test_application : public atlas::application {
 public:
     test_application(const atlas::application_settings& p_settings) : atlas::application(p_settings) {
+        atlas::register_update(this, &test_application::on_update);
     }
 };
 

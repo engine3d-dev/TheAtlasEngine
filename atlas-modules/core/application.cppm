@@ -15,6 +15,7 @@ import atlas.common;
 import atlas.window;
 import atlas.drivers;
 import atlas.core.event;
+import atlas.core.utilities.poll_state;
 
 export namespace atlas {
 
@@ -80,6 +81,8 @@ export namespace atlas {
 
             while(m_window->available()) {
                 flush_events();
+
+                invoke_on_update();
             }
 
         }
