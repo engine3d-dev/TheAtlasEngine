@@ -10,6 +10,8 @@ import atlas.common;
 // import atlas.drivers.vulkan;
 import atlas.graphics_api;
 import atlas.logger;
+import atlas.window;
+import atlas.drivers.graphics_context;
 import atlas.drivers.vulkan.window_context;
 import atlas.drivers.vulkan.instance_context;
 

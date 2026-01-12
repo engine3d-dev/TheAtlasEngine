@@ -16,8 +16,10 @@ module;
 
 export module atlas.drivers.vulkan.window_context;
 
+import atlas.window;
 import atlas.logger;
-export import atlas.window;
+import atlas.drivers.vulkan.instance_context;
+import atlas.drivers.vulkan.utilities;
 
 export namespace atlas {
     namespace vulkan {
@@ -39,12 +41,26 @@ export namespace atlas {
                 glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
                 glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
+                m_instance = instance_context::handle();
+
                 m_window_handle = glfwCreateWindow(static_cast<int>(m_params.width), static_cast<int>(m_params.height), m_params.name.c_str(), nullptr, nullptr);
 
                 glfwMakeContextCurrent(m_window_handle);
+
+                console_log_info("m_instance = {}", (m_instance == nullptr));
+
+                vk_check(
+                    glfwCreateWindowSurface(
+                    m_instance, m_window_handle, nullptr, &m_window_surface),
+                    "glfwCreateWindowSurface");
+
+                center_window();
             }
 
             virtual ~window_context() {
+                if(m_window_surface != nullptr) {
+                    vkDestroySurfaceKHR(m_instance, m_window_surface, nullptr);
+                }
                 glfwDestroyWindow(m_window_handle);
             }
 
@@ -76,7 +92,9 @@ export namespace atlas {
 
         private:
             GLFWwindow* m_window_handle=nullptr;
+            VkSurfaceKHR m_window_surface=nullptr;
             window_params m_params;
+            VkInstance m_instance=nullptr;
         };
     };
 };

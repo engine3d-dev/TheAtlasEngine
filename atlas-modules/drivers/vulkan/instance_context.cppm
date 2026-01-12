@@ -4,17 +4,30 @@ module;
 #include <string>
 #include <vector>
 #include <functional>
+
+#define GLFW_INCLUDE_VULKAN
+#if _WIN32
+#define VK_USE_PLATFORM_WIN32_KHR
+#include <GLFW/glfw3.h>
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <GLFW/glfw3native.h>
 #include <vulkan/vulkan.h>
+#else
+#include <GLFW/glfw3.h>
+#include <vulkan/vulkan.h>
+#endif
 
 export module atlas.drivers.vulkan.instance_context;
 
 import atlas.logger;
 
-export import atlas.drivers.graphics_context;
+import atlas.drivers.graphics_context;
 import atlas.drivers.vulkan.utilities;
+import atlas.drivers.vulkan.physical_device;
+import atlas.drivers.vulkan.device;
 
 namespace atlas::vulkan {
-    std::vector<const char*> initialize_instance_extensions() {
+    static std::vector<const char*> initialize_instance_extensions() {
         std::vector<const char*> extension_names;
 
         extension_names.emplace_back(VK_KHR_SURFACE_EXTENSION_NAME);
@@ -151,6 +164,10 @@ namespace atlas::vulkan {
                                     "vkSetDebugUtilsObjectNameEXT"));
     #endif
             console_log_info("vulkan::instance_context finished being initialized!!!");
+
+            m_physical = physical_device(m_instance_handler);
+            m_device = device(m_physical);
+
             s_instance = this;
         }
 
@@ -210,6 +227,8 @@ namespace atlas::vulkan {
         VkInstance m_instance_handler=nullptr;
         std::deque<std::function<void()>> m_resources_free{};
         PFN_vkSetDebugUtilsObjectNameEXT m_vk_set_debug_utils_object_name_ext;
+        physical_device m_physical;
+        device m_device;
     };
 
     instance_context* instance_context::s_instance = nullptr;

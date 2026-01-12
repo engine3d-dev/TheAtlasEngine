@@ -122,6 +122,8 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas-modules/drivers/vulkan/utilities.cppm
     atlas-modules/drivers/vulkan/instance_context.cppm
     atlas-modules/drivers/vulkan/window_context.cppm
+    atlas-modules/drivers/vulkan/physical_device.cppm
+    atlas-modules/drivers/vulkan/device.cppm
 )
 
 # target_sources(${PROJECT_NAME} PUBLIC

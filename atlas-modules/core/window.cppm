@@ -34,9 +34,9 @@ export namespace atlas {
         /**
          * @brief Returns the aspect ratio of the current window
          */
-        // [[nodiscard]] float aspect_ratio() const {
-        //     (float)get_params().width / (float)get_params().height;
-        // }
+        [[nodiscard]] float aspect_ratio() const {
+            return static_cast<float>(get_params().width) / static_cast<float>(get_params().height);
+        }
 
         /**
          * @brief gives you the next presentable image to use and the index to

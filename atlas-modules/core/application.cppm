@@ -12,7 +12,6 @@ export module core:application;
 import atlas.graphics_api;
 import atlas.logger;
 import atlas.common;
-// import atlas.drivers.vulkan.window_context;
 import atlas.window;
 import atlas.drivers;
 import atlas.core.event;
@@ -73,21 +72,10 @@ export namespace atlas {
         }
 
         /**
-         * TODO: Need to remove this as it is not needed here
-         *
-         * Originally was used to handle the fixed physics timestep, but that
-         * can be handled else where.
-         */
-        static float physics_step() {
-            return 0.f;
-        }
-
-        /**
          * @brief Explicitly is used to execute the application's mainloop
          */
         void execute() {
-            // execute
-            std::println("Executing game mainloop!!!");
+            console_log_info("Executing game mainloop!!!");
 
 
             while(m_window->available()) {
@@ -101,7 +89,7 @@ export namespace atlas {
          * to close
          */
         void post_destroy() {
-            std::println("Executing post cleanup!!!");
+            console_log_info("Executing post cleanup!!!");
         }
 
         /**
@@ -138,6 +126,7 @@ export namespace atlas {
          * be a direct calls users can have access to
          */
         static void destroy() {
+            s_instance->m_window->close();
         }
 
         /**
@@ -179,10 +168,6 @@ export namespace atlas {
         // [[nodiscard]] ref<renderer> renderer_instance() const {
         //     return m_renderer;
         // }
-
-    private:
-        void set_current_api(graphics_api api) {
-        }
 
     private:
         float m_delta_time = 0.f;
