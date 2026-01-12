@@ -6,10 +6,8 @@ module;
 
 export module atlas.window;
 
-// export import :common;
 import atlas.common;
 import atlas.graphics_api;
-
 
 export namespace atlas {
     struct window_params {
@@ -94,7 +92,9 @@ export namespace atlas {
          * @param p_current_frame_idx is current frame index to currently
          * process an image in the current frame
          */
-        void present(const uint32_t& p_current_frame_idx);
+        void present(const uint32_t& p_current_frame_idx) {
+            return present_frame(p_current_frame_idx);
+        }
 
     protected:
         [[nodiscard]] virtual window_params get_params() const = 0;
@@ -104,25 +104,6 @@ export namespace atlas {
 
         // [[nodiscard]] virtual ::vk::command_buffer current_active_command(uint32_t p_frame_idx) = 0;
 
-        virtual void presentation_process(const uint32_t& p_current_frame) = 0;
+        virtual void present_frame(const uint32_t& p_current_frame) = 0;
     };
-
-    /**
-     * @brief constructs an atlas::window
-     *
-     * There should only ever be one window constructed throughout the entire
-     * application
-     *
-     * @param p_settings is the window settings to construct the window with
-     *
-     * @return shared_ptr<atlas::window>
-     */
-    // ref<window> create_window(const window_params& p_params, graphics_api p_api) {
-    //     switch(p_api) {
-    //         case graphics_api::vulkan:
-    //             return nullptr;
-    //         default:
-    //             return nullptr;
-    //     }
-    // }
 };

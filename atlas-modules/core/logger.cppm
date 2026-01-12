@@ -8,11 +8,10 @@ module;
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <memory>
+#include <print>
 
 export module atlas.logger;
 export import atlas.common;
-
-static std::string g_current_pattern_for_logs = "Undefined Pattern Specified";
 
 export namespace atlas {
     /**
@@ -23,58 +22,29 @@ export namespace atlas {
      */
     class console_log_manager {
     public:
-        /**
-         * @brief initializes the console_log_manager
-         *
-         * TODO: Revisit the logger and do some refactoring because the way this
-         * works should be changed, as I'd prob do this differently now.
-         */
-        static void initialize_logger_manager(const std::string& pattern = "%^[%n] [%T]: %v%$") {
-            g_current_pattern_for_logs = pattern;
-
+        console_log_manager(const std::string& p_pattern = "%^[%n] [%T]: %v%$") {
+            std::println("Constructing console_log_manager!");
+            
             //! @note Setting up logs for different log stdout's
             //! @note Logs for p_tag is logs specific to the game.
-            s_loggers.insert({ "atlas", spdlog::stdout_color_mt("atlas") });
-            s_loggers.insert({ "physics", spdlog::stdout_color_mt("physics") });
-            s_loggers.insert({ "vulkan", spdlog::stdout_color_mt("vulkan") });
-            s_loggers.insert(
+            m_loggers.insert({ "atlas", spdlog::stdout_color_mt("atlas") });
+            m_loggers.insert({ "physics", spdlog::stdout_color_mt("physics") });
+            m_loggers.insert({ "vulkan", spdlog::stdout_color_mt("vulkan") });
+            m_loggers.insert(
             { "assert", spdlog::stdout_color_mt("core assertion") });
 
-            s_loggers["atlas"]->set_pattern(pattern);
-            s_loggers["atlas"]->set_level(spdlog::level::trace);
+            m_loggers["atlas"]->set_pattern(p_pattern);
+            m_loggers["atlas"]->set_level(spdlog::level::trace);
 
-            s_loggers["physics"]->set_level(spdlog::level::trace);
-            s_loggers["physics"]->set_pattern(pattern);
+            m_loggers["physics"]->set_level(spdlog::level::trace);
+            m_loggers["physics"]->set_pattern(p_pattern);
 
-            s_loggers["vulkan"]->set_level(spdlog::level::trace);
-            s_loggers["vulkan"]->set_pattern(pattern);
+            m_loggers["vulkan"]->set_level(spdlog::level::trace);
+            m_loggers["vulkan"]->set_pattern(p_pattern);
 
-            s_loggers["assert"]->set_level(spdlog::level::trace);
-            s_loggers["assert"]->set_pattern(pattern);
-        }
-
-        /**
-         * @brief sets what the current logger to write to the console with
-         */
-        static void set_current_logger(const std::string& p_tag = "Undefined g_Tag in console_logger") {
-            #ifndef ENABLE_TESTS_ONLY
-                //! @note Setting up logs for different log stdout's
-                //! @note Logs for p_tag is logs specific to the game
-                s_loggers[p_tag] = spdlog::stdout_color_mt(p_tag);
-                s_loggers[p_tag]->set_level(spdlog::level::trace);
-                s_loggers[p_tag]->set_pattern(g_current_pattern_for_logs);
-            #endif
-        }
-
-        /**
-         * @brief constructs a new spdlog::logger to write to the console
-         */
-        static void create_new_logger(const std::string& p_tag = "Undefined Tag") {
-            #ifndef ENABLE_TESTS_ONLY
-                s_loggers[p_tag] = spdlog::stdout_color_mt(p_tag);
-                s_loggers[p_tag]->set_level(spdlog::level::trace);
-                s_loggers[p_tag]->set_pattern(g_current_pattern_for_logs);
-            #endif
+            m_loggers["assert"]->set_level(spdlog::level::trace);
+            m_loggers["assert"]->set_pattern(p_pattern);
+            s_instance = this;
         }
 
         /**
@@ -86,16 +56,18 @@ export namespace atlas {
          * nullptr
          */
         static std::shared_ptr<spdlog::logger> get(const std::string& p_tag) {
-            return s_loggers[p_tag];
+            return s_instance->m_loggers[p_tag];
         }
 
     private:
+        static console_log_manager* s_instance;
         // Using an unordered_map to specify through a string what logger to
         // retrieve to log messages
-        static std::unordered_map<std::string, std::shared_ptr<spdlog::logger>> s_loggers;
+        std::unordered_map<std::string, std::shared_ptr<spdlog::logger>> m_loggers;
     };
 
-    std::unordered_map<std::string, ref<spdlog::logger>> console_log_manager::s_loggers;
+    // std::unordered_map<std::string, ref<spdlog::logger>> console_log_manager::s_loggers;
+    console_log_manager* console_log_manager::s_instance = nullptr;
 };
 
 export {

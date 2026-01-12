@@ -3,7 +3,7 @@ module;
 #include <string>
 #include <vulkan/vulkan_core.h>
 
-export module vulkan:utilities;
+export module atlas.drivers.vulkan.utilities;
 
 import atlas.logger;
 import core;

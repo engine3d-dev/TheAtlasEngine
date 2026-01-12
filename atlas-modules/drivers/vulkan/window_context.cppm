@@ -3,11 +3,11 @@ module;
 #include <GLFW/glfw3.h>
 #include <cstdint>
 
-export module vulkan:window_context;
+export module atlas.drivers.vulkan.window_context;
 
 import core;
 import atlas.logger;
-import atlas.window;
+export import atlas.window;
 
 export namespace atlas {
     namespace vulkan {
@@ -46,6 +46,9 @@ export namespace atlas {
                 return 0;
             }
 
+            void present_frame(const uint32_t& p_current_frame) override {
+            }
+
         private:
             void center_window() {
                 GLFWmonitor* monitor = glfwGetPrimaryMonitor();
@@ -61,29 +64,3 @@ export namespace atlas {
         };
     };
 };
-
-
-// /*
-
-
-
-
-// core: module that is partitioned associated with
-//     logger
-//     import logger;
-// drivers:
-//     vulkan: module that is partitioned associated with
-//         import vulkan;
-//             internal: export module vulkan:*
-//     jolt_cpp: module that is partitioned associated with
-//         import jolt_cpp
-//             internal: export module jolt_cpp:*
-
-
-// atlas: global module unit
-//     export import core;
-//     export import vulkan;
-//     export import jolt_cpp
-
-
-// */

@@ -6,11 +6,12 @@ module;
 #include <functional>
 #include <vulkan/vulkan.h>
 
-export module vulkan:instance_context;
-
-import :utilities;
+export module atlas.drivers.vulkan.instance_context;
 
 import atlas.logger;
+
+export import atlas.drivers.graphics_context;
+import atlas.drivers.vulkan.utilities;
 
 namespace atlas::vulkan {
     std::vector<const char*> initialize_instance_extensions() {
@@ -65,10 +66,9 @@ namespace atlas::vulkan {
     }
 #endif
 
-    class instance_context {
+    export class instance_context : public graphics_context {
     public:
         instance_context(const std::string& p_name) {
-            console_log_manager::create_new_logger(p_name);
             VkApplicationInfo app_info = {
                 .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
                 .pNext = nullptr,
@@ -150,8 +150,11 @@ namespace atlas::vulkan {
                 vkGetInstanceProcAddr(m_instance_handler,
                                     "vkSetDebugUtilsObjectNameEXT"));
     #endif
+            console_log_info("vulkan::instance_context finished being initialized!!!");
             s_instance = this;
         }
+
+        virtual ~instance_context() = default;
 
         static VkInstance handle() {
             return s_instance->m_instance_handler;
@@ -188,8 +191,9 @@ namespace atlas::vulkan {
             s_instance->m_resources_free.push_back(p_resource);
         }
 
-
-        void destroy_context() {
+    protected:
+        void destroy_context() override {
+            console_log_info("destroy_context!");
             for (auto& callback : m_resources_free) {
                 callback();
             }
