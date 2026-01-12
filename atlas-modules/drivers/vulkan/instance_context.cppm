@@ -154,7 +154,9 @@ namespace atlas::vulkan {
             s_instance = this;
         }
 
-        virtual ~instance_context() = default;
+        virtual ~instance_context() {
+            vkDestroyInstance(m_instance_handler, nullptr);
+        }
 
         static VkInstance handle() {
             return s_instance->m_instance_handler;

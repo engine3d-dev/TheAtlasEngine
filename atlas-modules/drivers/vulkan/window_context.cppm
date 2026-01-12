@@ -44,7 +44,9 @@ export namespace atlas {
                 glfwMakeContextCurrent(m_window_handle);
             }
 
-            virtual ~window_context() = default;
+            virtual ~window_context() {
+                glfwDestroyWindow(m_window_handle);
+            }
 
 
         protected:

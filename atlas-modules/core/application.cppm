@@ -15,6 +15,7 @@ import atlas.common;
 // import atlas.drivers.vulkan.window_context;
 import atlas.window;
 import atlas.drivers;
+import atlas.core.event;
 
 export namespace atlas {
 
@@ -87,6 +88,12 @@ export namespace atlas {
         void execute() {
             // execute
             std::println("Executing game mainloop!!!");
+
+
+            while(m_window->available()) {
+                flush_events();
+            }
+
         }
 
         /**
