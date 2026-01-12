@@ -17,8 +17,8 @@ import atlas.drivers;
 class test_application : public atlas::application {
 public:
     test_application(const atlas::application_settings& p_settings) : atlas::application(p_settings) {
-        atlas::register_update(this, &test_application::on_update);
     }
+
 };
 
 

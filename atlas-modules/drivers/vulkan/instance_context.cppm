@@ -217,7 +217,7 @@ namespace atlas::vulkan {
                 callback();
             }
 
-            // m_driver.destroy();
+            m_device.destroy();
         }
 
     private:

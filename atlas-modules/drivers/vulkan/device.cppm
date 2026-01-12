@@ -143,9 +143,8 @@ namespace atlas::vulkan {
             console_log_warn("vulkan::device constructed successfully!!!");
         }
 
-        ~device(){
-            destroy();
-        }
+        // Use .destroy to explicitly invoke when to do proper vulkan cleanup
+        ~device() = default;
 
         /**
          * @brief returns the specified graphics queue from this logical device

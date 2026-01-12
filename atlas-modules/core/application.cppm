@@ -79,10 +79,19 @@ export namespace atlas {
             console_log_info("Executing game mainloop!!!");
 
 
+            invoke_start();
+
+
             while(m_window->available()) {
                 flush_events();
 
                 invoke_on_update();
+
+                invoke_physics_update();
+
+                invoke_defer_update();
+
+                invoke_ui_update();
             }
 
         }
