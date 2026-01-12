@@ -1,6 +1,7 @@
 export module atlas;
 
-export import core;
+// export import core;
+// export import atlas.core.application;
 
 export import atlas.graphics_api;
 export import atlas.logger;

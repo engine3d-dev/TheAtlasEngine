@@ -6,8 +6,9 @@ module;
 #include <string>
 #include <print>
 #include <optional>
+#include <GLFW/glfw3.h>
 
-export module core:application;
+export module atlas.application;
 
 import atlas.graphics_api;
 import atlas.logger;
@@ -56,7 +57,7 @@ export namespace atlas {
                 .name = p_params.name,
             };
             m_window = initialize_window(params, graphics_api::vulkan);
-
+            event::set_window_size(static_cast<GLFWwindow*>(*m_window));
             s_instance = this;
         }
 
@@ -83,7 +84,7 @@ export namespace atlas {
 
 
             while(m_window->available()) {
-                flush_events();
+                event::flush_events();
 
                 invoke_on_update();
 
@@ -174,6 +175,10 @@ export namespace atlas {
          */
         static uint32_t image_size() {
             return 0;
+        }
+
+        static window& get_window() {
+            return *s_instance->m_window;
         }
 
     protected:
