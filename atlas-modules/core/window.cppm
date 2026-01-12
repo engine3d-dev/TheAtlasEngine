@@ -9,6 +9,8 @@ export module atlas.window;
 import atlas.common;
 import atlas.graphics_api;
 import atlas.core.utilities.types;
+import atlas.drivers.vulkan.swapchain;
+import vk;
 
 export namespace atlas {
 
@@ -47,9 +49,9 @@ export namespace atlas {
         /**
          * @brief Returns the window's currently selected swapchain
          */
-        // [[nodiscard]] vk::vk_swapchain current_swapchain() const {
-        //     return window_swapchain();
-        // }
+        [[nodiscard]] vulkan::swapchain current_swapchain() const {
+            return window_swapchain();
+        }
 
         /**
          * @brief retrieves the current command buffer using the current frame
@@ -58,9 +60,9 @@ export namespace atlas {
          *
          * @return command buffer to actively record commands to
          */
-        // ::vk::command_buffer active_command(uint32_t p_frame_index) {
-        //     return current_active_command(p_frame_index);
-        // }
+        vk::command_buffer active_command(uint32_t p_frame_index) {
+            return current_active_command(p_frame_index);
+        }
 
         /**
          * @brief operator overload for treating atlas::window as a GLFWwindow
@@ -96,9 +98,9 @@ export namespace atlas {
         [[nodiscard]] virtual window_params get_params() const = 0;
         [[nodiscard]] virtual GLFWwindow* native_window() const = 0;
         [[nodiscard]] virtual uint32_t read_acquired_next_frame() = 0;
-        // [[nodiscard]] virtual vk::vk_swapchain window_swapchain() const = 0;
+        [[nodiscard]] virtual vulkan::swapchain window_swapchain() const = 0;
 
-        // [[nodiscard]] virtual ::vk::command_buffer current_active_command(uint32_t p_frame_idx) = 0;
+        [[nodiscard]] virtual vk::command_buffer current_active_command(uint32_t p_frame_idx) = 0;
 
         virtual void present_frame(const uint32_t& p_current_frame) = 0;
     };

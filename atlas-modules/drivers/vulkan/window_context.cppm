@@ -23,6 +23,7 @@ import atlas.drivers.vulkan.utilities;
 import atlas.core.utilities.types;
 
 import atlas.drivers.vulkan.swapchain;
+import vk;
 
 export namespace atlas {
     namespace vulkan {
@@ -86,6 +87,14 @@ export namespace atlas {
 
             [[nodiscard]] uint32_t read_acquired_next_frame() override {
                 return m_window_swapchain.read_acquired_image();
+            }
+
+            [[nodiscard]] vulkan::swapchain window_swapchain() const override{
+                return m_window_swapchain;
+            }
+
+            [[nodiscard]] vk::command_buffer current_active_command(uint32_t p_frame_idx) override {
+                return m_window_swapchain.active_command(p_frame_idx);
             }
 
             void present_frame(const uint32_t& p_current_frame) override {

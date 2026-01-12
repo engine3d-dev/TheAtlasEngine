@@ -292,8 +292,9 @@ export namespace atlas::vulkan {
                 .family = 0,
                 .index = 0,
             };
-            m_present_to_queue = ::vk::device_present_queue(
-            m_driver, m_swapchain_handler, present_queue_params);
+            m_present_to_queue = ::vk::device_present_queue(m_driver, m_swapchain_handler, present_queue_params);
+            console_log_info("m_present_to_queue initialized!!!");
+            console_log_info("m_presesnt_to_queue.alive() = {}", (m_present_to_queue != nullptr));
         }
 
         uint32_t select_images_size(const VkSurfaceCapabilitiesKHR& p_surface_capabilities) {

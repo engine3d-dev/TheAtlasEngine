@@ -7,6 +7,7 @@ module;
 #include <print>
 #include <optional>
 #include <GLFW/glfw3.h>
+#include <chrono>
 
 export module atlas.application;
 
@@ -18,6 +19,7 @@ import atlas.window;
 import atlas.drivers;
 import atlas.core.event;
 import atlas.core.utilities.poll_state;
+import atlas.logger;
 
 export namespace atlas {
 
@@ -80,12 +82,21 @@ export namespace atlas {
         void execute() {
             console_log_info("Executing game mainloop!!!");
 
+            auto start_time = std::chrono::high_resolution_clock::now();
 
             invoke_start();
 
 
             while(m_window->available()) {
+                auto current_time = std::chrono::high_resolution_clock::now();
+                m_delta_time = std::chrono::duration<float, std::chrono::seconds::period>(current_time - start_time).count();
+                start_time = current_time;
+
                 event::flush_events();
+
+                // m_current_frame_index = m_window->acquired_next_frame();
+
+                console_log_info("current_frame = {}", m_current_frame_index);
 
                 invoke_on_update();
 
