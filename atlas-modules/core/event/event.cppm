@@ -39,6 +39,8 @@ namespace atlas {
 
     using button_id = int;
     using controller_id = int;
+
+    // TODO: Probably make this into std::map<uint32_t, GLFWwindow*> s_window_viewports?
     static GLFWwindow* s_window_address;
 
     export namespace event {

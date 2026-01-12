@@ -113,7 +113,15 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas-modules/core/application.cppm
     atlas-modules/core/window.cppm
 
+    atlas-modules/core/utilities/state.cppm
+    atlas-modules/core/utilities/poll_state.cppm
+
     atlas-modules/core/event/event.cppm
+    atlas-modules/core/event/bus.cppm
+    atlas-modules/core/event/listener.cppm
+    atlas-modules/core/event/keys.cppm
+    atlas-modules/core/event/mouse_codes.cppm
+    atlas-modules/core/event/joystick_codes.cppm
     
     atlas-modules/drivers/drivers.cppm
     atlas-modules/drivers/graphics_context.cppm
