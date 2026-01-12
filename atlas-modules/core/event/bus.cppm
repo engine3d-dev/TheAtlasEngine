@@ -10,7 +10,7 @@ export module atlas.core.event.bus;
 
 import atlas.core.event.listener;
 
-namespace atlas::event {
+export namespace atlas::event {
     /**
      * @brief Event bus that holds the responsibility to reroute events to the
      * subscribers of those particular event.

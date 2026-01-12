@@ -114,6 +114,13 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas-modules/core/application.cppm
     atlas-modules/core/window.cppm
 
+    atlas-modules/core/math/math.cppm
+
+    atlas-modules/core/scene/components.cppm
+    atlas-modules/core/scene/game_object.cppm
+    atlas-modules/core/scene/scene.cppm
+    atlas-modules/core/scene/world.cppm
+
     atlas-modules/core/utilities/state.cppm
     atlas-modules/core/utilities/poll_state.cppm
 
