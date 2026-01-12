@@ -6,6 +6,7 @@ module;
 export module atlas.drivers;
 
 import atlas.common;
+import atlas.core.utilities.types;
 // import atlas.vulkan.window_context;
 // import atlas.drivers.vulkan;
 import atlas.graphics_api;

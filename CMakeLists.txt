@@ -108,6 +108,7 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas-modules/atlas.cppm
     atlas-modules/core/api.cppm
     atlas-modules/core/common.cppm
+    atlas-modules/core/utilities/types.cppm
     atlas-modules/core/core.cppm
     atlas-modules/core/logger.cppm
     atlas-modules/core/application.cppm
@@ -132,6 +133,7 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas-modules/drivers/vulkan/window_context.cppm
     atlas-modules/drivers/vulkan/physical_device.cppm
     atlas-modules/drivers/vulkan/device.cppm
+    atlas-modules/drivers/vulkan/swapchain.cppm
 )
 
 # target_sources(${PROJECT_NAME} PUBLIC

@@ -20,6 +20,9 @@ import atlas.window;
 import atlas.logger;
 import atlas.drivers.vulkan.instance_context;
 import atlas.drivers.vulkan.utilities;
+import atlas.core.utilities.types;
+
+import atlas.drivers.vulkan.swapchain;
 
 export namespace atlas {
     namespace vulkan {
@@ -55,6 +58,13 @@ export namespace atlas {
                     "glfwCreateWindowSurface");
 
                 center_window();
+
+                m_window_swapchain = swapchain(m_window_surface, m_params);
+
+                instance_context::submit_resource_free([this](){
+                    console_log_info("vulkan::window_context submit_resource_free invokation!");
+                    m_window_swapchain.destroy();
+                });
             }
 
             virtual ~window_context() {
@@ -75,10 +85,11 @@ export namespace atlas {
             }
 
             [[nodiscard]] uint32_t read_acquired_next_frame() override {
-                return 0;
+                return m_window_swapchain.read_acquired_image();
             }
 
             void present_frame(const uint32_t& p_current_frame) override {
+                m_window_swapchain.present(p_current_frame);
             }
 
         private:
@@ -95,6 +106,7 @@ export namespace atlas {
             VkSurfaceKHR m_window_surface=nullptr;
             window_params m_params;
             VkInstance m_instance=nullptr;
+            swapchain m_window_swapchain;
         };
     };
 };

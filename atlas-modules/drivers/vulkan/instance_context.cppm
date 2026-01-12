@@ -210,6 +210,15 @@ namespace atlas::vulkan {
             s_instance->m_resources_free.push_back(p_resource);
         }
 
+
+        static physical_device physical_driver() {
+            return s_instance->m_physical;
+        }
+
+        static device logical_device() {
+            return s_instance->m_device;
+        }
+
     protected:
         void destroy_context() override {
             console_log_info("destroy_context!");

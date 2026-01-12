@@ -8,13 +8,9 @@ export module atlas.window;
 
 import atlas.common;
 import atlas.graphics_api;
+import atlas.core.utilities.types;
 
 export namespace atlas {
-    struct window_params {
-        uint32_t width;
-        uint32_t height;
-        std::string name="";
-    };
 
     class window {
     public:

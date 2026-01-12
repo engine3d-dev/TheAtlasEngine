@@ -12,6 +12,7 @@ export module atlas.application;
 
 import atlas.graphics_api;
 import atlas.logger;
+import atlas.core.utilities.types;
 import atlas.common;
 import atlas.window;
 import atlas.drivers;
