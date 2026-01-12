@@ -112,6 +112,8 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas-modules/core/logger.cppm
     atlas-modules/core/application.cppm
     atlas-modules/core/window.cppm
+
+    atlas-modules/core/event/event.cppm
     
     atlas-modules/drivers/drivers.cppm
     atlas-modules/drivers/graphics_context.cppm
