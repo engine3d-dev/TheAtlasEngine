@@ -90,8 +90,6 @@ export namespace atlas::vulkan {
             m_queue_family_properties.data());
 
             m_queue_indices = select_queue_family_indices();
-
-            console_log_warn("vulkan::physical_device constructed successful!!!");
         }
 
         ~physical_device() = default;

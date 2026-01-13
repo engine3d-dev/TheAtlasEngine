@@ -163,7 +163,6 @@ namespace atlas::vulkan {
                 vkGetInstanceProcAddr(m_instance_handler,
                                     "vkSetDebugUtilsObjectNameEXT"));
     #endif
-            console_log_info("vulkan::instance_context finished being initialized!!!");
 
             m_physical = physical_device(m_instance_handler);
             m_device = device(m_physical);

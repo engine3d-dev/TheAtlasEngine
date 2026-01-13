@@ -59,14 +59,7 @@ int main() {
         return -1;
     }
 
-    // atlas::application_settings settings = {
-    //     .name = "Editor",
-    //     .width = 1900,
-    //     .height = 600,
-    //     .background_color = {1.f, 1.f, 1.f, 1.f},
-    // };
-    // atlas::ref<test_application> app = atlas::create_ref<test_application>(settings);
-
+    // TODO: Level streamer is going to be replacing system_registry
     atlas::ref<atlas::system_registry> system = atlas::create_ref<atlas::system_registry>("system");
     atlas::ref<atlas::graphics_context> context = atlas::initialize_context("vulkan", atlas::graphics_api::vulkan);
 

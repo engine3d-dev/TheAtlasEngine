@@ -139,8 +139,6 @@ namespace atlas::vulkan {
 
             vkGetDeviceQueue(
             m_driver, graphics_index, 0, &m_device_queues.graphics_queue);
-
-            console_log_warn("vulkan::device constructed successfully!!!");
         }
 
         // Use .destroy to explicitly invoke when to do proper vulkan cleanup
