@@ -170,7 +170,7 @@ namespace atlas::vulkan {
             s_instance = this;
         }
 
-        virtual ~instance_context() {
+        ~instance_context() override {
             vkDestroyInstance(m_instance_handler, nullptr);
         }
 
