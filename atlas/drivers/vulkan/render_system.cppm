@@ -60,7 +60,7 @@ export namespace atlas::vulkan {
      */
     class render_system : public renderer_system {
     public:
-        render_system(const window_params& p_params, uint32_t p_image_size, const std::string& p_tag) {
+        render_system(const window_params& p_params, uint32_t p_image_size, const std::string&) {
             m_device = instance_context::logical_device();
 
             console_log_info("m_device = {}", (m_device != nullptr));
@@ -95,34 +95,34 @@ export namespace atlas::vulkan {
 #endif
             std::array<::vk::vertex_attribute_entry, 4> attribute_entries = {
                 ::vk::vertex_attribute_entry{
-                .location = 0,
-                .format = ::vk::format::rgb32_sfloat,
-                .stride = offsetof(vk::vertex_input, position),
+                    .location = 0,
+                    .format = ::vk::format::rgb32_sfloat,
+                    .stride = offsetof(vk::vertex_input, position),
                 },
                 ::vk::vertex_attribute_entry{
-                .location = 1,
-                .format = ::vk::format::rgb32_sfloat,
-                .stride = offsetof(vk::vertex_input, color),
+                    .location = 1,
+                    .format = ::vk::format::rgb32_sfloat,
+                    .stride = offsetof(vk::vertex_input, color),
                 },
                 ::vk::vertex_attribute_entry{
-                .location = 2,
-                .format = ::vk::format::rgb32_sfloat,
-                .stride = offsetof(vk::vertex_input, normals),
+                    .location = 2,
+                    .format = ::vk::format::rgb32_sfloat,
+                    .stride = offsetof(vk::vertex_input, normals),
                 },
                 ::vk::vertex_attribute_entry{
-                .location = 3,
-                .format = ::vk::format::rg32_sfloat,
-                .stride = offsetof(vk::vertex_input, uv),
+                    .location = 3,
+                    .format = ::vk::format::rg32_sfloat,
+                    .stride = offsetof(vk::vertex_input, uv),
                 }
             };
 
             std::array<::vk::vertex_attribute, 1> attribute = {
                 ::vk::vertex_attribute{
-                // layout (set = 0, binding = 0)
-                .binding = 0,
-                .entries = attribute_entries,
-                .stride = sizeof(vk::vertex_input),
-                .input_rate = ::vk::input_rate::vertex,
+                    // layout (set = 0, binding = 0)
+                    .binding = 0,
+                    .entries = attribute_entries,
+                    .stride = sizeof(vk::vertex_input),
+                    .input_rate = ::vk::input_rate::vertex,
                 },
             };
 
@@ -203,12 +203,12 @@ export namespace atlas::vulkan {
 
             std::array<::vk::write_buffer_descriptor, 2> set0_write_buffers = {
                 ::vk::write_buffer_descriptor{
-                .dst_binding = 0,
-                .uniforms = binding0_uniforms,
+                    .dst_binding = 0,
+                    .uniforms = binding0_uniforms,
                 },
                 ::vk::write_buffer_descriptor{
-                .dst_binding = 1,
-                .uniforms = binding1_uniforms,
+                    .dst_binding = 1,
+                    .uniforms = binding1_uniforms,
                 }
             };
             m_global_descriptors.update(set0_write_buffers);
@@ -365,30 +365,30 @@ export namespace atlas::vulkan {
                     // specify to the vk::write_descriptor_buffer
                     std::array<::vk::write_buffer, 1> binding0_buffers = {
                         ::vk::write_buffer{
-                        .buffer = m_mesh_geometry_set[p_entity.id()],
-                        .offset = 0,
-                        .range = m_mesh_geometry_set[p_entity.id()].size_bytes(),
+                            .buffer = m_mesh_geometry_set[p_entity.id()],
+                            .offset = 0,
+                            .range = m_mesh_geometry_set[p_entity.id()].size_bytes(),
                         }
                     };
 
                     std::array<::vk::write_buffer, 1> binding3_buffers = {
                         ::vk::write_buffer{
-                        .buffer = m_mesh_material_set[p_entity.id()],
-                        .offset = 0,
-                        .range = m_mesh_material_set[p_entity.id()].size_bytes(),
+                            .buffer = m_mesh_material_set[p_entity.id()],
+                            .offset = 0,
+                            .range = m_mesh_material_set[p_entity.id()].size_bytes(),
                         }
                     };
 
                     std::vector<::vk::write_buffer_descriptor> material_uniforms = {
                         // layout(set=  1, binding = 0) geometry_ubo
                         ::vk::write_buffer_descriptor{
-                        .dst_binding = 0,
-                        .uniforms = binding0_buffers,
+                            .dst_binding = 0,
+                            .uniforms = binding0_buffers,
                         },
                         // layout(set=  1, binding = 3) material_ubo
                         ::vk::write_buffer_descriptor{
-                        .dst_binding = 3,
-                        .uniforms = binding3_buffers,
+                            .dst_binding = 3,
+                            .uniforms = binding3_buffers,
                         },
                     };
 
@@ -408,33 +408,37 @@ export namespace atlas::vulkan {
 
                     // writes to texture at layout(set = 1, binding = 1)
                     std::array<::vk::write_image, 1>
-                    binding1_images = { ::vk::write_image{
-                        .sampler = diffuse.sampler(),
-                        .view = diffuse.image_view(),
-                        // .image_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-                        .layout = ::vk::image_layout::shader_read_only_optimal,
-                    } };
+                    binding1_images = {
+                        ::vk::write_image{
+                            .sampler = diffuse.sampler(),
+                            .view = diffuse.image_view(),
+                            // .image_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                            .layout = ::vk::image_layout::shader_read_only_optimal,
+                        },
+                    };
 
                     // writes to texture at layout(set = 1, binding = 2)
                     std::array<::vk::write_image, 1>
-                    binding2_images = { ::vk::write_image{
-                        .sampler = specular.sampler(),
-                        .view = specular.image_view(),
-                        // .image_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-                        .layout = ::vk::image_layout::shader_read_only_optimal,
-                    } };
+                    binding2_images = {
+                            ::vk::write_image{
+                            .sampler = specular.sampler(),
+                            .view = specular.image_view(),
+                            // .image_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                            .layout = ::vk::image_layout::shader_read_only_optimal,
+                        },
+                    };
 
                     // vulkan image descriptors are for writing textures
                     std::vector<::vk::write_image_descriptor> material_textures = {
                         // layout(set = 1, binding = 1) uniform sampler2D
                         ::vk::write_image_descriptor{
-                        .dst_binding = 1,
-                        .sample_images = binding1_images,
+                            .dst_binding = 1,
+                            .sample_images = binding1_images,
                         },
                         // layout(set = 1, binding = 2) uniform sampler2D
                         ::vk::write_image_descriptor{
-                        .dst_binding = 2,
-                        .sample_images = binding2_images,
+                            .dst_binding = 2,
+                            .sample_images = binding2_images,
                         },
                     };
 

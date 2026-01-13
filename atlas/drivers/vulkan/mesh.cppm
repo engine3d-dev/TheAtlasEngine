@@ -51,7 +51,7 @@ export namespace atlas::vulkan {
             m_ibo = vk::index_buffer(m_device, ibo_settings);
         }
 
-        mesh(const std::filesystem::path& p_filename, bool p_flip = false) {
+        mesh(const std::filesystem::path& p_filename, bool p_flip = false) : m_flip(p_flip) {
             m_physical = instance_context::physical_driver();
             m_device = instance_context::logical_device();
             reload_mesh(p_filename);

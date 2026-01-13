@@ -39,6 +39,7 @@ namespace atlas::vulkan {
         return read_raw_spirv(p_shader_source.filename);
     }
 
+#if ENABLE_SHADERC
     static std::string read_shader_source_code(const std::string& p_filename) {
         std::ifstream ins(p_filename, std::ios::ate | std::ios::binary);
 
@@ -55,6 +56,7 @@ namespace atlas::vulkan {
 
         return output;
     }
+#endif
 
     /**
      * compiles source code from the shader directly without needing manual
@@ -66,7 +68,7 @@ namespace atlas::vulkan {
      * filename text entry_point: the entry point to this shader options:
      * compiler-specific options to enable when compiling the shader sources
      */
-#ifdef ENABLE_SHADERC
+#if ENABLE_SHADERC
     static std::vector<uint32_t> compile_source_from_file(
       const ::vk::shader_source& p_shader_source) {
         shaderc::CompileOptions options;
@@ -167,7 +169,7 @@ namespace atlas::vulkan {
                 }
 #endif
                 
-#if ENABLE_SHADERC
+#ifdef ENABLE_SHADERC
                 if (filepath.extension().string() != ".spv") {
                     std::string text_source_code =
                     read_shader_source_code(filepath.string());

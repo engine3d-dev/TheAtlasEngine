@@ -61,7 +61,7 @@ endif()
 # )
 
 add_library(${PROJECT_NAME} STATIC)
-add_subdirectory(editor_modules)
+add_subdirectory(editor)
 
 set_packages(
     ENABLE_TESTS OFF
@@ -111,94 +111,94 @@ target_sources(${PROJECT_NAME} PUBLIC
     FILE_SET CXX_MODULES
     TYPE CXX_MODULES
     FILES
-    atlas-modules/atlas.cppm
-    atlas-modules/core/api.cppm
-    atlas-modules/core/common.cppm
-    atlas-modules/core/utilities/types.cppm
-    atlas-modules/core/core.cppm
-    atlas-modules/core/logger.cppm
-    atlas-modules/core/application.cppm
-    atlas-modules/core/window.cppm
+    atlas/atlas.cppm
+    atlas/core/api.cppm
+    atlas/core/common.cppm
+    atlas/core/utilities/types.cppm
+    atlas/core/core.cppm
+    atlas/core/logger.cppm
+    atlas/core/application.cppm
+    atlas/core/window.cppm
 
     # math
-    atlas-modules/core/math/types.cppm
-    atlas-modules/core/math/math.cppm
+    atlas/core/math/types.cppm
+    atlas/core/math/math.cppm
 
-    atlas-modules/core/scene/components.cppm
-    atlas-modules/core/scene/game_object.cppm
-    atlas-modules/core/scene/scene.cppm
-    atlas-modules/core/scene/world.cppm
-    atlas-modules/core/scene/system_registry.cppm
+    atlas/core/scene/components.cppm
+    atlas/core/scene/game_object.cppm
+    atlas/core/scene/scene.cppm
+    atlas/core/scene/world.cppm
+    atlas/core/scene/system_registry.cppm
 
-    atlas-modules/core/utilities/state.cppm
-    atlas-modules/core/utilities/poll_state.cppm
+    atlas/core/utilities/state.cppm
+    atlas/core/utilities/poll_state.cppm
 
-    atlas-modules/core/event/event.cppm
-    atlas-modules/core/event/bus.cppm
-    atlas-modules/core/event/listener.cppm
-    atlas-modules/core/event/keys.cppm
-    atlas-modules/core/event/mouse_codes.cppm
-    atlas-modules/core/event/joystick_codes.cppm
-    atlas-modules/core/event/types.cppm
+    atlas/core/event/event.cppm
+    atlas/core/event/bus.cppm
+    atlas/core/event/listener.cppm
+    atlas/core/event/keys.cppm
+    atlas/core/event/mouse_codes.cppm
+    atlas/core/event/joystick_codes.cppm
+    atlas/core/event/types.cppm
 
     # editor
-    atlas-modules/core/editor/dockspace.cppm
-    atlas-modules/core/editor/menu_item.cppm
-    atlas-modules/core/ui/widgets.cppm
-    atlas-modules/core/filesystem/file_dialog.cppm
+    atlas/core/editor/dockspace.cppm
+    atlas/core/editor/menu_item.cppm
+    atlas/core/ui/widgets.cppm
+    atlas/core/filesystem/file_dialog.cppm
 
     # serialize
-    atlas-modules/core/serialize/types.cppm
-    atlas-modules/core/serialize/serializer.cppm
+    atlas/core/serialize/types.cppm
+    atlas/core/serialize/serializer.cppm
 
-    atlas-modules/renderer/renderer.cppm
+    atlas/renderer/renderer.cppm
     
-    atlas-modules/drivers/drivers.cppm
-    atlas-modules/drivers/graphics_context.cppm
+    atlas/drivers/drivers.cppm
+    atlas/drivers/graphics_context.cppm
 
-    atlas-modules/drivers/renderer_system.cppm
-    atlas-modules/drivers/vulkan/hash.cppm
-    atlas-modules/drivers/vulkan/mesh.cppm
-    atlas-modules/drivers/vulkan/shader_resource_group.cppm
-    atlas-modules/drivers/vulkan/render_system.cppm
-    atlas-modules/drivers/vulkan/uniforms.cppm
+    atlas/drivers/renderer_system.cppm
+    atlas/drivers/vulkan/hash.cppm
+    atlas/drivers/vulkan/mesh.cppm
+    atlas/drivers/vulkan/shader_resource_group.cppm
+    atlas/drivers/vulkan/render_system.cppm
+    atlas/drivers/vulkan/uniforms.cppm
 
-    atlas-modules/drivers/vulkan/imgui_context.cppm
+    atlas/drivers/vulkan/imgui_context.cppm
 
     # physics
-    atlas-modules/drivers/physics_context.cppm
-    atlas-modules/physics/types.cppm
-    atlas-modules/physics/physics_engine.cppm
+    atlas/drivers/physics_context.cppm
+    atlas/physics/types.cppm
+    atlas/physics/physics_engine.cppm
     
     # jolt_cpp
-    atlas-modules/drivers/jolt_cpp/math.cppm
-    atlas-modules/drivers/jolt_cpp/broad_phase.cppm
-    atlas-modules/drivers/jolt_cpp/contact_listener.cppm
-    atlas-modules/drivers/jolt_cpp/context.cppm
+    atlas/drivers/jolt_cpp/math.cppm
+    atlas/drivers/jolt_cpp/broad_phase.cppm
+    atlas/drivers/jolt_cpp/contact_listener.cppm
+    atlas/drivers/jolt_cpp/context.cppm
 
 
-    atlas-modules/drivers/vulkan/vulkan.cppm
-    atlas-modules/drivers/vulkan/utilities.cppm
-    atlas-modules/drivers/vulkan/instance_context.cppm
-    atlas-modules/drivers/vulkan/window_context.cppm
-    atlas-modules/drivers/vulkan/physical_device.cppm
-    atlas-modules/drivers/vulkan/device.cppm
-    atlas-modules/drivers/vulkan/swapchain.cppm
+    atlas/drivers/vulkan/vulkan.cppm
+    atlas/drivers/vulkan/utilities.cppm
+    atlas/drivers/vulkan/instance_context.cppm
+    atlas/drivers/vulkan/window_context.cppm
+    atlas/drivers/vulkan/physical_device.cppm
+    atlas/drivers/vulkan/device.cppm
+    atlas/drivers/vulkan/swapchain.cppm
 
     # entry point
-    # atlas-modules/core/entry_point/main.cppm
+    # atlas/core/entry_point/main.cppm
 )
 
 target_sources(${PROJECT_NAME} PUBLIC
     FILE_SET CXX_MODULES
     TYPE CXX_MODULES
-    PRIVATE atlas-modules/core/entry_point/main.cpp
+    PRIVATE atlas/core/entry_point/main.cpp
 )
 
 # target_sources(${PROJECT_NAME} PUBLIC
 #     FILE_SET CXX_MODULES
 #     TYPE CXX_MODULES
-#     PRIVATE atlas-modules/core/main.cpp
+#     PRIVATE atlas/core/main.cpp
 # )
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)

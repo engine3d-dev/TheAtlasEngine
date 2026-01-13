@@ -81,7 +81,7 @@ namespace atlas::vulkan {
 
     export class instance_context : public graphics_context {
     public:
-        instance_context(const std::string& p_name) {
+        instance_context(const std::string&) {
             VkApplicationInfo app_info = {
                 .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
                 .pNext = nullptr,

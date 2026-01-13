@@ -63,10 +63,10 @@ export namespace atlas::physics {
          * @return JPH::ValidateResult
          */
         JPH::ValidateResult OnContactValidate(
-          const JPH::Body& in_body1,
-          const JPH::Body& in_body2,
-          JPH::RVec3Arg in_base_offset,
-          const JPH::CollideShapeResult& in_collision_result) override {
+          const JPH::Body&,
+          const JPH::Body&,
+          JPH::RVec3Arg,
+          const JPH::CollideShapeResult&) override {
             return JPH::ValidateResult::AcceptAllContactsForThisBodyPair;
         }
 
@@ -83,8 +83,8 @@ export namespace atlas::physics {
          */
         void OnContactAdded(const JPH::Body& p_body1,
                             const JPH::Body& p_body2,
-                            const JPH::ContactManifold& manifold,
-                            JPH::ContactSettings& settings) override {
+                            const JPH::ContactManifold&,
+                            JPH::ContactSettings&) override {
              event::collision_enter begin_event = {
                 .entity1 = static_cast<uint64_t>(p_body1.GetUserData()),
                 .entity2 = static_cast<uint64_t>(p_body2.GetUserData())
@@ -108,8 +108,8 @@ export namespace atlas::physics {
          */
         void OnContactPersisted(const JPH::Body& p_body1,
                                 const JPH::Body& p_body2,
-                                const JPH::ContactManifold& in_manifold,
-                                JPH::ContactSettings& io_settings) override {
+                                const JPH::ContactManifold&,
+                                JPH::ContactSettings&) override {
             event::collision_persisted persisted_event = {
                 .entity1 = static_cast<uint64_t>(p_body1.GetUserData()),
                 .entity2 = static_cast<uint64_t>(p_body2.GetUserData())
@@ -125,7 +125,7 @@ export namespace atlas::physics {
          * @param in_sub_shape_pair The pair of shapes that no longer touch.
          * FIXME: Still needs to be implemented
          */
-        void OnContactRemoved(const JPH::SubShapeIDPair& p_sub_shape_pair) override {
+        void OnContactRemoved(const JPH::SubShapeIDPair&) override {
             console_log_info("Collisions Removed!");
             // For Event system to handle when collision ends
         }
