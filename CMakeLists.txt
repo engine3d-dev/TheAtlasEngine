@@ -101,6 +101,12 @@ set_packages(
     nfd::nfd
 )
 
+target_compile_options(
+    ${PROJECT_NAME}
+    PUBLIC
+    -g -Wall -Wextra -Wno-missing-field-initializers -Wshadow -msse4.1 -mavx
+)
+
 target_sources(${PROJECT_NAME} PUBLIC
     FILE_SET CXX_MODULES
     TYPE CXX_MODULES
@@ -114,6 +120,8 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas-modules/core/application.cppm
     atlas-modules/core/window.cppm
 
+    # math
+    atlas-modules/core/math/types.cppm
     atlas-modules/core/math/math.cppm
 
     atlas-modules/core/scene/components.cppm
@@ -156,6 +164,18 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas-modules/drivers/vulkan/uniforms.cppm
 
     atlas-modules/drivers/vulkan/imgui_context.cppm
+
+    # physics
+    atlas-modules/drivers/physics_context.cppm
+    atlas-modules/physics/types.cppm
+    atlas-modules/physics/physics_engine.cppm
+    
+    # jolt_cpp
+    atlas-modules/drivers/jolt_cpp/math.cppm
+    atlas-modules/drivers/jolt_cpp/broad_phase.cppm
+    atlas-modules/drivers/jolt_cpp/contact_listener.cppm
+    atlas-modules/drivers/jolt_cpp/context.cppm
+
 
     atlas-modules/drivers/vulkan/vulkan.cppm
     atlas-modules/drivers/vulkan/utilities.cppm

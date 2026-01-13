@@ -33,6 +33,7 @@ import atlas.core.ui.widgets;
 import atlas.core.editor.menu_item;
 import atlas.core.serialize;
 import atlas.logger;
+import atlas.physics.engine;
 
 static void ui_component_list(flecs::entity& p_selected_entity) {
     std::string entity_name = p_selected_entity.name().c_str();
@@ -279,18 +280,21 @@ public:
         if (!m_deserializer_test.load("LevelScene", *this)) {
             console_log_error("Could not load yaml file LevelScene!!!");
         }
+
+        flecs::world registry = *this;
+        m_physics_engine = atlas::physics::engine(registry, *event_handle());
     }
 
     void on_update() {
         auto query_cameras = query_builder<atlas::perspective_camera, atlas::transform>().build();
+        float dt = atlas::application::delta_time();
 
-        query_cameras.each([this](atlas::perspective_camera& p_camera,
+        query_cameras.each([this, dt](atlas::perspective_camera& p_camera,
                                 atlas::transform& p_transform) {
             if (!p_camera.is_active) {
                 return;
             }
 
-            float dt = atlas::application::delta_time();
             float default_speed = 10.f; // current default movement speed that does
                                         // not applied modified speed
             float rotation_speed = 1.f;
@@ -337,6 +341,14 @@ public:
 
             p_transform.set_rotation(p_transform.rotation);
         });
+
+        if (m_physics_runtime) {
+            m_physics_engine.update(dt);
+        }
+
+        if (atlas::event::is_key_pressed(key_l) and m_physics_runtime) {
+            runtime_stop();
+        }
     }
 
     void on_ui_update() {
@@ -642,12 +654,57 @@ public:
     }
 
     void physics_update() {
+        float dt = atlas::application::delta_time();
+        if (atlas::event::is_key_pressed(key_r) and !m_physics_runtime) {
+            runtime_start();
+        }
+
+        auto viking_room = entity("Viking Room");
+
+        atlas::physics_body* sphere_body =
+        viking_room.get_mut<atlas::physics_body>();
+        // U = +up
+        // J = -up
+        // H = +left
+        // L = -Left
+        if (atlas::event::is_key_pressed(key_space)) {
+            glm::vec3 linear_velocity = { 0.f, 10.0f, 0.f };
+            sphere_body->linear_velocity = linear_velocity;
+            sphere_body->impulse = linear_velocity;
+        }
+
+        if (atlas::event::is_key_pressed(key_j)) {
+            glm::vec3 angular_vel = { -10.f, 0.f, 0.f };
+            sphere_body->angular_velocity = angular_vel;
+        }
+
+        if (atlas::event::is_key_pressed(key_h)) {
+            glm::vec3 angular_vel = { 10.f, 0.f, 0.f };
+            sphere_body->angular_velocity = angular_vel;
+        }
+
+        if (atlas::event::is_key_pressed(key_l)) {
+            glm::vec3 angular_vel = { -0.1f, 0.f, 0.f };
+            sphere_body->angular_velocity = angular_vel;
+        }
+
+        if (m_physics_runtime) {
+            m_physics_engine.update(dt);
+        }
+
+        if (atlas::event::is_key_pressed(key_l) and m_physics_runtime) {
+            runtime_stop();
+        }
     }
 
     void runtime_start() {
+        m_physics_runtime = true;
+        m_physics_engine.start();
     }
 
     void runtime_stop() {
+        m_physics_runtime = false;
+        m_physics_engine.stop();
         reset_objects();
     }
 
@@ -659,9 +716,21 @@ public:
 
 private:
     void collision_enter(atlas::event::collision_enter& p_event) {
+        console_log_warn("collision_enter event!!!");
+        atlas::game_object e1 = entity(p_event.entity1);
+        atlas::game_object e2 = entity(p_event.entity2);
+
+        console_log_warn("Entity1 = {}", e1.name().c_str());
+        console_log_warn("Entity2 = {}", e2.name().c_str());
     }
 
     void collision_persisted(atlas::event::collision_persisted& p_event) {
+        console_log_warn("collision_persisted(p_event) invoked!!");
+        atlas::game_object e1 = entity(p_event.entity1);
+        atlas::game_object e2 = entity(p_event.entity2);
+
+        console_log_warn("Entity1 = {}", e1.name().c_str());
+        console_log_warn("Entity2 = {}", e2.name().c_str());
     }
 
 private:
@@ -673,9 +742,9 @@ private:
 
     // Setting physics system
     // TODO -- when refactoring this would be at atlas::world level
-    // atlas::physics::physics_engine m_physics_engine;
+    atlas::physics::engine m_physics_engine;
 
-    // bool m_physics_runtime = false;
+    bool m_physics_runtime = false;
 
     atlas::ui::dockspace m_editor_dockspace;
     atlas::ui::menu_item m_editor_menu;
