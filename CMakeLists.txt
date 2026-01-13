@@ -133,6 +133,12 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas-modules/core/event/joystick_codes.cppm
     atlas-modules/core/event/types.cppm
 
+    # editor
+    atlas-modules/core/editor/dockspace.cppm
+    atlas-modules/core/editor/menu_item.cppm
+    atlas-modules/core/ui/widgets.cppm
+    atlas-modules/core/filesystem/file_dialog.cppm
+
     atlas-modules/renderer/renderer.cppm
     
     atlas-modules/drivers/drivers.cppm
@@ -144,6 +150,8 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas-modules/drivers/vulkan/shader_resource_group.cppm
     atlas-modules/drivers/vulkan/render_system.cppm
     atlas-modules/drivers/vulkan/uniforms.cppm
+
+    atlas-modules/drivers/vulkan/imgui_context.cppm
 
     atlas-modules/drivers/vulkan/vulkan.cppm
     atlas-modules/drivers/vulkan/utilities.cppm

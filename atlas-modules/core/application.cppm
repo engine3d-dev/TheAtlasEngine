@@ -32,6 +32,7 @@ import atlas.core.scene.world;
 import atlas.core.scene.system_registry;
 import atlas.core.scene.components;
 import atlas.core.math;
+import atlas.drivers.vulkan.imgui_context;
 import vk;
 
 export namespace atlas {
@@ -83,8 +84,11 @@ export namespace atlas {
             p_params.background_color.w,
             });
 
-            // instance_context::submit_resource_free([this](){
-            // });
+            m_ui_context = vulkan::imgui_context(m_window);
+
+            vulkan::instance_context::submit_resource_free([this](){
+                m_ui_context.destroy();
+            });
             s_instance = this;
         }
 
@@ -238,10 +242,15 @@ export namespace atlas {
                     current_framebuffer,
                     m_proj_view,
                     m_current_frame_index);
+
+                // TODO: vk:imgui_context will have its own renderpass, command
+                // buffers, and framebuffers specifically for UI-widgets + viewport
+                m_ui_context.begin(currently_active, m_current_frame_index);
                 
                 // execute UI logic
                 invoke_ui_update();
 
+                m_ui_context.end();
                 m_renderer->end_frame();
                 
                 /*
@@ -257,7 +266,7 @@ export namespace atlas {
                     currently_active,
                 };
                 m_window->current_swapchain().submit(commands);
-                
+
                 // Presents to the swapchain to display to screen
                 m_window->present(m_current_frame_index);
 
@@ -317,7 +326,7 @@ export namespace atlas {
          * @return a float which is just a static_cast<float>(width / height);
          */
         static float aspect_ratio() {
-            return 0.f;
+            return s_instance->m_window->aspect_ratio();
         }
 
         /**
@@ -331,8 +340,8 @@ export namespace atlas {
             return s_instance->m_window->current_swapchain().image_size();
         }
 
-        static window& get_window() {
-            return *s_instance->m_window;
+        static window_params params() {
+            return s_instance->m_window->current_swapchain().settings();
         }
 
     protected:
@@ -348,7 +357,7 @@ export namespace atlas {
         ref<renderer_system> m_renderer = nullptr;
         glm::mat4 m_proj_view;
         uint32_t m_current_frame_index = -1;
-        // vk::imgui_context m_ui_context;
+        vulkan::imgui_context m_ui_context;
         static application* s_instance;
     };
 };

@@ -78,7 +78,7 @@ export namespace atlas {
 
         protected:
             [[nodiscard]] window_params get_params() const override {
-                return m_params;
+                return m_window_swapchain.settings();
             }
             
             [[nodiscard]] GLFWwindow* native_window() const override {
