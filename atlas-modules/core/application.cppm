@@ -257,8 +257,8 @@ export namespace atlas {
                     currently_active,
                 };
                 m_window->current_swapchain().submit(commands);
+                
                 // Presents to the swapchain to display to screen
-                // m_renderer->present(m_current_frame_index);
                 m_window->present(m_current_frame_index);
 
             }
@@ -318,20 +318,6 @@ export namespace atlas {
          */
         static float aspect_ratio() {
             return 0.f;
-        }
-
-        /**
-         * @brief Gives you the current frame index which is used for the Vulkan
-         * renderer
-         *
-         * Provides information such as what is the current frame index to
-         * correcly index the commands that get submitted to the GPU for
-         * processing commands (tasks)
-         *
-         * @return uint32_t
-         */
-        static uint32_t current_frame() {
-            return 0;
         }
 
         /**

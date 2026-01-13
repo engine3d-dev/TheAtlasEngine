@@ -57,81 +57,81 @@ public:
             .diffuse = "assets/models/wood.png",
         });
 
-        // viking_room.set<atlas::sphere_collider>({
-        // .radius = 1.0f,
-        // });
+        viking_room.set<atlas::sphere_collider>({
+        .radius = 1.0f,
+        });
 
-        // viking_room.set<atlas::physics_body>({
-        // .friction = 15.f,
-        // .restitution = 0.3f,
-        // .body_movement_type = atlas::dynamic,
-        // });
+        viking_room.set<atlas::physics_body>({
+        .friction = 15.f,
+        .restitution = 0.3f,
+        .body_movement_type = atlas::dynamic,
+        });
 
-        // atlas::game_object cube = entity("Aircraft");
+        atlas::game_object cube = entity("Aircraft");
 
-        // cube.set<atlas::transform>({
-        // .position = { 0.f, 2.10f, -7.30f },
-        // .scale = { 0.9f, 0.9f, 0.9f },
-        // });
+        cube.set<atlas::transform>({
+        .position = { 0.f, 2.10f, -7.30f },
+        .scale = { 0.9f, 0.9f, 0.9f },
+        });
 
-        // cube.set<atlas::mesh_source>({
-        // .color = { 1.f, 1.f, 1.f, 1.f },
-        // // .model_path = "assets/models/E 45 Aircraft_obj.obj",
-        // .model_path = "assets/backpack/backpack.obj",
-        // .diffuse = "assets/backpack/diffuse.jpg",
-        // .specular = "assets/backpack/specular.jpg"
-        // //   .diffuse = "assets/models/E-45-steel detail_2_col.jpg",
-        // });
+        cube.set<atlas::mesh_source>({
+        .color = { 1.f, 1.f, 1.f, 1.f },
+        // .model_path = "assets/models/E 45 Aircraft_obj.obj",
+        .model_path = "assets/backpack/backpack.obj",
+        .diffuse = "assets/backpack/diffuse.jpg",
+        .specular = "assets/backpack/specular.jpg"
+        //   .diffuse = "assets/models/E-45-steel detail_2_col.jpg",
+        });
 
-        // atlas::game_object robot_model = entity("Cube");
+        atlas::game_object robot_model = entity("Cube");
+        robot_model.add<atlas::tag::serialize>();
         // robot_model.add<atlas::tag::serialize>();
-        // // robot_model.add<atlas::tag::serialize>();
-        // robot_model.set<atlas::transform>({
-        // .position = { -2.70, 3.50f, 4.10f },
-        // .scale = { 1.f, 1.f, 1.f },
-        // });
+        robot_model.set<atlas::transform>({
+        .position = { -2.70, 3.50f, 4.10f },
+        .scale = { 1.f, 1.f, 1.f },
+        });
 
-        // robot_model.set<atlas::mesh_source>(
-        // { .color = { 1.f, 1.f, 1.f, 1.f },
-        //     .model_path = "assets/models/cube.obj",
-        //     .diffuse = "assets/models/container_diffuse.png",
-        //     .specular = "assets/models/container_specular.png" });
+        robot_model.set<atlas::mesh_source>(
+        { .color = { 1.f, 1.f, 1.f, 1.f },
+            .model_path = "assets/models/cube.obj",
+            .diffuse = "assets/models/container_diffuse.png",
+            .specular = "assets/models/container_specular.png" });
 
-        // robot_model.set<atlas::box_collider>({
-        // .half_extent = { 1.f, 1.f, 1.f },
-        // });
-        // robot_model.set<atlas::physics_body>({
-        // //   .restitution = 1.f,
-        // .body_movement_type = atlas::dynamic,
-        // });
+        robot_model.set<atlas::box_collider>({
+        .half_extent = { 1.f, 1.f, 1.f },
+        });
+        robot_model.set<atlas::physics_body>({
+        //   .restitution = 1.f,
+        .body_movement_type = atlas::dynamic,
+        });
 
-        // atlas::game_object platform = entity("Platform");
+        atlas::game_object platform = entity("Platform");
 
-        // platform.set<atlas::transform>({
-        // .scale = { 15.f, 0.30f, 10.0f },
-        // });
-        // platform.set<atlas::mesh_source>({
-        // .model_path = "assets/models/cube.obj",
-        // .diffuse = "assets/models/wood.png",
-        // });
-        // platform.set<atlas::physics_body>({
-        // .body_movement_type = atlas::fixed,
-        // });
-        // platform.set<atlas::box_collider>({
-        // .half_extent = { 15.f, 0.30f, 10.0f },
-        // });
+        platform.set<atlas::transform>({
+        .scale = { 15.f, 0.30f, 10.0f },
+        });
+        platform.set<atlas::mesh_source>({
+        .model_path = "assets/models/cube.obj",
+        .diffuse = "assets/models/wood.png",
+        });
+        platform.set<atlas::physics_body>({
+        .body_movement_type = atlas::fixed,
+        });
+        platform.set<atlas::box_collider>({
+        .half_extent = { 15.f, 0.30f, 10.0f },
+        });
 
-        // atlas::game_object point_light = entity("Point Light 1");
-        // point_light.set<atlas::transform>({
-        // .position = { 0.f, 2.10f, -7.30f },
-        // .scale = { 0.9f, 0.9f, 0.9f },
-        // });
+        atlas::game_object point_light = entity("Point Light 1");
+        point_light.set<atlas::transform>({
+        .position = { 0.f, 2.10f, -7.30f },
+        .scale = { 0.9f, 0.9f, 0.9f },
+        });
 
-        // point_light.set<atlas::mesh_source>({
-        // .model_path = "assets/models/cube.obj",
-        // .diffuse = "assets/models/wood.png",
-        // });
-        // point_light.add<atlas::tag::serialize>();
+        point_light.set<atlas::mesh_source>({
+        .model_path = "assets/models/cube.obj",
+        .diffuse = "assets/models/wood.png",
+        });
+        point_light.add<atlas::tag::serialize>();
 
         // benchmark
 
