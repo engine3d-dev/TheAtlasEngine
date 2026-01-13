@@ -68,10 +68,14 @@ export namespace atlas {
         }
 
         //! @brief shorthand for glm::vec3(1.f, 0.f, 0.f)
-        glm::vec3 right();
+        glm::vec3 right() {
+            return glm::vec3(1.f, 0.f, 0.f);
+        }
 
         //! @brief shorthand for glm::vec3(-1.f, 0.f, 0.f)
-        glm::vec3 left();
+        glm::vec3 left() {
+            return glm::vec3(-1.f, 0.f, 0.f);
+        }
 
         //! @brief shorthand for glm::vec3(0.f, 1.f, 0.f)
         glm::vec3 up() {

@@ -2,6 +2,13 @@ module;
 
 #include <string>
 #include <flecs.h>
+#include <glm/ext.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/quaternion.hpp>
+
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/matrix_decompose.hpp>
 
 export module level_scene;
 
@@ -11,25 +18,28 @@ import atlas.core.scene.game_object;
 import atlas.core.event.bus;
 import atlas.core.scene.components;
 import atlas.core.utilities.state;
+import atlas.core.math;
+import atlas.core.event;
+import atlas.core.event.keys;
+import atlas.core.event.mouse_codes;
+import atlas.application;
 
 export class level_scene final : public atlas::scene {
 public:
     level_scene(const std::string& p_name, atlas::event::bus& p_bus) : atlas::scene(p_name, p_bus) {
         auto editor_camera = entity("Editor Camera");
-        editor_camera
-        .add<flecs::pair<atlas::tag::editor, atlas::projection_view>>();
+        editor_camera.add<flecs::pair<atlas::tag::editor, atlas::projection_view>>();
         editor_camera.set<atlas::transform>({
-        .position = { 3.50f, 4.90f, 36.40f },
-        .scale{ 1.f },
+            .position = { 3.50f, 4.90f, 36.40f },
+            .scale{ 1.f },
         });
         editor_camera.set<atlas::perspective_camera>({
-        .plane = { 0.1f, 5000.f },
-        .is_active = true,
-        .field_of_view = 45.f,
+            .plane = { 0.1f, 5000.f },
+            .is_active = true,
+            .field_of_view = 45.f,
         });
 
         atlas::game_object bob_object = entity("Bob");
-
         bob_object.add<atlas::point_light>();
 
         // @brief For now adding this in
@@ -189,6 +199,61 @@ public:
     }
 
     void on_update() {
+        auto query_cameras = query_builder<atlas::perspective_camera, atlas::transform>().build();
+
+        query_cameras.each([this](atlas::perspective_camera& p_camera,
+                                atlas::transform& p_transform) {
+            if (!p_camera.is_active) {
+                return;
+            }
+
+            float dt = atlas::application::delta_time();
+            float default_speed = 10.f; // current default movement speed that does
+                                        // not applied modified speed
+            float rotation_speed = 1.f;
+            float velocity = default_speed * dt;
+            if (atlas::event::is_mouse_pressed(mouse_button_middle)) {
+                velocity = m_movement_speed * dt;
+            }
+            float rotation_velocity = rotation_speed * dt;
+
+            glm::quat to_quaternion = atlas::to_quat(p_transform.quaternion);
+
+            glm::vec3 up = glm::rotate(to_quaternion, atlas::math::up());
+            glm::vec3 forward = glm::rotate(to_quaternion, atlas::math::backward());
+            glm::vec3 right = glm::rotate(to_quaternion, atlas::math::right());
+
+            if (atlas::event::is_key_pressed(key_left_shift)) {
+                p_transform.position += up * velocity;
+            }
+
+            if (atlas::event::is_key_pressed(key_space)) {
+                p_transform.position -= up * velocity;
+            }
+
+            if (atlas::event::is_key_pressed(key_w)) {
+                p_transform.position += forward * velocity;
+            }
+            if (atlas::event::is_key_pressed(key_s)) {
+                p_transform.position -= forward * velocity;
+            }
+
+            if (atlas::event::is_key_pressed(key_d)) {
+                p_transform.position += right * velocity;
+            }
+            if (atlas::event::is_key_pressed(key_a)) {
+                p_transform.position -= right * velocity;
+            }
+
+            if (atlas::event::is_key_pressed(key_q)) {
+                p_transform.rotation.y += rotation_velocity;
+            }
+            if (atlas::event::is_key_pressed(key_e)) {
+                p_transform.rotation.y -= rotation_velocity;
+            }
+
+            p_transform.set_rotation(p_transform.rotation);
+        });
     }
 
     void on_ui_update() {
@@ -215,10 +280,10 @@ private:
 
 private:
     // atlas::serializer m_deserializer_test;
-    // flecs::entity m_selected_entity;
+    flecs::entity m_selected_entity;
 
     // atlas::game_object_optional m_current_entity;
-    // float m_movement_speed = 10.f;
+    float m_movement_speed = 10.f;
 
     // Setting physics system
     // TODO -- when refactoring this would be at atlas::world level

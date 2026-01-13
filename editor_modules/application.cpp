@@ -31,13 +31,6 @@ public:
     }
 
 
-    void on_update() {
-        if(atlas::event::is_key_pressed(key_escape)) {
-            atlas::application::destroy();
-        }
-    }
-
-
 private:
     // std::pmr::polymorphic_allocator<uint8_t> m_allocator;
     atlas::ref<editor_world> m_world;
@@ -54,9 +47,9 @@ TODO: Pre-defined this in TheAtlasEngine
 atlas::ref<atlas::application> initialize_application() {
     atlas::application_settings settings = {
         .name = "Editor",
-        .width = 1900,
-        .height = 600,
-        .background_color = {1.f, 1.f, 1.f, 1.f},
+        .width = 1200,
+        .height = 800,
+        .background_color = { 0.f, 0.f, 0.f, 0.f },
     };
     return create_ref<test_application>(settings);
 }
