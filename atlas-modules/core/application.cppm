@@ -20,6 +20,9 @@ import atlas.drivers;
 import atlas.core.event;
 import atlas.core.utilities.poll_state;
 import atlas.logger;
+import atlas.drivers.renderer_system;
+import atlas.renderer;
+import atlas.drivers.vulkan.instance_context;
 
 export namespace atlas {
 
@@ -61,6 +64,17 @@ export namespace atlas {
             };
             m_window = initialize_window(params, graphics_api::vulkan);
             event::set_window_size(static_cast<GLFWwindow*>(*m_window));
+
+            m_renderer = initialize_renderer(graphics_api::vulkan, params, m_window->current_swapchain().image_size(), "Renderer");
+            m_renderer->set_background_color({
+            p_params.background_color.x,
+            p_params.background_color.y,
+            p_params.background_color.z,
+            p_params.background_color.w,
+            });
+
+            // instance_context::submit_resource_free([this](){
+            // });
             s_instance = this;
         }
 
@@ -83,6 +97,8 @@ export namespace atlas {
             console_log_info("Executing game mainloop!!!");
 
             auto start_time = std::chrono::high_resolution_clock::now();
+            m_renderer->preload(
+                m_window->current_swapchain().swapchain_renderpass());
 
             invoke_start();
 
@@ -96,7 +112,7 @@ export namespace atlas {
 
                 // m_current_frame_index = m_window->acquired_next_frame();
 
-                console_log_info("current_frame = {}", m_current_frame_index);
+                // console_log_info("current_frame = {}", m_current_frame_index);
 
                 invoke_on_update();
 
@@ -194,16 +210,16 @@ export namespace atlas {
         }
 
     protected:
-        // [[nodiscard]] ref<renderer> renderer_instance() const {
-        //     return m_renderer;
-        // }
+        [[nodiscard]] ref<renderer_system> renderer_instance() const {
+            return m_renderer;
+        }
 
     private:
         float m_delta_time = 0.f;
         ref<window> m_window;
         // vulkan::instance_context m_instance_handle_test;
         // std::optional<vulkan::instance_context> m_instance_handle_test;
-        // ref<renderer> m_renderer = nullptr;
+        ref<renderer_system> m_renderer = nullptr;
         glm::mat4 m_proj_view;
         uint32_t m_current_frame_index = -1;
         // vk::imgui_context m_ui_context;

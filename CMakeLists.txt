@@ -120,6 +120,7 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas-modules/core/scene/game_object.cppm
     atlas-modules/core/scene/scene.cppm
     atlas-modules/core/scene/world.cppm
+    atlas-modules/core/scene/system_registry.cppm
 
     atlas-modules/core/utilities/state.cppm
     atlas-modules/core/utilities/poll_state.cppm
@@ -130,6 +131,7 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas-modules/core/event/keys.cppm
     atlas-modules/core/event/mouse_codes.cppm
     atlas-modules/core/event/joystick_codes.cppm
+    atlas-modules/core/event/types.cppm
 
     atlas-modules/renderer/renderer.cppm
     

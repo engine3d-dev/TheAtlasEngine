@@ -3,7 +3,8 @@ module;
 #include <cstdint>
 
 export module atlas.core.event.types;
-namespace atlas::event {
+
+export namespace atlas::event {
 
     struct collision_enter {
         uint64_t entity1;

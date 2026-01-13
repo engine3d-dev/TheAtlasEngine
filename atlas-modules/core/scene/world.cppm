@@ -11,7 +11,7 @@ export module atlas.core.scene.world;
 import atlas.common;
 import atlas.core.scene;
 
-namespace atlas {
+export namespace atlas {
     /**
      * @brief world represents a larger scope of areas that manages the scene
      * contexts

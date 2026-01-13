@@ -1,4 +1,9 @@
 // import atlas;
+#include <print>
+#include <memory>
+#include <optional>
+#include <GLFW/glfw3.h>
+
 import atlas.application;
 import atlas.common;
 import atlas.logger;
@@ -10,17 +15,19 @@ import atlas.drivers.graphics_context;
 import atlas.drivers;
 import atlas.core.event;
 import atlas.core.event.keys;
-
-#include <print>
-#include <memory>
-#include <optional>
-#include <GLFW/glfw3.h>
-
+import editor_world;
+import atlas.core.scene.system_registry;
 
 class test_application : public atlas::application {
 public:
     test_application(const atlas::application_settings& p_settings) : atlas::application(p_settings) {
-        atlas::register_update(this, &test_application::on_update);
+        // atlas::register_update(this, &test_application::on_update);std::pmr::monotonic_buffer_resource resource{ 4096 };
+        // m_allocator.construct(&resource);
+
+        // TODO -- this is going to be changed with the use of the level
+        // streamer API
+        console_log_info("renderer_instance = {}", (renderer_instance() != nullptr));
+        m_world = atlas::create_ref<editor_world>("Editor World", renderer_instance());
     }
 
 
@@ -31,7 +38,9 @@ public:
     }
 
 
-
+private:
+    // std::pmr::polymorphic_allocator<uint8_t> m_allocator;
+    atlas::ref<editor_world> m_world;
 
 };
 
@@ -101,6 +110,8 @@ int main() {
     //     .background_color = {1.f, 1.f, 1.f, 1.f},
     // };
     // atlas::ref<test_application> app = atlas::create_ref<test_application>(settings);
+
+    atlas::ref<atlas::system_registry> system = atlas::create_ref<atlas::system_registry>("system");
     atlas::ref<atlas::graphics_context> context = atlas::initialize_context("vulkan", atlas::graphics_api::vulkan);
 
     atlas::ref<atlas::application> app = initialize_application();

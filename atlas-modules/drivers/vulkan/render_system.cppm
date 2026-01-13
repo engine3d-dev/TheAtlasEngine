@@ -12,10 +12,10 @@ module;
 #include <glm/ext.hpp>
 
 export module atlas.drivers.vulkan.render_system;
+import atlas.drivers.renderer_system;
 
 import atlas.logger;
 import atlas.common;
-import atlas.drivers.renderer_system;
 import vk;
 import atlas.core.utilities.types;
 import atlas.common;
@@ -30,7 +30,6 @@ import atlas.core.scene;
 import atlas.drivers.vulkan.uniforms;
 import atlas.drivers.vulkan.mesh;
 import atlas.core.scene.components;
-import atlas.application;
 
 export namespace atlas::vulkan {
     /**
@@ -63,11 +62,14 @@ export namespace atlas::vulkan {
     public:
         render_system(const window_params& p_params, uint32_t p_image_size, const std::string& p_tag) {
             m_device = instance_context::logical_device();
+
+            console_log_info("m_device = {}", (m_device != nullptr));
             m_physical = instance_context::physical_driver();
             m_window_extent = p_params;
             m_image_count = p_image_size;
 
 #ifdef USE_SHADERC
+        console_log_info("shaderc enabled!!");
         std::array<::vk::shader_source, 2> shader_sources = {
             ::vk::shader_source{
               "experimental-shaders/test.vert",
@@ -79,6 +81,7 @@ export namespace atlas::vulkan {
             }
         };
 #else
+        console_log_info("shaderc disabled!!");
         std::array<::vk::shader_source, 2> shader_sources = {
             ::vk::shader_source{
               "experimental-shaders/test.vert.spv",
@@ -222,6 +225,7 @@ export namespace atlas::vulkan {
             ::vk::texture(m_device, extent, m_physical.memory_properties());
 
             instance_context::submit_resource_free([this]() {
+                console_log_info("vulkan::render_system destructin invoked!!");
                 m_white_texture.destroy();
                 m_shader_group.destroy();
                 m_global_descriptors.destroy();
@@ -248,6 +252,9 @@ export namespace atlas::vulkan {
                 }
                 m_main_pipeline.destroy();
             });
+
+
+            console_log_info("Vulkan-specific implementation constructed successfully!!!");
         }
 
         ~render_system() override = default;
@@ -259,6 +266,14 @@ export namespace atlas::vulkan {
             // ref<world> current_world = system_registry::get_world("Editor
             // World"); ref<scene> current_scene =
             // current_world->get_scene("LevelScene");
+            
+            if(m_current_scene == nullptr) {
+                console_log_error("m_current_scene == nullptr!");
+                return;
+            }
+            else {
+                console_log_error("m_current_scene != nullptr!");
+            }
 
             flecs::query<> caching =
             m_current_scene->query_builder<mesh_source>().build();
@@ -441,11 +456,14 @@ export namespace atlas::vulkan {
                 .descriptor_layouts = m_sets_layouts
             };
             m_main_pipeline = ::vk::pipeline(m_device, pipeline_configuration);
+
+            console_log_warn("graphics pipeline = {}", m_main_pipeline.alive());
         }
 
-        void start_frame(const ::vk::command_buffer& p_current, const window_params& p_settings, const VkRenderPass& p_renderpass, const VkFramebuffer& p_framebuffer, const glm::mat4& p_proj_view) override {
+        void start_frame(const ::vk::command_buffer& p_current, const window_params& p_settings, const VkRenderPass& p_renderpass, const VkFramebuffer& p_framebuffer, const glm::mat4& p_proj_view, uint32_t p_current_frame) override {
             m_proj_view = p_proj_view;
-            m_current_frame = application::current_frame();
+            // m_current_frame = application::current_frame();
+            m_current_frame = p_current_frame;
             m_final_renderpass = p_renderpass;
 
             std::array<VkClearValue, 2> clear_values = {};
