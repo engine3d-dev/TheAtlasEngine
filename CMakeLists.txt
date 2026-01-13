@@ -184,6 +184,15 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas-modules/drivers/vulkan/physical_device.cppm
     atlas-modules/drivers/vulkan/device.cppm
     atlas-modules/drivers/vulkan/swapchain.cppm
+
+    # entry point
+    # atlas-modules/core/entry_point/main.cppm
+)
+
+target_sources(${PROJECT_NAME} PUBLIC
+    FILE_SET CXX_MODULES
+    TYPE CXX_MODULES
+    PRIVATE atlas-modules/core/entry_point/main.cpp
 )
 
 # target_sources(${PROJECT_NAME} PUBLIC
