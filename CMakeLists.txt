@@ -139,6 +139,10 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas-modules/core/ui/widgets.cppm
     atlas-modules/core/filesystem/file_dialog.cppm
 
+    # serialize
+    atlas-modules/core/serialize/types.cppm
+    atlas-modules/core/serialize/serializer.cppm
+
     atlas-modules/renderer/renderer.cppm
     
     atlas-modules/drivers/drivers.cppm

@@ -31,6 +31,8 @@ import atlas.core.editor.dockspace;
 import atlas.application;
 import atlas.core.ui.widgets;
 import atlas.core.editor.menu_item;
+import atlas.core.serialize;
+import atlas.logger;
 
 static void ui_component_list(flecs::entity& p_selected_entity) {
     std::string entity_name = p_selected_entity.name().c_str();
@@ -137,10 +139,6 @@ public:
             .rotation = { 2.30f, 95.90f, 91.80f },
             .scale{ 1.f },
         });
-        viking_room.set<atlas::mesh_source>({
-            .model_path = "assets/models/cube.obj",
-            .diffuse = "assets/models/wood.png",
-        });
 
         viking_room.set<atlas::sphere_collider>({
         .radius = 1.0f,
@@ -211,11 +209,6 @@ public:
         .position = { 0.f, 2.10f, -7.30f },
         .scale = { 0.9f, 0.9f, 0.9f },
         });
-
-        point_light.set<atlas::mesh_source>({
-        .model_path = "assets/models/cube.obj",
-        .diffuse = "assets/models/wood.png",
-        });
         point_light.add<atlas::tag::serialize>();
 
         // benchmark
@@ -267,7 +260,7 @@ public:
         // gerald.add<atlas::point_light>();
 
         // TODO: Move this outside of level_scene
-        // m_deserializer_test = atlas::serializer();
+        m_deserializer_test = atlas::serializer();
 
         subscribe<atlas::event::collision_enter>(this,
                                                 &level_scene::collision_enter);
@@ -281,6 +274,11 @@ public:
     ~level_scene() override = default;
 
     void start() {
+        m_deserializer_test = atlas::serializer();
+
+        if (!m_deserializer_test.load("LevelScene", *this)) {
+            console_log_error("Could not load yaml file LevelScene!!!");
+        }
     }
 
     void on_update() {
@@ -650,9 +648,13 @@ public:
     }
 
     void runtime_stop() {
+        reset_objects();
     }
 
     void reset_objects() {
+        if (!m_deserializer_test.load("LevelScene", *this)) {
+            console_log_error("Could not load yaml file LevelScene!!!");
+        }
     }
 
 private:
@@ -663,7 +665,7 @@ private:
     }
 
 private:
-    // atlas::serializer m_deserializer_test;
+    atlas::serializer m_deserializer_test;
     flecs::entity m_selected_entity;
 
     atlas::game_object_optional m_current_entity;
