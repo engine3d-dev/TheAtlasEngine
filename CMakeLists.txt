@@ -130,9 +130,18 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas-modules/core/event/keys.cppm
     atlas-modules/core/event/mouse_codes.cppm
     atlas-modules/core/event/joystick_codes.cppm
+
+    atlas-modules/renderer/renderer.cppm
     
     atlas-modules/drivers/drivers.cppm
     atlas-modules/drivers/graphics_context.cppm
+
+    atlas-modules/drivers/renderer_system.cppm
+    atlas-modules/drivers/vulkan/hash.cppm
+    atlas-modules/drivers/vulkan/mesh.cppm
+    atlas-modules/drivers/vulkan/shader_resource_group.cppm
+    atlas-modules/drivers/vulkan/render_system.cppm
+    atlas-modules/drivers/vulkan/uniforms.cppm
 
     atlas-modules/drivers/vulkan/vulkan.cppm
     atlas-modules/drivers/vulkan/utilities.cppm
