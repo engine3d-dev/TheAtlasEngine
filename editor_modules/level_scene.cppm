@@ -257,8 +257,8 @@ public:
         // 	});
         // }
 
-        // atlas::game_object gerald = entity("Gerald");
-        // gerald.add<atlas::point_light>();
+        atlas::game_object gerald = entity("Gerald");
+        gerald.add<atlas::point_light>();
 
         // TODO: Move this outside of level_scene
         m_deserializer_test = atlas::serializer();
