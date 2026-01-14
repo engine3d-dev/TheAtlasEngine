@@ -2,7 +2,7 @@ module;
 
 #include <cstdint>
 
-export module atlas.core.event.joystick_codes;
+export module atlas.core.event:joystick_codes;
 
 namespace atlas::event {
     enum JoystickCodes : int {

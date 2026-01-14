@@ -6,9 +6,9 @@ module;
 #include <unordered_map>
 #include <any>
 
-export module atlas.core.event.bus;
+export module atlas.core.event:bus;
 
-import atlas.core.event.listener;
+import :listener;
 
 export namespace atlas::event {
     /**

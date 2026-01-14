@@ -8,6 +8,12 @@ module;
 
 export module atlas.core.event;
 
+export import :keys;
+export import :mouse_codes;
+export import :types;
+export import :listener;
+export import :bus;
+
 namespace atlas {
 
     /**

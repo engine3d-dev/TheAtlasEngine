@@ -2,7 +2,7 @@ module;
 
 #include<cstdint>
 
-export module atlas.core.event.keys;
+export module atlas.core.event:keys;
 
 
 export namespace atlas::event {

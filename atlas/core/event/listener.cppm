@@ -3,7 +3,7 @@ module;
 #include <functional>
 #include <deque>
 
-export module atlas.core.event.listener;
+export module atlas.core.event:listener;
 
 export namespace atlas::event {
      /**

@@ -34,8 +34,8 @@ module;
 
 export module atlas.drivers.jolt_cpp.contact_listener;
 import atlas.logger;
-import atlas.core.event.bus;
-import atlas.core.event.types;
+// import atlas.core.event.types;
+import atlas.core.event;
 
 export namespace atlas::physics {
     /**

@@ -40,6 +40,7 @@ export module atlas.drivers.jolt_cpp.context;
 // import atlas.logger;
 // import atlas.common;
 import atlas.core.utilities;
+import atlas.core.event;
 import atlas.core.scene.components;
 
 import atlas.drivers.jolt_cpp.broad_phase;
@@ -47,7 +48,6 @@ import atlas.drivers.jolt_cpp.contact_listener;
 
 import atlas.drivers.jolt_cpp.types;
 import atlas.drivers.physics_context;
-import atlas.core.event.bus;
 import atlas.drivers.jolt_cpp.types;
 
 namespace atlas::physics {

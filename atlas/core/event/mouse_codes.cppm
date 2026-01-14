@@ -2,7 +2,7 @@ module;
 
 #include <cstdint>
 
-export module atlas.core.event.mouse_codes;
+export module atlas.core.event:mouse_codes;
 
 namespace atlas::event {
     enum Mouse : uint32_t {

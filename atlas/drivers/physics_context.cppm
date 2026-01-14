@@ -40,7 +40,7 @@ export module atlas.drivers.physics_context;
 
 import atlas.common;
 import atlas.core.scene.components;
-import atlas.core.event.bus;
+import atlas.core.event;
 
 
 

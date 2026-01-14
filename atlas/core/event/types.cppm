@@ -2,7 +2,7 @@ module;
 
 #include <cstdint>
 
-export module atlas.core.event.types;
+export module atlas.core.event:types;
 
 export namespace atlas::event {
 
