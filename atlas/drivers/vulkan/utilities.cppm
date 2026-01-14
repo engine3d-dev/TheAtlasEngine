@@ -4,8 +4,8 @@ module;
 #include <vulkan/vulkan_core.h>
 
 export module atlas.drivers.vulkan.utilities;
-
 import atlas.logger;
+
 export namespace atlas {
     namespace vulkan {
 

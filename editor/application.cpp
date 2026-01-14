@@ -1,6 +1,5 @@
 import atlas.application;
 import atlas.common;
-import atlas.logger;
 
 import editor_world;
 import atlas.core.scene.system_registry;

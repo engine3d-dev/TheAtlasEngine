@@ -6,9 +6,10 @@ module;
 
 export module atlas.window;
 
-import atlas.common;
-import atlas.graphics_api;
-import atlas.core.utilities.types;
+// import atlas.common;
+// import atlas.graphics_api;
+// import atlas.core.utilities.types;
+import atlas.core.utilities;
 import atlas.drivers.vulkan.swapchain;
 import vk;
 

@@ -19,8 +19,6 @@ module;
 
 export module atlas.drivers.vulkan.device;
 
-import atlas.logger;
-
 import atlas.drivers.vulkan.utilities;
 import atlas.drivers.vulkan.physical_device;
 

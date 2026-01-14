@@ -111,10 +111,13 @@ target_sources(${PROJECT_NAME} PUBLIC
     FILE_SET CXX_MODULES
     TYPE CXX_MODULES
     FILES
+
+    # core
     atlas/atlas.cppm
     atlas/core/api.cppm
     atlas/core/common.cppm
     atlas/core/utilities/types.cppm
+    atlas/core/utilities/utilities.cppm
     atlas/core/core.cppm
     atlas/core/logger.cppm
     atlas/core/application.cppm
@@ -124,6 +127,7 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas/core/math/types.cppm
     atlas/core/math/math.cppm
 
+    # scenes
     atlas/core/scene/components.cppm
     atlas/core/scene/game_object.cppm
     atlas/core/scene/scene.cppm
@@ -133,6 +137,7 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas/core/utilities/state.cppm
     atlas/core/utilities/poll_state.cppm
 
+    # event
     atlas/core/event/event.cppm
     atlas/core/event/bus.cppm
     atlas/core/event/listener.cppm

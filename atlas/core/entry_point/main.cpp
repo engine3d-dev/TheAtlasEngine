@@ -5,8 +5,6 @@ import atlas.common;
 import atlas.logger;
 import atlas.graphics_api;
 
-import atlas.core.utilities.state;
-
 // expose visibility to ref<graphics>
 import atlas.drivers.graphics_context;
 

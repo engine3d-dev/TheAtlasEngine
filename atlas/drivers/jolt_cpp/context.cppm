@@ -37,8 +37,9 @@ module;
 
 export module atlas.drivers.jolt_cpp.context;
 
-import atlas.logger;
-import atlas.common;
+// import atlas.logger;
+// import atlas.common;
+import atlas.core.utilities;
 import atlas.core.scene.components;
 
 import atlas.drivers.jolt_cpp.broad_phase;

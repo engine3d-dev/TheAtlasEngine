@@ -15,15 +15,11 @@ module;
 
 export module atlas.application;
 
-import atlas.graphics_api;
-import atlas.logger;
-import atlas.core.utilities.types;
-import atlas.common;
+import atlas.core.utilities;
+import atlas.core.utilities.poll_state;
 import atlas.window;
 import atlas.drivers;
 import atlas.core.event;
-import atlas.core.utilities.poll_state;
-import atlas.logger;
 import atlas.drivers.renderer_system;
 import atlas.renderer;
 import atlas.drivers.vulkan.instance_context;
@@ -205,9 +201,9 @@ export namespace atlas {
                 // renderer is in sync when swapchain is resized
                 ::vk::command_buffer currently_active = m_window->active_command(m_current_frame_index);
 
-                invoke_on_update();
-
                 invoke_physics_update();
+
+                invoke_on_update();
 
                 invoke_defer_update();
                 // We want this to be called after late update

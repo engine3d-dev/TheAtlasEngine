@@ -16,14 +16,16 @@ module;
 
 export module atlas.drivers.vulkan.window_context;
 
+// import atlas.logger;
+// import atlas.core.utilities.types;
+import atlas.core.utilities;
+import vk;
+
 import atlas.window;
-import atlas.logger;
 import atlas.drivers.vulkan.instance_context;
 import atlas.drivers.vulkan.utilities;
-import atlas.core.utilities.types;
-
 import atlas.drivers.vulkan.swapchain;
-import vk;
+
 
 export namespace atlas {
     namespace vulkan {

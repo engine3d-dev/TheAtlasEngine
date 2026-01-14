@@ -16,6 +16,8 @@ module;
 
 export module level_scene;
 
+// import atlas.logger;
+import atlas.core.utilities;
 import atlas.application;
 import atlas.core.event.types;
 import atlas.core.scene;
@@ -32,7 +34,6 @@ import atlas.application;
 import atlas.core.ui.widgets;
 import atlas.core.editor.menu_item;
 import atlas.core.serialize;
-import atlas.logger;
 import atlas.physics.engine;
 
 static void ui_component_list(flecs::entity& p_selected_entity) {
