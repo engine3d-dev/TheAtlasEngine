@@ -2,11 +2,12 @@ from conan import ConanFile
 from conan.tools.cmake import CMakeToolchain, CMake, cmake_layout, CMakeDeps
 from conan.tools.files import copy
 import os
+from pathlib import Path
 import shutil
 
 class AtlasRecipe(ConanFile):
     name = "atlas"
-    version = "0.4"
+    version = "0.5"
     package_type = "library"
     license = "Apache-2.0"
     homepage = "https://github.com/engine3d-dev/TheAtlasEngine"
@@ -18,8 +19,8 @@ class AtlasRecipe(ConanFile):
 
     # Specifying our build_type is only Debug and Release
     options = {"shared": [True, False], "fPIC": [True, False], "enable_tests_only": [True, False], "enable_shaderc": [True, False]}
-    default_options = {"shared": False, "fPIC": True, "enable_tests_only": True, "enable_shaderc": True}
-
+    default_options = {"shared": False, "fPIC": True, "enable_tests_only": True, "enable_shaderc": False}
+    exports_sources = "atlas/*", "tests/*", "CMakeLists.txt", "LICENSE"
 
     def build_requirements(self):
         self.tool_requires("cmake/4.1.1")
@@ -45,13 +46,6 @@ class AtlasRecipe(ConanFile):
         self.requires("nfd/2.0")
         self.requires("watcher/0.12.0")
         self.requires("boost-ext-ut/2.3.1")
-    
-    def export_sources(self):
-        copy(self,"CMakeLists.txt", self.recipe_folder, self.export_sources_folder)
-        copy(self,"src/CMakeLists.txt", self.recipe_folder, self.export_sources_folder)
-        copy(self,"*.hpp", self.recipe_folder, self.export_sources_folder)
-        copy(self,"*.cpp", self.recipe_folder, self.export_sources_folder)
-        copy(self, "shader_ubo_tutorial", self.recipe_folder, self.export_sources_folder)
 
     def config_options(self):
         if self.settings.os == "Windows":
@@ -74,6 +68,7 @@ class AtlasRecipe(ConanFile):
         tc = CMakeToolchain(self)
         # TODO: Remove this once fixing shaderc issue in the CI is resolved
         # These are options that can be enabled/disabled with the `-o` parameter when compiling with `conan` command
+        tc.generator = "Ninja"
         tc.variables["USE_SHADERC"] = self.options.enable_shaderc
         tc.variables["ENABLE_TESTS_ONLY"] = self.options.enable_tests_only
         tc.generate()
@@ -103,17 +98,15 @@ class AtlasRecipe(ConanFile):
 
 
     def package(self):
-        copy(self, "LICENSE", src=self.source_folder, dst=os.path.join(self.package_folder, "licenses"))
-        copy(self, pattern="*.hpp", src=os.path.join(self.source_folder, "atlas"), dst=os.path.join(self.package_folder, "atlas"))
-        copy(self, pattern="*.a", src=self.build_folder, dst=os.path.join(self.package_folder, "lib"), keep_path=False)
-        copy(self, pattern="*.so", src=self.build_folder, dst=os.path.join(self.package_folder, "lib"), keep_path=False)
-        copy(self, pattern="*.lib", src=self.build_folder, dst=os.path.join(self.package_folder, "lib"), keep_path=False)
-        copy(self, pattern="*.dll", src=self.build_folder, dst=os.path.join(self.package_folder, "bin"), keep_path=False)
-        copy(self, pattern="*.dylib", src=self.build_folder, dst=os.path.join(self.package_folder, "lib"), keep_path=False)
         cmake = CMake(self)
         cmake.install()
 
+        copy(self, "LICENSE",
+             dst=Path(self.package_folder) / "licenses",
+             src=self.source_folder)
+
     def package_info(self):
-        self.cpp_info.set_property("cmake_target_name", "atlas::atlas")
-        self.cpp_info.libs = ["atlas"]
-        self.cpp_info.includedirs = ['./', './atlas']  # Ordered list of include paths
+        # DISABLE Conan's config file generation
+        self.cpp_info.set_property("cmake_find_mode", "none")
+        # Tell CMake to include this directory in its search path
+        self.cpp_info.builddirs.append("lib/cmake")

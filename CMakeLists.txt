@@ -61,7 +61,7 @@ endif()
 # )
 
 add_library(${PROJECT_NAME} STATIC)
-add_subdirectory(editor)
+# add_subdirectory(editor)
 
 set_packages(
     ENABLE_TESTS OFF
