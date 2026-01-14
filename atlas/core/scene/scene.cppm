@@ -5,7 +5,7 @@ module;
 
 export module atlas.core.scene;
 
-import atlas.common;
+import atlas.core.utilities;
 import atlas.core.event;
 import atlas.core.scene.game_object;
 
