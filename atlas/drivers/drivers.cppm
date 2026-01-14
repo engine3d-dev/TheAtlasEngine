@@ -1,7 +1,6 @@
 module;
 
 #include <string>
-#include <memory>
 
 export module atlas.drivers;
 

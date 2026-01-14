@@ -8,6 +8,7 @@ module;
 #include <filesystem>
 #include <vulkan/vulkan.h>
 #include <glm/glm.hpp>
+#include <unordered_map>
 
 export module atlas.drivers.vulkan.mesh;
 import vk;
