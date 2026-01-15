@@ -286,9 +286,9 @@ public:
         m_physics_engine = atlas::physics::engine(registry, *event_handle());
     }
 
-    void on_update() {
+    void on_update(float p_delta_time) {
         auto query_cameras = query_builder<atlas::perspective_camera, atlas::transform>().build();
-        float dt = atlas::application::delta_time();
+        float dt = p_delta_time;
 
         query_cameras.each([this, dt](atlas::perspective_camera& p_camera,
                                 atlas::transform& p_transform) {

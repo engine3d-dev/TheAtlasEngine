@@ -213,7 +213,7 @@ export namespace atlas {
 
                 invoke_physics_update();
 
-                invoke_on_update();
+                invoke_on_update(m_delta_time);
 
                 invoke_defer_update();
                 // We want this to be called after late update

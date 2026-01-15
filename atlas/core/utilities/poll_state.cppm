@@ -7,7 +7,7 @@ export module atlas.core.utilities.poll_state;
 
 
 export namespace atlas {
-    inline std::unordered_map<void*, std::function<void()>> s_update{};
+    inline std::unordered_map<void*, std::function<void(float)>> s_update{};
     inline std::unordered_map<void*, std::function<void()>>
         s_defer_update{};
     inline std::unordered_map<void*, std::function<void()>> s_ui_update{};
@@ -16,7 +16,7 @@ export namespace atlas {
     inline std::unordered_map<void*, std::function<void()>> s_start{};
 
     // TODO: Look into a different way of doing this
-    void poll_update(void* p_address,const std::function<void()>& p_callback) {
+    void poll_update(void* p_address,const std::function<void(float)>& p_callback) {
         s_update.emplace(p_address, p_callback);
     }
 
@@ -75,9 +75,9 @@ export namespace atlas {
      * As thesse are intended for invoking those queue's directly.
      *
      */
-    void invoke_on_update() {
+    void invoke_on_update(float p_delta_time) {
         for (auto& [address, on_update] : s_update) {
-            on_update();
+            on_update(p_delta_time);
         }
     }
 

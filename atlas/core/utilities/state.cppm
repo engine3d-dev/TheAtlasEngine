@@ -70,8 +70,8 @@ export namespace atlas {
         static_assert(std::is_member_pointer_v<UCallback>,
                       "Cannot register a function that is not a member "
                       "function of a class object");
-        poll_update(p_instance, [p_instance, p_callable]() {
-            (p_instance->*p_callable)();
+        poll_update(p_instance, [p_instance, p_callable](float p_delta_time) {
+            (p_instance->*p_callable)(p_delta_time);
         });
     }
 
