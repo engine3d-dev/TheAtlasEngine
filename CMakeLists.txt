@@ -113,7 +113,7 @@ target_sources(${PROJECT_NAME} PUBLIC
     FILES
 
     # core
-    atlas/atlas.cppm
+    # atlas/atlas.cppm
     atlas/core/api.cppm
     atlas/core/common.cppm
     atlas/core/utilities/types.cppm
@@ -186,7 +186,8 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas/drivers/jolt_cpp/context.cppm
 
     # drivers
-    atlas/drivers/vulkan/vulkan.cppm
+    # atlas/drivers/window_context.cppm
+    # atlas/drivers/vulkan/vulkan.cppm
     atlas/drivers/vulkan/utilities.cppm
     atlas/drivers/vulkan/instance_context.cppm
     atlas/drivers/vulkan/window_context.cppm
