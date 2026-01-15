@@ -61,7 +61,7 @@ endif()
 # )
 
 add_library(${PROJECT_NAME} STATIC)
-# add_subdirectory(editor)
+add_subdirectory(editor)
 
 set_packages(
     ENABLE_TESTS OFF
@@ -156,12 +156,16 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas/core/serialize/types.cppm
     atlas/core/serialize/serializer.cppm
 
+    # renderer
+    atlas/renderer/loader.cppm
     atlas/renderer/renderer.cppm
     
     atlas/drivers/drivers.cppm
     atlas/drivers/graphics_context.cppm
 
     atlas/drivers/renderer_system.cppm
+
+
     atlas/drivers/vulkan/hash.cppm
     atlas/drivers/vulkan/mesh.cppm
     atlas/drivers/vulkan/shader_resource_group.cppm
@@ -181,7 +185,7 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas/drivers/jolt_cpp/contact_listener.cppm
     atlas/drivers/jolt_cpp/context.cppm
 
-
+    # drivers
     atlas/drivers/vulkan/vulkan.cppm
     atlas/drivers/vulkan/utilities.cppm
     atlas/drivers/vulkan/instance_context.cppm

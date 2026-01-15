@@ -9,7 +9,8 @@ import atlas.graphics_api;
 import atlas.drivers.graphics_context;
 
 // this includes initialize_context
-import atlas.drivers;
+// import atlas.drivers;
+import atlas.renderer.loader;
 import atlas.core.scene.system_registry;
 
 // Defined in the user-application side

@@ -18,6 +18,7 @@ import atlas.core.utilities;
 import atlas.core.utilities.poll_state;
 import atlas.window;
 import atlas.drivers;
+import atlas.renderer.loader;
 import atlas.core.event;
 import atlas.drivers.renderer_system;
 import atlas.renderer;

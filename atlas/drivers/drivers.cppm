@@ -6,9 +6,8 @@ export module atlas.drivers;
 
 import atlas.core.utilities;
 import atlas.window;
-import atlas.drivers.graphics_context;
+// import atlas.drivers.graphics_context;
 import atlas.drivers.vulkan.window_context;
-import atlas.drivers.vulkan.instance_context;
 
 /**
  * @brief This drivers.cppm will contain API-agnostic implementation that may be widely implemented differently.
@@ -40,12 +39,12 @@ export namespace atlas {
      * @brief construct a new graphics context and initializes that API
      * @return shared_ptr<graphics_context>
      */
-    ref<graphics_context> initialize_context(const std::string& p_name, graphics_api p_api) {
-        switch(p_api) {
-            case graphics_api::vulkan:
-                return create_ref<vulkan::instance_context>(p_name);
-            default:
-                return nullptr;
-        }
-    }
+    // ref<graphics_context> initialize_context(const std::string& p_name, graphics_api p_api) {
+    //     switch(p_api) {
+    //         case graphics_api::vulkan:
+    //             return create_ref<vulkan::instance_context>(p_name);
+    //         default:
+    //             return nullptr;
+    //     }
+    // }
 };
