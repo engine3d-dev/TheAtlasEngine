@@ -12,11 +12,11 @@ export module atlas.drivers.vulkan.imgui_context;
 
 import atlas.common;
 import vk;
-import atlas.window;
 
 import atlas.drivers.vulkan.instance_context;
 import atlas.drivers.vulkan.physical_device;
 import atlas.drivers.vulkan.device;
+import atlas.drivers.vulkan.swapchain;
 
 namespace atlas::vulkan {
     static void im_gui_layout_color_modification() {
@@ -58,12 +58,12 @@ namespace atlas::vulkan {
     public:
         imgui_context() = default;
 
-        imgui_context(const ref<window>& p_window_ctx) {
+        imgui_context(const swapchain& p_swapchain_ctx, GLFWwindow* p_window_ctx) {
             m_instance = instance_context::handle();
             m_physical = instance_context::physical_driver();
             m_driver = instance_context::logical_device();
 
-            m_current_swapchain_handler = p_window_ctx->current_swapchain();
+            m_current_swapchain_handler = p_swapchain_ctx;
 
             // Setting up imgui
             IMGUI_CHECKVERSION();
@@ -95,7 +95,7 @@ namespace atlas::vulkan {
             }
 
             m_viewport_command_buffers.resize(
-            p_window_ctx->current_swapchain().image_size());
+            p_swapchain_ctx.image_size());
 
             for (size_t i = 0; i < m_viewport_command_buffers.size(); i++) {
                 ::vk::command_params settings = {
@@ -147,9 +147,9 @@ namespace atlas::vulkan {
                         m_driver, &desc_pool_create_info, nullptr, &m_desc_pool),
                         "vkCreateDescriptorPool");
 
-            create(*p_window_ctx,
-                p_window_ctx->current_swapchain().image_size(),
-                p_window_ctx->current_swapchain().swapchain_renderpass());
+            create(p_window_ctx,
+                p_swapchain_ctx.image_size(),
+                p_swapchain_ctx.swapchain_renderpass());
         }
 
         void create(GLFWwindow* p_window_handler, const uint32_t& p_image_size, const VkRenderPass& p_current_renderpass) {

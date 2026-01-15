@@ -79,7 +79,7 @@ export namespace atlas {
             p_params.background_color.w,
             });
 
-            m_ui_context = vulkan::imgui_context(m_window);
+            m_ui_context = vulkan::imgui_context(m_window->current_swapchain(), *m_window);
 
             vulkan::instance_context::submit_resource_free([this](){
                 m_ui_context.destroy();
