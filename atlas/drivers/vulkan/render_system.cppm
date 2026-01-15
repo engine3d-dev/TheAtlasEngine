@@ -14,12 +14,10 @@ module;
 export module atlas.drivers.vulkan.render_system;
 import atlas.drivers.renderer_system;
 
-// import atlas.logger;
-// import atlas.common;
-// import atlas.core.utilities.types;
 import atlas.core.utilities;
 import vk;
 import atlas.core.scene;
+import atlas.drivers.graphics_context;
 import atlas.drivers.vulkan.instance_context;
 import atlas.drivers.vulkan.physical_device;
 import atlas.drivers.vulkan.device;
@@ -60,11 +58,10 @@ export namespace atlas::vulkan {
      */
     class render_system : public renderer_system {
     public:
-        render_system(const window_params& p_params, uint32_t p_image_size, const std::string&) {
+        render_system(ref<graphics_context> p_context, const window_params& p_params, uint32_t p_image_size, const std::string&) {
+            m_physical = instance_context::physical_driver();
             m_device = instance_context::logical_device();
 
-            console_log_info("m_device = {}", (m_device != nullptr));
-            m_physical = instance_context::physical_driver();
             m_window_extent = p_params;
             m_image_count = p_image_size;
 
@@ -224,7 +221,7 @@ export namespace atlas::vulkan {
             m_white_texture =
             ::vk::texture(m_device, extent, m_physical.memory_properties());
 
-            instance_context::submit_resource_free([this]() {
+            p_context->submit_resource_free([this]() {
                 console_log_info("vulkan::render_system destructin invoked!!");
                 m_white_texture.destroy();
                 m_shader_group.destroy();

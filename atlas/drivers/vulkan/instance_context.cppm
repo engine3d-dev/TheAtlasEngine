@@ -174,10 +174,6 @@ namespace atlas::vulkan {
             vkDestroyInstance(m_instance_handler, nullptr);
         }
 
-        static VkInstance handle() {
-            return s_instance->m_instance_handler;
-        }
-
         /**
          * @brief returns function pointer to allow for setting debug object
          * name
@@ -219,6 +215,14 @@ namespace atlas::vulkan {
         }
 
     protected:
+        [[nodiscard]] VkInstance context_handle() const override {
+            return m_instance_handler;
+        }
+
+        void context_submit_resource_free(const std::function<void()>& p_resource) override {
+            m_resources_free.push_back(p_resource);
+        }
+
         void destroy_context() override {
             console_log_info("destroy_context!");
             for (auto& callback : m_resources_free) {

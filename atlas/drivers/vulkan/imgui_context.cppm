@@ -58,8 +58,9 @@ namespace atlas::vulkan {
     public:
         imgui_context() = default;
 
-        imgui_context(const swapchain& p_swapchain_ctx, GLFWwindow* p_window_ctx) {
-            m_instance = instance_context::handle();
+        imgui_context(const VkInstance& p_instance, const swapchain& p_swapchain_ctx, GLFWwindow* p_window_ctx) {
+            // m_instance = instance_context::handle();
+            m_instance = p_instance;
             m_physical = instance_context::physical_driver();
             m_driver = instance_context::logical_device();
 

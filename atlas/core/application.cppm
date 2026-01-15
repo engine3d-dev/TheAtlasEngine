@@ -31,9 +31,13 @@ import atlas.core.scene.components;
 import atlas.core.math;
 import atlas.drivers.vulkan.imgui_context;
 import vk;
+import atlas.drivers.graphics_context;
 
 export namespace atlas {
 
+    struct resource {
+        ref<graphics_context> graphics_context;
+    };
 
     /**
      * @brief application properties settings for the window
@@ -62,7 +66,7 @@ export namespace atlas {
          * @param p_settings is the specific application settings to configure
          * how the application may be setup
          */
-        application(const application_settings& p_params) {
+        application(ref<graphics_context> p_context, const application_settings& p_params) {
             console_log_info("application(const application_settings&) initialized!!!");
 
             window_params params = {
@@ -70,10 +74,10 @@ export namespace atlas {
                 .height = p_params.height,
                 .name = p_params.name,
             };
-            m_window = initialize_window(params, graphics_api::vulkan);
+            m_window = initialize_window(p_context, params, graphics_api::vulkan);
             event::set_window_size(static_cast<GLFWwindow*>(*m_window));
 
-            m_renderer = initialize_renderer(graphics_api::vulkan, params, m_window->current_swapchain().image_size(), "Renderer");
+            m_renderer = initialize_renderer(p_context, graphics_api::vulkan, params, m_window->current_swapchain().image_size(), "Renderer");
             m_renderer->set_background_color({
             p_params.background_color.x,
             p_params.background_color.y,
@@ -81,11 +85,16 @@ export namespace atlas {
             p_params.background_color.w,
             });
 
-            m_ui_context = vulkan::imgui_context(m_window->current_swapchain(), *m_window);
+            m_ui_context = vulkan::imgui_context(p_context->handle(), m_window->current_swapchain(), *m_window);
 
-            vulkan::instance_context::submit_resource_free([this](){
+            // vulkan::instance_context::submit_resource_free([this](){
+            //     m_ui_context.destroy();
+            // });
+
+            p_context->submit_resource_free([this](){
                 m_ui_context.destroy();
             });
+
             s_instance = this;
         }
 

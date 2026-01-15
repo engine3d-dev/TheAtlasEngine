@@ -14,7 +14,7 @@ import atlas.renderer.loader;
 import atlas.core.scene.system_registry;
 
 // Defined in the user-application side
-[[nodiscard]] atlas::ref<atlas::application> initialize_application();
+[[nodiscard]] atlas::ref<atlas::application> initialize_application(atlas::ref<atlas::graphics_context> p_context);
 
 
 // /*
@@ -62,7 +62,7 @@ int main() {
     atlas::ref<atlas::system_registry> system = atlas::create_ref<atlas::system_registry>("system");
     atlas::ref<atlas::graphics_context> context = atlas::initialize_context("vulkan", atlas::graphics_api::vulkan);
 
-    atlas::ref<atlas::application> app = initialize_application();
+    atlas::ref<atlas::application> app = initialize_application(context);
 
     app->execute();
     

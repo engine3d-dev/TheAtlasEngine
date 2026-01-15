@@ -22,7 +22,8 @@ import atlas.core.utilities;
 import vk;
 
 import atlas.window;
-import atlas.drivers.vulkan.instance_context;
+import atlas.drivers.graphics_context;
+// import atlas.drivers.vulkan.instance_context;
 import atlas.drivers.vulkan.utilities;
 import atlas.drivers.vulkan.swapchain;
 
@@ -34,7 +35,7 @@ export namespace atlas {
         */
         class window_context : public window {
         public:
-            window_context(const window_params& p_params) : m_params(p_params) {
+            window_context(ref<graphics_context> p_context, const window_params& p_params) : m_params(p_params) {
 
                 console_log_info("window_context constructed!!!");
 
@@ -47,7 +48,8 @@ export namespace atlas {
                 glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
                 glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
-                m_instance = instance_context::handle();
+                // m_instance = instance_context::handle();
+                m_instance = p_context->handle();
 
                 m_window_handle = glfwCreateWindow(static_cast<int>(m_params.width), static_cast<int>(m_params.height), m_params.name.c_str(), nullptr, nullptr);
 
@@ -64,7 +66,7 @@ export namespace atlas {
 
                 m_window_swapchain = swapchain(m_window_surface, m_params);
 
-                instance_context::submit_resource_free([this](){
+                p_context->submit_resource_free([this](){
                     console_log_info("vulkan::window_context submit_resource_free invokation!");
                     m_window_swapchain.destroy();
                 });
