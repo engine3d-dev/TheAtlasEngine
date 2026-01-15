@@ -199,17 +199,20 @@ export namespace atlas {
                 current_world_scope.progress(m_delta_time);
 
                 m_current_frame_index = m_window->acquired_next_frame();
+                console_log_info("current_frame_raw_index = {}", m_current_frame_index);
 
                 // Current commands that are going to be iterated through
                 // Prevents things like stalling so the CPU doesnt have to wait for
                 // the GPU to fully complete before starting on the next frame
-                // Command buffer uses this to track the frames to process its
-                // commands currently_active_frame = (m_current_frame_index + 1) %
-                // m_window->current_swapchain().settings().frames_in_flight;
+                // Command buffer uses this to track the frames to process its commands.
+                // current_frame = (acquired_next_frame + 1) % frames_in_flight;
+                auto current_frame = (m_current_frame_index + 1) % 2;
+                console_log_info("current_frame = {}", current_frame);
+
                 // TODO: Going to need to figure out where to put this
                 // Added this here because to ensure the handlers being used by the
                 // renderer is in sync when swapchain is resized
-                ::vk::command_buffer currently_active = m_window->active_command(m_current_frame_index);
+                ::vk::command_buffer currently_active = m_window->active_command(current_frame);
 
                 invoke_physics_update();
 
