@@ -79,10 +79,10 @@ export namespace atlas {
 
             m_renderer = initialize_renderer(p_context, graphics_api::vulkan, params, m_window->current_swapchain().image_size(), "Renderer");
             m_renderer->set_background_color({
-            p_params.background_color.x,
-            p_params.background_color.y,
-            p_params.background_color.z,
-            p_params.background_color.w,
+                p_params.background_color.x,
+                p_params.background_color.y,
+                p_params.background_color.z,
+                p_params.background_color.w,
             });
 
             m_ui_context = vulkan::imgui_context(p_context->handle(), m_window->current_swapchain(), *m_window);
@@ -99,7 +99,7 @@ export namespace atlas {
         }
 
         ~application() {
-            destroy();
+            m_window->close();
         }
 
         /**
@@ -315,41 +315,6 @@ export namespace atlas {
             return m_window->current_swapchain();
         }
 
-        /**
-         * @brief destroys the application completely
-         *
-         * TODO: Not make this static because you should not allow for this to
-         * be a direct calls users can have access to
-         */
-        static void destroy() {
-            s_instance->m_window->close();
-        }
-
-        /**
-         * @brief gives you the current aspect ratio based on the dimensions of
-         * the window
-         *
-         * @return a float which is just a static_cast<float>(width / height);
-         */
-        static float aspect_ratio() {
-            return s_instance->m_window->aspect_ratio();
-        }
-
-        /**
-         * @brief Intended to get the image size so when you use current_frame()
-         * to get thje frame index, that you are not making an attempt at
-         * accessing anything outside of the frame.
-         *
-         * @return uint32_t
-         */
-        static uint32_t image_size() {
-            return s_instance->m_window->current_swapchain().image_size();
-        }
-
-        static window_params params() {
-            return s_instance->m_window->current_swapchain().settings();
-        }
-
     protected:
         [[nodiscard]] ref<renderer_system> renderer_instance() const {
             return m_renderer;
@@ -366,7 +331,6 @@ export namespace atlas {
         vulkan::imgui_context m_ui_context;
         static application* s_instance;
     };
+
+    application* application::s_instance = nullptr;
 };
-
-
-atlas::application* atlas::application::s_instance = nullptr;

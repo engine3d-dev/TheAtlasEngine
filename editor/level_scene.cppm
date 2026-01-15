@@ -379,9 +379,10 @@ public:
         m_editor_menu.end();
 
         if (ImGui::Begin("Viewport")) {
-            glm::vec2 viewport_panel_size =
-            glm::vec2{ atlas::application::params().width,
-                        atlas::application::params().height };
+            // TODO: Consider doing this a different way, but not with static.
+            // glm::vec2 viewport_panel_size =
+            // glm::vec2{ atlas::application::params().width,
+            //             atlas::application::params().height };
 
             ImGui::End();
         }
