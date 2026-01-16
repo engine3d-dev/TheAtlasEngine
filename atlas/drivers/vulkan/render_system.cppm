@@ -67,63 +67,63 @@ export namespace atlas::vulkan {
 
 #ifdef USE_SHADERC
         console_log_info("shaderc enabled!!");
-        std::array<::vk::shader_source, 2> shader_sources = {
-            ::vk::shader_source{
+        std::array<vk::shader_source, 2> shader_sources = {
+            vk::shader_source{
               "experimental-shaders/test.vert",
-              ::vk::shader_stage::vertex,
+              vk::shader_stage::vertex,
             },
-            ::vk::shader_source{
+            vk::shader_source{
               "experimental-shaders/test.frag",
-              ::vk::shader_stage::fragment,
+              vk::shader_stage::fragment,
             }
         };
 #else
         console_log_info("shaderc disabled!!");
-        std::array<::vk::shader_source, 2> shader_sources = {
-            ::vk::shader_source{
+        std::array<vk::shader_source, 2> shader_sources = {
+            vk::shader_source{
               "experimental-shaders/test.vert.spv",
-              ::vk::shader_stage::vertex,
+              vk::shader_stage::vertex,
             },
-            ::vk::shader_source{
+            vk::shader_source{
               "experimental-shaders/test.frag.spv",
-              ::vk::shader_stage::fragment,
+              vk::shader_stage::fragment,
             }
         };
 #endif
-            std::array<::vk::vertex_attribute_entry, 4> attribute_entries = {
-                ::vk::vertex_attribute_entry{
+            std::array<vk::vertex_attribute_entry, 4> attribute_entries = {
+                vk::vertex_attribute_entry{
                     .location = 0,
-                    .format = ::vk::format::rgb32_sfloat,
+                    .format = vk::format::rgb32_sfloat,
                     .stride = offsetof(vk::vertex_input, position),
                 },
-                ::vk::vertex_attribute_entry{
+                vk::vertex_attribute_entry{
                     .location = 1,
-                    .format = ::vk::format::rgb32_sfloat,
+                    .format = vk::format::rgb32_sfloat,
                     .stride = offsetof(vk::vertex_input, color),
                 },
-                ::vk::vertex_attribute_entry{
+                vk::vertex_attribute_entry{
                     .location = 2,
-                    .format = ::vk::format::rgb32_sfloat,
+                    .format = vk::format::rgb32_sfloat,
                     .stride = offsetof(vk::vertex_input, normals),
                 },
-                ::vk::vertex_attribute_entry{
+                vk::vertex_attribute_entry{
                     .location = 3,
-                    .format = ::vk::format::rg32_sfloat,
+                    .format = vk::format::rg32_sfloat,
                     .stride = offsetof(vk::vertex_input, uv),
                 }
             };
 
-            std::array<::vk::vertex_attribute, 1> attribute = {
-                ::vk::vertex_attribute{
+            std::array<vk::vertex_attribute, 1> attribute = {
+                vk::vertex_attribute{
                     // layout (set = 0, binding = 0)
                     .binding = 0,
                     .entries = attribute_entries,
                     .stride = sizeof(vk::vertex_input),
-                    .input_rate = ::vk::input_rate::vertex,
+                    .input_rate = vk::input_rate::vertex,
                 },
             };
 
-            ::vk::shader_resource_info shader_info = {
+            vk::shader_resource_info shader_info = {
                 .sources = shader_sources,
             };
 
@@ -136,74 +136,74 @@ export namespace atlas::vulkan {
                 console_log_error("{}", e.what());
             }
             // Setting global descriptor set 0
-            std::vector<::vk::descriptor_entry> set0_entries = {
-                ::vk::descriptor_entry{
+            std::vector<vk::descriptor_entry> set0_entries = {
+                vk::descriptor_entry{
                     // specifies "layout (set = 0, binding = 0) uniform GlobalUbo"
-                    .type = ::vk::buffer::uniform,
+                    .type = vk::buffer::uniform,
                     .binding_point = {
                         .binding = 0,
-                        .stage = ::vk::shader_stage::vertex,
+                        .stage = vk::shader_stage::vertex,
                     },
                     .descriptor_count = 1,
                 },
-                ::vk::descriptor_entry{
+                vk::descriptor_entry{
                     // specifies "layout (set = 0, binding = 1) uniform light_ubo"
-                    .type = ::vk::buffer::uniform,
+                    .type = vk::buffer::uniform,
                     .binding_point = {
                         .binding = 1,
-                        .stage = ::vk::shader_stage::fragment,
+                        .stage = vk::shader_stage::fragment,
                     },
                     .descriptor_count = 1,
                 },
             };
 
             // uint32_t image_count = image_count;
-            ::vk::descriptor_layout set0_layout = {
+            vk::descriptor_layout set0_layout = {
                 .slot = 0,
                 .max_sets = m_image_count,
                 .entries = set0_entries,
             };
-            m_global_descriptors = ::vk::descriptor_resource(m_device, set0_layout);
+            m_global_descriptors = vk::descriptor_resource(m_device, set0_layout);
 
-            ::vk::uniform_params global_info = {
+            vk::uniform_params global_info = {
                 .phsyical_memory_properties = m_physical.memory_properties(),
                 .size_bytes = sizeof(global_ubo),
                 .debug_name = "\nm_global_uniforms\n",
                 .vkSetDebugUtilsObjectNameEXT = instance_context::get_debug_object_name()
             };
-            m_global_uniforms = ::vk::uniform_buffer(m_device, global_info);
+            m_global_uniforms = vk::uniform_buffer(m_device, global_info);
 
             // setting up our light uniforms as the global uniforms rather then
             // per-object basis
-            ::vk::uniform_params light_ubo_params = {
+            vk::uniform_params light_ubo_params = {
                 .phsyical_memory_properties = m_physical.memory_properties(),
                 .size_bytes = sizeof(light_scene_ubo),
             };
             m_point_light_uniforms =
-            ::vk::uniform_buffer(m_device, light_ubo_params);
+            vk::uniform_buffer(m_device, light_ubo_params);
 
-            std::array<::vk::write_buffer, 1> binding0_uniforms = {
-                ::vk::write_buffer{
+            std::array<vk::write_buffer, 1> binding0_uniforms = {
+                vk::write_buffer{
                 .buffer = m_global_uniforms,
                 .offset = 0,
                 .range = m_global_uniforms.size_bytes(),
                 },
             };
 
-            std::array<::vk::write_buffer, 1> binding1_uniforms = {
-                ::vk::write_buffer{
+            std::array<vk::write_buffer, 1> binding1_uniforms = {
+                vk::write_buffer{
                 .buffer = m_point_light_uniforms,
                 .offset = 0,
                 .range = m_point_light_uniforms.size_bytes(),
                 },
             };
 
-            std::array<::vk::write_buffer_descriptor, 2> set0_write_buffers = {
-                ::vk::write_buffer_descriptor{
+            std::array<vk::write_buffer_descriptor, 2> set0_write_buffers = {
+                vk::write_buffer_descriptor{
                     .dst_binding = 0,
                     .uniforms = binding0_uniforms,
                 },
-                ::vk::write_buffer_descriptor{
+                vk::write_buffer_descriptor{
                     .dst_binding = 1,
                     .uniforms = binding1_uniforms,
                 }
@@ -214,12 +214,12 @@ export namespace atlas::vulkan {
                 m_global_descriptors.layout(),
             };
 
-            ::vk::image_extent extent = {
+            vk::image_extent extent = {
                 .width = 1,
                 .height = 1,
             };
             m_white_texture =
-            ::vk::texture(m_device, extent, m_physical.memory_properties());
+            vk::texture(m_device, extent, m_physical.memory_properties());
 
             p_context->submit_resource_free([this]() {
                 console_log_info("vulkan::render_system destructin invoked!!");
@@ -283,25 +283,25 @@ export namespace atlas::vulkan {
                 // we do a check if the geometry uniform associated with this game
                 // object is valid
                 if (!m_mesh_geometry_set.contains(p_entity.id())) {
-                    ::vk::uniform_params geo_info = {
+                    vk::uniform_params geo_info = {
                         .phsyical_memory_properties =
                         m_physical.memory_properties(),
                         .size_bytes = sizeof(material_uniform),
                     };
                     m_mesh_geometry_set[p_entity.id()] =
-                    ::vk::uniform_buffer(m_device, geo_info);
+                    vk::uniform_buffer(m_device, geo_info);
                 }
 
                 // check if material is already associated with this particular game
                 // object
                 if (!m_mesh_material_set.contains(p_entity.id())) {
-                    ::vk::uniform_params mat_info = {
+                    vk::uniform_params mat_info = {
                         .phsyical_memory_properties =
                         m_physical.memory_properties(),
                         .size_bytes = sizeof(material_metadata),
                     };
                     m_mesh_material_set[p_entity.id()] =
-                    ::vk::uniform_buffer(m_device, mat_info);
+                    vk::uniform_buffer(m_device, mat_info);
                 }
 
                 new_mesh.add_diffuse(std::filesystem::path(target->diffuse));
@@ -310,46 +310,46 @@ export namespace atlas::vulkan {
                 if (new_mesh.loaded()) {
                     m_cached_meshes.emplace(p_entity.id(), new_mesh);
 
-                    std::vector<::vk::descriptor_entry> set1_entries = {
-                        ::vk::descriptor_entry{
+                    std::vector<vk::descriptor_entry> set1_entries = {
+                        vk::descriptor_entry{
                             // specifies "layout (set = 1, binding = 0) uniform geometry_uniform"
-                            .type = ::vk::buffer::uniform,
+                            .type = vk::buffer::uniform,
                             .binding_point = {
                                 .binding = 0,
-                                .stage = ::vk::shader_stage::vertex,
+                                .stage = vk::shader_stage::vertex,
                             },
                             .descriptor_count = 1,
                         },
-                        ::vk::descriptor_entry{
+                        vk::descriptor_entry{
                             // specifies "layout (set = 1, binding = 1) uniform sampler2D diffuse_texture"
-                            .type = ::vk::buffer::combined_image_sampler,
+                            .type = vk::buffer::combined_image_sampler,
                             .binding_point = {
                                 .binding = 1,
-                                .stage = ::vk::shader_stage::fragment,
+                                .stage = vk::shader_stage::fragment,
                             },
                             .descriptor_count = 1,
                         },
-                        ::vk::descriptor_entry{
+                        vk::descriptor_entry{
                             // specifies "layout (set = 1, binding = 2) uniform sampler2D specular_texture"
-                            .type = ::vk::buffer::combined_image_sampler,
+                            .type = vk::buffer::combined_image_sampler,
                             .binding_point = {
                                 .binding = 2,
-                                .stage = ::vk::shader_stage::fragment,
+                                .stage = vk::shader_stage::fragment,
                             },
                             .descriptor_count = 1,
                         },
-                        ::vk::descriptor_entry{
+                        vk::descriptor_entry{
                             // specifies "layout (set = 1, binding = 3) uniform sampler2D material_ubo"
-                            .type = ::vk::buffer::uniform,
+                            .type = vk::buffer::uniform,
                             .binding_point = {
                                 .binding = 3,
-                                .stage = ::vk::shader_stage::fragment,
+                                .stage = vk::shader_stage::fragment,
                             },
                             .descriptor_count = 1,
                         },
                     };
 
-                    ::vk::descriptor_layout set1_layout = {
+                    vk::descriptor_layout set1_layout = {
                         .slot = 1,
                         .max_sets = m_image_count,
                         .entries = set1_entries,
@@ -357,33 +357,33 @@ export namespace atlas::vulkan {
 
                     m_mesh_descriptors[p_entity.id()].emplace(
                     "materials",
-                    ::vk::descriptor_resource(m_device, set1_layout));
+                    vk::descriptor_resource(m_device, set1_layout));
 
                     // specify to the vk::write_descriptor_buffer
-                    std::array<::vk::write_buffer, 1> binding0_buffers = {
-                        ::vk::write_buffer{
+                    std::array<vk::write_buffer, 1> binding0_buffers = {
+                        vk::write_buffer{
                             .buffer = m_mesh_geometry_set[p_entity.id()],
                             .offset = 0,
                             .range = m_mesh_geometry_set[p_entity.id()].size_bytes(),
                         }
                     };
 
-                    std::array<::vk::write_buffer, 1> binding3_buffers = {
-                        ::vk::write_buffer{
+                    std::array<vk::write_buffer, 1> binding3_buffers = {
+                        vk::write_buffer{
                             .buffer = m_mesh_material_set[p_entity.id()],
                             .offset = 0,
                             .range = m_mesh_material_set[p_entity.id()].size_bytes(),
                         }
                     };
 
-                    std::vector<::vk::write_buffer_descriptor> material_uniforms = {
+                    std::vector<vk::write_buffer_descriptor> material_uniforms = {
                         // layout(set=  1, binding = 0) geometry_ubo
-                        ::vk::write_buffer_descriptor{
+                        vk::write_buffer_descriptor{
                             .dst_binding = 0,
                             .uniforms = binding0_buffers,
                         },
                         // layout(set=  1, binding = 3) material_ubo
-                        ::vk::write_buffer_descriptor{
+                        vk::write_buffer_descriptor{
                             .dst_binding = 3,
                             .uniforms = binding3_buffers,
                         },
@@ -392,48 +392,48 @@ export namespace atlas::vulkan {
                     // layout(set = 1, binding = 1)
                     // If the texture loaded successfully then we use that texture,
                     // otherwise utilize the default white texture
-                    ::vk::sample_image diffuse =
+                    vk::sample_image diffuse =
                     m_cached_meshes[p_entity.id()].diffuse_loaded()
                         ? m_cached_meshes[p_entity.id()].diffuse()
                         : m_white_texture.image();
 
                     // layout(set = 1, binding = 2)
-                    ::vk::sample_image specular =
+                    vk::sample_image specular =
                     m_cached_meshes[p_entity.id()].specular_loaded()
                         ? m_cached_meshes[p_entity.id()].specular()
                         : m_white_texture.image();
 
                     // writes to texture at layout(set = 1, binding = 1)
-                    std::array<::vk::write_image, 1>
+                    std::array<vk::write_image, 1>
                     binding1_images = {
-                        ::vk::write_image{
+                        vk::write_image{
                             .sampler = diffuse.sampler(),
                             .view = diffuse.image_view(),
                             // .image_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-                            .layout = ::vk::image_layout::shader_read_only_optimal,
+                            .layout = vk::image_layout::shader_read_only_optimal,
                         },
                     };
 
                     // writes to texture at layout(set = 1, binding = 2)
-                    std::array<::vk::write_image, 1>
+                    std::array<vk::write_image, 1>
                     binding2_images = {
-                            ::vk::write_image{
+                            vk::write_image{
                             .sampler = specular.sampler(),
                             .view = specular.image_view(),
                             // .image_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-                            .layout = ::vk::image_layout::shader_read_only_optimal,
+                            .layout = vk::image_layout::shader_read_only_optimal,
                         },
                     };
 
                     // vulkan image descriptors are for writing textures
-                    std::vector<::vk::write_image_descriptor> material_textures = {
+                    std::vector<vk::write_image_descriptor> material_textures = {
                         // layout(set = 1, binding = 1) uniform sampler2D
-                        ::vk::write_image_descriptor{
+                        vk::write_image_descriptor{
                             .dst_binding = 1,
                             .sample_images = binding1_images,
                         },
                         // layout(set = 1, binding = 2) uniform sampler2D
-                        ::vk::write_image_descriptor{
+                        vk::write_image_descriptor{
                             .dst_binding = 2,
                             .sample_images = binding2_images,
                         },
@@ -447,21 +447,21 @@ export namespace atlas::vulkan {
                 }
             });
 
-            std::vector<::vk::shader_handle> modules = m_shader_group.handles();
+            std::vector<vk::shader_handle> modules = m_shader_group.handles();
 
-            ::vk::pipeline_settings pipeline_configuration = {
+            vk::pipeline_settings pipeline_configuration = {
                 .renderpass = m_final_renderpass,
                 .shader_modules = modules,
                 .vertex_attributes = m_shader_group.vertex_attributes(),
                 .vertex_bind_attributes = m_shader_group.vertex_bind_attributes(),
                 .descriptor_layouts = m_sets_layouts
             };
-            m_main_pipeline = ::vk::pipeline(m_device, pipeline_configuration);
+            m_main_pipeline = vk::pipeline(m_device, pipeline_configuration);
 
             console_log_warn("graphics pipeline = {}", m_main_pipeline.alive());
         }
 
-        void start_frame(const ::vk::command_buffer& p_current, const window_params& p_settings, const VkRenderPass& p_renderpass, const VkFramebuffer& p_framebuffer, const glm::mat4& p_proj_view, uint32_t p_current_frame) override {
+        void start_frame(const vk::command_buffer& p_current, const window_params& p_settings, const VkRenderPass& p_renderpass, const VkFramebuffer& p_framebuffer, const glm::mat4& p_proj_view, uint32_t p_current_frame) override {
             m_proj_view = p_proj_view;
             // m_current_frame = application::current_frame();
             m_current_frame = p_current_frame;
@@ -493,7 +493,7 @@ export namespace atlas::vulkan {
 
             m_current_command_buffer = p_current;
             m_current_command_buffer.begin(
-            ::vk::command_usage::simulatneous_use_bit);
+            vk::command_usage::simulatneous_use_bit);
 
             VkViewport viewport = {
                 .x = 0.0f,
@@ -520,10 +520,10 @@ export namespace atlas::vulkan {
                                 VK_SUBPASS_CONTENTS_INLINE);
         }
 
-        void background_color(const std::array<float, 4>& p_color) override {
+        void background_color(const glm::vec4& p_color) override {
             m_color = {
-                { p_color.at(0), p_color.at(1), p_color.at(2), p_color.at(3) }
-            };
+                { p_color.x, p_color.y, p_color.z, p_color.w },
+        };
         }
 
         void post_frame() override {
@@ -639,10 +639,10 @@ export namespace atlas::vulkan {
         vk::uniform_buffer m_point_light_uniforms;
 
         // game object-specific meshes
-        std::map<uint32_t, ::vk::uniform_buffer> m_mesh_geometry_set;
+        std::map<uint32_t, vk::uniform_buffer> m_mesh_geometry_set;
         // TODO: Make this into a material system, eventually
-        std::map<uint64_t, ::vk::uniform_buffer> m_mesh_material_set;
-        std::map<uint32_t, std::map<std::string, ::vk::descriptor_resource>>
+        std::map<uint64_t, vk::uniform_buffer> m_mesh_material_set;
+        std::map<uint32_t, std::map<std::string, vk::descriptor_resource>>
           m_mesh_descriptors;
         uint32_t m_current_frame = 0;
         glm::mat4 m_model = { 1.f };

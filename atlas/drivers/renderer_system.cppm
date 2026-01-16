@@ -71,7 +71,7 @@ export namespace atlas {
          * @brief sets the background color and request that change to the
          * graphics API
          */
-        void set_background_color(const std::array<float, 4>& p_color) {
+        void set_background_color(const glm::vec4& p_color) {
             return background_color(p_color);
         }
 
@@ -90,7 +90,7 @@ export namespace atlas {
                                  uint32_t p_current_frame) = 0;
         virtual void post_frame() = 0;
 
-        virtual void background_color(const std::array<float, 4>& p_color) = 0;
+        virtual void background_color(const glm::vec4& p_color) = 0;
 
         virtual void current_scene(ref<scene>) = 0;
     };

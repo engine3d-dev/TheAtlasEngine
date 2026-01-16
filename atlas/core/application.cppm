@@ -78,12 +78,7 @@ export namespace atlas {
             event::set_window_size(static_cast<GLFWwindow*>(*m_window));
 
             m_renderer = initialize_renderer(p_context, graphics_api::vulkan, params, m_window->current_swapchain().image_size(), "Renderer");
-            m_renderer->set_background_color({
-                p_params.background_color.x,
-                p_params.background_color.y,
-                p_params.background_color.z,
-                p_params.background_color.w,
-            });
+            m_renderer->set_background_color(p_params.background_color);
 
             m_ui_context = vulkan::imgui_context(p_context->handle(), m_window->current_swapchain(), *m_window);
 
