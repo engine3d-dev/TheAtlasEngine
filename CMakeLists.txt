@@ -157,7 +157,7 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas/core/serialize/serializer.cppm
 
     # renderer
-    atlas/renderer/loader.cppm
+    atlas/renderer/context_loader.cppm
     atlas/renderer/renderer.cppm
     
     atlas/drivers/drivers.cppm
