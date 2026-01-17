@@ -9,7 +9,6 @@ import atlas.common;
 import atlas.core.scene.components;
 import atlas.core.event;
 import atlas.drivers.physics_context;
-import atlas.drivers.physics_context;
 import atlas.drivers.jolt_cpp.context;
 
 namespace atlas::physics {
@@ -17,8 +16,8 @@ namespace atlas::physics {
     //! @brief initializes the physics backend. SHOULD have an API associated
     //! with but for now, we assume we only have JoltPhysics as our only physics
     //! backend
-    ref<physics_context> initialize_physics_context(const jolt_settings& p_settings, event::bus& p_bus) {
-        return create_ref<jolt_context>(p_settings, p_bus);
+    ref<physics_context> initialize_physics_context(event::bus& p_bus) {
+        return create_ref<jolt_context>(p_bus);
     }
 
     /**
@@ -31,9 +30,8 @@ namespace atlas::physics {
         // Required by maps but should not be used in anyother circumstance.
         engine() = default;
         engine(flecs::world& p_registry,
-                       event::bus& p_bus,
-                       const jolt_settings& p_settings={}) : m_registry(&p_registry), m_bus(&p_bus) {
-            m_physics_context = initialize_physics_context(p_settings, *m_bus);
+                       event::bus& p_bus) : m_registry(&p_registry), m_bus(&p_bus) {
+            m_physics_context = initialize_physics_context(*m_bus);
 
             // This may change, but for now we want to ensure that we only want to
             // create a single physics body with a specific collider Rather then

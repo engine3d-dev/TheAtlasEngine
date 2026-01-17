@@ -18,7 +18,7 @@ import atlas.core.utilities;
 import atlas.core.utilities.poll_state;
 import atlas.window;
 import atlas.drivers;
-import atlas.renderer.loader;
+import atlas.renderer.context_loader;
 import atlas.core.event;
 import atlas.drivers.renderer_system;
 import atlas.renderer;
@@ -34,10 +34,6 @@ import vk;
 import atlas.drivers.graphics_context;
 
 export namespace atlas {
-
-    struct resource {
-        ref<graphics_context> graphics_context;
-    };
 
     /**
      * @brief application properties settings for the window

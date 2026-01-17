@@ -52,6 +52,53 @@ import atlas.drivers.jolt_cpp.types;
 
 namespace atlas::physics {
 
+    enum thread_type : uint8_t {
+        default_system = 0,
+        job_system = 1,
+    };
+
+    // This might be able to be generalized eventually but we will have to
+    // create our own manifold before that happens.
+    struct contact_event {
+        uint64_t entity_a = 0;
+        uint64_t entity_b = 0;
+        JPH::ContactManifold manifold;
+        JPH::ContactSettings settings;
+    };
+
+    /**
+     * @brief Jolt-specific context configurations
+     * These are going to be internally integrated to jolt_context
+     *
+     * As these parameters currently are going to be specific to Jolt.
+     *
+     * These parameters are also only specific to the construction-level, not
+     * initiation level of the API's
+     *
+     * @remark Min and max world bounds are values that are artbitrary (in other
+     * words limit the simulation space) as JoltPhysics has a limit on distance
+     * for its limitation in simulation space
+     */
+    struct jolt_settings {
+
+        uint32_t allocation_amount = 10 * 1024 * 1024;
+
+        //! @brief Specifying which threading system to use for Jolt.
+        thread_type thread_type = thread_type::default_system;
+
+        uint32_t physics_threads =
+          std::max(1u, std::thread::hardware_concurrency() - 2);
+
+        uint32_t max_jobs_power = 10;
+        uint32_t max_barriers = physics_threads * 16;
+        bool enable_multithread = true;
+
+        // Max memory size per scene
+        uint32_t max_bodies = 16384;
+        uint32_t max_body_pairs = 32768;
+        uint32_t max_contact_constraints = 8192;
+    };
+
     static void trace_impl(const char* p_in_fmt, ...) {
         va_list list;
         va_start(list, p_in_fmt);
@@ -94,7 +141,8 @@ namespace atlas::physics {
          * @param p_bus is the event::bus that allows for publishing physics
          * events to the subscribers of those said events
          */
-        jolt_context(const jolt_settings& p_settings, event::bus& p_bus) : m_contact_listener(p_bus) {
+        jolt_context(event::bus& p_bus) : m_contact_listener(p_bus) {
+            jolt_settings settings = {};
             JPH::RegisterDefaultAllocator();
 
             JPH::Trace = trace_impl;
@@ -104,7 +152,7 @@ namespace atlas::physics {
             JPH::RegisterTypes();
 
             m_temp_allocator =
-            create_ref<JPH::TempAllocatorImpl>(p_settings.allocation_amount);
+            create_ref<JPH::TempAllocatorImpl>(settings.allocation_amount);
 
             // This just sets up the JoltPhysics system and any listeners
             m_physics_system = create_ref<JPH::PhysicsSystem>();
@@ -114,24 +162,24 @@ namespace atlas::physics {
             create_ref<object_vs_broadphase_layer>();
             m_object_layer_pair_filter = create_ref<object_layer_pair_filter>();
 
-            if (p_settings.thread_type == thread_type::default_system) {
+            if (settings.thread_type == thread_type::default_system) {
 
                 m_thread_system = create_scope<JPH::JobSystemThreadPool>(
                 // Max jobs must be a power of 2, otherwise jph crashes.
                 // Bianary tree must be fully balanced
-                std::pow(2, p_settings.max_jobs_power),
-                p_settings.max_barriers,
-                p_settings.physics_threads);
+                std::pow(2, settings.max_jobs_power),
+                settings.max_barriers,
+                settings.physics_threads);
             }
             else {
                 console_log_error("Unsupported custom job system");
                 assert(false);
             }
 
-            m_physics_system->Init(p_settings.max_bodies,
+            m_physics_system->Init(settings.max_bodies,
                                 0,
-                                p_settings.max_body_pairs,
-                                p_settings.max_contact_constraints,
+                                settings.max_body_pairs,
+                                settings.max_contact_constraints,
                                 *m_broad_phase_layer_interface,
                                 *m_object_vs_broadphase_filter,
                                 *m_object_layer_pair_filter);

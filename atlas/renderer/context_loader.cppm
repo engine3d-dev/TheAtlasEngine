@@ -3,7 +3,7 @@ module;
 #include <string>
 #include <cstdint>
 
-export module atlas.renderer.loader;
+export module atlas.renderer.context_loader;
 
 import atlas.core.utilities;
 
