@@ -120,11 +120,19 @@ set_packages(
     nfd::nfd
 )
 
+if(UNIX AND NOT APPLE)
 target_compile_options(
     ${PROJECT_NAME}
     PUBLIC
     -g -Wall -Wextra -Wno-missing-field-initializers -Wshadow -msse4.1 -mavx
 )
+else()
+target_compile_options(
+    ${PROJECT_NAME}
+    PUBLIC
+    -g -Wall -Wextra -Wno-missing-field-initializers -Wshadow
+)
+endif()
 
 target_sources(${PROJECT_NAME} PUBLIC
     FILE_SET CXX_MODULES
