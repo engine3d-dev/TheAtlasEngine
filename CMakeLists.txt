@@ -30,6 +30,25 @@ else()
     message(STATUS "ENABLE_TESTS_ONLY macro not enabled")
 endif()
 
+# The variable CLANG_FORMAT_PATH is now defined automatically by conan_toolchain.cmake
+if(EXISTS "${CLANG_FORMAT_PATH}")
+    message(STATUS "${CLANG_FORMAT_PATH} found!")
+else()
+    message(WARNING "${CLANG_FORMAT_PATH} not found!")
+endif()
+
+if(EXISTS "${CLANG_TIDY_PATH}")
+    message(STATUS "${CLANG_TIDY_PATH} found!")
+else()
+    message(WARNING "${CLANG_TIDY_PATH} not found!")
+endif()
+
+if(EXISTS "${CMAKE_PATH}")
+    message(STATUS "${CMAKE_PATH} found!")
+else()
+    message(WARNING "${CMAKE_PATH} not found!")
+endif()
+
 # build_core_library(
 #     DIRECTORIES src editor
 

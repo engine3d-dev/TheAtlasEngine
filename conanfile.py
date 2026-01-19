@@ -4,6 +4,7 @@ from conan.tools.files import copy
 import os
 from pathlib import Path
 import shutil
+from conan.tools.files import save
 
 class AtlasRecipe(ConanFile):
     name = "atlas"
@@ -63,6 +64,13 @@ class AtlasRecipe(ConanFile):
         cmake_layout(self)
 
     def generate(self):
+        # llvm = self.dependencies["llvm-toolchain/20"]
+        llvm_path = self.dependencies.build["llvm-toolchain"].package_folder
+        cmake_path = self.dependencies.build["cmake"].package_folder
+        cmake_binary_location = f"{cmake_path.replace("\\", "/")}/bin/cmake.exe"
+        clang_format_path = f"{llvm_path}/bin/clang-format.exe"
+        clang_tidy_path = f"{llvm_path}/bin/clang-tidy.exe"
+        
         deps = CMakeDeps(self)
         deps.generate()
         tc = CMakeToolchain(self)
@@ -71,6 +79,9 @@ class AtlasRecipe(ConanFile):
         tc.generator = "Ninja"
         tc.variables["USE_SHADERC"] = self.options.enable_shaderc
         tc.variables["ENABLE_TESTS_ONLY"] = self.options.enable_tests_only
+        tc.variables["CLANG_FORMAT_PATH"] = clang_format_path.replace("\\", "/")
+        tc.variables["CLANG_TIDY_PATH"] = clang_tidy_path.replace("\\", "/")
+        tc.variables["CMAKE_PATH"] = cmake_binary_location
         tc.generate()
 
     def build(self):

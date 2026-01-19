@@ -13,6 +13,7 @@ module;
 #include <imgui.h>
 #include <imgui/backends/imgui_impl_glfw.h>
 #include <imgui/backends/imgui_impl_vulkan.h>
+#include <format>
 
 export module level_scene;
 
@@ -213,46 +214,26 @@ public:
         });
         point_light.add<atlas::tag::serialize>();
 
-        // benchmark
-
-        // auto start = std::chrono::high_resolution_clock::now();
-        // TEMP Code
-        // [[maybe_unused]] atlas::game_object point_light_test = entity("Point
-        // Light 1"); auto end = std::chrono::high_resolution_clock::now(); auto
-        // duration = (end - start);
-
-        // auto seconds =
-        // std::chrono::duration_cast<std::chrono::seconds>(duration).count(); auto
-        // nanoseconds =
-        // std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
-        // auto microseconds =
-        // std::chrono::duration_cast<std::chrono::microseconds>(duration).count();
-
-        // console_log_fatal("Seconds = {:.1f}", static_cast<float>(seconds));
-        // console_log_fatal("Nanoseconds = {:.1f}",
-        // static_cast<float>(nanoseconds)); console_log_fatal("Microseconds =
-        // {:.1f}", static_cast<float>(microseconds));
-
         // for(size_t i = 0; i < 26; i++) {
         // 	auto obj = entity(std::format("Object #{}", i));
-        // 	obj->set<atlas::physics_body>({
+        // 	obj.set<atlas::physics_body>({
         // 		.restitution = 1.25f,
         // 		.body_movement_type = atlas::dynamic,
         // 	});
 
-        // 	obj->set<atlas::sphere_collider>(
+        // 	obj.set<atlas::sphere_collider>(
         // 		{
         // 		.radius = 1.0f,
         // 	});
 
         // 	glm::vec3 pos = {float(0*1.4),float(0 * 1.4),float(0 * -3) };
 
-        // 	obj->set<atlas::transform>({
+        // 	obj.set<atlas::transform>({
         // 		.position = pos,
         // 		.rotation = {.3f, 0.0f, 0.0f},
         // 	});
 
-        // 	obj->set<atlas::mesh_source>({
+        // 	obj.set<atlas::mesh_source>({
         // 		.model_path = "assets/models/Ball OBJ.obj",
         // 		.diffuse = "assets/models/clear.png",
         // 	});
@@ -656,6 +637,7 @@ public:
     }
 
     void physics_update() {
+        // TODO: Replace delta_time with physics fixed-timestep instead
         float dt = atlas::application::delta_time();
         if (atlas::event::is_key_pressed(key_r) and !m_physics_runtime) {
             runtime_start();
