@@ -49,38 +49,8 @@ else()
     message(WARNING "${CMAKE_PATH} not found!")
 endif()
 
-# build_core_library(
-#     DIRECTORIES src editor
-
-#     ENABLE_TESTS ${ENABLE_TESTS_ONLY}
-
-#     UNIT_TEST_SOURCES
-
-#     tests/main.test.cpp
-#     tests/basic_add.test.cpp
-#     tests/entity_component_system.test.cpp
-#     tests/math.test.cpp
-#     tests/scene.test.cpp
-#     tests/jolt_type_conversion.test.cpp
-#     tests/jolt_engine.test.cpp
-
-#     PACKAGES
-#     tinyobjloader
-#     ${SHADERC_PACKAGE}
-#     watcher
-#     vulkan-cpp`
-#     nfd
-
-#     LINK_PACKAGES
-#     tinyobjloader::tinyobjloader
-#     ${SHADERC_LINK_PACKAGE}
-#     watcher::watcher
-#     vulkan-cpp
-#     nfd::nfd
-# )
-
 add_library(${PROJECT_NAME} STATIC)
-add_subdirectory(editor)
+# add_subdirectory(editor)
 
 set_packages(
     ENABLE_TESTS OFF
