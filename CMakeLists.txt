@@ -52,8 +52,22 @@ endif()
 add_library(${PROJECT_NAME} STATIC)
 # add_subdirectory(editor)
 
+if(${ENABLE_TESTS_ONLY})
+message(STATUS "ENABLING_TESTS_ON = TRUE")
+build_unit_test(
+    TEST_SOURCES
+    tests/main.test.cpp
+    tests/basic_add.test.cpp
+    tests/entity_component_system.test.cpp
+    tests/math.test.cpp
+    tests/scene.test.cpp
+
+    LINK_PACKAGES
+    atlas
+)
+endif()
+
 set_packages(
-    ENABLE_TESTS OFF
 
     PACKAGES
     glfw3
