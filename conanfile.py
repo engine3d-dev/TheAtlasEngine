@@ -44,7 +44,7 @@ class AtlasRecipe(ConanFile):
         self.requires("tinyobjloader/2.0.0-rc10")
         self.requires("stb/cci.20230920")
 
-        self.requires("nfd/2.0")
+        self.requires("nfd/3.0")
         self.requires("watcher/0.12.0")
         self.requires("boost-ext-ut/2.3.1")
 
