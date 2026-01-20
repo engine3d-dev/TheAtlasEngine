@@ -64,7 +64,6 @@ class AtlasRecipe(ConanFile):
         cmake_layout(self)
 
     def generate(self):
-        # llvm = self.dependencies["llvm-toolchain/20"]
         llvm_path = self.dependencies.build["llvm-toolchain"].package_folder
         cmake_path = self.dependencies.build["cmake"].package_folder
         cmake_binary_location = f"{cmake_path.replace("\\", "/")}/bin/cmake.exe"
