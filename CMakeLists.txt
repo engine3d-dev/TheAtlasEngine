@@ -90,17 +90,17 @@ set_packages(
     nfd::nfd
 )
 
-if(WIN32 OR UNIX)
+if(APPLE)
 target_compile_options(
     ${PROJECT_NAME}
     PUBLIC
-    -g -Wall -Wextra -Wno-missing-field-initializers -Wshadow -msse4.1 -mavx
+    -g -Wall -Wextra -Wno-missing-field-initializers -Wshadow
 )
 else()
 target_compile_options(
     ${PROJECT_NAME}
     PUBLIC
-    -g -Wall -Wextra -Wno-missing-field-initializers -Wshadow
+    -g -Wall -Wextra -Wno-missing-field-initializers -Wshadow -msse4.1 -mavx
 )
 endif()
 
