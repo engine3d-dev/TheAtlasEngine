@@ -120,7 +120,7 @@ set_packages(
     nfd::nfd
 )
 
-if(UNIX AND NOT APPLE)
+if(WIN32 OR UNIX)
 target_compile_options(
     ${PROJECT_NAME}
     PUBLIC
