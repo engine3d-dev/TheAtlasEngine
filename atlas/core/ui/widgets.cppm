@@ -6,6 +6,7 @@ module;
 #include <GLFW/glfw3.h>
 #include <flecs.h>
 #include <type_traits>
+#include <typeinfo>
 
 export module atlas.core.ui.widgets;
 

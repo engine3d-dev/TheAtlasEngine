@@ -1,7 +1,7 @@
 module;
 
 #include <Jolt/Jolt.h>
-#include <Flecs.h>
+#include <flecs.h>
 
 export module atlas.physics.engine;
 

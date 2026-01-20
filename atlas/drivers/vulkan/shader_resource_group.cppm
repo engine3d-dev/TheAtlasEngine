@@ -324,8 +324,18 @@ namespace atlas::vulkan {
             // Using C++'s std::views to extract all of the values in
             // unordered_map<string, vk::shader_handle> to a vector<shader_handle>
             // that gets passed to graphics pipeline
-            return (m_modules | std::views::values |
-                    std::ranges::to<std::vector>());
+            // TEMP: Removing this. Will add this back in later.
+            // return (m_modules | std::views::values |
+            //         std::ranges::to<std::vector>());
+            std::vector<::vk::shader_handle> result;
+
+            result.reserve(m_modules.size());
+
+            for (auto const& [name, handle] : m_modules) {
+                result.push_back(handle);
+            }
+
+            return result;
         }
 
         void create_module(std::span<char> p_blob, const ::vk::shader_source& p_source) {
