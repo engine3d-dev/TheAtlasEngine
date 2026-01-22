@@ -26,7 +26,7 @@ class AtlasRecipe(ConanFile):
     def build_requirements(self):
         self.tool_requires("cmake/4.1.1")
         self.tool_requires("ninja/1.13.1")
-        self.tool_requires("engine3d-cmake-utils/4.0")
+        self.tool_requires("engine3d-cmake-utils/5.0")
 
     def requirements(self):
         self.requires("joltphysics/5.2.0")

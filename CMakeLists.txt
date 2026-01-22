@@ -5,7 +5,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_COLOR_DIAGNOSTICS ON)
 
 project(atlas LANGUAGES CXX)
-set(ENGINE_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/atlas)
+
 
 # TODO: Remove this once shaderc in the github CI is fixed
 option(USE_SHADERC "[${PROJECT_NAME}] Enabling shaderc" OFF)
@@ -60,7 +60,6 @@ if(${ENABLE_TESTS_ONLY})
         tests/entity_component_system.test.cpp
         tests/math.test.cpp
         tests/scene.test.cpp
-        tests/object.test.cpp
 
         LINK_PACKAGES
         atlas
@@ -205,9 +204,6 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas/drivers/vulkan/physical_device.cppm
     atlas/drivers/vulkan/device.cppm
     atlas/drivers/vulkan/swapchain.cppm
-
-    # entry point
-    # atlas/core/entry_point/main.cppm
 )
 
 target_sources(${PROJECT_NAME} PUBLIC
@@ -215,12 +211,6 @@ target_sources(${PROJECT_NAME} PUBLIC
     TYPE CXX_MODULES
     PRIVATE atlas/core/entry_point/main.cpp
 )
-
-# target_sources(${PROJECT_NAME} PUBLIC
-#     FILE_SET CXX_MODULES
-#     TYPE CXX_MODULES
-#     PRIVATE atlas/core/main.cpp
-# )
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)
 
