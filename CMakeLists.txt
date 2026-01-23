@@ -1,6 +1,11 @@
-cmake_minimum_required(VERSION 3.27)
-project(atlas C CXX)
-set(ENGINE_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/atlas)
+cmake_minimum_required(VERSION 4.0)
+
+# Generate compile commands for anyone using our libraries.
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_COLOR_DIAGNOSTICS ON)
+
+project(atlas LANGUAGES CXX)
+
 
 # TODO: Remove this once shaderc in the github CI is fixed
 option(USE_SHADERC "[${PROJECT_NAME}] Enabling shaderc" OFF)
@@ -25,32 +30,203 @@ else()
     message(STATUS "ENABLE_TESTS_ONLY macro not enabled")
 endif()
 
-build_core_library(
-    DIRECTORIES src
+# The variable CLANG_FORMAT_PATH is now defined automatically by conan_toolchain.cmake
+if(EXISTS "${CLANG_FORMAT_PATH}")
+    message(STATUS "${CLANG_FORMAT_PATH} found!")
+else()
+    message(WARNING "${CLANG_FORMAT_PATH} not found!")
+endif()
 
-    ENABLE_TESTS ${ENABLE_TESTS_ONLY}
+if(EXISTS "${CLANG_TIDY_PATH}")
+    message(STATUS "${CLANG_TIDY_PATH} found!")
+else()
+    message(WARNING "${CLANG_TIDY_PATH} not found!")
+endif()
 
-    UNIT_TEST_SOURCES
+if(EXISTS "${CMAKE_PATH}")
+    message(STATUS "${CMAKE_PATH} found!")
+else()
+    message(WARNING "${CMAKE_PATH} not found!")
+endif()
 
-    tests/main.test.cpp
-    tests/basic_add.test.cpp
-    tests/entity_component_system.test.cpp
-    tests/math.test.cpp
-    tests/scene.test.cpp
-    tests/jolt_type_conversion.test.cpp
-    tests/jolt_engine.test.cpp
+add_library(${PROJECT_NAME} STATIC)
+# add_subdirectory(editor)
+
+if(${ENABLE_TESTS_ONLY})
+    build_unit_test(
+        TEST_SOURCES
+        tests/main.test.cpp
+        tests/basic_add.test.cpp
+        tests/entity_component_system.test.cpp
+        tests/math.test.cpp
+        tests/scene.test.cpp
+
+        LINK_PACKAGES
+        atlas
+    )
+endif()
+
+set_packages(
 
     PACKAGES
+    glfw3
+    Vulkan
+    glm
+    spdlog
+    imguidocking
+    Jolt
+    yaml-cpp
+    stb
+    flecs
+
     tinyobjloader
     ${SHADERC_PACKAGE}
     watcher
     vulkan-cpp
+    nfd
 
     LINK_PACKAGES
+    glfw
+    Vulkan::Vulkan
+    glm::glm
+    spdlog::spdlog
+    imguidocking::imguidocking
+
+    Jolt::Jolt
+    yaml-cpp
+    stb::stb
+    flecs::flecs_static
     tinyobjloader::tinyobjloader
     ${SHADERC_LINK_PACKAGE}
     watcher::watcher
-    vulkan-cpp::vulkan-cpp
+    vulkan-cpp
+    nfd::nfd
 )
 
-install(TARGETS ${PROJECT_NAME})
+if(APPLE)
+target_compile_options(
+    ${PROJECT_NAME}
+    PUBLIC
+    -g -Wall -Wextra -Wno-missing-field-initializers -Wshadow
+)
+else()
+target_compile_options(
+    ${PROJECT_NAME}
+    PUBLIC
+    -g -Wall -Wextra -Wno-missing-field-initializers -Wshadow -msse4.1 -mavx
+)
+endif()
+
+target_sources(${PROJECT_NAME} PUBLIC
+    FILE_SET CXX_MODULES
+    TYPE CXX_MODULES
+    FILES
+
+    # core
+    # atlas/atlas.cppm
+    atlas/core/api.cppm
+    atlas/core/common.cppm
+    atlas/core/utilities/types.cppm
+    atlas/core/utilities/utilities.cppm
+    atlas/core/core.cppm
+    atlas/core/logger.cppm
+    atlas/core/application.cppm
+    atlas/core/window.cppm
+
+    # math
+    atlas/core/math/types.cppm
+    atlas/core/math/math.cppm
+
+    # scenes
+    atlas/core/scene/components.cppm
+    atlas/core/scene/game_object.cppm
+    atlas/core/scene/scene.cppm
+    atlas/core/scene/world.cppm
+    atlas/core/scene/system_registry.cppm
+
+    atlas/core/utilities/state.cppm
+    atlas/core/utilities/poll_state.cppm
+
+    # event
+    atlas/core/event/event.cppm
+    atlas/core/event/bus.cppm
+    atlas/core/event/listener.cppm
+    atlas/core/event/keys.cppm
+    atlas/core/event/mouse_codes.cppm
+    atlas/core/event/joystick_codes.cppm
+    atlas/core/event/types.cppm
+
+    # editor
+    atlas/core/editor/dockspace.cppm
+    atlas/core/editor/menu_item.cppm
+    atlas/core/ui/widgets.cppm
+    atlas/core/filesystem/file_dialog.cppm
+
+    # serialize
+    atlas/core/serialize/types.cppm
+    atlas/core/serialize/serializer.cppm
+
+    # renderer
+    atlas/renderer/context_loader.cppm
+    atlas/renderer/renderer.cppm
+    
+    atlas/drivers/drivers.cppm
+    atlas/drivers/graphics_context.cppm
+
+    atlas/drivers/renderer_system.cppm
+
+
+    atlas/drivers/vulkan/hash.cppm
+    atlas/drivers/vulkan/mesh.cppm
+    atlas/drivers/vulkan/shader_resource_group.cppm
+    atlas/drivers/vulkan/render_system.cppm
+    atlas/drivers/vulkan/uniforms.cppm
+
+    atlas/drivers/vulkan/imgui_context.cppm
+
+    # physics
+    atlas/drivers/physics_context.cppm
+    atlas/physics/types.cppm
+    atlas/physics/physics_engine.cppm
+    
+    # jolt_cpp
+    atlas/drivers/jolt_cpp/math.cppm
+    atlas/drivers/jolt_cpp/broad_phase.cppm
+    atlas/drivers/jolt_cpp/contact_listener.cppm
+    atlas/drivers/jolt_cpp/context.cppm
+
+    # drivers
+    # atlas/drivers/window_context.cppm
+    # atlas/drivers/vulkan/vulkan.cppm
+    atlas/drivers/vulkan/utilities.cppm
+    atlas/drivers/vulkan/instance_context.cppm
+    atlas/drivers/vulkan/window_context.cppm
+    atlas/drivers/vulkan/physical_device.cppm
+    atlas/drivers/vulkan/device.cppm
+    atlas/drivers/vulkan/swapchain.cppm
+)
+
+target_sources(${PROJECT_NAME} PUBLIC
+    FILE_SET CXX_MODULES
+    TYPE CXX_MODULES
+    PRIVATE atlas/core/entry_point/main.cpp
+)
+
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)
+
+# install(TARGETS ${PROJECT_NAME})
+install(
+    TARGETS ${PROJECT_NAME}
+    EXPORT atlas_targets
+    FILE_SET CXX_MODULES DESTINATION "."
+    LIBRARY DESTINATION "lib"
+    ARCHIVE DESTINATION "lib"
+    CXX_MODULES_BMI DESTINATION "bmi"
+)
+
+install(
+    EXPORT atlas_targets
+    FILE "atlas-config.cmake"
+    DESTINATION "lib/cmake"
+    CXX_MODULES_DIRECTORY "cxx-modules"
+)

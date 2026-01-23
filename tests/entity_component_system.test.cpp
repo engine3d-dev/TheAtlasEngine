@@ -1,10 +1,16 @@
 #include <boost/ut.hpp>
-#include <core/math/types.hpp>
+// #include <core/math/types.hpp>
 #include <flecs.h>
 
 #include <Jolt/Jolt.h>
 #include <Jolt/Math/Vec4.h>
-#include <core/scene/scene.hpp>
+// #include <core/scene/scene.hpp>
+import atlas.core.scene;
+import atlas.core.scene.game_object;
+import atlas.core.math.types;
+import atlas.core.event;
+
+#include <glm/glm.hpp>
 
 namespace atlas {
 
@@ -82,7 +88,7 @@ namespace atlas {
 
         //! @note Each scene will define flecs::world typically
         //! @note flecs::world is how flecs (ECS) stores entities and components
-        atlas::event::event_bus test_event_bus;
+        atlas::event::bus test_event_bus;
         atlas::scene test_scene = atlas::scene("Mock Scene", test_event_bus);
 
         "create_entity::add<T>"_test = [&test_scene] {

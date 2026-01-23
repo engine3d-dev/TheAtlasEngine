@@ -1,8 +1,8 @@
-#include <core/math/types.hpp>
-
+#include <glm/glm.hpp>
 #include <Jolt/Jolt.h>
 #include <Jolt/Math/Vec4.h>
 #include <boost/ut.hpp>
+import atlas.core.math.types;
 
 namespace atlas {
     /**

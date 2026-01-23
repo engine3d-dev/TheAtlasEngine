@@ -1,4 +1,4 @@
-name: Linux Build Tests
+name: Linux Platform Build
 
 on: [pull_request]
 
@@ -9,11 +9,8 @@ jobs:
         steps:
             - uses: actions/checkout@v4
 
-            - name: Install LLVM
-              run: wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && sudo ./llvm.sh
-
             - name: Install LLVM's C++ Standard Library
-              run: sudo apt install libc++-17-dev libc++abi-17-dev
+              run: sudo apt-get install libc++-20-dev libc++abi-20-dev
 
             - name: Installing pipx
               run: sudo apt install pipx
@@ -21,24 +18,33 @@ jobs:
             - name: Installing Prerequisites for Linux
               run: |
                   sudo apt-get update
-                  sudo apt install lsb-release wget software-properties-common gnupg libgtk2.0-dev libgl1-mesa-dev -y
-                  # sudo apt install libx11-dev libx11-xcb-dev libfontenc-dev libice-dev libsm-dev libxau-dev libxaw7-dev libxt-dev libxtst-dev libxrender-dev libxrandr-dev libxi-dev -y
-                  sudo apt-get install -y libx11-dev libx11-xcb-dev libfontenc-dev libice-dev libsm-dev libxau-dev libxaw7-dev libxt-dev libxtst-dev libxrender-dev libxrandr-dev libxi-dev
                   sudo apt install software-properties-common -y
                   sudo add-apt-repository ppa:deadsnakes/ppa
 
+            - name: Install Vulkan SDK
+              uses: humbletim/setup-vulkan-sdk@v1.2.1
+              with:
+                vulkan-query-version: 1.4.304.1
+                vulkan-components: Vulkan-Headers, Vulkan-Loader
+                vulkan-use-cache: true
+
             - name: Installing Conan
-              run: pipx install "conan>=2.10.1"
+              run: pipx install "conan>=2.18.1"
 
             - name: Setting up Conan Profiles
               run: conan config install -sf profiles/x86_64/linux/ -tf profiles https://github.com/engine3d-dev/conan-config.git
 
-            - name: Installing project dependencies
-              run: conan remote add engine3d-conan https://libhal.jfrog.io/artifactory/api/conan/engine3d-conan
+            - name: Setting up Conan
+              run: |
+                conan config install https://github.com/engine3d-dev/conan-config.git
+                conan atlas setup
 
-            - name: Cloning Atlas repository
-              run: git clone https://github.com/engine3d-dev/TheAtlasEngine
-
-            - name: Building Atlas
-              run: conan build . -b missing -c tools.system.package_manager:sudo=True -c tools.system.package_manager:mode=install
+            - name: Creating Release build for TheAtlasEngine
+              run: conan atlas create . -s build_type=Release
+            
+            - name: Creating Debug build for TheAtlasEngine
+              run: conan atlas create . -s build_type=Debug
+            
+            - name: Creating MinSizeRel build for TheAtlasEngine
+              run: conan atlas create . -s build_type=MinSizeRel
 

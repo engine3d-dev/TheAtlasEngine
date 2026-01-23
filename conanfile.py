@@ -2,11 +2,13 @@ from conan import ConanFile
 from conan.tools.cmake import CMakeToolchain, CMake, cmake_layout, CMakeDeps
 from conan.tools.files import copy
 import os
+from pathlib import Path
 import shutil
+from conan.tools.files import save
 
 class AtlasRecipe(ConanFile):
     name = "atlas"
-    version = "0.4"
+    version = "0.5"
     package_type = "library"
     license = "Apache-2.0"
     homepage = "https://github.com/engine3d-dev/TheAtlasEngine"
@@ -18,19 +20,19 @@ class AtlasRecipe(ConanFile):
 
     # Specifying our build_type is only Debug and Release
     options = {"shared": [True, False], "fPIC": [True, False], "enable_tests_only": [True, False], "enable_shaderc": [True, False]}
-    default_options = {"shared": False, "fPIC": True, "enable_tests_only": True, "enable_shaderc": True}
-
+    default_options = {"shared": False, "fPIC": True, "enable_tests_only": True, "enable_shaderc": False}
+    exports_sources = "atlas/*", "tests/*", "CMakeLists.txt", "LICENSE"
 
     def build_requirements(self):
-        self.tool_requires("make/4.4.1")
         self.tool_requires("cmake/4.1.1")
-        self.tool_requires("engine3d-cmake-utils/4.0")
+        self.tool_requires("ninja/1.13.1")
+        self.tool_requires("engine3d-cmake-utils/5.0")
 
     def requirements(self):
         self.requires("joltphysics/5.2.0")
         if self.options.enable_shaderc:
             self.requires("shaderc/2025.3")
-        self.requires("imguidocking/2.0")
+        self.requires("imguidocking/3.0")
         self.requires("flecs/4.0.4")
         self.requires("glfw/3.4")
         self.requires("spdlog/1.16.0")
@@ -38,23 +40,13 @@ class AtlasRecipe(ConanFile):
         self.requires("yaml-cpp/0.8.0")
 
         # Vulkan-related headers and includes packages
-        self.requires("vulkan-headers/1.3.290.0")
-        self.requires("vulkan-cpp/3.0")
+        self.requires("vulkan-cpp/4.0")
         self.requires("tinyobjloader/2.0.0-rc10")
         self.requires("stb/cci.20230920")
 
-        self.requires("nfd/1.0")
+        self.requires("nfd/3.0")
         self.requires("watcher/0.12.0")
         self.requires("boost-ext-ut/2.3.1")
-    
-    def export_sources(self):
-        copy(self,"CMakeLists.txt", self.recipe_folder, self.export_sources_folder)
-        copy(self,"src/CMakeLists.txt", self.recipe_folder, self.export_sources_folder)
-        copy(self,"*.hpp", self.recipe_folder, self.export_sources_folder)
-        copy(self,"*.h", self.recipe_folder, self.export_sources_folder)
-        copy(self,"*.h", self.recipe_folder, self.export_sources_folder)
-        copy(self,"*.cpp", self.recipe_folder, self.export_sources_folder)
-        copy(self, "shader_ubo_tutorial", self.recipe_folder, self.export_sources_folder)
 
     def config_options(self):
         if self.settings.os == "Windows":
@@ -72,13 +64,23 @@ class AtlasRecipe(ConanFile):
         cmake_layout(self)
 
     def generate(self):
+        llvm_path = self.dependencies.build["llvm-toolchain"].package_folder
+        cmake_path = self.dependencies.build["cmake"].package_folder
+        cmake_binary_location = f"{cmake_path.replace("\\", "/")}/bin/cmake.exe"
+        clang_format_path = f"{llvm_path}/bin/clang-format.exe"
+        clang_tidy_path = f"{llvm_path}/bin/clang-tidy.exe"
+        
         deps = CMakeDeps(self)
         deps.generate()
         tc = CMakeToolchain(self)
         # TODO: Remove this once fixing shaderc issue in the CI is resolved
         # These are options that can be enabled/disabled with the `-o` parameter when compiling with `conan` command
+        tc.generator = "Ninja"
         tc.variables["USE_SHADERC"] = self.options.enable_shaderc
         tc.variables["ENABLE_TESTS_ONLY"] = self.options.enable_tests_only
+        tc.variables["CLANG_FORMAT_PATH"] = clang_format_path.replace("\\", "/")
+        tc.variables["CLANG_TIDY_PATH"] = clang_tidy_path.replace("\\", "/")
+        tc.variables["CMAKE_PATH"] = cmake_binary_location
         tc.generate()
 
     def build(self):
@@ -106,17 +108,15 @@ class AtlasRecipe(ConanFile):
 
 
     def package(self):
-        copy(self, "LICENSE", src=self.source_folder, dst=os.path.join(self.package_folder, "licenses"))
-        copy(self, pattern="*.hpp", src=os.path.join(self.source_folder, "atlas"), dst=os.path.join(self.package_folder, "atlas"))
-        copy(self, pattern="*.a", src=self.build_folder, dst=os.path.join(self.package_folder, "lib"), keep_path=False)
-        copy(self, pattern="*.so", src=self.build_folder, dst=os.path.join(self.package_folder, "lib"), keep_path=False)
-        copy(self, pattern="*.lib", src=self.build_folder, dst=os.path.join(self.package_folder, "lib"), keep_path=False)
-        copy(self, pattern="*.dll", src=self.build_folder, dst=os.path.join(self.package_folder, "bin"), keep_path=False)
-        copy(self, pattern="*.dylib", src=self.build_folder, dst=os.path.join(self.package_folder, "lib"), keep_path=False)
         cmake = CMake(self)
         cmake.install()
 
+        copy(self, "LICENSE",
+             dst=Path(self.package_folder) / "licenses",
+             src=self.source_folder)
+
     def package_info(self):
-        self.cpp_info.set_property("cmake_target_name", "atlas::atlas")
-        self.cpp_info.libs = ["atlas"]
-        self.cpp_info.includedirs = ['./', './atlas']  # Ordered list of include paths
+        # DISABLE Conan's config file generation
+        self.cpp_info.set_property("cmake_find_mode", "none")
+        # Tell CMake to include this directory in its search path
+        self.cpp_info.builddirs.append("lib/cmake")
