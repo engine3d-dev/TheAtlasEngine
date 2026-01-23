@@ -5,40 +5,35 @@
 [![GitHub forks](https://img.shields.io/github/forks/engine3d-dev/TheAtlasEngine.svg)](https://github.com/engine3d-dev/TheAtlasEngine/network)
 [![GitHub issues](https://img.shields.io/github/issues/engine3d-dev/TheAtlasEngine.svg)](https://github.com/engine3d-dev/TheAtlasEngine/issues)
 
-Open-source custom C++ 3D game engine which uses Vulkan for building games.
+An open-source 3D game engine using C++ and Vulkan with native C++20 module support.
 
 # Setup Development Environment
 
-TheAtlasEngine uses Conan the C++ package manager to manage our dependencies.
-
-Before you build the project, make sure to check the [getting start](https://engine3d-dev.github.io/0.1/getting_started/) page.
+New here? We use the C++ package manager, Conan. Follow the [Getting Started Guide](https://engine3d-dev.github.io/0.1/getting_started/) to setup your environment.
 
 ## How to Build the Editor
 
-Since there is not a way to set for building the editor. In the CMakeLists.txt file.
+Since there isn't a way to officially to building the editor. In the CMakeLists.txt file.
 
-Just add `editor` into your CMakeLists.txt file as shown in this example to build the editor.
+Just uncomment the `editor` into your CMakeLists.txt file as shown in this example to build the editor.
 
 ```Cmake
-build_core_library(
-    DIRECTORIES src editor
-    # ...
-)
+add_subdirectory(editor)
 ```
 
 ## Building the Project
 
 > [!TIP]
-> `-b missing` is to install any missing dependencies necessary to build TheAtlasEngine successfully.
-> `-s build_type=Debug` is to compile as a debug build when developing on the project.
+> `-s build_type=Debug` is recommended to compile the project as a Debug build for development.
+> For development to disable the testing environment.
 
 ```
-conan build . -b missing -s build_type=Debug
+conan atlas build . -s build_type=Debug -o enable_tests_only=False
 ```
 
 ## Executable Location
 
-After building TheAtlasEngine and the dependencies have been built successful. These are three locations where the editor executable is located at.
+After building TheAtlasEngine has been successful. Your executable will be executed via the following path layout.
 
 * Debug build will follow with, `./build/Debug/<exe path>`
 * Release build will follow with, `./build/Release/<exe path>`
@@ -67,7 +62,7 @@ This was the first game that we made with TheAtlasEngine when the project first 
 
 ## Wallace and Grommit Rocket Game
 ### Description
-Part of the SFSU Game Dev Club's Game Jam of Spring 2025. We developed a flappy-bird-like game mechanic rocket game. This is inspired by a few youtubers who also made a similar game. One of the YouTuber's named TheCherno.
+Developed during the SFSU Game Dev Club Spring 2025 Game Jam, this project serves as a technical demonstration of TheAtlasEngine core capabilities. Inspired by similar projects from creators like TheCherno -- to test the game engine's capabilities.
 
 * [itch.io link](https://niccoll-dyson.itch.io/wallace-and-grommit-spaceship-game) to out game jam submission
 * GitHub [repository link](https://github.com/SpinnerX/3d-rocket-game)
