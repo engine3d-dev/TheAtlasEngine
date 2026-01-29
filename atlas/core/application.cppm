@@ -231,7 +231,8 @@ export namespace atlas {
                 // pre-defined before the renderer does something with it.
                 // TODO: Add scene_manager to coordinate what to process
                 // before frame preparation
-                auto current_framebuffer =m_window->current_swapchain().active_framebuffer(m_current_frame_index);
+                // auto current_framebuffer =m_window->current_swapchain().active_framebuffer(m_current_frame_index);
+                auto current_framebuffer = m_ui_context.active_framebuffer(current_frame);
                 
                 m_renderer->begin_frame(
                     currently_active,
@@ -247,6 +248,7 @@ export namespace atlas {
                 
                 // execute UI logic
                 invoke_ui_update();
+                m_ui_context.create_viewport();
 
                 m_ui_context.end();
                 m_renderer->end_frame();
