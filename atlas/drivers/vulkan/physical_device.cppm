@@ -72,11 +72,22 @@ export namespace atlas::vulkan {
                 VkPhysicalDeviceFeatures device_features;
                 vkGetPhysicalDeviceProperties(device, &device_properties);
                 vkGetPhysicalDeviceFeatures(device, &device_features);
+            #if defined(__APPLE__)
+                // Apple silicon chips are integrated GPUs
+                // Prefer integrated GPU over discrete GPU on macOS
+                if (device_properties.deviceType ==
+                    VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU) {
+                    m_physical_driver = device;
+                    break;
+                }
+            #else
+                // Prefer discrete GPU over integrated GPU on other platforms (Linux, Windows)
                 if (device_properties.deviceType ==
                     VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
                     m_physical_driver = device;
                     break;
                 }
+            #endif
             }
 
             uint32_t queue_family_count = 0;

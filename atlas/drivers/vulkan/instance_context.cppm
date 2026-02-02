@@ -27,42 +27,31 @@ import atlas.drivers.vulkan.physical_device;
 import atlas.drivers.vulkan.device;
 
 namespace atlas::vulkan {
+
     static std::vector<const char*> initialize_instance_extensions() {
         std::vector<const char*> extension_names;
 
-        extension_names.emplace_back(VK_KHR_SURFACE_EXTENSION_NAME);
-        extension_names.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+        uint32_t extension_count = 0;
+        const char** require_extensions = glfwGetRequiredInstanceExtensions(&extension_count);
 
-        // An additional surface extension needs to be loaded. This extension is
-        // platform-specific so needs to be selected based on the platform the
-        // example is going to be deployed to. Preprocessor directives are used
-        // here to select the correct platform.
-#ifdef VK_USE_PLATFORM_WIN32_KHR
-        extension_names.emplace_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
-#endif
-#ifdef VK_USE_PLATFORM_XLIB_KHR
-        extensionNames.emplace_back(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
-#endif
-#ifdef VK_USE_PLATFORM_XCB_KHR
-        extensionNames.emplace_back(VK_KHR_XCB_SURFACE_EXTENSION_NAME);
-#endif
-#ifdef VK_USE_PLATFORM_ANDROID_KHR
-        extensionNames.emplace_back(VK_KHR_ANDROID_SURFACE_EXTENSION_NAME);
-#endif
-#ifdef VK_USE_PLATFORM_WAYLAND_KHR
-        extensionNames.emplace_back(VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME);
-#endif
-#ifdef VK_USE_PLATFORM_MACOS_MVK
-        extensionNames.emplace_back(VK_MVK_MACOS_SURFACE_EXTENSION_NAME);
-#endif
-#ifdef USE_PLATFORM_NULLWS
-        extensionNames.emplace_back(VK_KHR_DISPLAY_EXTENSION_NAME);
-#endif
+        for(uint32_t i = 0; i < extension_count; i++) {
+            // std::println("Required Extension = {}", require_extensions[i]);
+            extension_names.emplace_back(require_extensions[i]);
+        }
+
+    #if !defined(NDEBUG) || defined(_DEBUG) || defined(DEBUG)
+        extension_names.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+    #endif
+
+    #if defined(__APPLE__)
+        extension_names.emplace_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
+        extension_names.emplace_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+    #endif
 
         return extension_names;
     }
 
-#ifdef _DEBUG
+#if !defined(NDEBUG) || defined(_DEBUG) || defined(DEBUG)
     const std::vector<const char*> validation_layers = {
         "VK_LAYER_KHRONOS_validation",
         "VK_LAYER_KHRONOS_synchronization2"
@@ -98,15 +87,20 @@ namespace atlas::vulkan {
                 .pApplicationInfo = &app_info
             };
 
+
+    #if defined(__APPLE__)
+        create_info.flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
+    #endif
+
             //! @note Setting up the required extensions for vulkan
             std::vector<const char*> extensions = initialize_instance_extensions();
-    #if _DEBUG
+    #if !defined(NDEBUG) || defined(_DEBUG) || defined(DEBUG)
             extensions.push_back("VK_EXT_debug_utils");
     #endif
             create_info.enabledExtensionCount =
             static_cast<uint32_t>(extensions.size());
             create_info.ppEnabledExtensionNames = extensions.data();
-    #ifdef _DEBUG
+    #if !defined(NDEBUG) || defined(_DEBUG) || defined(DEBUG)
             // by default we enable validation layers used for debugging!
             create_info.enabledLayerCount =
             static_cast<uint32_t>(validation_layers.size());
@@ -144,8 +138,9 @@ namespace atlas::vulkan {
                 .pfnUserCallback = debug_callback,
             };
 
-            create_info.pNext =
-            (VkDebugUtilsMessengerCreateInfoEXT*)&debug_create_info;
+
+            // create_info.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&debug_create_info;
+            create_info.pNext = static_cast<VkDebugUtilsMessengerCreateInfoEXT*>(&debug_create_info);
     #else
             create_info.enabledLayerCount = 0;
             create_info.ppEnabledLayerNames = nullptr;
@@ -154,7 +149,7 @@ namespace atlas::vulkan {
             vk_check(vkCreateInstance(&create_info, nullptr, &m_instance_handler),
                     "vkCreateInstance");
 
-    #if _DEBUG
+    #if !defined(NDEBUG) || defined(_DEBUG) || defined(DEBUG)
             // This needs to be created after the VkInstance is or else it wont be
             // applied the debug information during validation layer error message
             // execution
