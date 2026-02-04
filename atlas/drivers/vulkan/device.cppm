@@ -98,9 +98,11 @@ namespace atlas::vulkan {
 
             float queue_priority[1] = { 0.0f };
 
-            std::vector<const char*> device_extension = {
-                VK_KHR_SWAPCHAIN_EXTENSION_NAME
-            };
+        #if defined(__APPLE__)
+            std::vector<const char*> device_extension = { VK_KHR_SWAPCHAIN_EXTENSION_NAME, "VK_KHR_portability_subset" };
+        #else
+            std::vector<const char*> device_extension = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+        #endif
 
             uint32_t graphics_index =
             m_physical.read_queue_family_indices().graphics;
