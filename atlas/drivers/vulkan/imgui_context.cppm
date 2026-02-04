@@ -86,7 +86,6 @@ namespace atlas::vulkan {
         vkQueueWaitIdle(temp_graphics_queue);
 
         temp_command_buffer.destroy();
-
     }
 
     export class imgui_context {
