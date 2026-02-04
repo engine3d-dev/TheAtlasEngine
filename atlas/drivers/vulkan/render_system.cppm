@@ -457,14 +457,27 @@ export namespace atlas::vulkan {
             });
 
             std::vector<vk::shader_handle> modules = m_shader_group.handles();
+            
+            std::array<vk::color_blend_attachment_state, 1> color_blend_attachments = {
+                vk::color_blend_attachment_state{},
+            };
 
-            vk::pipeline_settings pipeline_configuration = {
+            std::array<vk::dynamic_state, 2> dynamic_states = {
+                vk::dynamic_state::viewport, vk::dynamic_state::scissor
+            };
+
+            vk::pipeline_params pipeline_configuration = {
                 .renderpass = m_final_renderpass,
                 .shader_modules = modules,
                 .vertex_attributes = m_shader_group.vertex_attributes(),
                 .vertex_bind_attributes =
                   m_shader_group.vertex_bind_attributes(),
-                .descriptor_layouts = m_sets_layouts
+                .descriptor_layouts = m_sets_layouts,
+                .color_blend = {
+                    .attachments = color_blend_attachments,
+                },
+                .depth_stencil_enabled = true,
+                .dynamic_states = dynamic_states,
             };
             m_main_pipeline = vk::pipeline(m_device, pipeline_configuration);
 

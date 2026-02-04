@@ -170,7 +170,7 @@ export namespace atlas::vulkan {
                 .preTransform =
                 m_surface_properties.surface_capabilities.currentTransform,
                 .compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR,
-                .presentMode = VK_PRESENT_MODE_IMMEDIATE_KHR,
+                .presentMode = VK_PRESENT_MODE_FIFO_KHR,
                 .clipped = true
             };
 
