@@ -24,7 +24,6 @@ export namespace atlas::vulkan {
     /**
      * @brief mesh class specifically defined with vulkan implementations for
      * specific primitives
-     * TODO: Whenever we load in a texture that will be laucnhed asyncronously
      *
      * @brief mesh class will contain metadata needed by vulkan specifications
      * Ways to communicate through vulkan by only supplying information needed
