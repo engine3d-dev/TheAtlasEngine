@@ -31,7 +31,7 @@ export namespace atlas {
          * @brief responsibility is to preload any data that is necessary to be
          * loaded before being rendered
          */
-        void preload(const VkRenderPass& p_renderpass) {
+        void preload(const vk::renderpass& p_renderpass) {
             return preload_assets(p_renderpass);
         }
 
@@ -53,7 +53,7 @@ export namespace atlas {
          */
         void begin_frame(const vk::command_buffer& p_current,
                          const window_params& p_params,
-                         const VkRenderPass& p_renderpass,
+                         const vk::renderpass& p_renderpass,
                          const VkFramebuffer& p_framebuffer,
                          const glm::mat4& p_proj_view,
                          uint32_t p_current_frame) {
@@ -84,11 +84,11 @@ export namespace atlas {
         }
 
     private:
-        virtual void preload_assets(const VkRenderPass& p_renderpass) = 0;
+        virtual void preload_assets(const vk::renderpass& p_renderpass) = 0;
 
         virtual void start_frame(const vk::command_buffer& p_current,
                                  const window_params& p_params,
-                                 const VkRenderPass& p_renderpass,
+                                 const vk::renderpass& p_renderpass,
                                  const VkFramebuffer& p_framebuffer,
                                  const glm::mat4& p_proj_view,
                                  uint32_t p_current_frame) = 0;
