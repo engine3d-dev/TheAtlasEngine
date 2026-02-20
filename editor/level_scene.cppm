@@ -339,29 +339,29 @@ public:
 
     void on_ui_update() {
         // setting up the dockspace UI widgets at the window toolbar
-        m_editor_dockspace.begin();
-
-        try {
-            m_editor_menu.begin();
-        }
-        catch (const atlas::ui::menu_bar_exception& e) {
-        }
-
-        if (ImGui::BeginMenu("File")) {
-            if (ImGui::MenuItem("Save")) {
-                // m_deserializer_test.save("LevelScene");
+        if(m_editor_dockspace.begin()) {
+            try {
+                m_editor_menu.begin();
+            }
+            catch (const atlas::ui::menu_bar_exception& e) {
             }
 
-            ImGui::Separator();
+            if (ImGui::BeginMenu("File")) {
+                if (ImGui::MenuItem("Save")) {
+                    // m_deserializer_test.save("LevelScene");
+                }
 
-            if (ImGui::MenuItem("Exit")) {
-                // glfwSetWindowShouldClose(atlas::application::close(), true);
+                ImGui::Separator();
+
+                if (ImGui::MenuItem("Exit")) {
+                    // glfwSetWindowShouldClose(atlas::application::close(), true);
+                }
+
+                ImGui::EndMenu();
             }
 
-            ImGui::EndMenu();
+            m_editor_menu.end();
         }
-
-        m_editor_menu.end();
         ImGuiID dockspace_id = ImGui::GetID("Dockspace Demo");
         ImGui::SetNextWindowDockID(dockspace_id, ImGuiCond_FirstUseEver);
         if(ImGui::Begin("Viewport")) {
