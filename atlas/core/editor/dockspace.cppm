@@ -24,10 +24,9 @@ export namespace atlas::ui {
             m_is_dockspace_open = p_dockspace_open;
         }
 
-        void begin() {
+        bool begin() {
             ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
-            ImGuiWindowFlags window_flags =
-            ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+            ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove;
 
             if (m_fullscreen_enabled) {
                 ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -45,7 +44,7 @@ export namespace atlas::ui {
                 window_flags |= ImGuiWindowFlags_NoBackground;
             }
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-            ImGui::Begin("Dockspace Demo", &m_is_dockspace_open, window_flags);
+            m_is_begin = ImGui::Begin("Dockspace Demo", &m_is_dockspace_open, window_flags);
             ImGui::PopStyleVar();
 
             // Dockspace
@@ -54,6 +53,8 @@ export namespace atlas::ui {
                 ImGuiID dockspace_id = ImGui::GetID("MyDockspace");
                 ImGui::DockSpace(dockspace_id, ImVec2(0.f, 0.f), dockspace_flags);
             }
+
+            return m_is_begin;
         }
 
         void end() {
@@ -63,6 +64,7 @@ export namespace atlas::ui {
     private:
         bool m_fullscreen_enabled = false;
         bool m_is_dockspace_open = false;
+        bool m_is_begin=false;
     };
     
 };

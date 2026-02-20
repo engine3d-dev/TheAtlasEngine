@@ -71,6 +71,7 @@ export namespace atlas {
                 .name = p_params.name,
             };
             m_window = initialize_window(p_context, params, graphics_api::vulkan);
+            m_initial_window_params = m_window->data();
             event::set_window_size(static_cast<GLFWwindow*>(*m_window));
 
             m_renderer = initialize_renderer(p_context, graphics_api::vulkan, params, m_window->current_swapchain().image_size(), "Renderer");
@@ -216,6 +217,16 @@ export namespace atlas {
                     m_proj_view = p_pair->projection * p_pair->view;
                 });
 
+                // invalidate imgui context
+                if(m_initial_window_params.width != m_window->data().width and m_initial_window_params.height != m_window->data().height) {
+                    m_ui_context.invalidate(m_window->current_swapchain());
+                    // once we have invalidated the current width/height, we set that to its new width/height value post-resizing
+                    // TODO: Make this into a event::window_resize event that can be handled!
+                    m_initial_window_params = m_window->data();
+
+                    console_log_info("Window Size: ({}, {})", m_initial_window_params.width, m_initial_window_params.height);
+                }
+
                 // Prevents things like stalling so the CPU doesnt have to wait for
                 // the GPU to fully complete before starting on the next frame
                 // Command buffer uses this to track the frames to process its commands.
@@ -232,11 +243,12 @@ export namespace atlas {
                     m_proj_view,
                     m_current_frame_index);
 
-                m_ui_context.begin(currently_active, m_current_frame_index);
-                invoke_ui_update();
-                m_ui_context.create_viewport();
-
                 m_renderer->end_frame();
+
+
+                m_ui_context.begin(currently_active, m_current_frame_index);
+                
+                invoke_ui_update();
                 
                 // final renderpass for rendering the offscreen information to the final renderpass
                 window_params swapchain_extent = m_window->current_swapchain().settings();
@@ -307,6 +319,7 @@ export namespace atlas {
     private:
         float m_delta_time = 0.f;
         ref<window> m_window;
+        window_params m_initial_window_params;
         // vulkan::instance_context m_instance_handle_test;
         // std::optional<vulkan::instance_context> m_instance_handle_test;
         ref<renderer_system> m_renderer = nullptr;

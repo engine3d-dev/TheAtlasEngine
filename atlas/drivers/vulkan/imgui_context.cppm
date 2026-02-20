@@ -246,13 +246,6 @@ namespace atlas::vulkan {
 
             m_depth_viewport_image = vk::sample_image(m_driver, config_depth_image);
 
-            // std::array<VkImageView, 2> offscreen_image_view = { viewport_image.image_view(), depth_viewport_image.image_view() };
-            // vk::framebuffer_params configuring_offscreen_framebuffer = {
-            //     .renderpass = main_renderpass,
-            //     .views = offscreen_image_view, // the framebuffer attachments should match the images
-            //     .extent = swapchain_extent
-            // };
-            // vk::framebuffer offscreen_framebuffer(logical_device, configuring_offscreen_framebuffer);
             for (uint32_t i = 0; i < m_viewport_framebuffers.size(); i++) {
                 std::array<VkImageView, 2> image_view_attachments = { m_viewport_image.image_view(), m_depth_viewport_image.image_view() };
 
@@ -297,16 +290,80 @@ namespace atlas::vulkan {
             m_current = p_current;
         }
 
+        void invalidate(const swapchain& p_swapchain) {
+            // Wait for device to finish all operations before recreating resources
+            vkDeviceWaitIdle(m_driver);
 
-        void create_viewport() {
-            // ImGuiID dockspace_id = ImGui::GetID("Dockspace");
-            // ImGui::SetNextWindowDockID(dockspace_id, ImGuiCond_FirstUseEver);
-            // if(ImGui::Begin("Viewport")) {
-            //     ImVec2 viewport_size = ImGui::GetContentRegionAvail();
-            //     // ImGui::Image(m_viewport_image_id, {static_cast<float>(m_extent.width), static_cast<float>(m_extent.height)});
-            //     ImGui::Image(m_viewport_image_id, viewport_size);
-            //     ImGui::End();
-            // }
+            for(auto& fb : m_viewport_framebuffers) {
+                fb.destroy();
+            }
+
+            // Remove old texture from ImGui if needed
+            // ImTextureID in ImGui Vulkan backend is VkDescriptorSet cast to void*
+            if (g_viewport_image_id != nullptr) {
+                VkDescriptorSet old_descriptor_set = reinterpret_cast<VkDescriptorSet>(g_viewport_image_id);
+                ImGui_ImplVulkan_RemoveTexture(old_descriptor_set);
+                g_viewport_image_id = nullptr;
+            }
+            
+            // Destroy old images
+            m_viewport_image.destroy();
+            m_depth_viewport_image.destroy();
+            
+            // Recreate viewport images with new swapchain size
+            VkPhysicalDeviceMemoryProperties memory_properties = instance_context::physical_driver().memory_properties();
+            
+            vk::image_params config_image = {
+                .extent = { .width = p_swapchain.settings().width, .height = p_swapchain.settings().height },
+                .format = VK_FORMAT_B8G8R8A8_UNORM,
+                .property = vk::memory_property::device_local_bit,
+                .aspect = vk::image_aspect_flags::color_bit,
+                .usage = vk::image_usage::color_attachment_bit | vk::image_usage::transfer_dst_bit | vk::image_usage::sampled_bit,
+                .phsyical_memory_properties = memory_properties,
+                .address_mode_u = vk::sampler_address_mode::clamp_to_edge,
+                .addrses_mode_v = vk::sampler_address_mode::clamp_to_edge,
+                .addrses_mode_w = vk::sampler_address_mode::clamp_to_edge,
+            };
+            m_viewport_image = vk::sample_image(m_driver, config_image);
+            
+            // Transition to shader read-only layout
+            transition_image_layout(m_driver, m_viewport_image, VK_FORMAT_B8G8R8A8_UNORM, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+            
+            // Recreate depth image
+            vk::image_params config_depth_image = {
+                .extent = { .width = p_swapchain.settings().width, .height = p_swapchain.settings().height },
+                .format = m_driver.depth_format(),
+                .property = vk::memory_property::device_local_bit,
+                .aspect = vk::image_aspect_flags::depth_bit,
+                .usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
+                .phsyical_memory_properties = memory_properties,
+            };
+            m_depth_viewport_image = vk::sample_image(m_driver, config_depth_image);
+            
+            // Recreate framebuffers with new images
+            for (uint32_t i = 0; i < m_viewport_framebuffers.size(); i++) {
+                std::array<VkImageView, 2> image_view_attachments = { 
+                    m_viewport_image.image_view(), 
+                    m_depth_viewport_image.image_view() 
+                };
+                
+                vk::framebuffer_params framebuffer_info = {
+                    .renderpass = m_viewport_renderpass,
+                    .views = image_view_attachments,
+                    .extent = {p_swapchain.settings().width, p_swapchain.settings().height}
+                };
+                m_viewport_framebuffers[i] = vk::framebuffer(m_driver, framebuffer_info);
+            }
+            
+            // Update ImGui texture ID with new image
+            g_viewport_image_id = (ImTextureID)ImGui_ImplVulkan_AddTexture(
+                m_viewport_image.sampler(), 
+                m_viewport_image.image_view(), 
+                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+            );
+            
+            // Update extent
+            m_extent = {.width = p_swapchain.settings().width, .height = p_swapchain.settings().height};
         }
 
         void end() {
