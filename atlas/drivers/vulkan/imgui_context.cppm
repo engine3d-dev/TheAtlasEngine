@@ -88,6 +88,7 @@ namespace atlas::vulkan {
         temp_command_buffer.destroy();
     }
 
+    export ImTextureID g_viewport_image_id = nullptr;
     export class imgui_context {
     public:
         imgui_context() = default;
@@ -205,6 +206,34 @@ namespace atlas::vulkan {
             // transition image layout uses image memory barrier
             transition_image_layout(m_driver, m_viewport_image, VK_FORMAT_B8G8R8A8_UNORM, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
+            // Viewport-specific render pass: color attachment ends in SHADER_READ_ONLY_OPTIMAL
+            // so the offscreen texture can be sampled by ImGui. (Swapchain pass uses PRESENT_SRC.)
+            VkFormat depth_format = m_driver.depth_format();
+            std::array<::vk::attachment, 2> viewport_attachments = {
+                ::vk::attachment{
+                    .format = VK_FORMAT_B8G8R8A8_UNORM,
+                    .layout = ::vk::image_layout::color_optimal,
+                    .samples = ::vk::sample_bit::count_1,
+                    .load = ::vk::attachment_load::clear,
+                    .store = ::vk::attachment_store::store,
+                    .stencil_load = ::vk::attachment_load::clear,
+                    .stencil_store = ::vk::attachment_store::dont_care,
+                    .initial_layout = ::vk::image_layout::undefined,
+                    .final_layout = ::vk::image_layout::shader_read_only_optimal,
+                },
+                ::vk::attachment{
+                    .format = depth_format,
+                    .layout = ::vk::image_layout::depth_stencil_optimal,
+                    .samples = ::vk::sample_bit::count_1,
+                    .load = ::vk::attachment_load::clear,
+                    .store = ::vk::attachment_store::dont_care,
+                    .stencil_load = ::vk::attachment_load::dont_care,
+                    .stencil_store = ::vk::attachment_store::dont_care,
+                    .initial_layout = ::vk::image_layout::undefined,
+                    .final_layout = ::vk::image_layout::depth_stencil_optimal,
+                },
+            };
+            m_viewport_renderpass = ::vk::renderpass(m_driver, viewport_attachments);
 
             vk::image_params config_depth_image = {
                 .extent = { .width = p_swapchain_ctx.settings().width, .height = p_swapchain_ctx.settings().height },
@@ -225,18 +254,17 @@ namespace atlas::vulkan {
             // };
             // vk::framebuffer offscreen_framebuffer(logical_device, configuring_offscreen_framebuffer);
             for (uint32_t i = 0; i < m_viewport_framebuffers.size(); i++) {
-                // std::array<VkImageView, 2> image_view_attachments = { p_swapchain_ctx.active_image(0).image_view(), p_swapchain_ctx.active_image(1).image_view() };
                 std::array<VkImageView, 2> image_view_attachments = { m_viewport_image.image_view(), m_depth_viewport_image.image_view() };
 
                 vk::framebuffer_params framebuffer_info = {
-                    .renderpass = p_swapchain_ctx.swapchain_renderpass(),
+                    .renderpass = m_viewport_renderpass,
                     .views = image_view_attachments,
                     .extent = {p_swapchain_ctx.settings().width, p_swapchain_ctx.settings().height}
                 };
                 m_viewport_framebuffers[i] = vk::framebuffer(m_driver, framebuffer_info);
             }
 
-            m_viewport_image_id = (ImTextureID)ImGui_ImplVulkan_AddTexture(
+            g_viewport_image_id = (ImTextureID)ImGui_ImplVulkan_AddTexture(
                 m_viewport_image.sampler(), 
                 m_viewport_image.image_view(), 
                 VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
@@ -271,12 +299,14 @@ namespace atlas::vulkan {
 
 
         void create_viewport() {
-            if(ImGui::Begin("Viewport")) {
-                ImVec2 viewport_size = ImGui::GetContentRegionAvail();
-                // ImGui::Image(m_viewport_image_id, {static_cast<float>(m_extent.width), static_cast<float>(m_extent.height)});
-                ImGui::Image(m_viewport_image_id, viewport_size);
-                ImGui::End();
-            }
+            // ImGuiID dockspace_id = ImGui::GetID("Dockspace");
+            // ImGui::SetNextWindowDockID(dockspace_id, ImGuiCond_FirstUseEver);
+            // if(ImGui::Begin("Viewport")) {
+            //     ImVec2 viewport_size = ImGui::GetContentRegionAvail();
+            //     // ImGui::Image(m_viewport_image_id, {static_cast<float>(m_extent.width), static_cast<float>(m_extent.height)});
+            //     ImGui::Image(m_viewport_image_id, viewport_size);
+            //     ImGui::End();
+            // }
         }
 
         void end() {
@@ -300,6 +330,10 @@ namespace atlas::vulkan {
             return m_viewport_framebuffers[p_frame];
         }
 
+        [[nodiscard]] vk::renderpass viewport_renderpass() const {
+            return m_viewport_renderpass;
+        }
+
         void destroy() {
             ImGui_ImplVulkan_Shutdown();
             vkDestroyDescriptorPool(m_driver, m_desc_pool, nullptr);
@@ -312,6 +346,7 @@ namespace atlas::vulkan {
                 fb.destroy();
             }
 
+            m_viewport_renderpass.destroy();
             m_viewport_image.destroy();
             m_depth_viewport_image.destroy();
 
@@ -329,6 +364,7 @@ namespace atlas::vulkan {
         VkCommandBuffer m_current = nullptr;
         std::vector<::vk::command_buffer> m_viewport_command_buffers;
         std::array<vk::framebuffer, 2> m_viewport_framebuffers;
+        ::vk::renderpass m_viewport_renderpass;
         vk::sample_image m_viewport_image;
         vk::sample_image m_depth_viewport_image;
         ImTextureID m_viewport_image_id=nullptr;

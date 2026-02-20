@@ -65,7 +65,7 @@ export namespace atlas::vulkan {
             return m_swapchain_framebuffers[p_frame];
         }
 
-        [[nodiscard]] VkRenderPass swapchain_renderpass() const {
+        [[nodiscard]] vk::renderpass swapchain_renderpass() const {
             return m_final_renderpass;
         }
 

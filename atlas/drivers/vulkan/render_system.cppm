@@ -457,10 +457,11 @@ export namespace atlas::vulkan {
             });
 
             std::vector<vk::shader_handle> modules = m_shader_group.handles();
-            
-            std::array<vk::color_blend_attachment_state, 1> color_blend_attachments = {
-                vk::color_blend_attachment_state{},
-            };
+
+            std::array<vk::color_blend_attachment_state, 1>
+              color_blend_attachments = {
+                  vk::color_blend_attachment_state{},
+              };
 
             std::array<vk::dynamic_state, 2> dynamic_states = {
                 vk::dynamic_state::viewport, vk::dynamic_state::scissor
@@ -646,7 +647,10 @@ export namespace atlas::vulkan {
             });
 
             vkCmdEndRenderPass(m_current_command_buffer);
-            m_current_command_buffer.end();
+            // Do not end the command buffer here when using offscreen +
+            // swapchain two-pass: the application will begin the swapchain
+            // render pass for ImGui, then end the command buffer.
+            // m_current_command_buffer.end();
         }
 
         void current_scene(ref<scene> p_scene_ctx) override {
