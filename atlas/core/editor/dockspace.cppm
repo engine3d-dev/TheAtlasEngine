@@ -28,13 +28,14 @@ export namespace atlas::ui {
             ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
             ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove;
 
+            // Always sync dockspace to main viewport so it resizes with the host window
+            ImGuiViewport* viewport = ImGui::GetMainViewport();
+            // ImGui::SetNextWindowPos(viewport->Pos);
+            ImGui::SetNextWindowSize(viewport->Size);
+            ImGui::SetNextWindowViewport(viewport->ID);
+
             if (m_fullscreen_enabled) {
-                ImGuiViewport* viewport = ImGui::GetMainViewport();
-                ImGui::SetNextWindowPos(viewport->Pos);
-                ImGui::SetNextWindowSize(viewport->Size);
-                ImGui::SetNextWindowViewport(viewport->ID);
-                window_flags |= ImGuiWindowFlags_NoTitleBar |
-                                ImGuiWindowFlags_NoCollapse |
+                window_flags |= ImGuiWindowFlags_NoCollapse |
                                 ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
                 window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus |
                                 ImGuiWindowFlags_NoNavFocus;

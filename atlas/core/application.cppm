@@ -11,6 +11,8 @@ module;
 #include <GLFW/glfw3.h>
 #include <chrono>
 #include <flecs.h>
+#include <imgui.h>
+#include <imgui/backends/imgui_impl_glfw.h>
 
 export module atlas.application;
 
@@ -224,7 +226,8 @@ export namespace atlas {
                     // TODO: Make this into a event::window_resize event that can be handled!
                     m_initial_window_params = m_window->data();
 
-                    console_log_info("Window Size: ({}, {})", m_initial_window_params.width, m_initial_window_params.height);
+                    // Make sure to update the imgui window size
+                    ImGui::SetNextWindowSize(ImVec2(static_cast<float>(m_initial_window_params.width), static_cast<float>(m_initial_window_params.height)));
                 }
 
                 // Prevents things like stalling so the CPU doesnt have to wait for
