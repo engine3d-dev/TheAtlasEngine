@@ -14,6 +14,8 @@ module;
 #include <imgui/backends/imgui_impl_glfw.h>
 #include <imgui/backends/imgui_impl_vulkan.h>
 #include <format>
+#include <filesystem>
+#include <vulkan/vulkan.h>
 
 export module level_scene;
 
@@ -37,6 +39,8 @@ import atlas.core.editor.menu_item;
 import atlas.core.serialize;
 import atlas.physics.engine;
 import atlas.drivers.vulkan.imgui_context;
+import atlas.drivers.vulkan.instance_context;
+import vk;
 
 static void ui_component_list(flecs::entity& p_selected_entity) {
     std::string entity_name = p_selected_entity.name().c_str();
@@ -114,6 +118,12 @@ static void ui_component_list(flecs::entity& p_selected_entity) {
 
     ImGui::PopItemWidth();
 }
+
+
+enum scene_runtime {
+    edit,
+    play
+};
 
 export class level_scene final : public atlas::scene {
 public:
@@ -256,6 +266,32 @@ public:
         atlas::register_physics(this, &level_scene::physics_update);
         atlas::register_update(this, &level_scene::on_update);
         atlas::register_ui(this, &level_scene::on_ui_update);
+        // @note checking to see what state we are in. (If playing/stopping)
+		// Ref<Texture2D> icon = _sceneState == SceneState::Edit ? _iconPlay : _iconStop;
+        vk::texture_info config_texture = {
+            .phsyical_memory_properties = atlas::vulkan::instance_context::physical_driver().memory_properties(),
+            .filepath = std::filesystem::path("assets/icons/PlayButton.png")
+        };
+        m_play_button = vk::texture(atlas::vulkan::instance_context::logical_device(), config_texture);
+        if(!m_play_button.loaded()) {
+            console_log_info("Play Button Could not be loaded!!");
+        }
+        config_texture = {
+            .phsyical_memory_properties = atlas::vulkan::instance_context::physical_driver().memory_properties(),
+            .filepath = std::filesystem::path("assets/icons/StopButton.png")
+        };
+        m_stop_button = vk::texture(atlas::vulkan::instance_context::logical_device(), config_texture);
+        if(!m_stop_button.loaded()) {
+            console_log_info("Stop Button Could not be loaded!!");
+        }
+
+        m_play_button_id = static_cast<ImTextureID>(ImGui_ImplVulkan_AddTexture(m_play_button.image().sampler(), m_play_button.image().image_view(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
+        m_stop_button_id = static_cast<ImTextureID>(ImGui_ImplVulkan_AddTexture(m_stop_button.image().sampler(), m_stop_button.image().image_view(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
+
+        atlas::vulkan::instance_context::submit_resource_free([this](){
+            m_play_button.destroy();
+            m_stop_button.destroy();
+        });
     }
 
     ~level_scene() override = default;
@@ -327,14 +363,6 @@ public:
 
             p_transform.set_rotation(p_transform.rotation);
         });
-
-        if (m_physics_runtime) {
-            m_physics_engine.update(dt);
-        }
-
-        if (atlas::event::is_key_pressed(key_l) and m_physics_runtime) {
-            runtime_stop();
-        }
     }
 
     void on_ui_update() {
@@ -649,16 +677,59 @@ public:
             // }
         }
 
+
+        ui_toolbar();
+
         m_editor_dockspace.end();
+    }
+
+    void ui_toolbar() {
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 2)); // @note ImVec making button not touch bottom
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 2));
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+
+		auto& color = ImGui::GetStyle().Colors;
+		auto& buttonHovered = color[ImGuiCol_ButtonHovered];
+		auto& buttonActive = color[ImGuiCol_ButtonActive];
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
+
+		// @note setting size dynamically
+		/* float size = ImGui::GetWindowHeight() - 4.0f; */
+		float size = 20.0f;
+		// @note nullptr meaning not closing the toolbar (not having close button
+		/* ImGui::Begin("##", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse); */
+		ImGui::Begin("##toolbox");
+
+        ImTextureID button_id = (m_scene_state == scene_runtime::edit) ? m_play_button_id : m_stop_button_id;
+		
+		// @note GetWindowContentRegionMax().x is how much space is there for content (widgets)
+		// @note 0.5f is the offset for padding.
+		// @note takes button size and halves it and makes the offset the center of that tab. (centering  buttons)
+		ImGui::SameLine((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+
+		if(ImGui::ImageButton("##Button", button_id, ImVec2{size, size}, ImVec2(0, 0), ImVec2(1, 1))){
+			if(m_scene_state == scene_runtime::edit) {
+                console_log_warn("scene_runtime::play");
+                m_scene_state = scene_runtime::play;
+                m_physics_engine.start();
+            }
+			else if(m_scene_state == scene_runtime::play) {
+                console_log_warn("scene_runtime::edit");
+                m_scene_state = scene_runtime::edit;
+                m_physics_engine.stop();
+                reset_objects();
+            }
+		}
+		
+		ImGui::PopStyleVar(2);
+		ImGui::PopStyleColor(3);
+		ImGui::End();
     }
 
     void physics_update() {
         // TODO: Replace delta_time with physics fixed-timestep instead
         float dt = atlas::application::delta_time();
-        if (atlas::event::is_key_pressed(key_r) and !m_physics_runtime) {
-            runtime_start();
-        }
-
         auto viking_room = entity("Viking Room");
 
         atlas::physics_body* sphere_body =
@@ -688,24 +759,9 @@ public:
             sphere_body->angular_velocity = angular_vel;
         }
 
-        if (m_physics_runtime) {
+        if (m_scene_state == scene_runtime::play) {
             m_physics_engine.update(dt);
         }
-
-        if (atlas::event::is_key_pressed(key_l) and m_physics_runtime) {
-            runtime_stop();
-        }
-    }
-
-    void runtime_start() {
-        m_physics_runtime = true;
-        m_physics_engine.start();
-    }
-
-    void runtime_stop() {
-        m_physics_runtime = false;
-        m_physics_engine.stop();
-        reset_objects();
     }
 
     void reset_objects() {
@@ -744,10 +800,14 @@ private:
     // TODO -- when refactoring this would be at atlas::world level
     atlas::physics::engine m_physics_engine;
 
-    bool m_physics_runtime = false;
-
     atlas::ui::dockspace m_editor_dockspace;
     atlas::ui::menu_item m_editor_menu;
+
+    scene_runtime m_scene_state=scene_runtime::edit;
+    vk::texture m_play_button;
+    vk::texture m_stop_button;
+    ImTextureID m_play_button_id;
+    ImTextureID m_stop_button_id;
 
     // Note -- Added this temporarily
     // ImFont* m_font;
