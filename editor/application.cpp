@@ -30,8 +30,8 @@ atlas::ref<atlas::application>
 initialize_application(atlas::ref<atlas::graphics_context> p_contetxt) {
     atlas::application_settings settings = {
         .name = "Editor",
-        .width = 1200,
-        .height = 800,
+        .width = 1510,
+        .height = 877,
         .background_color = { 0.f, 0.f, 0.f, 0.f },
     };
     return create_ref<test_application>(p_contetxt, settings);

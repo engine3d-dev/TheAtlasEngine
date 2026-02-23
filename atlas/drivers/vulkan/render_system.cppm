@@ -262,7 +262,7 @@ export namespace atlas::vulkan {
         ~render_system() override = default;
 
     private:
-        void preload_assets(const VkRenderPass& p_renderpass) override {
+        void preload_assets(const vk::renderpass& p_renderpass) override {
             m_final_renderpass = p_renderpass;
             // set 1 -- material uniforms
             // ref<world> current_world = system_registry::get_world("Editor
@@ -457,10 +457,11 @@ export namespace atlas::vulkan {
             });
 
             std::vector<vk::shader_handle> modules = m_shader_group.handles();
-            
-            std::array<vk::color_blend_attachment_state, 1> color_blend_attachments = {
-                vk::color_blend_attachment_state{},
-            };
+
+            std::array<vk::color_blend_attachment_state, 1>
+              color_blend_attachments = {
+                  vk::color_blend_attachment_state{},
+              };
 
             std::array<vk::dynamic_state, 2> dynamic_states = {
                 vk::dynamic_state::viewport, vk::dynamic_state::scissor
@@ -486,7 +487,7 @@ export namespace atlas::vulkan {
 
         void start_frame(const vk::command_buffer& p_current,
                          const window_params& p_settings,
-                         const VkRenderPass& p_renderpass,
+                         const vk::renderpass& p_renderpass,
                          const VkFramebuffer& p_framebuffer,
                          const glm::mat4& p_proj_view,
                          uint32_t p_current_frame) override {
@@ -646,7 +647,10 @@ export namespace atlas::vulkan {
             });
 
             vkCmdEndRenderPass(m_current_command_buffer);
-            m_current_command_buffer.end();
+            // Do not end the command buffer here when using offscreen +
+            // swapchain two-pass: the application will begin the swapchain
+            // render pass for ImGui, then end the command buffer.
+            // m_current_command_buffer.end();
         }
 
         void current_scene(ref<scene> p_scene_ctx) override {
@@ -657,7 +661,7 @@ export namespace atlas::vulkan {
         VkDevice m_device = nullptr;
         physical_device m_physical;
         glm::mat4 m_proj_view;
-        VkRenderPass m_final_renderpass = nullptr;
+        vk::renderpass m_final_renderpass;
         window_params m_window_extent;
         vk::command_buffer m_current_command_buffer{};
         VkClearColorValue m_color;

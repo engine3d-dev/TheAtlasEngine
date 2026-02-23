@@ -65,7 +65,7 @@ export namespace atlas::vulkan {
             return m_swapchain_framebuffers[p_frame];
         }
 
-        [[nodiscard]] VkRenderPass swapchain_renderpass() const {
+        [[nodiscard]] vk::renderpass swapchain_renderpass() const {
             return m_final_renderpass;
         }
 
@@ -203,7 +203,7 @@ export namespace atlas::vulkan {
                                 m_swapchain_extent.height, },
                     .format = m_surface_properties.surface_format.format,
                     .aspect = ::vk::image_aspect_flags::color_bit,
-                    .usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+                    .usage = vk::image_usage::color_attachment_bit,
                     .mip_levels = 1,
                     .layer_count = 1,
                     .phsyical_memory_properties = m_physical.memory_properties(),

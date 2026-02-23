@@ -36,6 +36,7 @@ import atlas.core.ui.widgets;
 import atlas.core.editor.menu_item;
 import atlas.core.serialize;
 import atlas.physics.engine;
+import atlas.drivers.vulkan.imgui_context;
 
 static void ui_component_list(flecs::entity& p_selected_entity) {
     std::string entity_name = p_selected_entity.name().c_str();
@@ -239,6 +240,9 @@ public:
         // 	});
         // }
 
+        m_editor_dockspace.fullscreen(false);
+        m_editor_dockspace.dockspace_open(true);
+
         atlas::game_object gerald = entity("Gerald");
         gerald.add<atlas::point_light>();
 
@@ -335,38 +339,50 @@ public:
 
     void on_ui_update() {
         // setting up the dockspace UI widgets at the window toolbar
-        m_editor_dockspace.begin();
-
-        try {
-            m_editor_menu.begin();
-        }
-        catch (const atlas::ui::menu_bar_exception& e) {
-        }
-
-        if (ImGui::BeginMenu("File")) {
-            if (ImGui::MenuItem("Save")) {
-                // m_deserializer_test.save("LevelScene");
+        if(m_editor_dockspace.begin()) {
+            try {
+                m_editor_menu.begin();
+            }
+            catch (const atlas::ui::menu_bar_exception& e) {
             }
 
-            ImGui::Separator();
+            if (ImGui::BeginMenu("File")) {
+                if (ImGui::MenuItem("Save")) {
+                    // m_deserializer_test.save("LevelScene");
+                }
 
-            if (ImGui::MenuItem("Exit")) {
-                // glfwSetWindowShouldClose(atlas::application::close(), true);
+                ImGui::Separator();
+
+                if (ImGui::MenuItem("Exit")) {
+                    // glfwSetWindowShouldClose(atlas::application::close(), true);
+                }
+
+                ImGui::EndMenu();
             }
 
-            ImGui::EndMenu();
+            m_editor_menu.end();
         }
+        ImGuiID dockspace_id = ImGui::GetID("Dockspace Demo");
+        ImGui::SetNextWindowDockID(dockspace_id, ImGuiCond_FirstUseEver);
+        if(ImGui::Begin("Viewport")) {
+            ImVec2 viewport_size = ImGui::GetContentRegionAvail();
+            // ImGui::Image(m_viewport_image_id, {static_cast<float>(m_extent.width), static_cast<float>(m_extent.height)});
+            if(atlas::vulkan::g_viewport_image_id == nullptr) {
+                console_log_error("atlas::vulkan::g_viewport_image_id is nullptr!!!!!!!!!!!!!!!!!!!");
 
-        m_editor_menu.end();
-
-        if (ImGui::Begin("Viewport")) {
-            // TODO: Consider doing this a different way, but not with static.
-            // glm::vec2 viewport_panel_size =
-            // glm::vec2{ atlas::application::params().width,
-            //             atlas::application::params().height };
-
+            }
+            ImGui::Image(atlas::vulkan::g_viewport_image_id, viewport_size);
             ImGui::End();
         }
+
+        // if (ImGui::Begin("Viewport")) {
+        //     // TODO: Consider doing this a different way, but not with static.
+        //     // glm::vec2 viewport_panel_size =
+        //     // glm::vec2{ atlas::application::params().width,
+        //     //             atlas::application::params().height };
+
+        //     ImGui::End();
+        // }
 
         defer_begin();
         auto query_builder = this->query_builder<atlas::transform>().build();

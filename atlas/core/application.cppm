@@ -11,6 +11,8 @@ module;
 #include <GLFW/glfw3.h>
 #include <chrono>
 #include <flecs.h>
+#include <imgui.h>
+#include <imgui/backends/imgui_impl_glfw.h>
 
 export module atlas.application;
 
@@ -71,6 +73,7 @@ export namespace atlas {
                 .name = p_params.name,
             };
             m_window = initialize_window(p_context, params, graphics_api::vulkan);
+            m_initial_window_params = m_window->data();
             event::set_window_size(static_cast<GLFWwindow*>(*m_window));
 
             m_renderer = initialize_renderer(p_context, graphics_api::vulkan, params, m_window->current_swapchain().image_size(), "Renderer");
@@ -192,16 +195,9 @@ export namespace atlas {
                 m_current_frame_index = m_window->acquired_next_frame();
 
                 // Current commands that are going to be iterated through
-                // Prevents things like stalling so the CPU doesnt have to wait for
-                // the GPU to fully complete before starting on the next frame
-                // Command buffer uses this to track the frames to process its commands.
-                // current_frame = (acquired_next_frame + 1) % frames_in_flight;
-                auto current_frame = (m_current_frame_index + 1) % 2;
-
-                // TODO: Going to need to figure out where to put this
-                // Added this here because to ensure the handlers being used by the
-                // renderer is in sync when swapchain is resized
-                ::vk::command_buffer currently_active = m_window->active_command(current_frame);
+                // Use the acquired swapchain image index for the command buffer and swapchain framebuffer
+                // so we record and present the same image.
+                ::vk::command_buffer currently_active = m_window->active_command(m_current_frame_index);
 
                 invoke_physics_update();
 
@@ -223,49 +219,60 @@ export namespace atlas {
                     m_proj_view = p_pair->projection * p_pair->view;
                 });
 
-                // TODO: Introduce scene renderer that will make use of the
-                // begin/end semantics for setting up tasks during pre-frame
-                // operations
-                // renderer begin to indicate when a start of the frame to start
-                // processing specific tasks that either need to be computed or
-                // pre-defined before the renderer does something with it.
-                // TODO: Add scene_manager to coordinate what to process
-                // before frame preparation
-                auto current_framebuffer =m_window->current_swapchain().active_framebuffer(m_current_frame_index);
-                
+                // invalidate imgui context
+                if(m_initial_window_params.width != m_window->data().width and m_initial_window_params.height != m_window->data().height) {
+                    m_ui_context.invalidate(m_window->current_swapchain());
+                    // once we have invalidated the current width/height, we set that to its new width/height value post-resizing
+                    // TODO: Make this into a event::window_resize event that can be handled!
+                    m_initial_window_params = m_window->data();
+
+                    // Make sure to update the imgui window size
+                    ImGui::SetNextWindowSize(ImVec2(static_cast<float>(m_initial_window_params.width), static_cast<float>(m_initial_window_params.height)));
+                }
+
+                // Prevents things like stalling so the CPU doesnt have to wait for
+                // the GPU to fully complete before starting on the next frame
+                // Command buffer uses this to track the frames to process its commands.
+                // current_frame = (acquired_next_frame + 1) % frames_in_flight;
+                // auto current_frame = (m_current_frame_index + 1) % 2;
+
+                // viewport renderpass to render the 3D screen to the offscreen texture
+                auto viewport_framebuffer = m_ui_context.active_framebuffer(m_current_frame_index % 2u);
                 m_renderer->begin_frame(
                     currently_active,
                     m_window->current_swapchain().settings(),
-                    m_window->current_swapchain().swapchain_renderpass(),
-                    current_framebuffer,
+                    m_ui_context.viewport_renderpass(),
+                    viewport_framebuffer,
                     m_proj_view,
                     m_current_frame_index);
 
-                // TODO: vk:imgui_context will have its own renderpass, command
-                // buffers, and framebuffers specifically for UI-widgets + viewport
+                m_renderer->end_frame();
+
+
                 m_ui_context.begin(currently_active, m_current_frame_index);
                 
-                // execute UI logic
                 invoke_ui_update();
-
-                m_ui_context.end();
-                m_renderer->end_frame();
                 
-                /*
-                TODO -- have m_window present this to the screen, eventually
-                m_renderer should just fetch the images in the order to offload
-                to the swapchain for rendering.
-
-                    Where each image has gone through different phases of the
-                renderpass onto the final image
-                */
+                // final renderpass for rendering the offscreen information to the final renderpass
+                window_params swapchain_extent = m_window->current_swapchain().settings();
+                std::array<float, 4> color = { 0.1f, 0.105f, 0.11f, 1.0f };
+                vk::renderpass_begin_params begin_renderpass = {
+                    .current_command = currently_active,
+                    .extent = { swapchain_extent.width, swapchain_extent.height },
+                    .current_framebuffer = m_window->current_swapchain().active_framebuffer(m_current_frame_index),
+                    .color = color,
+                    .subpass = vk::subpass_contents::inline_bit
+                };
+                m_window->current_swapchain().swapchain_renderpass().begin(begin_renderpass);
+                m_ui_context.end();
+                m_window->current_swapchain().swapchain_renderpass().end(currently_active);
+                currently_active.end();
 
                 std::array<const VkCommandBuffer, 1> commands = {
                     currently_active,
                 };
                 m_window->current_swapchain().submit(commands);
 
-                // Presents to the swapchain to display to screen
                 m_window->present(m_current_frame_index);
 
             }
@@ -315,6 +322,7 @@ export namespace atlas {
     private:
         float m_delta_time = 0.f;
         ref<window> m_window;
+        window_params m_initial_window_params;
         // vulkan::instance_context m_instance_handle_test;
         // std::optional<vulkan::instance_context> m_instance_handle_test;
         ref<renderer_system> m_renderer = nullptr;

@@ -100,6 +100,7 @@ namespace atlas::vulkan {
             m_driver = instance_context::logical_device();
             // vk::device device_temp = instance_context::physical_driver();
 
+            m_glfw_window = p_window_ctx;
             m_current_swapchain_handler = p_swapchain_ctx;
             m_extent = {.width = p_swapchain_ctx.settings().width, .height = p_swapchain_ctx.settings().height};
 
@@ -257,11 +258,12 @@ namespace atlas::vulkan {
                 m_viewport_framebuffers[i] = vk::framebuffer(m_driver, framebuffer_info);
             }
 
-            g_viewport_image_id = (ImTextureID)ImGui_ImplVulkan_AddTexture(
+            // g_viewport_image_id = (ImTextureID)ImGui_ImplVulkan_AddTexture(
+            g_viewport_image_id = static_cast<ImTextureID>(ImGui_ImplVulkan_AddTexture(
                 m_viewport_image.sampler(), 
                 m_viewport_image.image_view(), 
                 VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
-            );
+            ));
         }
 
         void create(GLFWwindow* p_window_handler, const uint32_t& p_image_size, const VkRenderPass& p_current_renderpass) {
@@ -285,6 +287,22 @@ namespace atlas::vulkan {
             ImGui_ImplVulkan_NewFrame();
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
+
+            // Sync ImGui display size and main viewport with the host GLFW window so the
+            // dockspace and widgets resize correctly when the window is resized.
+            if (m_glfw_window != nullptr) {
+                int fb_width = 0, fb_height = 0;
+                glfwGetFramebufferSize(m_glfw_window, &fb_width, &fb_height);
+                if (fb_width > 0 && fb_height > 0) {
+                    ImGuiIO& io = ImGui::GetIO();
+                    io.DisplaySize = ImVec2(static_cast<float>(fb_width), static_cast<float>(fb_height));
+                    ImGuiViewport* main_viewport = ImGui::GetMainViewport();
+                    if (main_viewport != nullptr) {
+                        main_viewport->Pos = ImVec2(0.f, 0.f);
+                        main_viewport->Size = io.DisplaySize;
+                    }
+                }
+            }
 
             m_current_frame_index = p_frame_index;
             m_current = p_current;
@@ -364,6 +382,11 @@ namespace atlas::vulkan {
             
             // Update extent
             m_extent = {.width = p_swapchain.settings().width, .height = p_swapchain.settings().height};
+
+            ImGuiIO& io = ImGui::GetIO();
+            // io.Display
+            io.DisplaySize.x = static_cast<float>(m_extent.width);
+            io.DisplaySize.y = static_cast<float>(m_extent.height);
         }
 
         void end() {
@@ -415,6 +438,7 @@ namespace atlas::vulkan {
         VkInstance m_instance = nullptr;
         VkPhysicalDevice m_physical = nullptr;
         device m_driver{};
+        GLFWwindow* m_glfw_window = nullptr;
         uint32_t m_current_frame_index = 0;
         VkSwapchainKHR m_current_swapchain_handler = nullptr;
         VkDescriptorPool m_desc_pool = nullptr;
