@@ -19,15 +19,10 @@ module;
 
 export module level_scene;
 
-// import atlas.logger;
 import atlas.core.utilities;
 import atlas.application;
 import atlas.core.scene;
 import atlas.core.scene.game_object;
-// import atlas.core.event.bus;
-// import atlas.core.event.keys;
-// import atlas.core.event.mouse_codes;
-// import atlas.core.event.types;
 import atlas.core.event;
 import atlas.core.scene.components;
 import atlas.core.utilities.state;
@@ -698,11 +693,7 @@ public:
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
 
-		// @note setting size dynamically
-		/* float size = ImGui::GetWindowHeight() - 4.0f; */
-		float size = 20.0f;
-		// @note nullptr meaning not closing the toolbar (not having close button
-		/* ImGui::Begin("##", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse); */
+		float button_size = 20.0f;
 		ImGui::Begin("##toolbox");
 
         ImTextureID button_id = (m_scene_state == scene_runtime::edit) ? m_play_button_id : m_stop_button_id;
@@ -710,16 +701,14 @@ public:
 		// @note GetWindowContentRegionMax().x is how much space is there for content (widgets)
 		// @note 0.5f is the offset for padding.
 		// @note takes button size and halves it and makes the offset the center of that tab. (centering  buttons)
-		ImGui::SameLine((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+		ImGui::SameLine((ImGui::GetWindowContentRegionMax().x * 0.5f) - (button_size * 0.5f));
 
-		if(ImGui::ImageButton("##Button", button_id, ImVec2{size, size}, ImVec2(0, 0), ImVec2(1, 1))){
+		if(ImGui::ImageButton("##Button", button_id, ImVec2{button_size, button_size}, ImVec2(0, 0), ImVec2(1, 1))){
 			if(m_scene_state == scene_runtime::edit) {
-                console_log_warn("scene_runtime::play");
                 m_scene_state = scene_runtime::play;
                 m_physics_engine.start();
             }
 			else if(m_scene_state == scene_runtime::play) {
-                console_log_warn("scene_runtime::edit");
                 m_scene_state = scene_runtime::edit;
                 m_physics_engine.stop();
                 reset_objects();
@@ -799,9 +788,7 @@ private:
 
     atlas::game_object_optional m_current_entity;
     float m_movement_speed = 10.f;
-
-    // Setting physics system
-    // TODO -- when refactoring this would be at atlas::world level
+    
     atlas::physics::engine m_physics_engine;
 
     atlas::ui::dockspace m_editor_dockspace;

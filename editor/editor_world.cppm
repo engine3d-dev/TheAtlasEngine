@@ -4,12 +4,8 @@ module;
 
 export module editor_world;
 
-// import atlas.common;
-// import atlas.logger;
 import atlas.core.utilities;
 import atlas.core.scene.world;
-// import atlas.core.event.bus;
-// import atlas.core.event.types;
 import atlas.core.event;
 import atlas.core.scene.system_registry;
 import atlas.drivers.renderer_system;
