@@ -60,11 +60,11 @@ public:
 
             // Setting up content button properties
             static float padding = 16.0f;
-            static float thumbnailSize = 128.0f;
-            float cellSize = thumbnailSize + padding;
+            float thumbnail_size = 86.96f; // originally 128.f
+            float cell_size = thumbnail_size + padding;
 
             float panelWidth = ImGui::GetContentRegionAvail().x;
-            int columnCount = (int)(panelWidth / cellSize);
+            int columnCount = (int)(panelWidth / cell_size);
 
             if(columnCount < 1)
                 columnCount = 1;
@@ -89,8 +89,8 @@ public:
                 ImTextureID icon = dir_entry.is_directory() ? m_directory_icon_id : m_file_icon_id;
                 ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
 
-                // ImGui::ImageButton(reinterpret_cast<void *>(icon->getRendererID()), {thumbnailSize, thumbnailSize}, { 0, 1 }, { 1, 0});
-                ImGui::ImageButton("##Button", icon, ImVec2(thumbnailSize, thumbnailSize), { 1, 0 }, { 0, 1 });
+                // ImGui::ImageButton(reinterpret_cast<void *>(icon->getRendererID()), {thumbnail_size, thumbnail_size}, { 0, 1 }, { 1, 0});
+                ImGui::ImageButton("##Button", icon, ImVec2(thumbnail_size, thumbnail_size), { 1, 0 }, { 0, 1 });
                     
                 if(ImGui::BeginDragDropSource()){
                     std::string itemPath = relative_path.string();
@@ -113,9 +113,9 @@ public:
                 ImGui::PopID();
             }
 
-            ImGui::Columns(1);
-            ImGui::SliderFloat("Thumnail Size", &thumbnailSize, 16, 512);
-            ImGui::SliderFloat("Padding", &padding, 0, 32);
+            // ImGui::Columns(1);
+            // ImGui::SliderFloat("Thumnail Size", &thumbnail_size, 16, 512);
+            // ImGui::SliderFloat("Padding", &padding, 0, 32);
             
             ImGui::End();
         }
@@ -125,6 +125,7 @@ public:
     void destroy() {
         m_file_icon.destroy();
         m_directory_icon.destroy();
+        m_back_icon.destroy();
     }
 
 private:
