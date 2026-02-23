@@ -15,8 +15,7 @@ import vk;
 
 export class content_browser_panel {
 public:
-    content_browser_panel() : m_current_directory(std::filesystem::path("assets")) {
-        console_log_info("content_browser_panel()!");
+    content_browser_panel() {
         vk::texture_info config_texture = {
             .phsyical_memory_properties = atlas::vulkan::instance_context::physical_driver().memory_properties(),
             .filepath = std::filesystem::path("assets/icons/FileIcon.png")
@@ -33,17 +32,28 @@ public:
         if(!m_directory_icon.loaded()) {
             console_log_info("Stop Button Could not be loaded!!");
         }
+        config_texture = {
+            .phsyical_memory_properties = atlas::vulkan::instance_context::physical_driver().memory_properties(),
+            .filepath = std::filesystem::path("assets/icons/Back.png")
+        };
+        m_back_icon = vk::texture(atlas::vulkan::instance_context::logical_device(), config_texture);
+        if(!m_back_icon.loaded()) {
+            console_log_info("Stop Button Could not be loaded!!");
+        }
 
         m_file_icon_id = static_cast<ImTextureID>(ImGui_ImplVulkan_AddTexture(m_file_icon.image().sampler(), m_file_icon.image().image_view(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
         m_directory_icon_id = static_cast<ImTextureID>(ImGui_ImplVulkan_AddTexture(m_directory_icon.image().sampler(), m_directory_icon.image().image_view(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
+        m_back_icon_id = static_cast<ImTextureID>(ImGui_ImplVulkan_AddTexture(m_back_icon.image().sampler(), m_back_icon.image().image_view(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
     }
 
 
     void run() {
         if(ImGui::Begin("Content Browser")) {
-            // console_log_info("Path: {}", m_asset_path.string());
             if(m_current_directory != std::filesystem::path(m_asset_path)){
-                if(ImGui::Button("<-")){
+                // if(ImGui::Button("<-")){
+                //     m_current_directory = m_current_directory.parent_path();
+                // }
+                if(ImGui::ImageButton("##BackButton", m_back_icon_id, ImVec2(10, 10))){
                     m_current_directory = m_current_directory.parent_path();
                 }
             }
@@ -92,11 +102,8 @@ public:
                 ImGui::PopStyleColor();
 
                 if(ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)){
-                    console_log_warn("MouseLeftClick in Content Browser Panel!");
-                    console_log_info("Absolute Path: {}", path.filename().string());
                     if(dir_entry.is_directory()){
                         m_current_directory /= path.filename();
-                        console_log_info("Current Dir: {}", m_current_directory.string());
                     }
                 }
 
@@ -123,9 +130,10 @@ public:
 private:
     vk::texture m_file_icon;
     vk::texture m_directory_icon;
+    vk::texture m_back_icon;
     ImTextureID m_file_icon_id;
     ImTextureID m_directory_icon_id;
-    const std::filesystem::path m_project_path = std::filesystem::current_path();
-    const std::filesystem::path m_asset_path = m_project_path / "assets";
-    std::filesystem::path m_current_directory;
+    ImTextureID m_back_icon_id;
+    const std::filesystem::path m_asset_path = std::filesystem::current_path() / "assets";
+    std::filesystem::path m_current_directory = m_asset_path;
 };
