@@ -8,28 +8,35 @@ import atlas.core.scene.components;
 
 export namespace atlas {
     /**
-     * @brief Creates a pointer wrapper which extends capabilities of
-     * flecs::entity
+     * @brief Defines what a game object is represented as in TheAtlasEngine
+     * Does not own the entity created through the ecs registry
+     * Rather can make modifications related to that specific entity, such as
+     * add, get, setting components for that particular entity.
      *
-     * Provides our own construct of API's that handles any workload around some
-     * of the raw flecs API's that can still be used by other flecs API's
-     * without completely interacting touching raw flecs API
+     * Does NOT manage the object of that entity itself. Only for managing the
+     * data associated with the entity.
+     *
+     * If you need a game object to exist in the scene for immediate direct
+     * access within the scope of that scene. Use game_object_optional. Which is
+     * an alias to std::optional<game_object>.
      */
     class game_object : public flecs::entity {
     public:
-        //! @brief Should not construct a scene object not created through
-        //! flecs::world
+        //! @brief Remove ability to construct empty game object
         game_object() = delete;
 
-        game_object(flecs::world_t* p_registry, flecs::entity_t p_id) : flecs::entity(p_registry, p_id) {
+        game_object(flecs::world_t* p_registry, flecs::entity_t p_id)
+          : flecs::entity(p_registry, p_id) {
             add<transform>();
         }
 
-        game_object(const flecs::entity& p_base) : flecs::entity(p_base) {
+        game_object(const flecs::entity& p_base)
+          : flecs::entity(p_base) {
             add<transform>();
         }
 
-        explicit game_object(flecs::entity& p_base) : flecs::entity(p_base) {
+        explicit game_object(flecs::entity& p_base)
+          : flecs::entity(p_base) {
             add<transform>();
         }
 
