@@ -41,6 +41,7 @@ import atlas.physics.engine;
 import atlas.drivers.vulkan.imgui_context;
 import atlas.drivers.vulkan.instance_context;
 import vk;
+import content_browser;
 
 static void ui_component_list(flecs::entity& p_selected_entity) {
     std::string entity_name = p_selected_entity.name().c_str();
@@ -291,6 +292,7 @@ public:
         atlas::vulkan::instance_context::submit_resource_free([this](){
             m_play_button.destroy();
             m_stop_button.destroy();
+            m_content_browser.destroy();
         });
     }
 
@@ -680,6 +682,8 @@ public:
 
         ui_toolbar();
 
+        m_content_browser.run();
+
         m_editor_dockspace.end();
     }
 
@@ -808,6 +812,8 @@ private:
     vk::texture m_stop_button;
     ImTextureID m_play_button_id;
     ImTextureID m_stop_button_id;
+
+    content_browser_panel m_content_browser;
 
     // Note -- Added this temporarily
     // ImFont* m_font;
