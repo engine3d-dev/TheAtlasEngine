@@ -53,11 +53,10 @@ export namespace atlas::ui {
             }
         }
 
-        void end() {
-            ImGui::EndMenuBar();
-        }
+        void end() { ImGui::EndMenuBar(); }
 
-        void add_child(const std::string& p_name, const std::function<void()>& p_callback) {
+        void add_child(const std::string& p_name,
+                       const std::function<void()>& p_callback) {
             if (ImGui::MenuItem(p_name.c_str())) {
                 p_callback();
             }

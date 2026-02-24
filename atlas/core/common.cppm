@@ -5,7 +5,6 @@ module;
 
 export module atlas.common;
 
-
 export namespace atlas {
     /**
      * @brief alias to atlas::memory::strong_ptr<T>
@@ -19,8 +18,10 @@ export namespace atlas {
     //  *
     //  * @tparam ...Args is a template pack for packing in parameters
     //  * @tparam T is the type of object to construct strong_ptr with
-    //  * @param p_allocator is a polymorphic allocator when creating strong_ptr's.
-    //  * @param ...Args is an argument pack for packing to deduce the types that
+    //  * @param p_allocator is a polymorphic allocator when creating
+    //  strong_ptr's.
+    //  * @param ...Args is an argument pack for packing to deduce the types
+    //  that
     //  * is specified by object of type T
     //  */
     // template<typename T, typename... Args>

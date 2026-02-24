@@ -5,7 +5,6 @@ module;
 #include <flecs.h>
 #include <vector>
 
-
 export module atlas.core.scene.components;
 
 import atlas.core.math;

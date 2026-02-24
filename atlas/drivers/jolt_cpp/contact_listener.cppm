@@ -46,7 +46,8 @@ export namespace atlas::physics {
      */
     class contact_listener : public JPH::ContactListener {
     public:
-        contact_listener(event::bus& p_bus) : m_bus(&p_bus) {}
+        contact_listener(event::bus& p_bus)
+          : m_bus(&p_bus) {}
 
     private:
         /**
@@ -85,7 +86,7 @@ export namespace atlas::physics {
                             const JPH::Body& p_body2,
                             const JPH::ContactManifold&,
                             JPH::ContactSettings&) override {
-             event::collision_enter begin_event = {
+            event::collision_enter begin_event = {
                 .entity1 = static_cast<uint64_t>(p_body1.GetUserData()),
                 .entity2 = static_cast<uint64_t>(p_body2.GetUserData())
             };

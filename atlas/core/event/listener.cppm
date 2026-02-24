@@ -6,7 +6,7 @@ module;
 export module atlas.core.event:listener;
 
 export namespace atlas::event {
-     /**
+    /**
      * @brief Generic event listener of event type UEvent
      *
      * Listener that can have a different representation of a specific type of

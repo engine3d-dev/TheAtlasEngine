@@ -25,19 +25,20 @@ namespace atlas::event {
 } // namespace atlas
 
 export {
-inline constexpr uint32_t mouse_button_0 = ::atlas::event::Mouse::Button0;
-inline constexpr uint32_t mouse_button_1 = ::atlas::event::Mouse::Button1;
-inline constexpr uint32_t mouse_button_2 = ::atlas::event::Mouse::Button2;
-inline constexpr uint32_t mouse_button_3 = ::atlas::event::Mouse::Button3;
-inline constexpr uint32_t mouse_button_4 = ::atlas::event::Mouse::Button4;
-inline constexpr uint32_t mouse_button_5 = ::atlas::event::Mouse::Button5;
-inline constexpr uint32_t mouse_button_6 = ::atlas::event::Mouse::Button6;
-inline constexpr uint32_t mouse_button_7 = ::atlas::event::Mouse::Button7;
-inline constexpr uint32_t mouse_button_last = ::atlas::event::Mouse::ButtonLast;
-inline constexpr uint32_t mouse_button_left = ::atlas::event::Mouse::ButtonLeft;
-inline constexpr uint32_t mouse_button_right =
-  ::atlas::event::Mouse::ButtonRight;
-inline constexpr uint32_t mouse_button_middle =
-  ::atlas::event::Mouse::ButtonMiddle;
-
+    inline constexpr uint32_t mouse_button_0 = ::atlas::event::Mouse::Button0;
+    inline constexpr uint32_t mouse_button_1 = ::atlas::event::Mouse::Button1;
+    inline constexpr uint32_t mouse_button_2 = ::atlas::event::Mouse::Button2;
+    inline constexpr uint32_t mouse_button_3 = ::atlas::event::Mouse::Button3;
+    inline constexpr uint32_t mouse_button_4 = ::atlas::event::Mouse::Button4;
+    inline constexpr uint32_t mouse_button_5 = ::atlas::event::Mouse::Button5;
+    inline constexpr uint32_t mouse_button_6 = ::atlas::event::Mouse::Button6;
+    inline constexpr uint32_t mouse_button_7 = ::atlas::event::Mouse::Button7;
+    inline constexpr uint32_t mouse_button_last =
+      ::atlas::event::Mouse::ButtonLast;
+    inline constexpr uint32_t mouse_button_left =
+      ::atlas::event::Mouse::ButtonLeft;
+    inline constexpr uint32_t mouse_button_right =
+      ::atlas::event::Mouse::ButtonRight;
+    inline constexpr uint32_t mouse_button_middle =
+      ::atlas::event::Mouse::ButtonMiddle;
 };

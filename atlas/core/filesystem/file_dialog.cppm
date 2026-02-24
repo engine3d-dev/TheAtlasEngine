@@ -26,8 +26,9 @@ export namespace atlas::filesystem {
         return (result == NFD_OKAY) ? std::string(output_path) : "";
     }
 
-    std::string save_to_file(const std::string& p_filter,
-                             const std::filesystem::path& p_default_path = "Untitled.engine") {
+    std::string save_to_file(
+      const std::string& p_filter,
+      const std::filesystem::path& p_default_path = "Untitled.engine") {
         char* output_path = nullptr;
         nfdresult_t result = NFD_SaveDialog(
           p_filter.c_str(), p_default_path.string().c_str(), &output_path);

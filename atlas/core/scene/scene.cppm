@@ -9,10 +9,8 @@ import atlas.core.utilities;
 import atlas.core.event;
 import atlas.core.scene.game_object;
 
-
-
 export namespace atlas {
-     /**
+    /**
      * @brief Constructs a scene that defines an area where game objects are
      * part of contained within an atlas::world
      *
@@ -34,8 +32,9 @@ export namespace atlas {
          * @param p_bus is the globalized event bus that is given access to the
          * scene to subscribe events to it.
          */
-        scene(const std::string& p_name, event::bus& p_bus) : m_name(p_name), m_bus(&p_bus) {
-        }
+        scene(const std::string& p_name, event::bus& p_bus)
+          : m_name(p_name)
+          , m_bus(&p_bus) {}
 
         virtual ~scene() = default;
 
@@ -135,7 +134,10 @@ export namespace atlas {
          * ```
          */
         uint32_t children_count(const game_object& p_parent) {
-            return query_builder().with(flecs::ChildOf, p_parent).build().count();
+            return query_builder()
+              .with(flecs::ChildOf, p_parent)
+              .build()
+              .count();
         }
 
         /**

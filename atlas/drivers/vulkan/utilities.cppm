@@ -9,10 +9,10 @@ import atlas.logger;
 export namespace atlas {
     namespace vulkan {
 
-        void vk_check(const VkResult& p_result,
-                  const std::string& p_name) {
+        void vk_check(const VkResult& p_result, const std::string& p_name) {
             if (p_result != VK_SUCCESS) {
-                console_log_error_tagged("vulkan", "{} VkResult returned: {}", p_name, (int)p_result);
+                console_log_error_tagged(
+                  "vulkan", "{} VkResult returned: {}", p_name, (int)p_result);
             }
         }
     };

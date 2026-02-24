@@ -145,41 +145,44 @@ namespace atlas::vulkan {
          * @param p_info  has the properties such as specified shader sources to
          * load/compile
          */
-        shader_resource_group(const VkDevice& p_device, const ::vk::shader_resource_info& p_info) : m_device(p_device) {
+        shader_resource_group(const VkDevice& p_device,
+                              const ::vk::shader_resource_info& p_info)
+          : m_device(p_device) {
 
-            // We go through all of the specified shader source and their specific
-            // stage Compile them through shader compiler or if provided a .spv,
-            // then we compile and read in the stream of bytes directly
+            // We go through all of the specified shader source and their
+            // specific stage Compile them through shader compiler or if
+            // provided a .spv, then we compile and read in the stream of bytes
+            // directly
             for (size_t i = 0; i < p_info.sources.size(); i++) {
                 const vk::shader_source shader_src = p_info.sources[i];
                 std::filesystem::path filepath =
-                std::filesystem::path(shader_src.filename);
+                  std::filesystem::path(shader_src.filename);
 #ifndef ENABLE_SHADERC
                 if (filepath.extension().string() == ".spv") {
                     std::vector<char> blob =
-                    compile_binary_shader_source(shader_src);
+                      compile_binary_shader_source(shader_src);
 
                     if (blob.empty()) {
                         m_resource_valid = false;
-                        throw std::runtime_error("Cannot load in vector<uint32_t> "
-                                                "blob of compiled down data!!!");
+                        throw std::runtime_error(
+                          "Cannot load in vector<uint32_t> "
+                          "blob of compiled down data!!!");
                     }
 
                     create_module(blob, shader_src);
                 }
 #endif
-                
+
 #ifdef ENABLE_SHADERC
                 if (filepath.extension().string() != ".spv") {
                     std::string text_source_code =
-                    read_shader_source_code(filepath.string());
+                      read_shader_source_code(filepath.string());
                     std::vector<uint32_t> blob =
-                    compile_source_from_file(shader_src);
+                      compile_source_from_file(shader_src);
                     create_module(blob, shader_src);
                 }
 #endif
             }
-
         }
 
         ~shader_resource_group() = default;
@@ -196,7 +199,8 @@ namespace atlas::vulkan {
          * @param p_attributes is the high-level specifications for setting up
          * vertex attributes that correspond with these shaders
          */
-        void vertex_attributes(std::span<const ::vk::vertex_attribute> p_attributes) {
+        void vertex_attributes(
+          std::span<const ::vk::vertex_attribute> p_attributes) {
             /*
                 -- These comments are a reminder to myself --
                 - this function simplifies the need to separately define vertex
@@ -204,12 +208,12 @@ namespace atlas::vulkan {
 
                 - vertex attributes specify the types of data within the vertex
 
-                - vertex binding attribute specifies the rate of reading that data
-            layout specified by the vertex attributes
+                - vertex binding attribute specifies the rate of reading that
+            data layout specified by the vertex attributes
 
-                - Interpret the following vertex attributes below with this shader
-            code with `layout(location = n)` specified where by default these are
-            set to binding zero by the shader
+                - Interpret the following vertex attributes below with this
+            shader code with `layout(location = n)` specified where by default
+            these are set to binding zero by the shader
 
                 layout(location = 0) in vec3 inPosition;
                 layout(location = 1) in vec3 inColor;
@@ -218,10 +222,11 @@ namespace atlas::vulkan {
 
                 m_shader_group.set_vertex_attributes(VkVertexInputAttributeDescription{
                     { .location = 0, .binding = 0, .format =
-            VK_FORMAT_R32G32B32_SFLOAT, .offset = offsetof(vk::vertex, position),
+            VK_FORMAT_R32G32B32_SFLOAT, .offset = offsetof(vk::vertex,
+            position),
             }, { .location = 1, .binding = 0, .format =
-            VK_FORMAT_R32G32B32_SFLOAT, .offset = offsetof(vk::vertex, color), },
-                    { .location = 2, .binding = 0, .format =
+            VK_FORMAT_R32G32B32_SFLOAT, .offset = offsetof(vk::vertex, color),
+            }, { .location = 2, .binding = 0, .format =
             VK_FORMAT_R32G32B32_SFLOAT, .offset = offsetof(vk::vertex, normals),
             }, { .location = 3, .binding = 0, .format = VK_FORMAT_R32G32_SFLOAT,
             .offset = offsetof(vk::vertex, uv), },
@@ -242,18 +247,20 @@ namespace atlas::vulkan {
                 const ::vk::vertex_attribute attribute = p_attributes[i];
                 m_vertex_attributes.resize(attribute.entries.size());
                 m_vertex_binding_attributes[i] = { .binding = attribute.binding,
-                                                .stride = attribute.stride,
-                                                .inputRate = to_input_rate(
-                                                    attribute.input_rate) };
+                                                   .stride = attribute.stride,
+                                                   .inputRate = to_input_rate(
+                                                     attribute.input_rate) };
 
-                // then setting up the vertex attributes for the vertex data layouts
+                // then setting up the vertex attributes for the vertex data
+                // layouts
                 for (size_t j = 0; j < attribute.entries.size(); j++) {
-                    const ::vk::vertex_attribute_entry entry = attribute.entries[j];
+                    const ::vk::vertex_attribute_entry entry =
+                      attribute.entries[j];
                     m_vertex_attributes[j] = { .location = entry.location,
-                                            .binding = attribute.binding,
-                                            .format = static_cast<VkFormat>(
-                                                entry.format),
-                                            .offset = entry.stride };
+                                               .binding = attribute.binding,
+                                               .format = static_cast<VkFormat>(
+                                                 entry.format),
+                                               .offset = entry.stride };
                 }
             }
         }
@@ -297,7 +304,8 @@ namespace atlas::vulkan {
         void destroy() {
             for (auto& [filename, shader_handle] : m_modules) {
                 if (shader_handle.module != nullptr) {
-                    vkDestroyShaderModule(m_device, shader_handle.module, nullptr);
+                    vkDestroyShaderModule(
+                      m_device, shader_handle.module, nullptr);
                 }
             }
         }
@@ -322,10 +330,10 @@ namespace atlas::vulkan {
          */
         [[nodiscard]] std::vector<::vk::shader_handle> map_to_vector() const {
             // Using C++'s std::views to extract all of the values in
-            // unordered_map<string, vk::shader_handle> to a vector<shader_handle>
-            // that gets passed to graphics pipeline
-            // TEMP: Removing this. Will add this back in later.
-            // return (m_modules | std::views::values |
+            // unordered_map<string, vk::shader_handle> to a
+            // vector<shader_handle> that gets passed to graphics pipeline TEMP:
+            // Removing this. Will add this back in later. return (m_modules |
+            // std::views::values |
             //         std::ranges::to<std::vector>());
             std::vector<::vk::shader_handle> result;
 
@@ -338,7 +346,8 @@ namespace atlas::vulkan {
             return result;
         }
 
-        void create_module(std::span<char> p_blob, const ::vk::shader_source& p_source) {
+        void create_module(std::span<char> p_blob,
+                           const ::vk::shader_source& p_source) {
             VkShaderModuleCreateInfo shader_module_ci = {
                 .sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
                 .pNext = nullptr,
@@ -349,18 +358,20 @@ namespace atlas::vulkan {
             std::filesystem::path filepath(p_source.filename);
             std::string filename = filepath.filename().string();
 
-            // Setting m_shader_module_handlers[i]'s stage and the VkShaderModule
-            // handle altogether construct this beforehand and then we are going set
-            // that shader module
+            // Setting m_shader_module_handlers[i]'s stage and the
+            // VkShaderModule handle altogether construct this beforehand and
+            // then we are going set that shader module
             m_modules.emplace(filename, ::vk::shader_handle{});
-            ::vk::vk_check(
-            vkCreateShaderModule(
-                m_device, &shader_module_ci, nullptr, &m_modules[filename].module),
-            "vkCreateShaderModule");
+            ::vk::vk_check(vkCreateShaderModule(m_device,
+                                                &shader_module_ci,
+                                                nullptr,
+                                                &m_modules[filename].module),
+                           "vkCreateShaderModule");
             m_modules[filename].stage = p_source.stage;
         }
 
-        void create_module(std::span<uint32_t> p_blob, const ::vk::shader_source& p_source) {
+        void create_module(std::span<uint32_t> p_blob,
+                           const ::vk::shader_source& p_source) {
             VkShaderModuleCreateInfo shader_module_ci = {
                 .sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
                 .pNext = nullptr,
@@ -375,14 +386,15 @@ namespace atlas::vulkan {
 
             console_log_info("Key = {}", filename);
 
-            // Setting m_shader_module_handlers[i]'s stage and the VkShaderModule
-            // handle altogether construct this beforehand and then we are going set
-            // that shader module
+            // Setting m_shader_module_handlers[i]'s stage and the
+            // VkShaderModule handle altogether construct this beforehand and
+            // then we are going set that shader module
             m_modules.emplace(filename, ::vk::shader_handle{});
-            ::vk::vk_check(
-            vkCreateShaderModule(
-                m_device, &shader_module_ci, nullptr, &m_modules[filename].module),
-            "vkCreateShaderModule");
+            ::vk::vk_check(vkCreateShaderModule(m_device,
+                                                &shader_module_ci,
+                                                nullptr,
+                                                &m_modules[filename].module),
+                           "vkCreateShaderModule");
             m_modules[filename].stage = p_source.stage;
         }
 
@@ -411,8 +423,8 @@ namespace atlas::vulkan {
             };
 
             ::vk::vk_check(vkCreateShaderModule(
-                            m_device, &shader_module_ci, nullptr, &handle.module),
-                        "vkCreateShaderModule");
+                            m_device, &shader_module_ci, nullptr,
+        &handle.module), "vkCreateShaderModule");
         }
         */
 

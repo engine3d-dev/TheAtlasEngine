@@ -49,16 +49,16 @@ export namespace atlas::physics {
      */
 
     // This should eventually have a pipeline for the user to create masks.
-    enum class ObjectLayer : std::uint8_t {
-        NonMoving = 0,
-        Moving = 1,
-        NumLayers
+    enum class object_layer : std::uint8_t {
+        non_moving = 0,
+        moving = 1,
+        num_layers
     };
 
-    enum class BroadPhaseLayers : std::uint8_t {
-        NonMoving = 0,
-        Moving = 1,
-        NumLayers
+    enum class broad_phase_layer : std::uint8_t {
+        non_moving = 0,
+        moving = 1,
+        num_layers
     };
 
     /**
@@ -81,7 +81,7 @@ export namespace atlas::physics {
          * @return uint32_t
          */
         [[nodiscard]] uint32_t GetNumBroadPhaseLayers() const override {
-            return (uint32_t)(BroadPhaseLayers::NumLayers);
+            return (uint32_t)(broad_phase_layer::num_layers);
         }
 
         /**
@@ -96,7 +96,8 @@ export namespace atlas::physics {
          */
         [[nodiscard]] JPH::BroadPhaseLayer GetBroadPhaseLayer(
           JPH::ObjectLayer p_in_layer) const override {
-            JPH_ASSERT(p_in_layer < (JPH::ObjectLayer)ObjectLayer::NumLayers);
+            JPH_ASSERT(p_in_layer <
+                       static_cast<JPH::ObjectLayer>(object_layer::num_layers));
             return m_object_to_broadphase[p_in_layer];
         }
 
@@ -112,9 +113,9 @@ export namespace atlas::physics {
         [[nodiscard]] const char* GetBroadPhaseLayerName(
           JPH::BroadPhaseLayer p_in_layer) const override {
             switch (p_in_layer.GetValue()) {
-                case (JPH::BroadPhaseLayer::Type)(BroadPhaseLayers::NonMoving):
+                case static_cast<uint8_t>(broad_phase_layer::non_moving):
                     return "NonMoving";
-                case (JPH::BroadPhaseLayer::Type)(BroadPhaseLayers::Moving):
+                case static_cast<uint8_t>(broad_phase_layer::moving):
                     return "Moving";
                 default:
                     JPH_ASSERT(false);
@@ -126,8 +127,10 @@ export namespace atlas::physics {
     private:
         // The list of organizational layers
         std::vector<JPH::BroadPhaseLayer> m_object_to_broadphase{
-            JPH::BroadPhaseLayer((uint8_t)(BroadPhaseLayers::NonMoving)),
-            JPH::BroadPhaseLayer((uint8_t)(BroadPhaseLayers::Moving))
+            JPH::BroadPhaseLayer(
+              static_cast<uint8_t>(broad_phase_layer::non_moving)),
+            JPH::BroadPhaseLayer(
+              static_cast<uint8_t>(broad_phase_layer::moving))
 
         };
     };
@@ -155,11 +158,11 @@ export namespace atlas::physics {
           JPH::ObjectLayer p_in_layer1,
           JPH::BroadPhaseLayer p_in_layer2) const override {
             switch (p_in_layer1) {
-                case (int)(ObjectLayer::NonMoving):
+                case (int)(object_layer::non_moving):
                     return p_in_layer2 ==
-                           JPH::BroadPhaseLayer((JPH::BroadPhaseLayer::Type)(
-                             BroadPhaseLayers::Moving));
-                case (int)ObjectLayer::Moving:
+                           JPH::BroadPhaseLayer(
+                             static_cast<uint8_t>(broad_phase_layer::moving));
+                case (int)object_layer::moving:
                     return true;
                 default:
                     JPH_ASSERT(false);
@@ -181,9 +184,10 @@ export namespace atlas::physics {
           JPH::ObjectLayer p_in_object1,
           JPH::ObjectLayer p_in_object2) const override {
             switch (p_in_object1) {
-                case (int)(ObjectLayer::NonMoving):
-                    return p_in_object2 == (int)(ObjectLayer::Moving);
-                case (int)(ObjectLayer::Moving):
+                case static_cast<int>(object_layer::non_moving):
+                    return p_in_object2 ==
+                           static_cast<int>(object_layer::moving);
+                case static_cast<int>(object_layer::moving):
                     return true;
                 default:
                     JPH_ASSERT(false);

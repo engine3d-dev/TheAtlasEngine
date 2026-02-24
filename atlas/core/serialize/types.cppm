@@ -6,7 +6,6 @@ module;
 export module atlas.core.serialize.types;
 import atlas.core.scene.components;
 
-
 namespace YAML {
     /**
      * @brief Custom specialized classes from yaml-cpp to specialize to take in
@@ -343,14 +342,16 @@ namespace YAML {
 
 export namespace atlas {
     //! @brief from yaml-cpp, saving glm::highp_vec2 values to disk
-    YAML::Emitter& operator<<(YAML::Emitter& p_out, const glm::highp_vec2& p_values) {
+    YAML::Emitter& operator<<(YAML::Emitter& p_out,
+                              const glm::highp_vec2& p_values) {
         p_out << YAML::Flow;
         p_out << YAML::BeginSeq << p_values.x << p_values.y << YAML::EndSeq;
         return p_out;
     }
 
     //! @brief from yaml-cpp, saving glm::highp_vec3 values to disk
-    YAML::Emitter& operator<<(YAML::Emitter& p_out, const glm::highp_vec3& p_values) {
+    YAML::Emitter& operator<<(YAML::Emitter& p_out,
+                              const glm::highp_vec3& p_values) {
         p_out << YAML::Flow;
         p_out << YAML::BeginSeq << p_values.x << p_values.y << p_values.z
               << YAML::EndSeq;
@@ -358,7 +359,8 @@ export namespace atlas {
     }
 
     //! @brief from yaml-cpp, saving glm::highp_vec4 values to disk
-    YAML::Emitter& operator<<(YAML::Emitter& p_out, const glm::highp_vec4& p_values) {
+    YAML::Emitter& operator<<(YAML::Emitter& p_out,
+                              const glm::highp_vec4& p_values) {
         p_out << YAML::Flow;
         p_out << YAML::BeginSeq << p_values.x << p_values.y << p_values.z
               << p_values.w << YAML::EndSeq;
@@ -366,7 +368,8 @@ export namespace atlas {
     }
 
     //! @brief from yaml-cpp, saving transform values to disk
-    YAML::Emitter& operator<<(YAML::Emitter& p_output, const transform* p_transform) {
+    YAML::Emitter& operator<<(YAML::Emitter& p_output,
+                              const transform* p_transform) {
         p_output << YAML::Key << "Transform";
 
         p_output << YAML::BeginMap;
@@ -382,7 +385,8 @@ export namespace atlas {
     }
 
     //! @brief from yaml-cpp, saving perspective_camera values to disk
-    YAML::Emitter& operator<<(YAML::Emitter& p_output, const perspective_camera* p_camera) {
+    YAML::Emitter& operator<<(YAML::Emitter& p_output,
+                              const perspective_camera* p_camera) {
         p_output << YAML::Key << "PerspectiveCamera";
 
         p_output << YAML::BeginMap;
@@ -395,7 +399,8 @@ export namespace atlas {
     }
 
     //! @brief from yaml-cpp, saving mesh_source values to disk
-    YAML::Emitter& operator<<(YAML::Emitter& p_output, const mesh_source* p_material) {
+    YAML::Emitter& operator<<(YAML::Emitter& p_output,
+                              const mesh_source* p_material) {
         p_output << YAML::Key << "Mesh Source";
 
         p_output << YAML::BeginMap;
@@ -410,7 +415,8 @@ export namespace atlas {
     }
 
     //! @brief from yaml-cpp, saving mesh_source values to disk
-    YAML::Emitter& operator<<(YAML::Emitter& p_output, const point_light* p_material) {
+    YAML::Emitter& operator<<(YAML::Emitter& p_output,
+                              const point_light* p_material) {
         p_output << YAML::Key << "Point Light";
 
         p_output << YAML::BeginMap;
@@ -428,7 +434,8 @@ export namespace atlas {
     }
 
     //! @brief from yaml-cpp, saving physics_body values to disk
-    YAML::Emitter& operator<<(YAML::Emitter& p_output, const physics_body* p_body) {
+    YAML::Emitter& operator<<(YAML::Emitter& p_output,
+                              const physics_body* p_body) {
         p_output << YAML::Key << "Physics Body";
 
         p_output << YAML::BeginMap;
@@ -455,7 +462,8 @@ export namespace atlas {
     }
 
     //! @brief from yaml-cpp, saving box_collider values to disk
-    YAML::Emitter& operator<<(YAML::Emitter& p_output, const box_collider* p_body) {
+    YAML::Emitter& operator<<(YAML::Emitter& p_output,
+                              const box_collider* p_body) {
         // Tag this specific serialization values to the box collider
         p_output << YAML::Key << "Box Collider";
 
@@ -468,7 +476,8 @@ export namespace atlas {
     }
 
     //! @brief from yaml-cpp, saving sphere_collider values to disk
-    YAML::Emitter& operator<<(YAML::Emitter& p_output, const sphere_collider* p_body) {
+    YAML::Emitter& operator<<(YAML::Emitter& p_output,
+                              const sphere_collider* p_body) {
         p_output << YAML::Key << "Sphere Collider";
 
         p_output << YAML::BeginMap;
@@ -480,7 +489,8 @@ export namespace atlas {
     }
 
     //! @brief from yaml-cpp, saving capsule_collider values to disk
-    YAML::Emitter& operator<<(YAML::Emitter& p_output, const capsule_collider* p_body) {
+    YAML::Emitter& operator<<(YAML::Emitter& p_output,
+                              const capsule_collider* p_body) {
         p_output << YAML::Key << "Capsule Collider";
         p_output << YAML::BeginMap;
         p_output << YAML::Key << "Radius" << YAML::Value << p_body->radius;

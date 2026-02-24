@@ -17,7 +17,6 @@ import atlas.core.scene;
 import atlas.core.serialize.types;
 import atlas.core.scene.components;
 
-
 namespace atlas {
     // used to serialize entities
     // TODO -- expand on this to stream_reader and stream_writer
@@ -177,7 +176,8 @@ namespace atlas {
          * @param p_scene_ctx is the current scene to perform
          * serialization/deserialization to
          */
-        serializer(const ref<scene>& p_scene_ctx) : m_current_scene_ctx(p_scene_ctx) {}
+        serializer(const ref<scene>& p_scene_ctx)
+          : m_current_scene_ctx(p_scene_ctx) {}
 
         /**
          * @param p_filepath is the specified path to save the file
@@ -186,11 +186,11 @@ namespace atlas {
             YAML::Emitter output;
             output << YAML::BeginMap;
             output << YAML::Key << "Scene" << YAML::Value
-                << m_current_scene_ctx->name();
+                   << m_current_scene_ctx->name();
             output << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
 
-            //! @note Queries in flecs the ecs framework are how we can query all
-            //! entities that the engine (user creates through our API)
+            //! @note Queries in flecs the ecs framework are how we can query
+            //! all entities that the engine (user creates through our API)
             // ref<world_scope> world_object =
             //   system_registry::get_world("Editor World");
             // ref<scene> current_scene =
@@ -200,12 +200,12 @@ namespace atlas {
             //   current_scene->query_builder().with<atlas::transform>().build();
 
             // query all entities with a serialized tag specified
-            // while specifying to not query entities that also have the tag::editor
-            // specified
+            // while specifying to not query entities that also have the
+            // tag::editor specified
             flecs::query<> q = m_current_scene_ctx->query_builder()
-                                .with<tag::serialize>()
-                                .without<tag::editor>()
-                                .build();
+                                 .with<tag::serialize>()
+                                 .without<tag::editor>()
+                                 .build();
 
             q.each([&output](flecs::entity p_entity_id) {
                 serialize_entity(output, p_entity_id);
@@ -222,7 +222,8 @@ namespace atlas {
          * entities through that registry
          * @return true if loading was successful, otherwise will return false
          */
-        bool load(const std::filesystem::path& p_filepath, const flecs::world& p_registry) {
+        bool load(const std::filesystem::path& p_filepath,
+                  const flecs::world& p_registry) {
             std::ifstream ins(p_filepath.string());
             std::stringstream ss;
             ss << ins.rdbuf();
@@ -239,7 +240,7 @@ namespace atlas {
                 for (YAML::iterator::value_type entity : entity_objects) {
                     std::string name = entity["Entity"].as<std::string>();
                     flecs::entity deserialize_to_object =
-                    p_registry.entity(name.c_str());
+                      p_registry.entity(name.c_str());
 
                     // Deserialize atlas::transform component
                     deserialize_entity(entity, deserialize_to_object);

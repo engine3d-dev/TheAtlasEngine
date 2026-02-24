@@ -141,7 +141,8 @@ namespace atlas::physics {
          * @param p_bus is the event::bus that allows for publishing physics
          * events to the subscribers of those said events
          */
-        jolt_context(event::bus& p_bus) : m_contact_listener(p_bus) {
+        jolt_context(event::bus& p_bus)
+          : m_contact_listener(p_bus) {
             jolt_settings settings = {};
             JPH::RegisterDefaultAllocator();
 
@@ -152,24 +153,24 @@ namespace atlas::physics {
             JPH::RegisterTypes();
 
             m_temp_allocator =
-            create_ref<JPH::TempAllocatorImpl>(settings.allocation_amount);
+              create_ref<JPH::TempAllocatorImpl>(settings.allocation_amount);
 
             // This just sets up the JoltPhysics system and any listeners
             m_physics_system = create_ref<JPH::PhysicsSystem>();
             m_broad_phase_layer_interface =
-            create_ref<broad_phase_layer_interface>();
+              create_ref<broad_phase_layer_interface>();
             m_object_vs_broadphase_filter =
-            create_ref<object_vs_broadphase_layer>();
+              create_ref<object_vs_broadphase_layer>();
             m_object_layer_pair_filter = create_ref<object_layer_pair_filter>();
 
             if (settings.thread_type == thread_type::default_system) {
 
                 m_thread_system = create_scope<JPH::JobSystemThreadPool>(
-                // Max jobs must be a power of 2, otherwise jph crashes.
-                // Bianary tree must be fully balanced
-                std::pow(2, settings.max_jobs_power),
-                settings.max_barriers,
-                settings.physics_threads);
+                  // Max jobs must be a power of 2, otherwise jph crashes.
+                  // Bianary tree must be fully balanced
+                  std::pow(2, settings.max_jobs_power),
+                  settings.max_barriers,
+                  settings.physics_threads);
             }
             else {
                 console_log_error("Unsupported custom job system");
@@ -177,12 +178,12 @@ namespace atlas::physics {
             }
 
             m_physics_system->Init(settings.max_bodies,
-                                0,
-                                settings.max_body_pairs,
-                                settings.max_contact_constraints,
-                                *m_broad_phase_layer_interface,
-                                *m_object_vs_broadphase_filter,
-                                *m_object_layer_pair_filter);
+                                   0,
+                                   settings.max_body_pairs,
+                                   settings.max_contact_constraints,
+                                   *m_broad_phase_layer_interface,
+                                   *m_object_vs_broadphase_filter,
+                                   *m_object_layer_pair_filter);
 
             // Default contact listener impl and can change during runtime
             m_physics_system->SetContactListener(&m_contact_listener);
@@ -202,20 +203,21 @@ namespace atlas::physics {
 
             auto& body_interface = m_physics_system->GetBodyInterface();
             auto state = body_interface.AddBodiesPrepare(
-            all_body_ids.data(), static_cast<int>(all_body_ids.size()));
-            body_interface.AddBodiesFinalize(all_body_ids.data(),
-                                            static_cast<int>(all_body_ids.size()),
-                                            state,
-                                            JPH::EActivation::Activate);
+              all_body_ids.data(), static_cast<int>(all_body_ids.size()));
+            body_interface.AddBodiesFinalize(
+              all_body_ids.data(),
+              static_cast<int>(all_body_ids.size()),
+              state,
+              JPH::EActivation::Activate);
         }
 
         void update_simulation(float p_delta_time) override {
             float fixed_time_step = 1.0f / 60.0f;
             int time_step = 1 + (int)(60 * fixed_time_step);
             m_physics_system->Update(p_delta_time,
-                                    time_step,
-                                    m_temp_allocator.get(),
-                                    m_thread_system.get());
+                                     time_step,
+                                     m_temp_allocator.get(),
+                                     m_thread_system.get());
         }
 
         /**
@@ -224,21 +226,21 @@ namespace atlas::physics {
         void destroy_bodies() override {
             auto& body_interface = m_physics_system->GetBodyInterface();
 
-            // Retrieve all body ID's to ensure that we do proper deactivation and
-            // post cleanup for the physics simulation
+            // Retrieve all body ID's to ensure that we do proper deactivation
+            // and post cleanup for the physics simulation
             JPH::BodyIDVector all_body_ids;
             m_physics_system->GetBodies(all_body_ids);
 
             if (!all_body_ids.empty()) {
 
                 body_interface.DeactivateBodies(
-                all_body_ids.data(), static_cast<int>(all_body_ids.size()));
+                  all_body_ids.data(), static_cast<int>(all_body_ids.size()));
 
-                body_interface.RemoveBodies(all_body_ids.data(),
-                                            static_cast<int>(all_body_ids.size()));
+                body_interface.RemoveBodies(
+                  all_body_ids.data(), static_cast<int>(all_body_ids.size()));
 
-                body_interface.DestroyBodies(all_body_ids.data(),
-                                            static_cast<int>(all_body_ids.size()));
+                body_interface.DestroyBodies(
+                  all_body_ids.data(), static_cast<int>(all_body_ids.size()));
 
                 m_cached_body_ids.clear();
             }
@@ -252,15 +254,16 @@ namespace atlas::physics {
             using namespace JPH;
             auto& body_interface = m_physics_system->GetBodyInterface();
 
-            // Creating our box shape and specifying half_extent that is a glm::vec3
-            // conversion to JPH::Vec3 half_extents must be 0.5f or else it can get
-            // an invalid convex radius
-            BoxShapeSettings shape_settings(jolt::to_vec3(p_collider->half_extent));
+            // Creating our box shape and specifying half_extent that is a
+            // glm::vec3 conversion to JPH::Vec3 half_extents must be 0.5f or
+            // else it can get an invalid convex radius
+            BoxShapeSettings shape_settings(
+              jolt::to_vec3(p_collider->half_extent));
             auto result = shape_settings.Create();
 
             if (result.HasError()) {
                 console_log_error("Box shape creation error: {}",
-                                result.GetError());
+                                  result.GetError());
                 return;
             }
             EMotionType motion_type = EMotionType::Static;
@@ -278,23 +281,24 @@ namespace atlas::physics {
 
             auto& box = result.Get();
             BodyCreationSettings body_settings(
-            box,
-            jolt::to_vec3(p_transform->position),
-            jolt::to_quat(p_transform->quaternion),
-            motion_type,
-            p_body->body_layer_type);
+              box,
+              jolt::to_vec3(p_transform->position),
+              jolt::to_quat(p_transform->quaternion),
+              motion_type,
+              p_body->body_layer_type);
 
-            // NOTE TO  SELF ------ This is setting some pointer to the entity ID
-            // WE CAN USE THIS TO TELL THE EVENT SYSTEM WHICH FLECS ENTITY COLLIDED
-            // WITH EACH OTHER!!!!!!!! Because each contact listener allows you to
-            // take a pointer from the physics bodies that are just blocks of
-            // data!!!
+            // NOTE TO  SELF ------ This is setting some pointer to the entity
+            // ID WE CAN USE THIS TO TELL THE EVENT SYSTEM WHICH FLECS ENTITY
+            // COLLIDED WITH EACH OTHER!!!!!!!! Because each contact listener
+            // allows you to take a pointer from the physics bodies that are
+            // just blocks of data!!!
             body_settings.mUserData = static_cast<uint64_t>(p_entity_id);
             body_settings.mFriction = p_body->friction;
             body_settings.mRestitution = p_body->restitution;
-            body_settings.mLinearVelocity = jolt::to_vec3(p_body->linear_velocity);
+            body_settings.mLinearVelocity =
+              jolt::to_vec3(p_body->linear_velocity);
             body_settings.mAngularVelocity =
-            jolt::to_vec3(p_body->angular_velocity);
+              jolt::to_vec3(p_body->angular_velocity);
 
             Body* body = body_interface.CreateBody(body_settings);
             m_cached_body_ids.emplace(p_entity_id, body->GetID());
@@ -314,7 +318,7 @@ namespace atlas::physics {
 
             if (result.HasError()) {
                 console_log_error("Sphere shape creation error: {}",
-                                result.GetError());
+                                  result.GetError());
                 return;
             }
             EMotionType motion_type = EMotionType::Static;
@@ -332,20 +336,21 @@ namespace atlas::physics {
 
             auto& box = result.Get();
             BodyCreationSettings body_settings(
-            box,
-            jolt::to_vec3(p_transform->position),
-            jolt::to_quat(p_transform->quaternion),
-            motion_type,
-            p_body->body_layer_type);
+              box,
+              jolt::to_vec3(p_transform->position),
+              jolt::to_quat(p_transform->quaternion),
+              motion_type,
+              p_body->body_layer_type);
 
             // Assigning the entity ID as the user data
             // Fetched when collision happens
             body_settings.mUserData = static_cast<uint64_t>(p_entity_id);
             body_settings.mFriction = p_body->friction;
             body_settings.mRestitution = p_body->restitution;
-            body_settings.mLinearVelocity = jolt::to_vec3(p_body->linear_velocity);
+            body_settings.mLinearVelocity =
+              jolt::to_vec3(p_body->linear_velocity);
             body_settings.mAngularVelocity =
-            jolt::to_vec3(p_body->angular_velocity);
+              jolt::to_vec3(p_body->angular_velocity);
             Body* body = body_interface.CreateBody(body_settings);
 
             // body_interface.AddForce(body->GetID(),
@@ -368,7 +373,7 @@ namespace atlas::physics {
 
             if (result.HasError()) {
                 console_log_error("Capsule shape creation error: {}",
-                                result.GetError());
+                                  result.GetError());
                 return;
             }
             EMotionType motion_type = EMotionType::Static;
@@ -386,16 +391,17 @@ namespace atlas::physics {
 
             auto& box = result.Get();
             BodyCreationSettings body_settings(
-            box,
-            jolt::to_vec3(p_transform->position),
-            jolt::to_quat(p_transform->quaternion),
-            motion_type,
-            p_body->body_layer_type);
+              box,
+              jolt::to_vec3(p_transform->position),
+              jolt::to_quat(p_transform->quaternion),
+              motion_type,
+              p_body->body_layer_type);
             body_settings.mFriction = p_body->friction;
             body_settings.mRestitution = p_body->restitution;
-            body_settings.mLinearVelocity = jolt::to_vec3(p_body->linear_velocity);
+            body_settings.mLinearVelocity =
+              jolt::to_vec3(p_body->linear_velocity);
             body_settings.mAngularVelocity =
-            jolt::to_vec3(p_body->angular_velocity);
+              jolt::to_vec3(p_body->angular_velocity);
             body_settings.mUserData = static_cast<uint64_t>(p_entity_id);
 
             Body* body = body_interface.CreateBody(body_settings);
@@ -426,8 +432,8 @@ namespace atlas::physics {
             using namespace JPH;
             auto& body_interface = m_physics_system->GetBodyInterface();
 
-            // TODO: Will need to change this because if this entity doesn't exist
-            // then it will be set to zeroes, gotta be careful about this
+            // TODO: Will need to change this because if this entity doesn't
+            // exist then it will be set to zeroes, gotta be careful about this
             if (!m_cached_body_ids.contains(p_id)) {
                 return {};
             }
@@ -436,11 +442,11 @@ namespace atlas::physics {
 
             physics_body body = {
                 .linear_velocity =
-                to_vec3(body_interface.GetLinearVelocity(body_id)),
+                  to_vec3(body_interface.GetLinearVelocity(body_id)),
                 .angular_velocity =
-                to_vec3(body_interface.GetAngularVelocity(body_id)),
+                  to_vec3(body_interface.GetAngularVelocity(body_id)),
                 .center_mass_position =
-                to_vec3(body_interface.GetCenterOfMassPosition(body_id)),
+                  to_vec3(body_interface.GetCenterOfMassPosition(body_id)),
                 .gravity_factor = body_interface.GetGravityFactor(body_id),
                 .friction = body_interface.GetFriction(body_id),
                 .restitution = body_interface.GetRestitution(body_id),
@@ -455,7 +461,7 @@ namespace atlas::physics {
             auto& body_interface = m_physics_system->GetBodyInterface();
 
             body_interface.SetLinearVelocity(m_cached_body_ids.at(p_id),
-                                            jolt::to_vec3(p_linear_velocity));
+                                             jolt::to_vec3(p_linear_velocity));
         }
 
         void angular_velocity(uint64_t p_id,
@@ -464,8 +470,8 @@ namespace atlas::physics {
             auto& body_interface = m_physics_system->GetBodyInterface();
             BodyID body_id(p_id);
 
-            body_interface.SetAngularVelocity(m_cached_body_ids.at(p_id),
-                                            jolt::to_vec3(p_angular_velocity));
+            body_interface.SetAngularVelocity(
+              m_cached_body_ids.at(p_id), jolt::to_vec3(p_angular_velocity));
         }
 
         void force(uint64_t p_id, const glm::vec3& p_force) override {
@@ -484,8 +490,8 @@ namespace atlas::physics {
             auto& body_interface = m_physics_system->GetBodyInterface();
 
             body_interface.AddForceAndTorque(m_cached_body_ids.at(p_id),
-                                            jolt::to_vec3(p_force),
-                                            jolt::to_vec3(p_torque));
+                                             jolt::to_vec3(p_force),
+                                             jolt::to_vec3(p_torque));
         }
 
         void add_impulse(uint64_t p_id, const glm::vec3& p_impulse) override {
@@ -493,7 +499,7 @@ namespace atlas::physics {
             auto& body_interface = m_physics_system->GetBodyInterface();
 
             body_interface.AddImpulse(m_cached_body_ids.at(p_id),
-                                    jolt::to_vec3(p_impulse));
+                                      jolt::to_vec3(p_impulse));
         }
 
     private:

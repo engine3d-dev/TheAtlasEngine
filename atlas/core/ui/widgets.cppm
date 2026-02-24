@@ -50,7 +50,7 @@ export namespace atlas::ui {
      */
     void draw_vec3(const std::string& p_tag,
                    glm::vec3& p_position,
-                   float p_reset_value=0.f) {
+                   float p_reset_value = 0.f) {
         // ImGuiIO& io = ImGui::GetIO();
         ImGui::PushID(p_tag.c_str());
 
@@ -141,7 +141,7 @@ export namespace atlas::ui {
      */
     void draw_vec4(const std::string& p_tag,
                    glm::vec4& p_value,
-                   float p_reset_value=0.f) {
+                   float p_reset_value = 0.f) {
         // ImGuiIO& io = ImGui::GetIO();
         ImGui::PushID(p_tag.c_str());
 
@@ -232,7 +232,7 @@ export namespace atlas::ui {
      */
     void draw_float(const std::string& p_tag,
                     float& p_value,
-                    float reset_value=0.f) {
+                    float reset_value = 0.f) {
         ImGui::PushID(p_tag.c_str());
 
         float column_width = 100.0f;
@@ -339,8 +339,8 @@ export namespace atlas::ui {
      */
     template<typename UComponent, typename UFunction>
     void draw_panel_component(const std::string& p_name,
-                                     flecs::entity& p_entity,
-                                     const UFunction& p_callback) {
+                              flecs::entity& p_entity,
+                              const UFunction& p_callback) {
         const ImGuiTreeNodeFlags tree_node_flags =
           ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed |
           ImGuiTreeNodeFlags_SpanAvailWidth |
@@ -454,8 +454,8 @@ export namespace atlas::ui {
     */
     template<typename T, typename UFunction>
     void draw_component(const std::string& p_tag,
-                               flecs::entity& p_entity,
-                               const UFunction& p_callable) {
+                        flecs::entity& p_entity,
+                        const UFunction& p_callable) {
         const ImGuiTreeNodeFlags tree_node_flags =
           ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed |
           ImGuiTreeNodeFlags_SpanAvailWidth |
@@ -516,9 +516,10 @@ export namespace atlas::ui {
      * @param p_filter is the specific filter for file extensions to allow
      * displaying in the fild dialog
      */
-    void button_open_file_dialog(const std::string& p_tag,
-                                 std::string& p_filename,
-                                 const std::string& p_filter = "obj;glftf;fbx") {
+    void button_open_file_dialog(
+      const std::string& p_tag,
+      std::string& p_filename,
+      const std::string& p_filter = "obj;glftf;fbx") {
         if (ImGui::Button(p_tag.c_str())) {
             p_filename = filesystem::load_from_file_dialog(p_filter);
         }

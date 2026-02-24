@@ -5,30 +5,31 @@ module;
 
 export module atlas.core.utilities.poll_state;
 
-
 export namespace atlas {
     inline std::unordered_map<void*, std::function<void(float)>> s_update{};
-    inline std::unordered_map<void*, std::function<void()>>
-        s_defer_update{};
+    inline std::unordered_map<void*, std::function<void()>> s_defer_update{};
     inline std::unordered_map<void*, std::function<void()>> s_ui_update{};
-    inline std::unordered_map<void*, std::function<void()>>
-        s_physica_update{};
+    inline std::unordered_map<void*, std::function<void()>> s_physica_update{};
     inline std::unordered_map<void*, std::function<void()>> s_start{};
 
     // TODO: Look into a different way of doing this
-    void poll_update(void* p_address,const std::function<void(float)>& p_callback) {
+    void poll_update(void* p_address,
+                     const std::function<void(float)>& p_callback) {
         s_update.emplace(p_address, p_callback);
     }
 
-    void poll_defer_update(void* p_address, const std::function<void()>& p_callback) {
+    void poll_defer_update(void* p_address,
+                           const std::function<void()>& p_callback) {
         s_defer_update.emplace(p_address, p_callback);
     }
 
-    void poll_physics_update(void* p_address, const std::function<void()>& p_callback) {
+    void poll_physics_update(void* p_address,
+                             const std::function<void()>& p_callback) {
         s_physica_update.emplace(p_address, p_callback);
     }
 
-    void poll_ui_update(void* p_address, const std::function<void()>& p_callback) {
+    void poll_ui_update(void* p_address,
+                        const std::function<void()>& p_callback) {
         s_ui_update.emplace(p_address, p_callback);
     }
 

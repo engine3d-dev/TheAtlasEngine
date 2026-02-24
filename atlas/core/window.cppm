@@ -19,9 +19,7 @@ export namespace atlas {
     public:
         virtual ~window() = default;
 
-        [[nodiscard]] window_params data() const {
-            return get_params();
-        }
+        [[nodiscard]] window_params data() const { return get_params(); }
 
         /**
          * @brief Checks if window is available to close
@@ -34,7 +32,8 @@ export namespace atlas {
          * @brief Returns the aspect ratio of the current window
          */
         [[nodiscard]] float aspect_ratio() const {
-            return static_cast<float>(get_params().width) / static_cast<float>(get_params().height);
+            return static_cast<float>(get_params().width) /
+                   static_cast<float>(get_params().height);
         }
 
         /**
@@ -80,9 +79,7 @@ export namespace atlas {
         /**
          * @brief Closing the window operation
          */
-        void close() {
-            glfwSetWindowShouldClose(native_window(), true);
-        }
+        void close() { glfwSetWindowShouldClose(native_window(), true); }
 
         /**
          * @brief does the presentation operation that is operated internally
@@ -101,7 +98,8 @@ export namespace atlas {
         [[nodiscard]] virtual uint32_t read_acquired_next_frame() = 0;
         [[nodiscard]] virtual vulkan::swapchain window_swapchain() const = 0;
 
-        [[nodiscard]] virtual vk::command_buffer current_active_command(uint32_t p_frame_idx) = 0;
+        [[nodiscard]] virtual vk::command_buffer current_active_command(
+          uint32_t p_frame_idx) = 0;
 
         virtual void present_frame(const uint32_t& p_current_frame) = 0;
     };

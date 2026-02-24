@@ -19,7 +19,6 @@ import atlas.drivers.vulkan.physical_device;
 import atlas.drivers.vulkan.device;
 import atlas.drivers.vulkan.hash;
 
-
 export namespace atlas::vulkan {
     /**
      * @brief mesh class specifically defined with vulkan implementations for
@@ -37,21 +36,23 @@ export namespace atlas::vulkan {
     class mesh {
     public:
         mesh() = default;
-        mesh(std::span<vk::vertex_input> p_vertices, std::span<uint32_t> p_indices) {
+        mesh(std::span<vk::vertex_input> p_vertices,
+             std::span<uint32_t> p_indices) {
             m_physical = instance_context::physical_driver();
             m_device = instance_context::logical_device();
 
             vk::vertex_params vbo_settings = { .phsyical_memory_properties =
-                                                m_physical.memory_properties(),
-                                                .vertices = p_vertices };
+                                                 m_physical.memory_properties(),
+                                               .vertices = p_vertices };
             vk::index_params ibo_settings = { .phsyical_memory_properties =
                                                 m_physical.memory_properties(),
-                                                .indices = p_indices };
+                                              .indices = p_indices };
             m_vbo = vk::vertex_buffer(m_device, vbo_settings);
             m_ibo = vk::index_buffer(m_device, ibo_settings);
         }
 
-        mesh(const std::filesystem::path& p_filename, bool p_flip = false) : m_flip(p_flip) {
+        mesh(const std::filesystem::path& p_filename, bool p_flip = false)
+          : m_flip(p_flip) {
             m_physical = instance_context::physical_driver();
             m_device = instance_context::logical_device();
             reload_mesh(p_filename);
@@ -93,7 +94,7 @@ export namespace atlas::vulkan {
 
             if (!m_diffuse.loaded()) {
                 console_log_info("Diffuse Texture {} is NOT loaded!!!",
-                                p_path.string());
+                                 p_path.string());
                 return;
             }
         }
@@ -107,7 +108,7 @@ export namespace atlas::vulkan {
 
             if (!m_specular.loaded()) {
                 console_log_error("Specular Texture {} is NOT loaded!!!",
-                                p_path.string());
+                                  p_path.string());
                 return;
             }
         }
@@ -140,17 +141,17 @@ export namespace atlas::vulkan {
             //! @note If we return the constructor then we can check if the mesh
             //! loaded successfully
             //! @note We also receive hints if the loading is successful!
-            //! @note Return default constructor automatically returns false means
-            //! that mesh will return the boolean as false because it wasnt
-            //! successful
+            //! @note Return default constructor automatically returns false
+            //! means that mesh will return the boolean as false because it
+            //! wasnt successful
             if (!tinyobj::LoadObj(&attrib,
-                                &shapes,
-                                &materials,
-                                &warn,
-                                &err,
-                                p_filename.string().c_str())) {
+                                  &shapes,
+                                  &materials,
+                                  &warn,
+                                  &err,
+                                  p_filename.string().c_str())) {
                 console_log_warn("Could not load model from path {}",
-                                p_filename.string());
+                                 p_filename.string());
                 m_model_loaded = false;
                 return;
             }
@@ -169,7 +170,7 @@ export namespace atlas::vulkan {
 
                     if (!unique_vertices.contains(vertex)) {
                         unique_vertices[vertex] =
-                        static_cast<uint32_t>(vertices.size());
+                          static_cast<uint32_t>(vertices.size());
                         vertices.push_back(vertex);
                     }
 
@@ -196,20 +197,23 @@ export namespace atlas::vulkan {
                     }
                     if (!attrib.texcoords.empty()) {
                         glm::vec2 flipped_uv = {
-                            attrib.texcoords
-                            [static_cast<long long>(index.texcoord_index) * 2],
+                            attrib.texcoords[static_cast<long long>(
+                                               index.texcoord_index) *
+                                             2],
                             1.0f - attrib.texcoords[static_cast<long long>(
-                                                    index.texcoord_index) *
-                                                    2 +
+                                                      index.texcoord_index) *
+                                                      2 +
                                                     1],
                         };
 
                         glm::vec2 original_uv = {
-                            attrib.texcoords
-                            [static_cast<long long>(index.texcoord_index) * 2],
-                            attrib.texcoords
-                            [static_cast<long long>(index.texcoord_index) * 2 +
-                            1],
+                            attrib.texcoords[static_cast<long long>(
+                                               index.texcoord_index) *
+                                             2],
+                            attrib.texcoords[static_cast<long long>(
+                                               index.texcoord_index) *
+                                               2 +
+                                             1],
                         };
 
                         vertex.uv = m_flip ? flipped_uv : original_uv;
@@ -220,7 +224,7 @@ export namespace atlas::vulkan {
 
                     if (!unique_vertices.contains(vertex)) {
                         unique_vertices[vertex] =
-                        static_cast<uint32_t>(vertices.size());
+                          static_cast<uint32_t>(vertices.size());
                         vertices.push_back(vertex);
                     }
 
@@ -228,12 +232,14 @@ export namespace atlas::vulkan {
                 }
             }
 
-            ::vk::vertex_params vbo_settings = { .phsyical_memory_properties =
-                                                m_physical.memory_properties(),
-                                                .vertices = vertices };
-            ::vk::index_params ibo_settings = { .phsyical_memory_properties =
-                                                m_physical.memory_properties(),
-                                                .indices = indices };
+            ::vk::vertex_params vbo_settings = {
+                .phsyical_memory_properties = m_physical.memory_properties(),
+                .vertices = vertices
+            };
+            ::vk::index_params ibo_settings = {
+                .phsyical_memory_properties = m_physical.memory_properties(),
+                .indices = indices
+            };
             m_vbo = ::vk::vertex_buffer(m_device, vbo_settings);
             m_ibo = ::vk::index_buffer(m_device, ibo_settings);
             m_model_loaded = true;
