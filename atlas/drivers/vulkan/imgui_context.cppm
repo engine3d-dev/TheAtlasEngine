@@ -424,7 +424,6 @@ namespace atlas::vulkan {
         ::vk::renderpass m_viewport_renderpass;
         vk::sample_image m_viewport_image;
         vk::sample_image m_depth_viewport_image;
-        ImTextureID m_viewport_image_id=nullptr;
         window_params m_extent;
     };
 };
