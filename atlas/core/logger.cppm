@@ -126,9 +126,6 @@ export {
 #endif
     }
 
-    /////////////////////////////////////////
-    /////////////////////////////////////////
-    /////////////////////////////////////////
     template<typename... T>
     inline void console_log_trace_tagged(
       [[maybe_unused]] const std::string& p_tag,
