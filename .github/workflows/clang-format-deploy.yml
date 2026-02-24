@@ -22,5 +22,4 @@ jobs:
       with:
         clang-format-version: 19
         check-path: '.'
-        include-regex: '.*\.(c|cpp|h|hpp|cppm|ixx)$'
-        fallback-style: 'none' # optional
+        fallback-style: 'LLVM' # optional
