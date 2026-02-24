@@ -11,6 +11,11 @@ jobs:
     - name: 🌐 Downloading .clang-format from TheAtlasEngine
       run: wget https://raw.githubusercontent.com/engine3d-dev/TheAtlasEngine/main/.clang-format -O .clang-format
     
+    - name: 🔍 Check Runner Clang-Format Version
+      run: |
+        clang-format --version
+        which clang-format
+
     - uses: actions/checkout@v4
     - name: Run clang-format style check for C/C++/Protobuf programs.
       uses: jidicula/clang-format-action@v4.14.0
@@ -19,5 +24,3 @@ jobs:
         check-path: '.'
         include-regex: '.*\.(c|cpp|h|hpp|cppm|ixx)$'
         fallback-style: 'LLVM' # optional
-    - name: 🔍 Check Clang-Format Version
-      run: clang-format --version
