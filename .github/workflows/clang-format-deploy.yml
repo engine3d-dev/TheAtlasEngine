@@ -5,7 +5,9 @@ jobs:
     name: Formatting Check
     runs-on: ubuntu-latest
     steps:
-    
+    - name: 🚀 Checkout Repository
+      uses: actions/checkout@v4
+
     - name: 🌐 Downloading .clang-format from TheAtlasEngine
       run: wget https://raw.githubusercontent.com/engine3d-dev/TheAtlasEngine/main/.clang-format -O .clang-format
     
