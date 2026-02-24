@@ -96,7 +96,8 @@ export namespace atlas::physics {
          */
         [[nodiscard]] JPH::BroadPhaseLayer GetBroadPhaseLayer(
           JPH::ObjectLayer p_in_layer) const override {
-            JPH_ASSERT(p_in_layer < static_cast<JPH::ObjectLayer>(object_layer::num_layers));
+            JPH_ASSERT(p_in_layer <
+                       static_cast<JPH::ObjectLayer>(object_layer::num_layers));
             return m_object_to_broadphase[p_in_layer];
         }
 
@@ -184,7 +185,8 @@ export namespace atlas::physics {
           JPH::ObjectLayer p_in_object2) const override {
             switch (p_in_object1) {
                 case static_cast<int>(object_layer::non_moving):
-                    return p_in_object2 == static_cast<int>(object_layer::moving);
+                    return p_in_object2 ==
+                           static_cast<int>(object_layer::moving);
                 case static_cast<int>(object_layer::moving):
                     return true;
                 default:
