@@ -19,3 +19,5 @@ jobs:
         check-path: '.'
         include-regex: '.*\.(c|cpp|h|hpp|cppm|ixx)$'
         fallback-style: 'LLVM' # optional
+    - name: 🔍 Check Clang-Format Version
+      run: clang-format --version
