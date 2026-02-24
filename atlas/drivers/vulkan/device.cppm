@@ -93,19 +93,24 @@ namespace atlas::vulkan {
          * @param p_physical is the physical device required for the creation of
          * the logical device
          */
-        device(const physical_device& p_physical) : m_physical(p_physical) {
+        device(const physical_device& p_physical)
+          : m_physical(p_physical) {
             m_depth_format_selected = search_depth_format(m_physical);
 
             float queue_priority[1] = { 0.0f };
 
-        #if defined(__APPLE__)
-            std::vector<const char*> device_extension = { VK_KHR_SWAPCHAIN_EXTENSION_NAME, "VK_KHR_portability_subset" };
-        #else
-            std::vector<const char*> device_extension = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
-        #endif
+#if defined(__APPLE__)
+            std::vector<const char*> device_extension = {
+                VK_KHR_SWAPCHAIN_EXTENSION_NAME, "VK_KHR_portability_subset"
+            };
+#else
+            std::vector<const char*> device_extension = {
+                VK_KHR_SWAPCHAIN_EXTENSION_NAME
+            };
+#endif
 
             uint32_t graphics_index =
-            m_physical.read_queue_family_indices().graphics;
+              m_physical.read_queue_family_indices().graphics;
 
             VkDeviceQueueCreateInfo queue_create_info = {
                 .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
@@ -125,7 +130,7 @@ namespace atlas::vulkan {
                 .enabledLayerCount = 0,
                 .ppEnabledLayerNames = nullptr,
                 .enabledExtensionCount =
-                static_cast<uint32_t>(device_extension.size()),
+                  static_cast<uint32_t>(device_extension.size()),
                 .ppEnabledExtensionNames = device_extension.data(),
             };
 
@@ -134,11 +139,12 @@ namespace atlas::vulkan {
             features.robustBufferAccess = false;
             create_info.pEnabledFeatures = &features;
 
-            vk_check(vkCreateDevice(m_physical, &create_info, nullptr, &m_driver),
-                    "vkCreateDevice");
+            vk_check(
+              vkCreateDevice(m_physical, &create_info, nullptr, &m_driver),
+              "vkCreateDevice");
 
             vkGetDeviceQueue(
-            m_driver, graphics_index, 0, &m_device_queues.graphics_queue);
+              m_driver, graphics_index, 0, &m_device_queues.graphics_queue);
         }
 
         // Use .destroy to explicitly invoke when to do proper vulkan cleanup
@@ -154,14 +160,15 @@ namespace atlas::vulkan {
         /**
          * @return -1 if there are no flags available/compatible/valid
          */
-        uint32_t select_memory_type(uint32_t p_type_filter, VkMemoryPropertyFlags p_property_flag) {
+        uint32_t select_memory_type(uint32_t p_type_filter,
+                                    VkMemoryPropertyFlags p_property_flag) {
             VkPhysicalDeviceMemoryProperties mem_props;
             vkGetPhysicalDeviceMemoryProperties(m_physical, &mem_props);
 
             for (uint32_t i = 0; i < mem_props.memoryTypeCount; i++) {
                 if ((p_type_filter & (1 << i)) and
-                    (mem_props.memoryTypes[i].propertyFlags & p_property_flag) ==
-                    p_property_flag) {
+                    (mem_props.memoryTypes[i].propertyFlags &
+                     p_property_flag) == p_property_flag) {
                     return i;
                 }
             }

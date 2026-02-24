@@ -59,20 +59,20 @@ export namespace atlas::vulkan {
 
             if (device_count == 0) {
                 console_log_fatal("Device Count is {} and no devices found!!!",
-                                device_count);
+                                  device_count);
                 return;
             }
 
             std::vector<VkPhysicalDevice> physical_drivers(device_count);
             vkEnumeratePhysicalDevices(
-            p_instance, &device_count, physical_drivers.data());
+              p_instance, &device_count, physical_drivers.data());
 
             for (const auto& device : physical_drivers) {
                 VkPhysicalDeviceProperties device_properties;
                 VkPhysicalDeviceFeatures device_features;
                 vkGetPhysicalDeviceProperties(device, &device_properties);
                 vkGetPhysicalDeviceFeatures(device, &device_features);
-            #if defined(__APPLE__)
+#if defined(__APPLE__)
                 // Apple silicon chips are integrated GPUs
                 // Prefer integrated GPU over discrete GPU on macOS
                 if (device_properties.deviceType ==
@@ -80,25 +80,26 @@ export namespace atlas::vulkan {
                     m_physical_driver = device;
                     break;
                 }
-            #else
-                // Prefer discrete GPU over integrated GPU on other platforms (Linux, Windows)
+#else
+                // Prefer discrete GPU over integrated GPU on other platforms
+                // (Linux, Windows)
                 if (device_properties.deviceType ==
                     VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
                     m_physical_driver = device;
                     break;
                 }
-            #endif
+#endif
             }
 
             uint32_t queue_family_count = 0;
             vkGetPhysicalDeviceQueueFamilyProperties(
-            m_physical_driver, &queue_family_count, nullptr);
+              m_physical_driver, &queue_family_count, nullptr);
             m_queue_family_properties.resize(queue_family_count);
 
             vkGetPhysicalDeviceQueueFamilyProperties(
-            m_physical_driver,
-            &queue_family_count,
-            m_queue_family_properties.data());
+              m_physical_driver,
+              &queue_family_count,
+              m_queue_family_properties.data());
 
             m_queue_indices = select_queue_family_indices();
         }
@@ -115,7 +116,8 @@ export namespace atlas::vulkan {
             return m_queue_indices;
         }
 
-        [[nodiscard]] VkPhysicalDeviceMemoryProperties memory_properties() const {
+        [[nodiscard]] VkPhysicalDeviceMemoryProperties memory_properties()
+          const {
             VkPhysicalDeviceMemoryProperties physical_memory_properties;
             vkGetPhysicalDeviceMemoryProperties(m_physical_driver,
                                                 &physical_memory_properties);
@@ -126,15 +128,16 @@ export namespace atlas::vulkan {
          * @return uint32_t is the index to the presentation index of the
          * specific presentation queue
          */
-        [[nodiscard]] uint32_t read_presentation_index(const VkSurfaceKHR& p_surface) {
+        [[nodiscard]] uint32_t read_presentation_index(
+          const VkSurfaceKHR& p_surface) {
             uint32_t presentation_index = -1;
             VkBool32 compatible = VK_FALSE;
             uint32_t i = 0;
             for (const auto& queue_family : m_queue_family_properties) {
                 if (queue_family.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
                     vk_check(vkGetPhysicalDeviceSurfaceSupportKHR(
-                            m_physical_driver, i, p_surface, &compatible),
-                            "vkGetPhysicalDeviceSurfaceSupportKHR");
+                               m_physical_driver, i, p_surface, &compatible),
+                             "vkGetPhysicalDeviceSurfaceSupportKHR");
 
                     if (compatible) {
                         presentation_index = i;
@@ -150,24 +153,26 @@ export namespace atlas::vulkan {
          * @brief querying surface properties based on the currently specified
          * VkSurfaceKHR handle created
          */
-        [[nodiscard]] surface_properties get_surface_properties(const VkSurfaceKHR& p_surface) {
+        [[nodiscard]] surface_properties get_surface_properties(
+          const VkSurfaceKHR& p_surface) {
             vk_check(vkGetPhysicalDeviceSurfaceCapabilitiesKHR(
-                   m_physical_driver,
-                   p_surface,
-                   &m_surface_properties.surface_capabilities),
-                 "vkGetPhysicalDeviceSurfaceCapabilitiesKHR");
+                       m_physical_driver,
+                       p_surface,
+                       &m_surface_properties.surface_capabilities),
+                     "vkGetPhysicalDeviceSurfaceCapabilitiesKHR");
 
             uint32_t format_count = 0;
             std::vector<VkSurfaceFormatKHR> formats;
             vk_check(vkGetPhysicalDeviceSurfaceFormatsKHR(
-                    m_physical_driver, p_surface, &format_count, nullptr),
-                    "vkGetPhysicalDeviceSurfaceFormatsKHR");
+                       m_physical_driver, p_surface, &format_count, nullptr),
+                     "vkGetPhysicalDeviceSurfaceFormatsKHR");
 
             formats.resize(format_count);
 
-            vk_check(vkGetPhysicalDeviceSurfaceFormatsKHR(
-                    m_physical_driver, p_surface, &format_count, formats.data()),
-                    "vkGetPhysicalDeviceSurfaceFormatsKHR");
+            vk_check(
+              vkGetPhysicalDeviceSurfaceFormatsKHR(
+                m_physical_driver, p_surface, &format_count, formats.data()),
+              "vkGetPhysicalDeviceSurfaceFormatsKHR");
 
             for (const auto& format : formats) {
                 if (format.format == VK_FORMAT_B8G8R8A8_SRGB &&
@@ -202,8 +207,8 @@ export namespace atlas::vulkan {
     private:
         queue_family_indices select_queue_family_indices() {
             VkPhysicalDeviceMemoryProperties physical_device_memory_properties;
-            vkGetPhysicalDeviceMemoryProperties(m_physical_driver,
-                                                &physical_device_memory_properties);
+            vkGetPhysicalDeviceMemoryProperties(
+              m_physical_driver, &physical_device_memory_properties);
             physical_device::queue_family_indices indices;
             int i = 0;
 

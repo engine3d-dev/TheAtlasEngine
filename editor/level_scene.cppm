@@ -38,7 +38,8 @@ import atlas.drivers.vulkan.instance_context;
 import vk;
 import content_browser;
 
-static void ui_component_list(flecs::entity& p_selected_entity) {
+static void
+ui_component_list(flecs::entity& p_selected_entity) {
     std::string entity_name = p_selected_entity.name().c_str();
     std::string new_entity_name = "";
     atlas::ui::draw_input_text(new_entity_name, entity_name);
@@ -55,7 +56,7 @@ static void ui_component_list(flecs::entity& p_selected_entity) {
         if (!p_selected_entity.has<atlas::perspective_camera>()) {
             if (ImGui::MenuItem("Perspective Camera")) {
                 p_selected_entity.add<
-                flecs::pair<atlas::tag::editor, atlas::projection_view>>();
+                  flecs::pair<atlas::tag::editor, atlas::projection_view>>();
                 p_selected_entity.add<atlas::perspective_camera>();
                 ImGui::CloseCurrentPopup();
             }
@@ -115,25 +116,23 @@ static void ui_component_list(flecs::entity& p_selected_entity) {
     ImGui::PopItemWidth();
 }
 
-
-enum scene_runtime {
-    edit,
-    play
-};
+enum scene_runtime { edit, play };
 
 export class level_scene final : public atlas::scene {
 public:
-    level_scene(const std::string& p_name, atlas::event::bus& p_bus) : atlas::scene(p_name, p_bus) {
+    level_scene(const std::string& p_name, atlas::event::bus& p_bus)
+      : atlas::scene(p_name, p_bus) {
         auto editor_camera = entity("Editor Camera");
-        editor_camera.add<flecs::pair<atlas::tag::editor, atlas::projection_view>>();
+        editor_camera
+          .add<flecs::pair<atlas::tag::editor, atlas::projection_view>>();
         editor_camera.set<atlas::transform>({
-            .position = { 3.50f, 4.90f, 36.40f },
-            .scale{ 1.f },
+          .position = { 3.50f, 4.90f, 36.40f },
+          .scale{ 1.f },
         });
         editor_camera.set<atlas::perspective_camera>({
-            .plane = { 0.1f, 5000.f },
-            .is_active = true,
-            .field_of_view = 45.f,
+          .plane = { 0.1f, 5000.f },
+          .is_active = true,
+          .field_of_view = 45.f,
         });
 
         atlas::game_object bob_object = entity("Bob");
@@ -141,83 +140,84 @@ public:
 
         // @brief For now adding this in
         // because we do not have a way to handle empty scenes
-        // so we are adding this in just to have a specific mesh associated with the renderer for the time being, just to make sure it works.
+        // so we are adding this in just to have a specific mesh associated with
+        // the renderer for the time being, just to make sure it works.
         atlas::game_object viking_room = entity("Viking Room");
         viking_room.add<atlas::tag::serialize>();
         viking_room.set<atlas::transform>({
-            .position = { -2.70f, 2.70, -8.30f },
-            .rotation = { 2.30f, 95.90f, 91.80f },
-            .scale{ 1.f },
+          .position = { -2.70f, 2.70, -8.30f },
+          .rotation = { 2.30f, 95.90f, 91.80f },
+          .scale{ 1.f },
         });
 
         viking_room.set<atlas::sphere_collider>({
-        .radius = 1.0f,
+          .radius = 1.0f,
         });
 
         viking_room.set<atlas::physics_body>({
-        .friction = 15.f,
-        .restitution = 0.3f,
-        .body_movement_type = atlas::dynamic,
+          .friction = 15.f,
+          .restitution = 0.3f,
+          .body_movement_type = atlas::dynamic,
         });
 
         atlas::game_object cube = entity("Aircraft");
 
         cube.set<atlas::transform>({
-        .position = { 0.f, 2.10f, -7.30f },
-        .scale = { 0.9f, 0.9f, 0.9f },
+          .position = { 0.f, 2.10f, -7.30f },
+          .scale = { 0.9f, 0.9f, 0.9f },
         });
 
         cube.set<atlas::mesh_source>({
-        .color = { 1.f, 1.f, 1.f, 1.f },
-        // .model_path = "assets/models/E 45 Aircraft_obj.obj",
-        .model_path = "assets/backpack/backpack.obj",
-        .diffuse = "assets/backpack/diffuse.jpg",
-        .specular = "assets/backpack/specular.jpg"
-        //   .diffuse = "assets/models/E-45-steel detail_2_col.jpg",
+          .color = { 1.f, 1.f, 1.f, 1.f },
+          // .model_path = "assets/models/E 45 Aircraft_obj.obj",
+          .model_path = "assets/backpack/backpack.obj",
+          .diffuse = "assets/backpack/diffuse.jpg",
+          .specular = "assets/backpack/specular.jpg"
+          //   .diffuse = "assets/models/E-45-steel detail_2_col.jpg",
         });
 
         atlas::game_object robot_model = entity("Cube");
         robot_model.add<atlas::tag::serialize>();
         // robot_model.add<atlas::tag::serialize>();
         robot_model.set<atlas::transform>({
-        .position = { -2.70, 3.50f, 4.10f },
-        .scale = { 1.f, 1.f, 1.f },
+          .position = { -2.70, 3.50f, 4.10f },
+          .scale = { 1.f, 1.f, 1.f },
         });
 
         robot_model.set<atlas::mesh_source>(
-        { .color = { 1.f, 1.f, 1.f, 1.f },
+          { .color = { 1.f, 1.f, 1.f, 1.f },
             .model_path = "assets/models/cube.obj",
             .diffuse = "assets/models/container_diffuse.png",
             .specular = "assets/models/container_specular.png" });
 
         robot_model.set<atlas::box_collider>({
-        .half_extent = { 1.f, 1.f, 1.f },
+          .half_extent = { 1.f, 1.f, 1.f },
         });
         robot_model.set<atlas::physics_body>({
-        //   .restitution = 1.f,
-        .body_movement_type = atlas::dynamic,
+          //   .restitution = 1.f,
+          .body_movement_type = atlas::dynamic,
         });
 
         atlas::game_object platform = entity("Platform");
 
         platform.set<atlas::transform>({
-        .scale = { 15.f, 0.30f, 10.0f },
+          .scale = { 15.f, 0.30f, 10.0f },
         });
         platform.set<atlas::mesh_source>({
-        .model_path = "assets/models/cube.obj",
-        .diffuse = "assets/models/wood.png",
+          .model_path = "assets/models/cube.obj",
+          .diffuse = "assets/models/wood.png",
         });
         platform.set<atlas::physics_body>({
-        .body_movement_type = atlas::fixed,
+          .body_movement_type = atlas::fixed,
         });
         platform.set<atlas::box_collider>({
-        .half_extent = { 15.f, 0.30f, 10.0f },
+          .half_extent = { 15.f, 0.30f, 10.0f },
         });
 
         atlas::game_object point_light = entity("Point Light 1");
         point_light.set<atlas::transform>({
-        .position = { 0.f, 2.10f, -7.30f },
-        .scale = { 0.9f, 0.9f, 0.9f },
+          .position = { 0.f, 2.10f, -7.30f },
+          .scale = { 0.9f, 0.9f, 0.9f },
         });
         point_light.add<atlas::tag::serialize>();
 
@@ -256,35 +256,47 @@ public:
         m_deserializer_test = atlas::serializer();
 
         subscribe<atlas::event::collision_enter>(this,
-                                                &level_scene::collision_enter);
+                                                 &level_scene::collision_enter);
 
         atlas::register_start(this, &level_scene::start);
         atlas::register_physics(this, &level_scene::physics_update);
         atlas::register_update(this, &level_scene::on_update);
         atlas::register_ui(this, &level_scene::on_ui_update);
         // @note checking to see what state we are in. (If playing/stopping)
-		// Ref<Texture2D> icon = _sceneState == SceneState::Edit ? _iconPlay : _iconStop;
+        // Ref<Texture2D> icon = _sceneState == SceneState::Edit ? _iconPlay :
+        // _iconStop;
         vk::texture_info config_texture = {
-            .phsyical_memory_properties = atlas::vulkan::instance_context::physical_driver().memory_properties(),
+            .phsyical_memory_properties =
+              atlas::vulkan::instance_context::physical_driver()
+                .memory_properties(),
             .filepath = std::filesystem::path("assets/icons/PlayButton.png")
         };
-        m_play_button = vk::texture(atlas::vulkan::instance_context::logical_device(), config_texture);
-        if(!m_play_button.loaded()) {
+        m_play_button = vk::texture(
+          atlas::vulkan::instance_context::logical_device(), config_texture);
+        if (!m_play_button.loaded()) {
             console_log_info("Play Button Could not be loaded!!");
         }
-        config_texture = {
-            .phsyical_memory_properties = atlas::vulkan::instance_context::physical_driver().memory_properties(),
-            .filepath = std::filesystem::path("assets/icons/StopButton.png")
-        };
-        m_stop_button = vk::texture(atlas::vulkan::instance_context::logical_device(), config_texture);
-        if(!m_stop_button.loaded()) {
+        config_texture = { .phsyical_memory_properties =
+                             atlas::vulkan::instance_context::physical_driver()
+                               .memory_properties(),
+                           .filepath = std::filesystem::path(
+                             "assets/icons/StopButton.png") };
+        m_stop_button = vk::texture(
+          atlas::vulkan::instance_context::logical_device(), config_texture);
+        if (!m_stop_button.loaded()) {
             console_log_info("Stop Button Could not be loaded!!");
         }
 
-        m_play_button_id = static_cast<ImTextureID>(ImGui_ImplVulkan_AddTexture(m_play_button.image().sampler(), m_play_button.image().image_view(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
-        m_stop_button_id = static_cast<ImTextureID>(ImGui_ImplVulkan_AddTexture(m_stop_button.image().sampler(), m_stop_button.image().image_view(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
+        m_play_button_id = static_cast<ImTextureID>(ImGui_ImplVulkan_AddTexture(
+          m_play_button.image().sampler(),
+          m_play_button.image().image_view(),
+          VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
+        m_stop_button_id = static_cast<ImTextureID>(ImGui_ImplVulkan_AddTexture(
+          m_stop_button.image().sampler(),
+          m_stop_button.image().image_view(),
+          VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
 
-        atlas::vulkan::instance_context::submit_resource_free([this](){
+        atlas::vulkan::instance_context::submit_resource_free([this]() {
             m_play_button.destroy();
             m_stop_button.destroy();
             m_content_browser.destroy();
@@ -305,17 +317,18 @@ public:
     }
 
     void on_update(float p_delta_time) {
-        auto query_cameras = query_builder<atlas::perspective_camera, atlas::transform>().build();
+        auto query_cameras =
+          query_builder<atlas::perspective_camera, atlas::transform>().build();
         float dt = p_delta_time;
 
         query_cameras.each([this, dt](atlas::perspective_camera& p_camera,
-                                atlas::transform& p_transform) {
+                                      atlas::transform& p_transform) {
             if (!p_camera.is_active) {
                 return;
             }
 
-            float default_speed = 10.f; // current default movement speed that does
-                                        // not applied modified speed
+            float default_speed = 10.f; // current default movement speed that
+                                        // does not applied modified speed
             float rotation_speed = 1.f;
             float velocity = default_speed * dt;
             if (atlas::event::is_mouse_pressed(mouse_button_middle)) {
@@ -326,7 +339,8 @@ public:
             glm::quat to_quaternion = atlas::to_quat(p_transform.quaternion);
 
             glm::vec3 up = glm::rotate(to_quaternion, atlas::math::up());
-            glm::vec3 forward = glm::rotate(to_quaternion, atlas::math::backward());
+            glm::vec3 forward =
+              glm::rotate(to_quaternion, atlas::math::backward());
             glm::vec3 right = glm::rotate(to_quaternion, atlas::math::right());
 
             if (atlas::event::is_key_pressed(key_left_shift)) {
@@ -364,7 +378,7 @@ public:
 
     void on_ui_update() {
         // setting up the dockspace UI widgets at the window toolbar
-        if(m_editor_dockspace.begin()) {
+        if (m_editor_dockspace.begin()) {
             try {
                 m_editor_menu.begin();
             }
@@ -379,7 +393,8 @@ public:
                 ImGui::Separator();
 
                 if (ImGui::MenuItem("Exit")) {
-                    // glfwSetWindowShouldClose(atlas::application::close(), true);
+                    // glfwSetWindowShouldClose(atlas::application::close(),
+                    // true);
                 }
 
                 ImGui::EndMenu();
@@ -389,19 +404,22 @@ public:
         }
         ImGuiID dockspace_id = ImGui::GetID("Dockspace Demo");
         ImGui::SetNextWindowDockID(dockspace_id, ImGuiCond_FirstUseEver);
-        if(ImGui::Begin("Viewport")) {
+        if (ImGui::Begin("Viewport")) {
             ImVec2 viewport_size = ImGui::GetContentRegionAvail();
-            // ImGui::Image(m_viewport_image_id, {static_cast<float>(m_extent.width), static_cast<float>(m_extent.height)});
-            if(atlas::vulkan::g_viewport_image_id == nullptr) {
-                console_log_error("atlas::vulkan::g_viewport_image_id is nullptr!!!!!!!!!!!!!!!!!!!");
-
+            // ImGui::Image(m_viewport_image_id,
+            // {static_cast<float>(m_extent.width),
+            // static_cast<float>(m_extent.height)});
+            if (atlas::vulkan::g_viewport_image_id == nullptr) {
+                console_log_error("atlas::vulkan::g_viewport_image_id is "
+                                  "nullptr!!!!!!!!!!!!!!!!!!!");
             }
             ImGui::Image(atlas::vulkan::g_viewport_image_id, viewport_size);
             ImGui::End();
         }
 
         // if (ImGui::Begin("Viewport")) {
-        //     // TODO: Consider doing this a different way, but not with static.
+        //     // TODO: Consider doing this a different way, but not with
+        //     static.
         //     // glm::vec2 viewport_panel_size =
         //     // glm::vec2{ atlas::application::params().width,
         //     //             atlas::application::params().height };
@@ -425,12 +443,12 @@ public:
 
             query_builder.each([&](flecs::entity p_entity, atlas::transform&) {
                 // We set the imgui flags for our scene heirarchy panel
-                // TODO -- Make the scene heirarchy panel a separate class that is
-                // used for specify the layout and other UI elements here
+                // TODO -- Make the scene heirarchy panel a separate class that
+                // is used for specify the layout and other UI elements here
                 ImGuiTreeNodeFlags flags =
-                ((m_selected_entity == p_entity) ? ImGuiTreeNodeFlags_Selected
-                                                : 0) |
-                ImGuiTreeNodeFlags_OpenOnArrow;
+                  ((m_selected_entity == p_entity) ? ImGuiTreeNodeFlags_Selected
+                                                   : 0) |
+                  ImGuiTreeNodeFlags_OpenOnArrow;
                 flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
                 flags |= ImGuiWindowFlags_Popup;
                 flags |= ImGuiTreeNodeFlags_AllowItemOverlap;
@@ -460,15 +478,17 @@ public:
                     flags = ImGuiTreeNodeFlags_OpenOnArrow |
                             ImGuiTreeNodeFlags_SpanAvailWidth;
                     auto query_children_builder =
-                    this->query_builder().with(flecs::ChildOf, p_entity).build();
+                      this->query_builder()
+                        .with(flecs::ChildOf, p_entity)
+                        .build();
                     int32_t child_count = query_children_builder.count();
 
-                    // // Only show children in scene heirarchy panel if there are
-                    // children entities
+                    // // Only show children in scene heirarchy panel if there
+                    // are children entities
                     if (child_count > 0) {
                         m_selected_entity.children([&](flecs::entity p_child) {
                             opened =
-                            ImGui::TreeNodeEx(p_child.name().c_str(), flags);
+                              ImGui::TreeNodeEx(p_child.name().c_str(), flags);
                             if (opened) {
                                 if (ImGui::IsItemClicked()) {
                                     m_selected_entity = p_child;
@@ -491,46 +511,47 @@ public:
                 ui_component_list(m_selected_entity);
 
                 atlas::ui::draw_component<atlas::transform>(
-                "transform",
-                m_selected_entity,
-                [](atlas::transform* p_transform) {
-                    atlas::ui::draw_vec3("Position", p_transform->position);
-                    atlas::ui::draw_vec3("Scale", p_transform->scale);
-                    atlas::ui::draw_vec3("Rotation", p_transform->rotation);
-                });
+                  "transform",
+                  m_selected_entity,
+                  [](atlas::transform* p_transform) {
+                      atlas::ui::draw_vec3("Position", p_transform->position);
+                      atlas::ui::draw_vec3("Scale", p_transform->scale);
+                      atlas::ui::draw_vec3("Rotation", p_transform->rotation);
+                  });
 
                 atlas::ui::draw_component<atlas::perspective_camera>(
-                "camera",
-                m_selected_entity,
-                [this](atlas::perspective_camera* p_camera) {
-                    atlas::ui::draw_float("field of view",
+                  "camera",
+                  m_selected_entity,
+                  [this](atlas::perspective_camera* p_camera) {
+                      atlas::ui::draw_float("field of view",
                                             p_camera->field_of_view);
-                    ImGui::Checkbox("is_active", &p_camera->is_active);
-                    ImGui::DragFloat("Speed", &m_movement_speed);
-                });
+                      ImGui::Checkbox("is_active", &p_camera->is_active);
+                      ImGui::DragFloat("Speed", &m_movement_speed);
+                  });
 
                 atlas::ui::draw_component<atlas::mesh_source>(
-                "atlas::mesh_source",
-                m_selected_entity,
-                [](atlas::mesh_source* p_source) {
-                    std::string mesh_src = p_source->model_path;
-                    atlas::ui::draw_input_text(p_source->model_path, mesh_src);
-                    atlas::ui::draw_vec4("Color", p_source->color);
-                });
+                  "atlas::mesh_source",
+                  m_selected_entity,
+                  [](atlas::mesh_source* p_source) {
+                      std::string mesh_src = p_source->model_path;
+                      atlas::ui::draw_input_text(p_source->model_path,
+                                                 mesh_src);
+                      atlas::ui::draw_vec4("Color", p_source->color);
+                  });
 
                 atlas::ui::draw_component<atlas::material_metadata>(
-                "material",
-                m_selected_entity,
-                [](atlas::material_metadata* p_source) {
-                    float speed = 0.01f;
-                    ImGui::DragFloat4(
+                  "material",
+                  m_selected_entity,
+                  [](atlas::material_metadata* p_source) {
+                      float speed = 0.01f;
+                      ImGui::DragFloat4(
                         "Ambient", glm::value_ptr(p_source->ambient), speed);
-                    ImGui::DragFloat4(
+                      ImGui::DragFloat4(
                         "Diffuse", glm::value_ptr(p_source->diffuse), speed);
-                    ImGui::DragFloat4(
+                      ImGui::DragFloat4(
                         "Specular", glm::value_ptr(p_source->specular), speed);
-                    atlas::ui::draw_float("Shininess", p_source->shininess);
-                });
+                      atlas::ui::draw_float("Shininess", p_source->shininess);
+                  });
 
                 /*
                 atlas::ui::draw_component<atlas::directional_light>("Directional
@@ -538,106 +559,117 @@ public:
                 p_dir_light){ ImGui::DragFloat4("Direction",
                 glm::value_ptr(p_dir_light->direction)); ImGui::DragFloat4("View
                 Pos", glm::value_ptr(p_dir_light->view_position));
-                    ImGui::DragFloat4("Color", glm::value_ptr(p_dir_light->color));
+                    ImGui::DragFloat4("Color",
+                glm::value_ptr(p_dir_light->color));
                     ImGui::DragFloat4("Ambient",
-                glm::value_ptr(p_dir_light->ambient)); ImGui::DragFloat4("Diffuse",
-                glm::value_ptr(p_dir_light->diffuse)); ImGui::DragFloat4("Specular",
+                glm::value_ptr(p_dir_light->ambient));
+                ImGui::DragFloat4("Diffuse",
+                glm::value_ptr(p_dir_light->diffuse));
+                ImGui::DragFloat4("Specular",
                 glm::value_ptr(p_dir_light->specular));
                 });
                 */
 
                 atlas::ui::draw_component<atlas::point_light>(
-                "Point Light",
-                m_selected_entity,
-                [](atlas::point_light* p_dir_light) {
-                    ImGui::DragFloat4(
+                  "Point Light",
+                  m_selected_entity,
+                  [](atlas::point_light* p_dir_light) {
+                      ImGui::DragFloat4(
                         "Color", glm::value_ptr(p_dir_light->color), 0.01);
-                    ImGui::DragFloat(
+                      ImGui::DragFloat(
                         "Attenuation", &p_dir_light->attenuation, 0.001);
-                    ImGui::DragFloat4(
+                      ImGui::DragFloat4(
                         "Ambient", glm::value_ptr(p_dir_light->ambient), 0.01);
-                    ImGui::DragFloat4(
+                      ImGui::DragFloat4(
                         "Diffuse", glm::value_ptr(p_dir_light->diffuse), 0.01);
-                    ImGui::DragFloat4(
-                        "Specular", glm::value_ptr(p_dir_light->specular), 0.01);
-                    ImGui::DragFloat("Constant", &p_dir_light->constant, 0.01);
-                    ImGui::DragFloat("Linear", &p_dir_light->linear, 0.01);
-                    ImGui::DragFloat("Quadratic", &p_dir_light->quadratic, 0.01);
-                });
+                      ImGui::DragFloat4("Specular",
+                                        glm::value_ptr(p_dir_light->specular),
+                                        0.01);
+                      ImGui::DragFloat(
+                        "Constant", &p_dir_light->constant, 0.01);
+                      ImGui::DragFloat("Linear", &p_dir_light->linear, 0.01);
+                      ImGui::DragFloat(
+                        "Quadratic", &p_dir_light->quadratic, 0.01);
+                  });
 
                 atlas::ui::draw_component<atlas::physics_body>(
-                "Physics Body",
-                m_selected_entity,
-                [](atlas::physics_body* p_body) {
-                    std::array<std::string, 3> items = {
-                        "Static",
-                        "Kinematic",
-                        "Dynamic",
-                    };
-                    std::string combo_preview = items[p_body->body_movement_type];
+                  "Physics Body",
+                  m_selected_entity,
+                  [](atlas::physics_body* p_body) {
+                      std::array<std::string, 3> items = {
+                          "Static",
+                          "Kinematic",
+                          "Dynamic",
+                      };
+                      std::string combo_preview =
+                        items[p_body->body_movement_type];
 
-                    // Begin the combo box
-                    if (ImGui::BeginCombo("Body Type", combo_preview.data())) {
-                        for (int n = 0; n < 3; n++) {
-                            // Check if the current item is selected
-                            const bool is_selected =
+                      // Begin the combo box
+                      if (ImGui::BeginCombo("Body Type",
+                                            combo_preview.data())) {
+                          for (int n = 0; n < 3; n++) {
+                              // Check if the current item is selected
+                              const bool is_selected =
                                 (p_body->body_movement_type == n);
-                            if (ImGui::Selectable(items[n].data(), is_selected)) {
-                                // Update the current type when a new item is
-                                // selected
-                                p_body->body_movement_type =
+                              if (ImGui::Selectable(items[n].data(),
+                                                    is_selected)) {
+                                  // Update the current type when a new item is
+                                  // selected
+                                  p_body->body_movement_type =
                                     static_cast<atlas::body_type>(n);
-                            }
+                              }
 
-                            // Set the initial focus when the combo box is first
-                            // opened
-                            if (is_selected) {
-                                ImGui::SetItemDefaultFocus();
-                            }
-                        }
-                        ImGui::EndCombo();
-                    }
+                              // Set the initial focus when the combo box is
+                              // first opened
+                              if (is_selected) {
+                                  ImGui::SetItemDefaultFocus();
+                              }
+                          }
+                          ImGui::EndCombo();
+                      }
 
-                    // physics body parameters
-                    atlas::ui::draw_vec3("Linear Velocity",
-                                        p_body->linear_velocity);
-                    atlas::ui::draw_vec3("Angular Velocity",
-                                        p_body->angular_velocity);
-                    atlas::ui::draw_vec3("Force", p_body->force);
-                    atlas::ui::draw_vec3("Impulse", p_body->impulse);
-                    atlas::ui::draw_vec3("Torque", p_body->torque);
-                    atlas::ui::draw_vec3("Center Mass",
-                                        p_body->center_mass_position);
-                });
+                      // physics body parameters
+                      atlas::ui::draw_vec3("Linear Velocity",
+                                           p_body->linear_velocity);
+                      atlas::ui::draw_vec3("Angular Velocity",
+                                           p_body->angular_velocity);
+                      atlas::ui::draw_vec3("Force", p_body->force);
+                      atlas::ui::draw_vec3("Impulse", p_body->impulse);
+                      atlas::ui::draw_vec3("Torque", p_body->torque);
+                      atlas::ui::draw_vec3("Center Mass",
+                                           p_body->center_mass_position);
+                  });
 
                 atlas::ui::draw_component<atlas::box_collider>(
-                "Box Collider",
-                m_selected_entity,
-                [](atlas::box_collider* p_collider) {
-                    atlas::ui::draw_vec3("Half Extent", p_collider->half_extent);
-                });
+                  "Box Collider",
+                  m_selected_entity,
+                  [](atlas::box_collider* p_collider) {
+                      atlas::ui::draw_vec3("Half Extent",
+                                           p_collider->half_extent);
+                  });
 
                 atlas::ui::draw_component<atlas::sphere_collider>(
-                "Box Collider",
-                m_selected_entity,
-                [](atlas::sphere_collider* p_collider) {
-                    atlas::ui::draw_float("Radius", p_collider->radius);
-                });
+                  "Box Collider",
+                  m_selected_entity,
+                  [](atlas::sphere_collider* p_collider) {
+                      atlas::ui::draw_float("Radius", p_collider->radius);
+                  });
 
                 atlas::ui::draw_component<atlas::capsule_collider>(
-                "Box Collider",
-                m_selected_entity,
-                [](atlas::capsule_collider* p_collider) {
-                    atlas::ui::draw_float("Half Height", p_collider->half_height);
-                    atlas::ui::draw_float("Radius", p_collider->radius);
-                });
+                  "Box Collider",
+                  m_selected_entity,
+                  [](atlas::capsule_collider* p_collider) {
+                      atlas::ui::draw_float("Half Height",
+                                            p_collider->half_height);
+                      atlas::ui::draw_float("Radius", p_collider->radius);
+                  });
 
                 atlas::ui::draw_component<atlas::tag::serialize>(
-                "Serialize",
-                m_selected_entity,
-                [](atlas::tag::serialize* p_serialize) {
-                    ImGui::Checkbox("Enable", &p_serialize->enable);
-                });
+                  "Serialize",
+                  m_selected_entity,
+                  [](atlas::tag::serialize* p_serialize) {
+                      ImGui::Checkbox("Enable", &p_serialize->enable);
+                  });
             }
 
             ImGui::End();
@@ -653,11 +685,11 @@ public:
             // auto height = atlas::application::get_window().height();
 
             // ImGui::SetNextWindowPos(ImVec2(static_cast<float>(width) * 0.5f,
-            // static_cast<float>(height) * 0.5f), ImGuiCond_Always, ImVec2(0.5f,
-            // 0.5f)); ImGui::SetNextWindowSize(ImVec2(200, 20), ImGuiCond_Always);
-            // ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration |
-            // ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoInputs;
-            // ImGui::SetNextWindowBgAlpha(0.f);
+            // static_cast<float>(height) * 0.5f), ImGuiCond_Always,
+            // ImVec2(0.5f, 0.5f)); ImGui::SetNextWindowSize(ImVec2(200, 20),
+            // ImGuiCond_Always); ImGuiWindowFlags flags =
+            // ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground |
+            // ImGuiWindowFlags_NoInputs; ImGui::SetNextWindowBgAlpha(0.f);
 
             // if(ImGui::Begin("Testing", nullptr, flags)) {
             // ImGui::ProgressBar(10.f);
@@ -674,7 +706,6 @@ public:
             // }
         }
 
-
         ui_toolbar();
 
         m_content_browser.run();
@@ -683,41 +714,56 @@ public:
     }
 
     void ui_toolbar() {
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 2)); // @note ImVec making button not touch bottom
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 2));
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+        ImGui::PushStyleVar(
+          ImGuiStyleVar_WindowPadding,
+          ImVec2(0, 2)); // @note ImVec making button not touch bottom
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 2));
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
 
-		auto& color = ImGui::GetStyle().Colors;
-		auto& buttonHovered = color[ImGuiCol_ButtonHovered];
-		auto& buttonActive = color[ImGuiCol_ButtonActive];
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
+        auto& color = ImGui::GetStyle().Colors;
+        auto& buttonHovered = color[ImGuiCol_ButtonHovered];
+        auto& buttonActive = color[ImGuiCol_ButtonActive];
+        ImGui::PushStyleColor(
+          ImGuiCol_ButtonHovered,
+          ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
+        ImGui::PushStyleColor(
+          ImGuiCol_ButtonHovered,
+          ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
 
-		float button_size = 20.0f;
-		ImGui::Begin("##toolbox");
+        float button_size = 20.0f;
+        ImGui::Begin("##toolbox");
 
-        ImTextureID button_id = (m_scene_state == scene_runtime::edit) ? m_play_button_id : m_stop_button_id;
-		
-		// @note GetWindowContentRegionMax().x is how much space is there for content (widgets)
-		// @note 0.5f is the offset for padding.
-		// @note takes button size and halves it and makes the offset the center of that tab. (centering  buttons)
-		ImGui::SameLine((ImGui::GetWindowContentRegionMax().x * 0.5f) - (button_size * 0.5f));
+        ImTextureID button_id = (m_scene_state == scene_runtime::edit)
+                                  ? m_play_button_id
+                                  : m_stop_button_id;
 
-		if(ImGui::ImageButton("##Button", button_id, ImVec2{button_size, button_size}, ImVec2(0, 0), ImVec2(1, 1))){
-			if(m_scene_state == scene_runtime::edit) {
+        // @note GetWindowContentRegionMax().x is how much space is there for
+        // content (widgets)
+        // @note 0.5f is the offset for padding.
+        // @note takes button size and halves it and makes the offset the center
+        // of that tab. (centering  buttons)
+        ImGui::SameLine((ImGui::GetWindowContentRegionMax().x * 0.5f) -
+                        (button_size * 0.5f));
+
+        if (ImGui::ImageButton("##Button",
+                               button_id,
+                               ImVec2{ button_size, button_size },
+                               ImVec2(0, 0),
+                               ImVec2(1, 1))) {
+            if (m_scene_state == scene_runtime::edit) {
                 m_scene_state = scene_runtime::play;
                 m_physics_engine.start();
             }
-			else if(m_scene_state == scene_runtime::play) {
+            else if (m_scene_state == scene_runtime::play) {
                 m_scene_state = scene_runtime::edit;
                 m_physics_engine.stop();
                 reset_objects();
             }
-		}
-		
-		ImGui::PopStyleVar(2);
-		ImGui::PopStyleColor(3);
-		ImGui::End();
+        }
+
+        ImGui::PopStyleVar(2);
+        ImGui::PopStyleColor(3);
+        ImGui::End();
     }
 
     void physics_update() {
@@ -726,7 +772,7 @@ public:
         auto viking_room = entity("Viking Room");
 
         atlas::physics_body* sphere_body =
-        viking_room.get_mut<atlas::physics_body>();
+          viking_room.get_mut<atlas::physics_body>();
         // U = +up
         // J = -up
         // H = +left
@@ -788,13 +834,13 @@ private:
 
     atlas::game_object_optional m_current_entity;
     float m_movement_speed = 10.f;
-    
+
     atlas::physics::engine m_physics_engine;
 
     atlas::ui::dockspace m_editor_dockspace;
     atlas::ui::menu_item m_editor_menu;
 
-    scene_runtime m_scene_state=scene_runtime::edit;
+    scene_runtime m_scene_state = scene_runtime::edit;
     vk::texture m_play_button;
     vk::texture m_stop_button;
     ImTextureID m_play_button_id;

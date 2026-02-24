@@ -27,21 +27,23 @@ import atlas.drivers.graphics_context;
 import atlas.drivers.vulkan.utilities;
 import atlas.drivers.vulkan.swapchain;
 
-
 export namespace atlas {
     namespace vulkan {
         /**
          * @brief vulkan-backend implementation of the application-window
-        */
+         */
         class window_context : public window {
         public:
-            window_context(ref<graphics_context> p_context, const window_params& p_params) : m_params(p_params) {
+            window_context(ref<graphics_context> p_context,
+                           const window_params& p_params)
+              : m_params(p_params) {
 
                 console_log_info("window_context constructed!!!");
 
-                if(!glfwVulkanSupported()) {
+                if (!glfwVulkanSupported()) {
                     console_log_error("GLFW: Vulkan is not supported!!!");
-                    console_log_error("GLFW: Vulkan Supported = {}", static_cast<bool>(glfwVulkanSupported()));
+                    console_log_error("GLFW: Vulkan Supported = {}",
+                                      static_cast<bool>(glfwVulkanSupported()));
                     return;
                 }
 
@@ -51,40 +53,45 @@ export namespace atlas {
                 // m_instance = instance_context::handle();
                 m_instance = p_context->handle();
 
-                m_window_handle = glfwCreateWindow(static_cast<int>(m_params.width), static_cast<int>(m_params.height), m_params.name.c_str(), nullptr, nullptr);
+                m_window_handle =
+                  glfwCreateWindow(static_cast<int>(m_params.width),
+                                   static_cast<int>(m_params.height),
+                                   m_params.name.c_str(),
+                                   nullptr,
+                                   nullptr);
 
                 glfwMakeContextCurrent(m_window_handle);
 
                 console_log_info("m_instance = {}", (m_instance == nullptr));
 
                 vk_check(
-                    glfwCreateWindowSurface(
+                  glfwCreateWindowSurface(
                     m_instance, m_window_handle, nullptr, &m_window_surface),
-                    "glfwCreateWindowSurface");
+                  "glfwCreateWindowSurface");
 
                 center_window();
 
                 m_window_swapchain = swapchain(m_window_surface, m_params);
 
-                p_context->submit_resource_free([this](){
-                    console_log_info("vulkan::window_context submit_resource_free invokation!");
+                p_context->submit_resource_free([this]() {
+                    console_log_info("vulkan::window_context "
+                                     "submit_resource_free invokation!");
                     m_window_swapchain.destroy();
                 });
             }
 
             virtual ~window_context() {
-                if(m_window_surface != nullptr) {
+                if (m_window_surface != nullptr) {
                     vkDestroySurfaceKHR(m_instance, m_window_surface, nullptr);
                 }
                 glfwDestroyWindow(m_window_handle);
             }
 
-
         protected:
             [[nodiscard]] window_params get_params() const override {
                 return m_window_swapchain.settings();
             }
-            
+
             [[nodiscard]] GLFWwindow* native_window() const override {
                 return m_window_handle;
             }
@@ -93,11 +100,12 @@ export namespace atlas {
                 return m_window_swapchain.read_acquired_image();
             }
 
-            [[nodiscard]] vulkan::swapchain window_swapchain() const override{
+            [[nodiscard]] vulkan::swapchain window_swapchain() const override {
                 return m_window_swapchain;
             }
 
-            [[nodiscard]] vk::command_buffer current_active_command(uint32_t p_frame_idx) override {
+            [[nodiscard]] vk::command_buffer current_active_command(
+              uint32_t p_frame_idx) override {
                 return m_window_swapchain.active_command(p_frame_idx);
             }
 
@@ -111,14 +119,16 @@ export namespace atlas {
                 const GLFWvidmode* mode = glfwGetVideoMode(monitor);
                 uint32_t width = (mode->width / 2) - (m_params.width / 2);
                 uint32_t height = (mode->height / 2) - (m_params.height / 2);
-                glfwSetWindowPos(m_window_handle, static_cast<int>(width), static_cast<int>(height));
+                glfwSetWindowPos(m_window_handle,
+                                 static_cast<int>(width),
+                                 static_cast<int>(height));
             }
 
         private:
-            GLFWwindow* m_window_handle=nullptr;
-            VkSurfaceKHR m_window_surface=nullptr;
+            GLFWwindow* m_window_handle = nullptr;
+            VkSurfaceKHR m_window_surface = nullptr;
             window_params m_params;
-            VkInstance m_instance=nullptr;
+            VkInstance m_instance = nullptr;
             swapchain m_window_swapchain;
         };
     };

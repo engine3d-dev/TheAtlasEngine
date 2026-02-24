@@ -10,10 +10,12 @@ import atlas.drivers.graphics_context;
 import atlas.drivers.vulkan.window_context;
 
 /**
- * @brief This drivers.cppm will contain API-agnostic implementation that may be widely implemented differently.
- * 
- * Such as Window contexts, graphics API-agnostic implementation, renderers, etc.
-*/
+ * @brief This drivers.cppm will contain API-agnostic implementation that may be
+ * widely implemented differently.
+ *
+ * Such as Window contexts, graphics API-agnostic implementation, renderers,
+ * etc.
+ */
 
 export namespace atlas {
     /**
@@ -26,8 +28,10 @@ export namespace atlas {
      *
      * @return shared_ptr<atlas::window>
      */
-    ref<window> initialize_window(ref<graphics_context> p_context, const window_params& p_params, graphics_api p_api) {
-        switch(p_api) {
+    ref<window> initialize_window(ref<graphics_context> p_context,
+                                  const window_params& p_params,
+                                  graphics_api p_api) {
+        switch (p_api) {
             case graphics_api::vulkan:
                 return create_ref<vulkan::window_context>(p_context, p_params);
             default:

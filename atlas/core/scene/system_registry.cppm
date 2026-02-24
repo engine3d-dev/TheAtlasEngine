@@ -29,7 +29,8 @@ export namespace atlas {
          *
          * @param p_name is for specifying a name to give this registry
          */
-        system_registry(const std::string& p_name) : m_tag(p_name) {
+        system_registry(const std::string& p_name)
+          : m_tag(p_name) {
 
             s_instance = this;
         }

@@ -156,9 +156,9 @@ export namespace atlas::physics {
           JPH::BroadPhaseLayer p_in_layer2) const override {
             switch (p_in_layer1) {
                 case (int)(ObjectLayer::NonMoving):
-                    return p_in_layer2 ==
-                           JPH::BroadPhaseLayer((JPH::BroadPhaseLayer::Type)(
-                             BroadPhaseLayers::Moving));
+                    return p_in_layer2 == JPH::BroadPhaseLayer(
+                                            (JPH::BroadPhaseLayer::
+                                               Type)(BroadPhaseLayers::Moving));
                 case (int)ObjectLayer::Moving:
                     return true;
                 default:

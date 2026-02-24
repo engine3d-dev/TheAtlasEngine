@@ -5,7 +5,6 @@ module;
 #include <map>
 #include <stdexcept>
 
-
 export module atlas.core.scene.world;
 
 import atlas.common;
@@ -37,8 +36,8 @@ export namespace atlas {
          * @brief construct a new world with a specified name associated
          * with it
          */
-        world(const std::string& p_name) : m_name(p_name) {
-        }
+        world(const std::string& p_name)
+          : m_name(p_name) {}
 
         virtual ~world() = default;
 

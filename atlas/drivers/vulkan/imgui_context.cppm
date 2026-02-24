@@ -56,14 +56,19 @@ namespace atlas::vulkan {
           ImVec4{ 0.1f, 0.150f, 0.951f, 1.0f };
     }
 
-    void transition_image_layout(VkDevice p_device, vk::sample_image& p_image, VkFormat p_format, VkImageLayout p_old, VkImageLayout p_new) {
+    void transition_image_layout(VkDevice p_device,
+                                 vk::sample_image& p_image,
+                                 VkFormat p_format,
+                                 VkImageLayout p_old,
+                                 VkImageLayout p_new) {
         vk::command_params copy_command_params = {
             .levels = vk::command_levels::primary,
             .queue_index = 0,
             .flags = vk::command_pool_flags::reset,
         };
-        vk::command_buffer temp_command_buffer = vk::command_buffer(p_device, copy_command_params);
-        
+        vk::command_buffer temp_command_buffer =
+          vk::command_buffer(p_device, copy_command_params);
+
         temp_command_buffer.begin(vk::command_usage::one_time_submit);
 
         p_image.memory_barrier(temp_command_buffer, p_format, p_old, p_new);
@@ -80,7 +85,8 @@ namespace atlas::vulkan {
         uint32_t queue_family_index = 0;
         uint32_t queue_index = 0;
         VkQueue temp_graphics_queue;
-        vkGetDeviceQueue(p_device, queue_family_index, queue_index, &temp_graphics_queue);
+        vkGetDeviceQueue(
+          p_device, queue_family_index, queue_index, &temp_graphics_queue);
 
         vkQueueSubmit(temp_graphics_queue, 1, &submit_info, nullptr);
         vkQueueWaitIdle(temp_graphics_queue);
@@ -93,15 +99,19 @@ namespace atlas::vulkan {
     public:
         imgui_context() = default;
 
-        imgui_context(const VkInstance& p_instance, const swapchain& p_swapchain_ctx, GLFWwindow* p_window_ctx) {
+        imgui_context(const VkInstance& p_instance,
+                      const swapchain& p_swapchain_ctx,
+                      GLFWwindow* p_window_ctx) {
             m_instance = p_instance;
             m_physical = instance_context::physical_driver();
-            VkPhysicalDeviceMemoryProperties memory_properties = instance_context::physical_driver().memory_properties();
+            VkPhysicalDeviceMemoryProperties memory_properties =
+              instance_context::physical_driver().memory_properties();
             m_driver = instance_context::logical_device();
             // vk::device device_temp = instance_context::physical_driver();
 
             m_current_swapchain_handler = p_swapchain_ctx;
-            m_extent = {.width = p_swapchain_ctx.settings().width, .height = p_swapchain_ctx.settings().height};
+            m_extent = { .width = p_swapchain_ctx.settings().width,
+                         .height = p_swapchain_ctx.settings().height };
 
             // Setting up imgui
             IMGUI_CHECKVERSION();
@@ -109,13 +119,13 @@ namespace atlas::vulkan {
             ImGuiIO& io = ImGui::GetIO();
 
             io.ConfigFlags |=
-            ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
-            // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable
-            // Gamepad Controls
+              ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+            // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      //
+            // Enable Gamepad Controls
             io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable Docking
             io.ConfigFlags |=
-            ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport / Platform
-                                                // Windows
+              ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport /
+                                                // Platform Windows
 
             // io.ConfigViewportsNoAutoMerge = true;
             // io.ConfigViewportsNoAutoMerge = true;
@@ -132,41 +142,41 @@ namespace atlas::vulkan {
                 style.Colors[ImGuiCol_WindowBg].w = 1.0f;
             }
 
-            m_viewport_command_buffers.resize(
-            p_swapchain_ctx.image_size());
+            m_viewport_command_buffers.resize(p_swapchain_ctx.image_size());
 
             for (size_t i = 0; i < m_viewport_command_buffers.size(); i++) {
                 ::vk::command_params settings = {
                     .levels = ::vk::command_levels::primary,
-                    // .queue_index = enumerate_swapchain_settings.present_index,
+                    // .queue_index =
+                    // enumerate_swapchain_settings.present_index,
                     .queue_index = 0,
                     .flags = ::vk::command_pool_flags::reset,
                 };
                 m_viewport_command_buffers[i] =
-                ::vk::command_buffer(m_driver, settings);
+                  ::vk::command_buffer(m_driver, settings);
             }
 
             // ::vk::descriptor_res
             // m_imgui_descriptor = ::vk::descriptor_resource(m_driver, {});
             // 1: create descriptor pool for IMGUI
-            //  the size of the pool is very oversize, but it's copied from imgui
-            //  demo itself.
+            //  the size of the pool is very oversize, but it's copied from
+            //  imgui demo itself.
             std::array<VkDescriptorPoolSize, 11> pool_sizes = {
                 VkDescriptorPoolSize{ VK_DESCRIPTOR_TYPE_SAMPLER, 100 },
                 VkDescriptorPoolSize{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                    100 },
+                                      100 },
                 VkDescriptorPoolSize{ VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 100 },
                 VkDescriptorPoolSize{ VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 100 },
                 VkDescriptorPoolSize{ VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER,
-                                    100 },
+                                      100 },
                 VkDescriptorPoolSize{ VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER,
-                                    100 },
+                                      100 },
                 VkDescriptorPoolSize{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 100 },
                 VkDescriptorPoolSize{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 100 },
                 VkDescriptorPoolSize{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC,
-                                    100 },
+                                      100 },
                 VkDescriptorPoolSize{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC,
-                                    100 },
+                                      100 },
                 VkDescriptorPoolSize{ VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 100 }
             };
 
@@ -181,21 +191,26 @@ namespace atlas::vulkan {
             };
 
             // VkDescriptorPool imgui_pool;
-            vk::vk_check(vkCreateDescriptorPool(
-                        m_driver, &desc_pool_create_info, nullptr, &m_desc_pool),
-                        "vkCreateDescriptorPool");
+            vk::vk_check(
+              vkCreateDescriptorPool(
+                m_driver, &desc_pool_create_info, nullptr, &m_desc_pool),
+              "vkCreateDescriptorPool");
 
             create(p_window_ctx,
-                p_swapchain_ctx.image_size(),
-                p_swapchain_ctx.swapchain_renderpass());
+                   p_swapchain_ctx.image_size(),
+                   p_swapchain_ctx.swapchain_renderpass());
 
             vk::image_params config_image = {
-                .extent = { .width = p_swapchain_ctx.settings().width, .height = p_swapchain_ctx.settings().height },
+                .extent = { .width = p_swapchain_ctx.settings().width,
+                            .height = p_swapchain_ctx.settings().height },
                 .format = VK_FORMAT_B8G8R8A8_UNORM,
                 .property = vk::memory_property::device_local_bit,
                 .aspect = vk::image_aspect_flags::color_bit,
-                .usage = vk::image_usage::color_attachment_bit | vk::image_usage::transfer_dst_bit | vk::image_usage::sampled_bit,
-                // .usage = vk::image_usage::color_attachment_bit | vk::image_usage::transfer_dst_bit,
+                .usage = vk::image_usage::color_attachment_bit |
+                         vk::image_usage::transfer_dst_bit |
+                         vk::image_usage::sampled_bit,
+                // .usage = vk::image_usage::color_attachment_bit |
+                // vk::image_usage::transfer_dst_bit,
                 .phsyical_memory_properties = memory_properties,
                 .address_mode_u = vk::sampler_address_mode::clamp_to_edge,
                 .addrses_mode_v = vk::sampler_address_mode::clamp_to_edge,
@@ -204,39 +219,46 @@ namespace atlas::vulkan {
             m_viewport_image = vk::sample_image(m_driver, config_image);
 
             // transition image layout uses image memory barrier
-            transition_image_layout(m_driver, m_viewport_image, VK_FORMAT_B8G8R8A8_UNORM, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+            transition_image_layout(m_driver,
+                                    m_viewport_image,
+                                    VK_FORMAT_B8G8R8A8_UNORM,
+                                    VK_IMAGE_LAYOUT_UNDEFINED,
+                                    VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-            // Viewport-specific render pass: color attachment ends in SHADER_READ_ONLY_OPTIMAL
-            // so the offscreen texture can be sampled by ImGui. (Swapchain pass uses PRESENT_SRC.)
+            // Viewport-specific render pass: color attachment ends in
+            // SHADER_READ_ONLY_OPTIMAL so the offscreen texture can be sampled
+            // by ImGui. (Swapchain pass uses PRESENT_SRC.)
             VkFormat depth_format = m_driver.depth_format();
             std::array<::vk::attachment, 2> viewport_attachments = {
                 ::vk::attachment{
-                    .format = VK_FORMAT_B8G8R8A8_UNORM,
-                    .layout = ::vk::image_layout::color_optimal,
-                    .samples = ::vk::sample_bit::count_1,
-                    .load = ::vk::attachment_load::clear,
-                    .store = ::vk::attachment_store::store,
-                    .stencil_load = ::vk::attachment_load::clear,
-                    .stencil_store = ::vk::attachment_store::dont_care,
-                    .initial_layout = ::vk::image_layout::undefined,
-                    .final_layout = ::vk::image_layout::shader_read_only_optimal,
+                  .format = VK_FORMAT_B8G8R8A8_UNORM,
+                  .layout = ::vk::image_layout::color_optimal,
+                  .samples = ::vk::sample_bit::count_1,
+                  .load = ::vk::attachment_load::clear,
+                  .store = ::vk::attachment_store::store,
+                  .stencil_load = ::vk::attachment_load::clear,
+                  .stencil_store = ::vk::attachment_store::dont_care,
+                  .initial_layout = ::vk::image_layout::undefined,
+                  .final_layout = ::vk::image_layout::shader_read_only_optimal,
                 },
                 ::vk::attachment{
-                    .format = depth_format,
-                    .layout = ::vk::image_layout::depth_stencil_optimal,
-                    .samples = ::vk::sample_bit::count_1,
-                    .load = ::vk::attachment_load::clear,
-                    .store = ::vk::attachment_store::dont_care,
-                    .stencil_load = ::vk::attachment_load::dont_care,
-                    .stencil_store = ::vk::attachment_store::dont_care,
-                    .initial_layout = ::vk::image_layout::undefined,
-                    .final_layout = ::vk::image_layout::depth_stencil_optimal,
+                  .format = depth_format,
+                  .layout = ::vk::image_layout::depth_stencil_optimal,
+                  .samples = ::vk::sample_bit::count_1,
+                  .load = ::vk::attachment_load::clear,
+                  .store = ::vk::attachment_store::dont_care,
+                  .stencil_load = ::vk::attachment_load::dont_care,
+                  .stencil_store = ::vk::attachment_store::dont_care,
+                  .initial_layout = ::vk::image_layout::undefined,
+                  .final_layout = ::vk::image_layout::depth_stencil_optimal,
                 },
             };
-            m_viewport_renderpass = ::vk::renderpass(m_driver, viewport_attachments);
+            m_viewport_renderpass =
+              ::vk::renderpass(m_driver, viewport_attachments);
 
             vk::image_params config_depth_image = {
-                .extent = { .width = p_swapchain_ctx.settings().width, .height = p_swapchain_ctx.settings().height },
+                .extent = { .width = p_swapchain_ctx.settings().width,
+                            .height = p_swapchain_ctx.settings().height },
                 .format = m_driver.depth_format(),
                 .property = vk::memory_property::device_local_bit,
                 .aspect = vk::image_aspect_flags::depth_bit,
@@ -244,27 +266,34 @@ namespace atlas::vulkan {
                 .phsyical_memory_properties = memory_properties,
             };
 
-            m_depth_viewport_image = vk::sample_image(m_driver, config_depth_image);
+            m_depth_viewport_image =
+              vk::sample_image(m_driver, config_depth_image);
 
             for (uint32_t i = 0; i < m_viewport_framebuffers.size(); i++) {
-                std::array<VkImageView, 2> image_view_attachments = { m_viewport_image.image_view(), m_depth_viewport_image.image_view() };
+                std::array<VkImageView, 2> image_view_attachments = {
+                    m_viewport_image.image_view(),
+                    m_depth_viewport_image.image_view()
+                };
 
                 vk::framebuffer_params framebuffer_info = {
                     .renderpass = m_viewport_renderpass,
                     .views = image_view_attachments,
-                    .extent = {p_swapchain_ctx.settings().width, p_swapchain_ctx.settings().height}
+                    .extent = { p_swapchain_ctx.settings().width,
+                                p_swapchain_ctx.settings().height }
                 };
-                m_viewport_framebuffers[i] = vk::framebuffer(m_driver, framebuffer_info);
+                m_viewport_framebuffers[i] =
+                  vk::framebuffer(m_driver, framebuffer_info);
             }
 
             g_viewport_image_id = (ImTextureID)ImGui_ImplVulkan_AddTexture(
-                m_viewport_image.sampler(), 
-                m_viewport_image.image_view(), 
-                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
-            );
+              m_viewport_image.sampler(),
+              m_viewport_image.image_view(),
+              VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
         }
 
-        void create(GLFWwindow* p_window_handler, const uint32_t& p_image_size, const VkRenderPass& p_current_renderpass) {
+        void create(GLFWwindow* p_window_handler,
+                    const uint32_t& p_image_size,
+                    const VkRenderPass& p_current_renderpass) {
             ImGui_ImplGlfw_InitForVulkan(p_window_handler, true);
             ImGui_ImplVulkan_InitInfo init_info = {};
             init_info.Instance = m_instance;
@@ -281,7 +310,8 @@ namespace atlas::vulkan {
             ImGui_ImplVulkan_Init(&init_info);
         }
 
-        void begin(const VkCommandBuffer& p_current, const uint32_t& p_frame_index) {
+        void begin(const VkCommandBuffer& p_current,
+                   const uint32_t& p_frame_index) {
             ImGui_ImplVulkan_NewFrame();
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
@@ -291,79 +321,94 @@ namespace atlas::vulkan {
         }
 
         void invalidate(const swapchain& p_swapchain) {
-            // Wait for device to finish all operations before recreating resources
+            // Wait for device to finish all operations before recreating
+            // resources
             vkDeviceWaitIdle(m_driver);
 
-            for(auto& fb : m_viewport_framebuffers) {
+            for (auto& fb : m_viewport_framebuffers) {
                 fb.destroy();
             }
 
             // Remove old texture from ImGui if needed
-            // ImTextureID in ImGui Vulkan backend is VkDescriptorSet cast to void*
+            // ImTextureID in ImGui Vulkan backend is VkDescriptorSet cast to
+            // void*
             if (g_viewport_image_id != nullptr) {
-                VkDescriptorSet old_descriptor_set = reinterpret_cast<VkDescriptorSet>(g_viewport_image_id);
+                VkDescriptorSet old_descriptor_set =
+                  reinterpret_cast<VkDescriptorSet>(g_viewport_image_id);
                 ImGui_ImplVulkan_RemoveTexture(old_descriptor_set);
                 g_viewport_image_id = nullptr;
             }
-            
+
             // Destroy old images
             m_viewport_image.destroy();
             m_depth_viewport_image.destroy();
-            
+
             // Recreate viewport images with new swapchain size
-            VkPhysicalDeviceMemoryProperties memory_properties = instance_context::physical_driver().memory_properties();
-            
+            VkPhysicalDeviceMemoryProperties memory_properties =
+              instance_context::physical_driver().memory_properties();
+
             vk::image_params config_image = {
-                .extent = { .width = p_swapchain.settings().width, .height = p_swapchain.settings().height },
+                .extent = { .width = p_swapchain.settings().width,
+                            .height = p_swapchain.settings().height },
                 .format = VK_FORMAT_B8G8R8A8_UNORM,
                 .property = vk::memory_property::device_local_bit,
                 .aspect = vk::image_aspect_flags::color_bit,
-                .usage = vk::image_usage::color_attachment_bit | vk::image_usage::transfer_dst_bit | vk::image_usage::sampled_bit,
+                .usage = vk::image_usage::color_attachment_bit |
+                         vk::image_usage::transfer_dst_bit |
+                         vk::image_usage::sampled_bit,
                 .phsyical_memory_properties = memory_properties,
                 .address_mode_u = vk::sampler_address_mode::clamp_to_edge,
                 .addrses_mode_v = vk::sampler_address_mode::clamp_to_edge,
                 .addrses_mode_w = vk::sampler_address_mode::clamp_to_edge,
             };
             m_viewport_image = vk::sample_image(m_driver, config_image);
-            
+
             // Transition to shader read-only layout
-            transition_image_layout(m_driver, m_viewport_image, VK_FORMAT_B8G8R8A8_UNORM, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-            
+            transition_image_layout(m_driver,
+                                    m_viewport_image,
+                                    VK_FORMAT_B8G8R8A8_UNORM,
+                                    VK_IMAGE_LAYOUT_UNDEFINED,
+                                    VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
             // Recreate depth image
             vk::image_params config_depth_image = {
-                .extent = { .width = p_swapchain.settings().width, .height = p_swapchain.settings().height },
+                .extent = { .width = p_swapchain.settings().width,
+                            .height = p_swapchain.settings().height },
                 .format = m_driver.depth_format(),
                 .property = vk::memory_property::device_local_bit,
                 .aspect = vk::image_aspect_flags::depth_bit,
                 .usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
                 .phsyical_memory_properties = memory_properties,
             };
-            m_depth_viewport_image = vk::sample_image(m_driver, config_depth_image);
-            
+            m_depth_viewport_image =
+              vk::sample_image(m_driver, config_depth_image);
+
             // Recreate framebuffers with new images
             for (uint32_t i = 0; i < m_viewport_framebuffers.size(); i++) {
-                std::array<VkImageView, 2> image_view_attachments = { 
-                    m_viewport_image.image_view(), 
-                    m_depth_viewport_image.image_view() 
+                std::array<VkImageView, 2> image_view_attachments = {
+                    m_viewport_image.image_view(),
+                    m_depth_viewport_image.image_view()
                 };
-                
+
                 vk::framebuffer_params framebuffer_info = {
                     .renderpass = m_viewport_renderpass,
                     .views = image_view_attachments,
-                    .extent = {p_swapchain.settings().width, p_swapchain.settings().height}
+                    .extent = { p_swapchain.settings().width,
+                                p_swapchain.settings().height }
                 };
-                m_viewport_framebuffers[i] = vk::framebuffer(m_driver, framebuffer_info);
+                m_viewport_framebuffers[i] =
+                  vk::framebuffer(m_driver, framebuffer_info);
             }
-            
+
             // Update ImGui texture ID with new image
             g_viewport_image_id = (ImTextureID)ImGui_ImplVulkan_AddTexture(
-                m_viewport_image.sampler(), 
-                m_viewport_image.image_view(), 
-                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
-            );
-            
+              m_viewport_image.sampler(),
+              m_viewport_image.image_view(),
+              VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
             // Update extent
-            m_extent = {.width = p_swapchain.settings().width, .height = p_swapchain.settings().height};
+            m_extent = { .width = p_swapchain.settings().width,
+                         .height = p_swapchain.settings().height };
         }
 
         void end() {
@@ -399,7 +444,7 @@ namespace atlas::vulkan {
                 command_buffer.destroy();
             }
 
-            for(auto& fb : m_viewport_framebuffers) {
+            for (auto& fb : m_viewport_framebuffers) {
                 fb.destroy();
             }
 

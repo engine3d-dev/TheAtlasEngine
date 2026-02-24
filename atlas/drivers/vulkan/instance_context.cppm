@@ -32,21 +32,24 @@ namespace atlas::vulkan {
         std::vector<const char*> extension_names;
 
         uint32_t extension_count = 0;
-        const char** require_extensions = glfwGetRequiredInstanceExtensions(&extension_count);
+        const char** require_extensions =
+          glfwGetRequiredInstanceExtensions(&extension_count);
 
-        for(uint32_t i = 0; i < extension_count; i++) {
+        for (uint32_t i = 0; i < extension_count; i++) {
             // std::println("Required Extension = {}", require_extensions[i]);
             extension_names.emplace_back(require_extensions[i]);
         }
 
-    #if !defined(NDEBUG) || defined(_DEBUG) || defined(DEBUG)
+#if !defined(NDEBUG) || defined(_DEBUG) || defined(DEBUG)
         extension_names.emplace_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-    #endif
+#endif
 
-    #if defined(__APPLE__)
-        extension_names.emplace_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
-        extension_names.emplace_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
-    #endif
+#if defined(__APPLE__)
+        extension_names.emplace_back(
+          VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
+        extension_names.emplace_back(
+          VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+#endif
 
         return extension_names;
     }
@@ -87,23 +90,24 @@ namespace atlas::vulkan {
                 .pApplicationInfo = &app_info
             };
 
-
-    #if defined(__APPLE__)
-        create_info.flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
-    #endif
+#if defined(__APPLE__)
+            create_info.flags |=
+              VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
+#endif
 
             //! @note Setting up the required extensions for vulkan
-            std::vector<const char*> extensions = initialize_instance_extensions();
-    #if !defined(NDEBUG) || defined(_DEBUG) || defined(DEBUG)
+            std::vector<const char*> extensions =
+              initialize_instance_extensions();
+#if !defined(NDEBUG) || defined(_DEBUG) || defined(DEBUG)
             extensions.push_back("VK_EXT_debug_utils");
-    #endif
+#endif
             create_info.enabledExtensionCount =
-            static_cast<uint32_t>(extensions.size());
+              static_cast<uint32_t>(extensions.size());
             create_info.ppEnabledExtensionNames = extensions.data();
-    #if !defined(NDEBUG) || defined(_DEBUG) || defined(DEBUG)
+#if !defined(NDEBUG) || defined(_DEBUG) || defined(DEBUG)
             // by default we enable validation layers used for debugging!
             create_info.enabledLayerCount =
-            static_cast<uint32_t>(validation_layers.size());
+              static_cast<uint32_t>(validation_layers.size());
             create_info.ppEnabledLayerNames = validation_layers.data();
 
             // printing out available validation layers
@@ -112,52 +116,62 @@ namespace atlas::vulkan {
             vkEnumerateInstanceLayerProperties(&layer_count, nullptr);
 
             available_validation_layers.resize(layer_count);
-            vkEnumerateInstanceLayerProperties(&layer_count,
-                                            available_validation_layers.data());
+            vkEnumerateInstanceLayerProperties(
+              &layer_count, available_validation_layers.data());
 
-            console_log_trace("================================================");
+            console_log_trace(
+              "================================================");
             console_log_trace("\tValidation Layers Available");
-            console_log_trace("================================================");
+            console_log_trace(
+              "================================================");
             for (VkLayerProperties properties : available_validation_layers) {
-                console_log_trace("Validation Layer:\t\t{}", properties.layerName);
+                console_log_trace("Validation Layer:\t\t{}",
+                                  properties.layerName);
                 console_log_trace("Description\t\t{}", properties.description);
-                console_log_trace("Version\t\t\t{}", (int)properties.specVersion);
+                console_log_trace("Version\t\t\t{}",
+                                  (int)properties.specVersion);
             }
 
             console_log_trace("\n");
-            console_log_trace("================================================\n");
+            console_log_trace(
+              "================================================\n");
 
             VkDebugUtilsMessengerCreateInfoEXT debug_create_info = {
-                .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
-                .messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
-                                VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
-                                VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
+                .sType =
+                  VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
+                .messageSeverity =
+                  VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+                  VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+                  VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
                 .messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
-                            VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
-                            VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
+                               VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+                               VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
                 .pfnUserCallback = debug_callback,
             };
 
-
-            // create_info.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&debug_create_info;
-            create_info.pNext = static_cast<VkDebugUtilsMessengerCreateInfoEXT*>(&debug_create_info);
-    #else
+            // create_info.pNext =
+            // (VkDebugUtilsMessengerCreateInfoEXT*)&debug_create_info;
+            create_info.pNext =
+              static_cast<VkDebugUtilsMessengerCreateInfoEXT*>(
+                &debug_create_info);
+#else
             create_info.enabledLayerCount = 0;
             create_info.ppEnabledLayerNames = nullptr;
             create_info.pNext = nullptr;
-    #endif
-            vk_check(vkCreateInstance(&create_info, nullptr, &m_instance_handler),
-                    "vkCreateInstance");
+#endif
+            vk_check(
+              vkCreateInstance(&create_info, nullptr, &m_instance_handler),
+              "vkCreateInstance");
 
-    #if !defined(NDEBUG) || defined(_DEBUG) || defined(DEBUG)
-            // This needs to be created after the VkInstance is or else it wont be
-            // applied the debug information during validation layer error message
-            // execution
+#if !defined(NDEBUG) || defined(_DEBUG) || defined(DEBUG)
+            // This needs to be created after the VkInstance is or else it wont
+            // be applied the debug information during validation layer error
+            // message execution
             m_vk_set_debug_utils_object_name_ext =
-            reinterpret_cast<PFN_vkSetDebugUtilsObjectNameEXT>(
+              reinterpret_cast<PFN_vkSetDebugUtilsObjectNameEXT>(
                 vkGetInstanceProcAddr(m_instance_handler,
-                                    "vkSetDebugUtilsObjectNameEXT"));
-    #endif
+                                      "vkSetDebugUtilsObjectNameEXT"));
+#endif
 
             m_physical = physical_device(m_instance_handler);
             m_device = device(m_physical);
@@ -200,21 +214,19 @@ namespace atlas::vulkan {
             s_instance->m_resources_free.push_back(p_resource);
         }
 
-
         static physical_device physical_driver() {
             return s_instance->m_physical;
         }
 
-        static device logical_device() {
-            return s_instance->m_device;
-        }
+        static device logical_device() { return s_instance->m_device; }
 
     protected:
         [[nodiscard]] VkInstance context_handle() const override {
             return m_instance_handler;
         }
 
-        void context_submit_resource_free(const std::function<void()>& p_resource) override {
+        void context_submit_resource_free(
+          const std::function<void()>& p_resource) override {
             m_resources_free.push_back(p_resource);
         }
 
@@ -228,10 +240,9 @@ namespace atlas::vulkan {
         }
 
     private:
-    
     private:
         static instance_context* s_instance;
-        VkInstance m_instance_handler=nullptr;
+        VkInstance m_instance_handler = nullptr;
         std::deque<std::function<void()>> m_resources_free{};
         PFN_vkSetDebugUtilsObjectNameEXT m_vk_set_debug_utils_object_name_ext;
         physical_device m_physical;

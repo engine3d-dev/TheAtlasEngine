@@ -9,8 +9,6 @@ import atlas.common;
 import atlas.core.scene.components;
 import atlas.core.event;
 
-
-
 namespace atlas::physics {
 
     /**
