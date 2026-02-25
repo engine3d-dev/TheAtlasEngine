@@ -2,7 +2,6 @@ import atlas.application;
 import atlas.common;
 
 import editor_world;
-import atlas.core.scene.system_registry;
 
 import atlas.drivers.graphics_context;
 

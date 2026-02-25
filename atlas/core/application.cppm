@@ -27,7 +27,6 @@ import atlas.renderer;
 import atlas.drivers.vulkan.instance_context;
 import atlas.core.scene;
 import atlas.core.scene.world;
-import atlas.core.scene.system_registry;
 import atlas.core.scene.components;
 
 import atlas.core.math;

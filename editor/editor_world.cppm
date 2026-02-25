@@ -7,7 +7,6 @@ export module editor_world;
 import atlas.core.utilities;
 import atlas.core.scene.world;
 import atlas.core.event;
-import atlas.core.scene.system_registry;
 import atlas.drivers.renderer_system;
 import level_scene;
 
@@ -20,7 +19,6 @@ public:
     editor_world(const std::string& p_tag,
                  atlas::ref<atlas::renderer_system> p_renderer_instance)
       : atlas::world(p_tag), m_renderer(p_renderer_instance) {
-        // m_main_world = atlas::system_registry::create_world(p_tag);
         m_bus.create_listener<atlas::event::collision_enter>();
         m_bus.create_listener<atlas::event::collision_persisted>();
         m_bus.create_listener<atlas::event::collision_exit>();
