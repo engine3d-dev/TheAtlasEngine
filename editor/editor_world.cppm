@@ -31,6 +31,8 @@ public:
         console_log_error("editor_world initialized successfully!~!!");
     }
 
+    ~editor_world() override = default;
+
 private:
     atlas::event::bus m_bus;
     atlas::ref<atlas::renderer_system> m_renderer;
