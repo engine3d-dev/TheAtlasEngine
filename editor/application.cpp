@@ -10,13 +10,9 @@ public:
     test_application(atlas::ref<atlas::graphics_context> p_context,
                      const atlas::application_settings& p_settings)
       : atlas::application(p_context, p_settings) {
-        // atlas::register_update(this,
-        // &test_application::on_update);std::pmr::monotonic_buffer_resource
-        // resource{ 4096 }; m_allocator.construct(&resource);
 
         // TODO -- this is going to be changed with the use of the level
         // streamer API
-
         // Passing in the renderer instance to be able to render according to the current scene
         // Based the current scene. We render the entities within that particular scene.
         m_world = atlas::create_ref<editor_world>("Editor World", renderer_instance());
@@ -26,7 +22,6 @@ public:
     }
 
 private:
-    // std::pmr::polymorphic_allocator<uint8_t> m_allocator;
     atlas::ref<editor_world> m_world;
 };
 

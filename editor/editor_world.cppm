@@ -14,7 +14,7 @@ import level_scene;
 * @brief editor_world is where a lot of the editor logic will be handled
 * TODO: The level streamer will be constructed here
 */
-export class editor_world : public atlas::world {
+export class editor_world final : public atlas::world {
 public:
     editor_world(const std::string& p_tag,
                  atlas::ref<atlas::renderer_system> p_renderer_instance)
