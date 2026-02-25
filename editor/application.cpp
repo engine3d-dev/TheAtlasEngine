@@ -17,8 +17,13 @@ public:
 
         // TODO -- this is going to be changed with the use of the level
         // streamer API
-        m_world =
-          atlas::create_ref<editor_world>("Editor World", renderer_instance());
+
+        // Passing in the renderer instance to be able to render according to the current scene
+        // Based the current scene. We render the entities within that particular scene.
+        m_world = atlas::create_ref<editor_world>("Editor World", renderer_instance());
+
+
+        current_world(m_world->world());
     }
 
 private:

@@ -120,9 +120,9 @@ export namespace atlas {
 
             invoke_start();
 
-            ref<world> current_world =
-              system_registry::get_world("Editor World");
-            ref<scene> current_scene = current_world->get_scene("LevelScene");
+            // ref<world> current_world = system_registry::get_world("Editor World");
+            // ref<scene> current_scene = current_world->get_scene("LevelScene");
+            ref<scene> current_scene = m_current_world->get_scene("LevelScene");
             flecs::world current_world_scope = *current_scene;
 
             /*
@@ -331,6 +331,11 @@ export namespace atlas {
             return m_window->current_swapchain();
         }
 
+
+        void current_world(ref<world> p_world) {
+            m_current_world = p_world;
+        }
+
     protected:
         [[nodiscard]] ref<renderer_system> renderer_instance() const {
             return m_renderer;
@@ -338,6 +343,8 @@ export namespace atlas {
 
     private:
         float m_delta_time = 0.f;
+        // world* m_current_world=nullptr;
+        ref<world> m_current_world;
         ref<window> m_window;
         window_params m_initial_window_params;
         // vulkan::instance_context m_instance_handle_test;
