@@ -23,7 +23,7 @@ public:
         m_world = atlas::create_ref<editor_world>("Editor World", renderer_instance());
 
 
-        current_world(m_world->world());
+        current_world(m_world);
     }
 
 private:
