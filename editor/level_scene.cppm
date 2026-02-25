@@ -1,21 +1,16 @@
 module;
 
-#include <string>
-#include <flecs.h>
-#include <glm/ext.hpp>
+#include <glm/glm.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
-
-#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/matrix_decompose.hpp>
 
+#include <flecs.h>
 #include <imgui.h>
 #include <imgui/backends/imgui_impl_glfw.h>
 #include <imgui/backends/imgui_impl_vulkan.h>
 #include <format>
 #include <filesystem>
-#include <vulkan/vulkan.h>
 
 export module level_scene;
 
