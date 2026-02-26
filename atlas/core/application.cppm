@@ -7,13 +7,11 @@ module;
 #include <vulkan/vulkan.h>
 #include <string>
 #include <print>
-#include <optional>
-#include <GLFW/glfw3.h>
 #include <chrono>
 #include <utility>
 #include <flecs.h>
+#include <GLFW/glfw3.h>
 #include <imgui.h>
-#include <imgui/backends/imgui_impl_glfw.h>
 
 export module atlas.application;
 
