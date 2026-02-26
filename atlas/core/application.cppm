@@ -10,6 +10,7 @@ module;
 #include <optional>
 #include <GLFW/glfw3.h>
 #include <chrono>
+#include <utility>
 #include <flecs.h>
 #include <imgui.h>
 #include <imgui/backends/imgui_impl_glfw.h>
@@ -63,7 +64,7 @@ export namespace atlas {
          * @param p_settings is the specific application settings to configure
          * how the application may be setup
          */
-        application(ref<graphics_context> p_context,
+        application(/*NOLINT*/ref<graphics_context> p_context,
                     const application_settings& p_params) {
             console_log_info(
               "application(const application_settings&) initialized!!!");
@@ -117,13 +118,12 @@ export namespace atlas {
             m_renderer->preload(
               m_window->current_swapchain().swapchain_renderpass());
 
-            invoke_start();
-
             // ref<world> current_world = system_registry::get_world("Editor World");
             // ref<scene> current_scene = current_world->get_scene("LevelScene");
             ref<scene> current_scene = m_current_world->get_scene("LevelScene");
             flecs::world current_world_scope = *current_scene;
-
+            
+            invoke_start(current_scene.get());
             /*
                 - flecs::system is how your able to schedule changes for given
                 portions of data in this case the projection/view matrices are
@@ -206,11 +206,11 @@ export namespace atlas {
                 ::vk::command_buffer currently_active =
                   m_window->active_command(m_current_frame_index);
 
-                invoke_physics_update();
+                invoke_physics_update(current_scene.get());
 
-                invoke_on_update(m_delta_time);
+                invoke_on_update(current_scene.get(), m_delta_time);
 
-                invoke_defer_update();
+                invoke_defer_update(current_scene.get());
                 // We want this to be called after late update
                 // This queries all camera objects within the camera system
                 // Update -- going to be removing camera system in replacement
@@ -266,7 +266,7 @@ export namespace atlas {
 
                 m_ui_context.begin(currently_active, m_current_frame_index);
 
-                invoke_ui_update();
+                invoke_ui_update(current_scene.get());
 
                 // final renderpass for rendering the offscreen information to
                 // the final renderpass

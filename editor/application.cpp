@@ -1,3 +1,5 @@
+#include <utility>
+
 import atlas.application;
 import atlas.common;
 
@@ -9,7 +11,7 @@ class test_application : public atlas::application {
 public:
     test_application(atlas::ref<atlas::graphics_context> p_context,
                      const atlas::application_settings& p_settings)
-      : atlas::application(p_context, p_settings) {
+      : atlas::application(std::move(p_context), p_settings) {
 
         // TODO -- this is going to be changed with the use of the level
         // streamer API
@@ -26,7 +28,7 @@ private:
 };
 
 atlas::ref<atlas::application>
-initialize_application(atlas::ref<atlas::graphics_context> p_contetxt) {
+initialize_application(/*NOLINT*/atlas::ref<atlas::graphics_context> p_contetxt) {
     atlas::application_settings settings = {
         .name = "Editor",
         .width = 1510,

@@ -1,5 +1,4 @@
 module;
-
 #include <string>
 
 export module editor_world;
@@ -18,7 +17,7 @@ export class editor_world final : public atlas::world {
 public:
     editor_world(const std::string& p_tag,
                  atlas::ref<atlas::renderer_system> p_renderer_instance)
-      : atlas::world(p_tag), m_renderer(p_renderer_instance) {
+      : atlas::world(p_tag), m_renderer(std::move(p_renderer_instance)) {
         m_bus.create_listener<atlas::event::collision_enter>();
         m_bus.create_listener<atlas::event::collision_persisted>();
         m_bus.create_listener<atlas::event::collision_exit>();
