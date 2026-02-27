@@ -18,6 +18,9 @@ export namespace atlas {
         }
 
         operator uint64_t() { return m_uuid_value; }
+
+        operator uint64_t() const { return m_uuid_value; }
+
     private:
         uint64_t m_uuid_value=0;
     };
