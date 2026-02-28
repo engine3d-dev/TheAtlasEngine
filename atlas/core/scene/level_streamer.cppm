@@ -36,8 +36,8 @@ export namespace atlas {
         /**
         * @return the current scene
         */
-        ref<scene> current_scene() {
-            return nullptr;
+        ref<scene> current_scene(const std::string& p_name) {
+            return m_scenes[p_name];
         }
 
         /**
@@ -47,13 +47,29 @@ export namespace atlas {
         */
         void create_scene(const std::string& p_name) {
             uuid generate_id;
-            console_log_info("Generated UUID: {}", static_cast<uint64_t>(generate_id));
-            m_scenes[generate_id] = std::allocate_shared<scene>(m_allocator, p_name, *m_bus, generate_id);
+            m_scenes[p_name] = std::allocate_shared<scene>(m_allocator, p_name, *m_bus, generate_id);
+        }
+
+        void add_scene(const ref<scene>& p_scene) {
+            m_scenes.emplace(p_scene->name(), p_scene);
+        }
+
+
+        template<typename T>
+        void test_scene(const std::string& p_name) {
+            m_scenes.emplace(p_name, std::allocate_shared<T>(m_allocator, p_name));
+        }
+
+        template<typename UCallback>
+        void each(UCallback&& p_callback) {
+            for(auto[uuid, scene] : m_scenes) {
+                p_callback(scene);
+            }
         }
 
     private:
-        std::pmr::polymorphic_allocator<scene> m_allocator;
-        std::pmr::unordered_map<uint64_t, ref<scene>> m_scenes;
+        std::pmr::polymorphic_allocator<> m_allocator;
+        std::pmr::unordered_map<std::string, ref<scene>> m_scenes;
         event::bus* m_bus=nullptr;
     };
 

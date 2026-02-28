@@ -11,8 +11,9 @@ import atlas.core.utilities;
 import atlas.core.scene.world;
 import atlas.core.event;
 import atlas.drivers.renderer_system;
-import atlas.core.level_streamer;
 import atlas.core.scene.uuid;
+import atlas.core.level_streamer;
+import atlas.core.scene;
 import level_scene;
 
 /**
@@ -21,23 +22,24 @@ import level_scene;
 */
 export class editor_world final : public atlas::world {
 public:
-    editor_world(const std::string& p_tag,
-                 atlas::ref<atlas::renderer_system> p_renderer_instance)
-      : atlas::world(p_tag), m_renderer(std::move(p_renderer_instance)) {
-        m_bus.create_listener<atlas::event::collision_enter>();
-        m_bus.create_listener<atlas::event::collision_persisted>();
-        m_bus.create_listener<atlas::event::collision_exit>();
+    editor_world(const std::string& p_tag, atlas::event::bus& p_bus,
+                 atlas::ref<atlas::renderer_system> p_renderer_instance, atlas::ref<atlas::level_streamer> p_level_streamer)
+      : atlas::world(p_tag, p_level_streamer), m_bus(&p_bus), m_renderer(std::move(p_renderer_instance)) {
+        m_bus->create_listener<atlas::event::collision_enter>();
+        m_bus->create_listener<atlas::event::collision_persisted>();
+        m_bus->create_listener<atlas::event::collision_exit>();
+
+        // 0.) Add scene to level streamer
+        add_scene(atlas::create_ref<level_scene>("LevelScene", p_bus));
         
-        std::array<uint8_t, 1024> byte{};
-        std::pmr::monotonic_buffer_resource resource{byte.data(), byte.size()};
-        m_allocator.construct(&resource);
+        // 1.) World set current
+        current("LevelScene");
 
-        m_stream = std::allocate_shared<atlas::level_streamer>(m_allocator, m_bus);
-        m_stream->create_scene("LevelScene");
+        // 2.) Retrieve scene from level streamer
+        atlas::ref<atlas::scene> first_scene = current();
 
-        atlas::ref<level_scene> first_scene = atlas::create_ref<level_scene>("LevelScene", m_bus);
+        // 3.) Set current scene for rendering entities
         m_renderer->current_scene_context(first_scene);
-        add_scene(first_scene);
 
         console_log_error("editor_world initialized successfully!~!!");
     }
@@ -45,8 +47,6 @@ public:
     ~editor_world() override = default;
 
 private:
-    atlas::event::bus m_bus;
+    atlas::event::bus* m_bus=nullptr;
     atlas::ref<atlas::renderer_system> m_renderer;
-    std::pmr::polymorphic_allocator<atlas::level_streamer> m_allocator;
-    atlas::ref<atlas::level_streamer> m_stream;
 };
