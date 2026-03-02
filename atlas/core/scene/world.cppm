@@ -10,6 +10,7 @@ export module atlas.core.scene.world;
 import atlas.common;
 import atlas.core.scene;
 import atlas.core.level_streamer;
+import atlas.core.event;
 
 export namespace atlas {
     /**
@@ -80,6 +81,11 @@ export namespace atlas {
 
         void add_scene(const ref<scene>& p_scene) {
             m_level_streamer->add_scene(p_scene);
+        }
+
+        template<typename UScene>
+        void default_custom_scene(const std::string& p_name, event::bus& p_bus) {
+            m_level_streamer->default_scene<UScene>(p_name, p_bus);
         }
 
         void current(const std::string& p_name) {

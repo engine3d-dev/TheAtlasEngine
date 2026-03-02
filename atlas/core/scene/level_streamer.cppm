@@ -54,6 +54,12 @@ export namespace atlas {
             m_scenes.emplace(p_scene->name(), p_scene);
         }
 
+        template<typename UScene>
+        void default_scene(const std::string& p_name, event::bus& p_bus) {
+            // static_assert(std::is_base_of_v<UScene, scen>, "not a valid custom size scene of base class atlas::scene");
+            m_scenes.emplace(p_name, std::allocate_shared<UScene>(std::pmr::polymorphic_allocator<UScene>(m_allocator.resource()), p_name, p_bus));
+        }
+
 
         template<typename T>
         void test_scene(const std::string& p_name) {

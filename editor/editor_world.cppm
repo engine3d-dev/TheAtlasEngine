@@ -30,15 +30,17 @@ public:
         m_bus->create_listener<atlas::event::collision_exit>();
 
         // 0.) Add scene to level streamer
-        add_scene(atlas::create_ref<level_scene>("LevelScene", p_bus));
+        // Does polymorphic allocations for these customized scenes
+        default_custom_scene<level_scene>("LevelScene", p_bus);
         
-        // 1.) World set current
+        // 1.) Setting our current scene
+        // TODO: Probably have `default_custom_scene<UScene>() set this
         current("LevelScene");
 
-        // 2.) Retrieve scene from level streamer
+        // 2.) Getting current scene to start rendering
         atlas::ref<atlas::scene> first_scene = current();
 
-        // 3.) Set current scene for rendering entities
+        // 3.) Render our actual 3D scene
         m_renderer->current_scene_context(first_scene);
 
         console_log_error("editor_world initialized successfully!~!!");
