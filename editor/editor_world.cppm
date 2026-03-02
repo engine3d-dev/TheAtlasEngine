@@ -35,18 +35,56 @@ public:
         
         // 1.) Setting our current scene
         // TODO: Probably have `default_custom_scene<UScene>() set this
-        current("LevelScene");
+        std::string current_scene_name = "LevelScene";
+        current(current_scene_name);
 
         // 2.) Getting current scene to start rendering
-        atlas::ref<atlas::scene> first_scene = current();
+        // atlas::ref<atlas::scene> first_scene = current();
+        atlas::ref<atlas::scene> first_scene = p_level_streamer.current_scene(current_scene_name);
 
         // 3.) Render our actual 3D scene
+        // TODO: Probably move the atlas::renderer_system to application
+        // TODO: Have current() handle the system specification + editor camera usage.
         m_renderer->current_scene_context(first_scene);
 
         console_log_error("editor_world initialized successfully!!!");
     }
 
     ~editor_world() override = default;
+
+
+private:
+
+    void update(float p_delta_time) {
+        // do user-defined inputs
+        // TODO: Probably add select scene for a few reasons
+        // 1.) Use world specific update instead of the scene
+        // 2.) Select currently active scene to use the scenes inputs specifically.
+
+        /*
+        
+        Honestly, could just do:
+        m_current_scene->each([](){
+            // Then do this here.......
+        });
+        
+        */
+
+        console_log_warn("editor_world::update(float) invoked!!!");
+
+        // atlas::ref<atlas::scene> current_scene = current();
+
+
+        // current_scene->each([](){});
+    }
+
+    void physics_update() {
+        // perform physics simulation
+    }
+
+    void ui_update() {
+        // UI-specific updates
+    }
 
 private:
     atlas::event::bus* m_bus=nullptr;
