@@ -34,38 +34,30 @@ export namespace atlas {
         }
 
         /**
-        * @return the current scene
+        * @return the currently active scene to retrieve
         */
         ref<scene> current_scene(const std::string& p_name) {
             return m_scenes[p_name];
         }
 
-        /**
-        * @brief Creating a new scene
-        * 
-        * Scenes are managed by the level streamer
-        */
-        void create_scene(const std::string& p_name) {
-            uuid generate_id;
-            m_scenes[p_name] = std::allocate_shared<scene>(m_allocator, p_name, *m_bus, generate_id);
-        }
-
-        void add_scene(const ref<scene>& p_scene) {
-            m_scenes.emplace(p_scene->name(), p_scene);
-        }
-
         template<typename UScene>
         void default_scene(const std::string& p_name, event::bus& p_bus) {
-            // static_assert(std::is_base_of_v<UScene, scen>, "not a valid custom size scene of base class atlas::scene");
             m_scenes.emplace(p_name, std::allocate_shared<UScene>(std::pmr::polymorphic_allocator<UScene>(m_allocator.resource()), p_name, p_bus));
         }
 
 
-        template<typename T>
-        void test_scene(const std::string& p_name) {
-            m_scenes.emplace(p_name, std::allocate_shared<T>(m_allocator, p_name));
-        }
 
+        /**
+        * @brief used to iterate through over the scenes created
+        *
+        * Example Usage:
+        * ```C++
+        * m_level_streamer.each([this](ref<scene> p_scene){
+        *       // do some logic
+        * });
+        * ```
+        * 
+        */
         template<typename UCallback>
         void each(UCallback&& p_callback) {
             for(auto[uuid, scene] : m_scenes) {
