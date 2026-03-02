@@ -23,7 +23,7 @@ export namespace atlas {
         /**
         * @brief Constructs a level streamer and allocates an arbitrary amount of bytes to the allocator
         */
-        level_streamer(event::bus& p_bus) : m_bus(&p_bus) {
+        level_streamer() {
             std::array<uint8_t, 1024> bytes{};
             std::pmr::monotonic_buffer_resource resource_pool(bytes.data(), bytes.size());
             m_allocator.construct(&resource_pool);
@@ -44,8 +44,6 @@ export namespace atlas {
         void default_scene(const std::string& p_name, event::bus& p_bus) {
             m_scenes.emplace(p_name, std::allocate_shared<UScene>(std::pmr::polymorphic_allocator<UScene>(m_allocator.resource()), p_name, p_bus));
         }
-
-
 
         /**
         * @brief used to iterate through over the scenes created
@@ -68,7 +66,6 @@ export namespace atlas {
     private:
         std::pmr::polymorphic_allocator<> m_allocator;
         std::pmr::unordered_map<std::string, ref<scene>> m_scenes;
-        event::bus* m_bus=nullptr;
     };
 
 };

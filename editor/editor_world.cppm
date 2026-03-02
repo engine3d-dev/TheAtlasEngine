@@ -23,7 +23,7 @@ import level_scene;
 export class editor_world final : public atlas::world {
 public:
     editor_world(const std::string& p_tag, atlas::event::bus& p_bus,
-                 atlas::ref<atlas::renderer_system> p_renderer_instance, atlas::ref<atlas::level_streamer> p_level_streamer)
+                 atlas::ref<atlas::renderer_system> p_renderer_instance, atlas::level_streamer& p_level_streamer)
       : atlas::world(p_tag, p_level_streamer), m_bus(&p_bus), m_renderer(std::move(p_renderer_instance)) {
         m_bus->create_listener<atlas::event::collision_enter>();
         m_bus->create_listener<atlas::event::collision_persisted>();
@@ -43,7 +43,7 @@ public:
         // 3.) Render our actual 3D scene
         m_renderer->current_scene_context(first_scene);
 
-        console_log_error("editor_world initialized successfully!~!!");
+        console_log_error("editor_world initialized successfully!!!");
     }
 
     ~editor_world() override = default;

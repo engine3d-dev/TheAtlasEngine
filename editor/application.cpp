@@ -16,12 +16,6 @@ public:
                      const atlas::application_settings& p_settings)
       : atlas::application(std::move(p_context), p_settings) {
 
-        // Allocating bytes for the allocator for the streamer
-        std::array<uint8_t, 1024> byte{};
-        std::pmr::monotonic_buffer_resource resource{byte.data(), byte.size()};
-        m_allocator.construct(&resource);
-        m_stream = std::allocate_shared<atlas::level_streamer>(m_allocator, m_bus);
-        
         m_world = atlas::create_ref<editor_world>("Editor World", m_bus, renderer_instance(), m_stream);
 
 
@@ -31,8 +25,7 @@ public:
 private:
     atlas::event::bus m_bus;
     atlas::ref<editor_world> m_world;
-    std::pmr::polymorphic_allocator<atlas::level_streamer> m_allocator;
-    atlas::ref<atlas::level_streamer> m_stream;
+    atlas::level_streamer m_stream;
 };
 
 atlas::ref<atlas::application>
