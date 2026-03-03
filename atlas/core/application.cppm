@@ -120,7 +120,7 @@ export namespace atlas {
             // ref<scene> current_scene = current_world->get_scene("LevelScene");
             // ref<scene> current_scene = m_current_world->get_scene("LevelScene");
             ref<scene> current_scene = m_current_world->current();
-            flecs::world current_world_scope = *current_scene;
+            // flecs::world current_world_scope = *current_scene;
             
             invoke_start(current_scene.get());
             /*
@@ -135,8 +135,8 @@ export namespace atlas {
                 projection_view>>(), this automatically gets invoked by the
             .system<...> that gets invoked by the mainloop.
             */
-            current_world_scope
-              .system<flecs::pair<tag::editor, projection_view>,
+            current_scene
+              ->system<flecs::pair<tag::editor, projection_view>,
                       transform,
                       perspective_camera>()
               .each([&](flecs::pair<tag::editor, projection_view> p_pair,
@@ -194,7 +194,7 @@ export namespace atlas {
                 // Progresses the flecs::world by one tick (or replaced with
                 // using the delta time) This also invokes the following
                 // system<T...> call  before the mainloop
-                current_world_scope.progress(m_delta_time);
+                current_scene->progress(m_delta_time);
 
                 m_current_frame_index = m_window->acquired_next_frame();
 

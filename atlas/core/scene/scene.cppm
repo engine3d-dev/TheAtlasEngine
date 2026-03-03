@@ -118,6 +118,38 @@ export namespace atlas {
         }
 
         /**
+        * @brief systems in flecs are queries + a given callback
+        * 
+        * Which can be ran manually following up to the `.progress` API function
+        * 
+        * Example Usage:
+        * 
+        * We specify a filter at compile-time. Then anything that matches. We run
+        * this callback on that particular filter.
+        * 
+        * This systems filter must be set before the registry is used and not after.
+        * 
+        * ```C++
+        * m_scene.system<flecs::pair<tag::editor, projection_view>,
+        *   transform,
+        *   perspective_camera>()
+        *   .each([&](flecs::pair<tag::editor, projection_view> p_pair,
+        *   transform& p_transform,
+        *   perspective_camera& p_camera) {
+        * }
+        * ```
+        * 
+        */
+        template <typename... Components>
+        flecs::system_builder<Components...> system(const char* name = nullptr) {
+            return flecs::system_builder<Components...>(m_registry, name);
+        }
+
+        void progress(float p_delta_time) {
+            m_registry.progress(p_delta_time);
+        }
+
+        /**
          * @return the number of children entities
          *
          * Example Usage:
