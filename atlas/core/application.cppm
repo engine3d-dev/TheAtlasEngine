@@ -88,10 +88,6 @@ export namespace atlas {
             m_ui_context = vulkan::imgui_context(
               p_context->handle(), m_window->current_swapchain(), *m_window);
 
-            // vulkan::instance_context::submit_resource_free([this](){
-            //     m_ui_context.destroy();
-            // });
-
             p_context->submit_resource_free(
               [this]() { m_ui_context.destroy(); });
 
@@ -116,11 +112,7 @@ export namespace atlas {
             m_renderer->preload(
               m_window->current_swapchain().swapchain_renderpass());
 
-            // ref<world> current_world = system_registry::get_world("Editor World");
-            // ref<scene> current_scene = current_world->get_scene("LevelScene");
-            // ref<scene> current_scene = m_current_world->get_scene("LevelScene");
             ref<scene> current_scene = m_current_world->current();
-            // flecs::world current_world_scope = *current_scene;
             
             invoke_start(current_scene.get());
             /*
