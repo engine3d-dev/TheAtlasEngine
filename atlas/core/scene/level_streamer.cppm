@@ -4,8 +4,6 @@ module;
 #include <memory_resource>
 #include <array>
 #include <unordered_map>
-#include <span>
-#include <memory>
 
 export module atlas.core.level_streamer;
 

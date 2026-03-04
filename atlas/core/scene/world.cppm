@@ -3,7 +3,6 @@ module;
 #include <string>
 #include <flecs.h>
 #include <map>
-#include <stdexcept>
 
 export module atlas.core.scene.world;
 
