@@ -52,40 +52,6 @@ public:
 
     ~editor_world() override = default;
 
-
-private:
-
-    void update(float p_delta_time) {
-        // do user-defined inputs
-        // TODO: Probably add select scene for a few reasons
-        // 1.) Use world specific update instead of the scene
-        // 2.) Select currently active scene to use the scenes inputs specifically.
-
-        /*
-        
-        Honestly, could just do:
-        m_current_scene->each([](){
-            // Then do this here.......
-        });
-        
-        */
-
-        console_log_warn("editor_world::update(float) invoked!!!");
-
-        // atlas::ref<atlas::scene> current_scene = current();
-
-
-        // current_scene->each([](){});
-    }
-
-    void physics_update() {
-        // perform physics simulation
-    }
-
-    void ui_update() {
-        // UI-specific updates
-    }
-
 private:
     atlas::event::bus* m_bus=nullptr;
     atlas::ref<atlas::renderer_system> m_renderer;
