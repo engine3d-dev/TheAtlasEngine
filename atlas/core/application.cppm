@@ -62,7 +62,7 @@ export namespace atlas {
          * @param p_settings is the specific application settings to configure
          * how the application may be setup
          */
-        application(/*NOLINT*/ref<graphics_context> p_context,
+        application(/*NOLINT*/ ref<graphics_context> p_context,
                     const application_settings& p_params) {
             console_log_info(
               "application(const application_settings&) initialized!!!");
@@ -109,12 +109,20 @@ export namespace atlas {
             console_log_info("Executing game mainloop!!!");
 
             auto start_time = std::chrono::high_resolution_clock::now();
+
+            ref<scene> current_scene = m_current_world->current();
+
+            m_renderer->current_scene_context(current_scene);
+
+            // Bug-prone API.
+            //  Due to requiring there to be a valid m_current_scene specified.
+            // TODO: SHOULD have this API be invoked whenever a
+            // `current_scene_context` sets a new scene (for invalidation)
             m_renderer->preload(
               m_window->current_swapchain().swapchain_renderpass());
 
-            ref<scene> current_scene = m_current_world->current();
-            
             invoke_start(current_scene.get());
+
             /*
                 - flecs::system is how your able to schedule changes for given
                 portions of data in this case the projection/view matrices are
@@ -129,8 +137,8 @@ export namespace atlas {
             */
             current_scene
               ->system<flecs::pair<tag::editor, projection_view>,
-                      transform,
-                      perspective_camera>()
+                       transform,
+                       perspective_camera>()
               .each([&](flecs::pair<tag::editor, projection_view> p_pair,
                         transform& p_transform,
                         perspective_camera& p_camera) {
@@ -321,10 +329,7 @@ export namespace atlas {
             return m_window->current_swapchain();
         }
 
-
-        void current_world(ref<world> p_world) {
-            m_current_world = p_world;
-        }
+        void current_world(ref<world> p_world) { m_current_world = p_world; }
 
     protected:
         [[nodiscard]] ref<renderer_system> renderer_instance() const {
@@ -333,12 +338,9 @@ export namespace atlas {
 
     private:
         float m_delta_time = 0.f;
-        // world* m_current_world=nullptr;
         ref<world> m_current_world;
         ref<window> m_window;
         window_params m_initial_window_params;
-        // vulkan::instance_context m_instance_handle_test;
-        // std::optional<vulkan::instance_context> m_instance_handle_test;
         ref<renderer_system> m_renderer = nullptr;
         glm::mat4 m_proj_view;
         uint32_t m_current_frame_index = -1;

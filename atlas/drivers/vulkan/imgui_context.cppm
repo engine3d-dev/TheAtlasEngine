@@ -285,10 +285,11 @@ namespace atlas::vulkan {
                   vk::framebuffer(m_driver, framebuffer_info);
             }
 
-            g_viewport_image_id = (ImTextureID)ImGui_ImplVulkan_AddTexture(
-              m_viewport_image.sampler(),
-              m_viewport_image.image_view(),
-              VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+            g_viewport_image_id =
+              static_cast<ImTextureID>(ImGui_ImplVulkan_AddTexture(
+                m_viewport_image.sampler(),
+                m_viewport_image.image_view(),
+                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
         }
 
         void create(GLFWwindow* p_window_handler,

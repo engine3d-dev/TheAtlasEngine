@@ -13,11 +13,11 @@ import atlas.drivers.graphics_context;
 class editor_application : public atlas::application {
 public:
     editor_application(atlas::ref<atlas::graphics_context> p_context,
-                     const atlas::application_settings& p_settings)
+                       const atlas::application_settings& p_settings)
       : atlas::application(std::move(p_context), p_settings) {
 
-        m_world = atlas::create_ref<editor_world>("Editor World", m_bus, renderer_instance(), m_stream);
-
+        m_world =
+          atlas::create_ref<editor_world>("Editor World", m_bus, m_stream);
 
         current_world(m_world);
     }
@@ -29,7 +29,8 @@ private:
 };
 
 atlas::ref<atlas::application>
-initialize_application(/*NOLINT*/atlas::ref<atlas::graphics_context> p_contetxt) {
+initialize_application(
+  /*NOLINT*/ atlas::ref<atlas::graphics_context> p_contetxt) {
     atlas::application_settings settings = {
         .name = "Editor",
         .width = 1510,
