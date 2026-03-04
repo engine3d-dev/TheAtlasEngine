@@ -2,6 +2,7 @@ module;
 
 #include <string>
 #include <memory_resource>
+#include <memory>
 #include <array>
 #include <unordered_map>
 
