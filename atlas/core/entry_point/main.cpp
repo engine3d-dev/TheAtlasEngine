@@ -1,4 +1,4 @@
-
+// For glfwInit call
 #include <GLFW/glfw3.h>
 import atlas.application;
 import atlas.common;
@@ -6,7 +6,6 @@ import atlas.logger;
 import atlas.graphics_api;
 import atlas.drivers.graphics_context;
 import atlas.renderer.context_loader;
-import atlas.core.scene.system_registry;
 
 // Defined in the user-application side
 [[nodiscard]] atlas::ref<atlas::application> initialize_application(
@@ -21,9 +20,6 @@ main() {
         return -1;
     }
 
-    // TODO: Level streamer is going to be replacing system_registry
-    atlas::ref<atlas::system_registry> system =
-      atlas::create_ref<atlas::system_registry>("system");
     atlas::ref<atlas::graphics_context> context =
       atlas::initialize_context("vulkan", atlas::graphics_api::vulkan);
 

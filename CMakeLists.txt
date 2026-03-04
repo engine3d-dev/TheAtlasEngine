@@ -143,7 +143,8 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas/core/scene/game_object.cppm
     atlas/core/scene/scene.cppm
     atlas/core/scene/world.cppm
-    atlas/core/scene/system_registry.cppm
+    atlas/core/scene/level_streamer.cppm
+    atlas/core/scene/uuid.cppm
 
     atlas/core/utilities/state.cppm
     atlas/core/utilities/poll_state.cppm

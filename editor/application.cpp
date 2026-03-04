@@ -1,38 +1,41 @@
+#include <utility>
+#include <memory_resource>
+#include <memory>
+
 import atlas.application;
 import atlas.common;
-
+import atlas.core.level_streamer;
+import atlas.core.event;
 import editor_world;
-import atlas.core.scene.system_registry;
 
 import atlas.drivers.graphics_context;
 
-class test_application : public atlas::application {
+class editor_application : public atlas::application {
 public:
-    test_application(atlas::ref<atlas::graphics_context> p_context,
-                     const atlas::application_settings& p_settings)
-      : atlas::application(p_context, p_settings) {
-        // atlas::register_update(this,
-        // &test_application::on_update);std::pmr::monotonic_buffer_resource
-        // resource{ 4096 }; m_allocator.construct(&resource);
+    editor_application(atlas::ref<atlas::graphics_context> p_context,
+                       const atlas::application_settings& p_settings)
+      : atlas::application(std::move(p_context), p_settings) {
 
-        // TODO -- this is going to be changed with the use of the level
-        // streamer API
         m_world =
-          atlas::create_ref<editor_world>("Editor World", renderer_instance());
+          atlas::create_ref<editor_world>("Editor World", m_bus, m_stream);
+
+        current_world(m_world);
     }
 
 private:
-    // std::pmr::polymorphic_allocator<uint8_t> m_allocator;
+    atlas::event::bus m_bus;
     atlas::ref<editor_world> m_world;
+    atlas::level_streamer m_stream;
 };
 
 atlas::ref<atlas::application>
-initialize_application(atlas::ref<atlas::graphics_context> p_contetxt) {
+initialize_application(
+  /*NOLINT*/ atlas::ref<atlas::graphics_context> p_contetxt) {
     atlas::application_settings settings = {
         .name = "Editor",
         .width = 1510,
         .height = 877,
         .background_color = { 0.f, 0.f, 0.f, 0.f },
     };
-    return create_ref<test_application>(p_contetxt, settings);
+    return create_ref<editor_application>(p_contetxt, settings);
 }

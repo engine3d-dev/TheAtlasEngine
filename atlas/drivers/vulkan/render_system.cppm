@@ -264,18 +264,6 @@ export namespace atlas::vulkan {
     private:
         void preload_assets(const vk::renderpass& p_renderpass) override {
             m_final_renderpass = p_renderpass;
-            // set 1 -- material uniforms
-            // ref<world> current_world = system_registry::get_world("Editor
-            // World"); ref<scene> current_scene =
-            // current_world->get_scene("LevelScene");
-
-            if (m_current_scene == nullptr) {
-                console_log_error("m_current_scene == nullptr!");
-                return;
-            }
-            else {
-                console_log_error("m_current_scene != nullptr!");
-            }
 
             flecs::query<> caching =
               m_current_scene->query_builder<mesh_source>().build();
@@ -416,8 +404,6 @@ export namespace atlas::vulkan {
                         vk::write_image{
                           .sampler = diffuse.sampler(),
                           .view = diffuse.image_view(),
-                          // .image_layout =
-                          // VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
                           .layout = vk::image_layout::shader_read_only_optimal,
                         },
                     };
@@ -427,8 +413,6 @@ export namespace atlas::vulkan {
                         vk::write_image{
                           .sampler = specular.sampler(),
                           .view = specular.image_view(),
-                          // .image_layout =
-                          // VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
                           .layout = vk::image_layout::shader_read_only_optimal,
                         },
                     };
@@ -566,10 +550,6 @@ export namespace atlas::vulkan {
             // std::span<uint8_t> bytes_data = to_bytes(global_frame_ubo);
             // m_global_uniforms.update(bytes_data.data());
             m_global_uniforms.update(&global_frame_ubo);
-
-            // ref<world> current_world = system_registry::get_world("Editor
-            // World"); ref<scene> current_scene =
-            // current_world->get_scene("LevelScene");
 
             // query all entities that have a point light
             flecs::query<point_light> query_point_lights =

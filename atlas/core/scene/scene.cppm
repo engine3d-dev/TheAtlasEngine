@@ -8,6 +8,7 @@ export module atlas.core.scene;
 import atlas.core.utilities;
 import atlas.core.event;
 import atlas.core.scene.game_object;
+import atlas.core.scene.uuid;
 
 export namespace atlas {
     /**
@@ -35,6 +36,14 @@ export namespace atlas {
         scene(const std::string& p_name, event::bus& p_bus)
           : m_name(p_name)
           , m_bus(&p_bus) {}
+        /**
+         * @param p_name is the name given to this scene
+         * @param p_bus is the globalized event bus that is given access to the
+         * scene to subscribe events to it.
+         */
+        scene(const std::string& p_name, event::bus& p_bus, uuid p_uuid)
+          : m_name(p_name)
+          , m_bus(&p_bus), m_scene_uuid(p_uuid) {}
 
         virtual ~scene() = default;
 
@@ -109,6 +118,38 @@ export namespace atlas {
         }
 
         /**
+        * @brief systems in flecs are queries + a given callback
+        * 
+        * Which can be ran manually following up to the `.progress` API function
+        * 
+        * Example Usage:
+        * 
+        * We specify a filter at compile-time. Then anything that matches. We run
+        * this callback on that particular filter.
+        * 
+        * This systems filter must be set before the registry is used and not after.
+        * 
+        * ```C++
+        * m_scene.system<flecs::pair<tag::editor, projection_view>,
+        *   transform,
+        *   perspective_camera>()
+        *   .each([&](flecs::pair<tag::editor, projection_view> p_pair,
+        *   transform& p_transform,
+        *   perspective_camera& p_camera) {
+        * }
+        * ```
+        * 
+        */
+        template <typename... Components>
+        flecs::system_builder<Components...> system(const char* name = nullptr) {
+            return flecs::system_builder<Components...>(m_registry, name);
+        }
+
+        void progress(float p_delta_time) {
+            m_registry.progress(p_delta_time);
+        }
+
+        /**
          * @return the number of children entities
          *
          * Example Usage:
@@ -171,6 +212,11 @@ export namespace atlas {
         [[nodiscard]] event::bus* event_handle() const { return m_bus; }
 
         /**
+        * @return the unique scene ID
+        */
+        [[nodiscard]] uint64_t unique_id() const { return m_scene_uuid; }
+
+        /**
          * @brief Requires to return flecs::world is returned by reference to
          * prevent making copies of flecs::world
          */
@@ -180,5 +226,6 @@ export namespace atlas {
         flecs::world m_registry;
         std::string m_name;
         event::bus* m_bus = nullptr;
+        uuid m_scene_uuid;
     };
 };

@@ -7,12 +7,11 @@ module;
 #include <vulkan/vulkan.h>
 #include <string>
 #include <print>
-#include <optional>
-#include <GLFW/glfw3.h>
 #include <chrono>
+#include <utility>
 #include <flecs.h>
+#include <GLFW/glfw3.h>
 #include <imgui.h>
-#include <imgui/backends/imgui_impl_glfw.h>
 
 export module atlas.application;
 
@@ -27,7 +26,6 @@ import atlas.renderer;
 import atlas.drivers.vulkan.instance_context;
 import atlas.core.scene;
 import atlas.core.scene.world;
-import atlas.core.scene.system_registry;
 import atlas.core.scene.components;
 
 import atlas.core.math;
@@ -64,7 +62,7 @@ export namespace atlas {
          * @param p_settings is the specific application settings to configure
          * how the application may be setup
          */
-        application(ref<graphics_context> p_context,
+        application(/*NOLINT*/ ref<graphics_context> p_context,
                     const application_settings& p_params) {
             console_log_info(
               "application(const application_settings&) initialized!!!");
@@ -90,10 +88,6 @@ export namespace atlas {
             m_ui_context = vulkan::imgui_context(
               p_context->handle(), m_window->current_swapchain(), *m_window);
 
-            // vulkan::instance_context::submit_resource_free([this](){
-            //     m_ui_context.destroy();
-            // });
-
             p_context->submit_resource_free(
               [this]() { m_ui_context.destroy(); });
 
@@ -115,15 +109,19 @@ export namespace atlas {
             console_log_info("Executing game mainloop!!!");
 
             auto start_time = std::chrono::high_resolution_clock::now();
+
+            ref<scene> current_scene = m_current_world->current();
+
+            m_renderer->current_scene_context(current_scene);
+
+            // Bug-prone API.
+            //  Due to requiring there to be a valid m_current_scene specified.
+            // TODO: SHOULD have this API be invoked whenever a
+            // `current_scene_context` sets a new scene (for invalidation)
             m_renderer->preload(
               m_window->current_swapchain().swapchain_renderpass());
 
-            invoke_start();
-
-            ref<world> current_world =
-              system_registry::get_world("Editor World");
-            ref<scene> current_scene = current_world->get_scene("LevelScene");
-            flecs::world current_world_scope = *current_scene;
+            invoke_start(current_scene.get());
 
             /*
                 - flecs::system is how your able to schedule changes for given
@@ -137,10 +135,10 @@ export namespace atlas {
                 projection_view>>(), this automatically gets invoked by the
             .system<...> that gets invoked by the mainloop.
             */
-            current_world_scope
-              .system<flecs::pair<tag::editor, projection_view>,
-                      transform,
-                      perspective_camera>()
+            current_scene
+              ->system<flecs::pair<tag::editor, projection_view>,
+                       transform,
+                       perspective_camera>()
               .each([&](flecs::pair<tag::editor, projection_view> p_pair,
                         transform& p_transform,
                         perspective_camera& p_camera) {
@@ -196,7 +194,7 @@ export namespace atlas {
                 // Progresses the flecs::world by one tick (or replaced with
                 // using the delta time) This also invokes the following
                 // system<T...> call  before the mainloop
-                current_world_scope.progress(m_delta_time);
+                current_scene->progress(m_delta_time);
 
                 m_current_frame_index = m_window->acquired_next_frame();
 
@@ -207,11 +205,11 @@ export namespace atlas {
                 ::vk::command_buffer currently_active =
                   m_window->active_command(m_current_frame_index);
 
-                invoke_physics_update();
+                invoke_physics_update(current_scene.get());
 
-                invoke_on_update(m_delta_time);
+                invoke_on_update(current_scene.get(), m_delta_time);
 
-                invoke_defer_update();
+                invoke_defer_update(current_scene.get());
                 // We want this to be called after late update
                 // This queries all camera objects within the camera system
                 // Update -- going to be removing camera system in replacement
@@ -267,7 +265,7 @@ export namespace atlas {
 
                 m_ui_context.begin(currently_active, m_current_frame_index);
 
-                invoke_ui_update();
+                invoke_ui_update(current_scene.get());
 
                 // final renderpass for rendering the offscreen information to
                 // the final renderpass
@@ -331,6 +329,8 @@ export namespace atlas {
             return m_window->current_swapchain();
         }
 
+        void current_world(ref<world> p_world) { m_current_world = p_world; }
+
     protected:
         [[nodiscard]] ref<renderer_system> renderer_instance() const {
             return m_renderer;
@@ -338,10 +338,9 @@ export namespace atlas {
 
     private:
         float m_delta_time = 0.f;
+        ref<world> m_current_world;
         ref<window> m_window;
         window_params m_initial_window_params;
-        // vulkan::instance_context m_instance_handle_test;
-        // std::optional<vulkan::instance_context> m_instance_handle_test;
         ref<renderer_system> m_renderer = nullptr;
         glm::mat4 m_proj_view;
         uint32_t m_current_frame_index = -1;
