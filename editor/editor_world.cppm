@@ -21,15 +21,7 @@ public:
     editor_world(const std::string& p_tag,
                  atlas::event::bus& p_bus,
                  atlas::level_streamer& p_level_streamer)
-      : atlas::world(p_tag, p_level_streamer)
-      , m_bus(&p_bus) {
-        m_bus->create_listener<atlas::event::collision_enter>();
-        m_bus->create_listener<atlas::event::collision_persisted>();
-        m_bus->create_listener<atlas::event::collision_exit>();
-        m_bus->create_immediate_listener<atlas::event::mesh_reload>();
-
-
-        m_bus->trigger<atlas::event::mesh_reload>(this, &editor_world::reload_mesh);
+      : atlas::world(p_tag, p_level_streamer) {
 
         // Create defualt scene to level streamer
         // Does polymorphic allocations for these customized scenes
@@ -44,10 +36,5 @@ public:
 
     ~editor_world() override = default;
 
-    void reload_mesh(atlas::event::mesh_reload&) {
-        console_log_info("reload_mesh requested from editor_world!");
-    }
-
 private:
-    atlas::event::bus* m_bus = nullptr;
 };

@@ -18,13 +18,12 @@ public:
       : atlas::application(std::move(p_context), p_settings, p_bus) {
 
         m_world =
-          atlas::create_ref<editor_world>("Editor World", m_bus, m_stream);
+          atlas::create_ref<editor_world>("Editor World", p_bus, m_stream);
 
         current_world(m_world);
     }
 
 private:
-    atlas::event::bus m_bus;
     atlas::ref<editor_world> m_world;
     atlas::level_streamer m_stream;
 };

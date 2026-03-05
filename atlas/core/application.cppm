@@ -93,6 +93,14 @@ export namespace atlas {
               [this]() { m_ui_context.destroy(); });
 
             s_instance = this;
+
+            // Setting internal-level listeners for specific events
+            m_bus->create_listener<atlas::event::collision_enter>();
+            m_bus->create_listener<atlas::event::collision_persisted>();
+            m_bus->create_listener<atlas::event::collision_exit>();
+            m_bus->create_immediate_listener<atlas::event::mesh_reload>();
+
+            m_bus->trigger<event::mesh_reload>(this, &application::reload_mesh);
         }
 
         ~application() { m_window->close(); }
@@ -331,6 +339,11 @@ export namespace atlas {
         }
 
         void current_world(ref<world> p_world) { m_current_world = p_world; }
+
+
+        void reload_mesh(event::mesh_reload&) {
+            console_log_info("application::trigger<UEvent> invoked from core/application!");
+        }
 
     protected:
         [[nodiscard]] ref<renderer_system> renderer_instance() const {
