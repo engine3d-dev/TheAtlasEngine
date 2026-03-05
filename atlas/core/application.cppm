@@ -341,8 +341,9 @@ export namespace atlas {
         void current_world(ref<world> p_world) { m_current_world = p_world; }
 
 
-        void reload_mesh(event::mesh_reload&) {
+        void reload_mesh(event::mesh_reload& p_reload_request) {
             console_log_info("application::trigger<UEvent> invoked from core/application!");
+            m_renderer->invalidate_mesh(p_reload_request.entity_id, p_reload_request.filename);
         }
 
     protected:

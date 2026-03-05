@@ -541,8 +541,8 @@ public:
                       // TEMP: Used for testing the signaling for specific triggering events
                       if(ImGui::Button("Reload")) {
                             atlas::event::mesh_reload reload_request = {
-                                .entity_id = 0,
-                                .filename = "Test",
+                                .entity_id = m_selected_entity.id(),
+                                .filename = "assets/models/E 45 Aircraft_obj.obj",
                             };
 
                         signal(reload_request);

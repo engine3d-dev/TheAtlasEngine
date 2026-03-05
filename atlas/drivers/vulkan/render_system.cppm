@@ -637,6 +637,10 @@ export namespace atlas::vulkan {
             m_current_scene = p_scene_ctx;
         }
 
+        void render_invalidate_mesh(uint32_t p_entity_id, std::filesystem::path p_filename) override {
+            m_cached_meshes[p_entity_id].reload_mesh(p_filename);
+        }
+
     private:
         VkDevice m_device = nullptr;
         physical_device m_physical;
