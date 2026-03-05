@@ -257,6 +257,11 @@ public:
         atlas::register_physics(this, &level_scene::physics_update);
         atlas::register_update(this, &level_scene::on_update);
         atlas::register_ui(this, &level_scene::on_ui_update);
+
+        // TEMP: This is for testing if the triggered event only occurs once whenever a signal occurs.
+        // This should be moved to the internal application... OR the renderer
+        // trigger<atlas::event::mesh_reload>(this, &level_scene::reload_mesh);
+
         // @note checking to see what state we are in. (If playing/stopping)
         // Ref<Texture2D> icon = _sceneState == SceneState::Edit ? _iconPlay :
         // _iconStop;
@@ -527,11 +532,21 @@ public:
                 atlas::ui::draw_component<atlas::mesh_source>(
                   "atlas::mesh_source",
                   m_selected_entity,
-                  [](atlas::mesh_source* p_source) {
+                  [this](atlas::mesh_source* p_source) {
                       std::string mesh_src = p_source->model_path;
                       atlas::ui::draw_input_text(p_source->model_path,
                                                  mesh_src);
                       atlas::ui::draw_vec4("Color", p_source->color);
+
+                      // TEMP: Used for testing the signaling for specific triggering events
+                      if(ImGui::Button("Reload")) {
+                            atlas::event::mesh_reload reload_request = {
+                                .entity_id = 0,
+                                .filename = "Test",
+                            };
+
+                        signal(reload_request);
+                      }
                   });
 
                 atlas::ui::draw_component<atlas::material_metadata>(
@@ -803,6 +818,7 @@ public:
             console_log_error("Could not load yaml file LevelScene!!!");
         }
     }
+
 
 private:
     void collision_enter(atlas::event::collision_enter& p_event) {

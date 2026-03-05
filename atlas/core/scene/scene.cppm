@@ -86,6 +86,16 @@ export namespace atlas {
             m_bus->subscribe<UEventType>(p_instance, p_callback);
         }
 
+        template<typename UEvent, typename UObject, typename UCallback>
+        void trigger(UObject* p_instance, const UCallback& p_callback) {
+            m_bus->trigger<UEvent>(p_instance, p_callback);
+        }
+
+        template<typename UEvent>
+        void signal(UEvent& p_event) {
+            m_bus->signal<UEvent>(p_event);
+        }
+
         /**
          * @brief queries components, returning entities (game objects) that
          * contain those components queried with.
@@ -112,7 +122,7 @@ export namespace atlas {
          * ```
          */
         template<typename... Comps, typename... Args>
-        flecs::query_builder<Comps...> query_builder(Args&&... args) const {
+        [[nodiscard]] flecs::query_builder<Comps...> query_builder(Args&&... args) const {
             return flecs::query_builder<Comps...>(m_registry,
                                                   std::forward(args)...);
         }
