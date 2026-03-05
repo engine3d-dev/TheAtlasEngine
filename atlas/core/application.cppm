@@ -26,6 +26,7 @@ import atlas.renderer;
 import atlas.drivers.vulkan.instance_context;
 import atlas.core.scene;
 import atlas.core.scene.world;
+import atlas.core.event;
 import atlas.core.scene.components;
 
 import atlas.core.math;
@@ -63,7 +64,7 @@ export namespace atlas {
          * how the application may be setup
          */
         application(/*NOLINT*/ ref<graphics_context> p_context,
-                    const application_settings& p_params) {
+                    const application_settings& p_params, event::bus& p_bus) : m_bus(&p_bus) {
             console_log_info(
               "application(const application_settings&) initialized!!!");
 
@@ -345,6 +346,7 @@ export namespace atlas {
         glm::mat4 m_proj_view;
         uint32_t m_current_frame_index = -1;
         vulkan::imgui_context m_ui_context;
+        event::bus* m_bus=nullptr;
         static application* s_instance;
     };
 
