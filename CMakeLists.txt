@@ -208,6 +208,7 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas/drivers/vulkan/physical_device.cppm
     atlas/drivers/vulkan/device.cppm
     atlas/drivers/vulkan/swapchain.cppm
+    atlas/drivers/vulkan/environment_map.cppm
 )
 
 target_sources(${PROJECT_NAME} PUBLIC
