@@ -473,10 +473,10 @@ export namespace atlas::vulkan {
                          const window_params& p_settings,
                          const vk::renderpass& p_renderpass,
                          const VkFramebuffer& p_framebuffer,
-                         const glm::mat4& p_proj_view,
+                         const glm::mat4& p_projection,
+                         const glm::mat4& p_view,
                          uint32_t p_current_frame) override {
-            m_proj_view = p_proj_view;
-            // m_current_frame = application::current_frame();
+            m_proj_view = p_projection * p_view;
             m_current_frame = p_current_frame;
             m_final_renderpass = p_renderpass;
 

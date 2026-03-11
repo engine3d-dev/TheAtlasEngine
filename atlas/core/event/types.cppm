@@ -41,4 +41,10 @@ export namespace atlas::event {
         uint64_t entity_id;
         std::string_view filename;
     };
+
+    struct material_reload {
+        uint64_t entity_id;
+        std::string_view diffuse;
+        std::string_view specular;
+    };
 };

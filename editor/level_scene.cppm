@@ -30,6 +30,7 @@ import atlas.core.serialize;
 import atlas.physics.engine;
 import atlas.drivers.vulkan.imgui_context;
 import atlas.drivers.vulkan.instance_context;
+import atlas.core.ui.widgets.imgui_stdlib;
 import vk;
 import content_browser;
 
@@ -533,19 +534,29 @@ public:
                   "atlas::mesh_source",
                   m_selected_entity,
                   [this](atlas::mesh_source* p_source) {
-                      std::string mesh_src = p_source->model_path;
-                      atlas::ui::draw_input_text(p_source->model_path,
-                                                 mesh_src);
+
+                    if (ImGui::InputText("Input Label", &p_source->model_path, ImGuiInputTextFlags_EnterReturnsTrue)) {
+                        console_log_info("mesh_src = {}", p_source->model_path);
+                        atlas::event::mesh_reload reload_request = {
+                            .entity_id = m_selected_entity.id(),
+                            .filename = p_source->model_path,
+                        };
+
+                        if(std::filesystem::exists(p_source->model_path)) {
+                            signal(reload_request);
+                        }
+                    }
                       atlas::ui::draw_vec4("Color", p_source->color);
 
-                      // TEMP: Used for testing the signaling for specific triggering events
-                      if(ImGui::Button("Reload")) {
-                            atlas::event::mesh_reload reload_request = {
-                                .entity_id = m_selected_entity.id(),
-                                .filename = "assets/models/E 45 Aircraft_obj.obj",
-                            };
 
-                        signal(reload_request);
+                      if(ImGui::Button("Reload Material")) {
+                        atlas::event::material_reload reload_material_request = {
+                            .entity_id = m_selected_entity.id(),
+                            .diffuse = "assets/models/viking_room.png",
+                            .specular = "",
+                        };
+
+                        signal(reload_material_request);
                       }
                   });
 

@@ -99,8 +99,10 @@ export namespace atlas {
             m_bus->create_listener<atlas::event::collision_persisted>();
             m_bus->create_listener<atlas::event::collision_exit>();
             m_bus->create_immediate_listener<atlas::event::mesh_reload>();
+            m_bus->create_immediate_listener<atlas::event::material_reload>();
 
             m_bus->trigger<event::mesh_reload>(this, &application::reload_mesh);
+            m_bus->trigger<event::material_reload>(this, &application::reload_material);
         }
 
         ~application() { m_window->close(); }
@@ -232,7 +234,9 @@ export namespace atlas {
                           return;
                       }
 
-                      m_proj_view = p_pair->projection * p_pair->view;
+                    //   m_proj_view = p_pair->projection * p_pair->view;
+                    m_projection = p_pair->projection;
+                    m_view = p_pair->view;
                   });
 
                 // invalidate imgui context
@@ -267,7 +271,8 @@ export namespace atlas {
                   m_window->current_swapchain().settings(),
                   m_ui_context.viewport_renderpass(),
                   viewport_framebuffer,
-                  m_proj_view,
+                  m_projection,
+                  m_view,
                   m_current_frame_index);
 
                 m_renderer->end_frame();
@@ -341,9 +346,12 @@ export namespace atlas {
         void current_world(ref<world> p_world) { m_current_world = p_world; }
 
 
-        void reload_mesh(event::mesh_reload& p_reload_request) {
+        void reload_mesh(event::mesh_reload&) {
             console_log_info("application::trigger<UEvent> invoked from core/application!");
-            m_renderer->invalidate_mesh(p_reload_request.entity_id, p_reload_request.filename);
+        }
+
+        void reload_material(event::material_reload&) {
+            console_log_info("application::trigger<material> invoked from core/application!");
         }
 
     protected:
@@ -357,7 +365,8 @@ export namespace atlas {
         ref<window> m_window;
         window_params m_initial_window_params;
         ref<renderer_system> m_renderer = nullptr;
-        glm::mat4 m_proj_view;
+        glm::mat4 m_projection;
+        glm::mat4 m_view;
         uint32_t m_current_frame_index = -1;
         vulkan::imgui_context m_ui_context;
         event::bus* m_bus=nullptr;

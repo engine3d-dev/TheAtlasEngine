@@ -56,13 +56,15 @@ export namespace atlas {
                          const window_params& p_params,
                          const vk::renderpass& p_renderpass,
                          const VkFramebuffer& p_framebuffer,
-                         const glm::mat4& p_proj_view,
+                        const glm::mat4& p_projection,
+                        const glm::mat4& p_view,
                          uint32_t p_current_frame) {
             return start_frame(p_current,
                                p_params,
                                p_renderpass,
                                p_framebuffer,
-                               p_proj_view,
+                               p_projection,
+                               p_view,
                                p_current_frame);
         }
 
@@ -95,7 +97,8 @@ export namespace atlas {
                                  const window_params& p_params,
                                  const vk::renderpass& p_renderpass,
                                  const VkFramebuffer& p_framebuffer,
-                                 const glm::mat4& p_proj_view,
+                                const glm::mat4& p_projection,
+                                const glm::mat4& p_view,
                                  uint32_t p_current_frame) = 0;
         virtual void post_frame() = 0;
 
