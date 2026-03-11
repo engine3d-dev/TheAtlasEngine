@@ -269,12 +269,12 @@ export namespace atlas::vulkan {
             m_final_renderpass = p_renderpass;
 
             std::vector<std::string> faces = {
-                "assets/skybox/right.jpg",
-                "assets/skybox/left.jpg",
-                "assets/skybox/top.jpg",
-                "assets/skybox/bottom.jpg",
-                "assets/skybox/front.jpg",
-                "assets/skybox/back.jpg"
+                "assets/skybox/light_sky/right.png",
+                "assets/skybox/light_sky/left.png",
+                "assets/skybox/light_sky/top.png",
+                "assets/skybox/light_sky/bottom.png",
+                "assets/skybox/light_sky/front.png",
+                "assets/skybox/light_sky/back.png"
             };
             m_skybox = environment_map(m_device, faces, m_physical.memory_properties(), m_final_renderpass);
 
