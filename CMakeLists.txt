@@ -184,7 +184,9 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas/drivers/vulkan/render_system.cppm
     atlas/drivers/vulkan/uniforms.cppm
 
+    # imgui/UI
     atlas/drivers/vulkan/imgui_context.cppm
+    atlas/core/ui/imgui_stdlib.cppm
 
     # physics
     atlas/drivers/physics_context.cppm
