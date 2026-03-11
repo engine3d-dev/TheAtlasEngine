@@ -51,7 +51,7 @@ else()
 endif()
 
 add_library(${PROJECT_NAME} STATIC)
-# add_subdirectory(editor)
+add_subdirectory(editor)
 
 if(${ENABLE_TESTS_ONLY})
     build_unit_test(
@@ -162,6 +162,7 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas/core/editor/dockspace.cppm
     atlas/core/editor/menu_item.cppm
     atlas/core/ui/widgets.cppm
+    atlas/core/ui/imgui_stdlib.cppm
     atlas/core/filesystem/file_dialog.cppm
 
     # serialize
@@ -206,6 +207,7 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas/drivers/vulkan/physical_device.cppm
     atlas/drivers/vulkan/device.cppm
     atlas/drivers/vulkan/swapchain.cppm
+    atlas/drivers/vulkan/environment_map.cppm
 )
 
 target_sources(${PROJECT_NAME} PUBLIC
