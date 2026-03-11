@@ -65,6 +65,13 @@ ui_component_list(flecs::entity& p_selected_entity) {
             }
         }
 
+        if (!p_selected_entity.has<atlas::material_metadata>()) {
+            if (ImGui::MenuItem("Material")) {
+                p_selected_entity.add<atlas::material_metadata>();
+                ImGui::CloseCurrentPopup();
+            }
+        }
+
         if (!p_selected_entity.has<atlas::point_light>()) {
             if (ImGui::MenuItem("Point Light")) {
                 p_selected_entity.add<atlas::point_light>();
@@ -113,6 +120,63 @@ ui_component_list(flecs::entity& p_selected_entity) {
 }
 
 enum scene_runtime { edit, play };
+
+
+namespace ui::experimental {
+    class icon {
+    public:
+        icon() = default;
+        icon(const std::filesystem::path& p_filename) {
+            vk::texture_info config_texture = {
+                .phsyical_memory_properties = atlas::vulkan::instance_context::physical_driver().memory_properties(),
+                .filepath = p_filename
+            };
+            m_icon_image = vk::texture(atlas::vulkan::instance_context::logical_device(), config_texture);
+            if (!m_icon_image.loaded()) {
+                console_log_info("Play Button Could not be loaded!!");
+            }
+            m_icon_image_id = static_cast<ImTextureID>(ImGui_ImplVulkan_AddTexture(m_icon_image.image().sampler(), m_icon_image.image().image_view(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
+        
+        }
+
+        icon(const vk::image_extent& p_extent) {
+            // vk::texture_info config_texture = {
+            //     .phsyical_memory_properties = atlas::vulkan::instance_context::physical_driver().memory_properties(),
+            //     .filepath = p_filename
+            // };
+            m_icon_image = vk::texture(atlas::vulkan::instance_context::logical_device(), p_extent, atlas::vulkan::instance_context::physical_driver().memory_properties());
+            // if (!m_icon_image.loaded()) {
+            //     console_log_info("Play Button Could not be loaded!!");
+            // }
+            m_icon_image_id = static_cast<ImTextureID>(ImGui_ImplVulkan_AddTexture(m_icon_image.image().sampler(), m_icon_image.image().image_view(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
+        
+        }
+
+        ~icon() {
+            // implicitly destroy
+            // destroy();
+        }
+
+        [[nodiscard]] uint32_t width() const { return m_icon_image.width(); }
+
+        [[nodiscard]] uint32_t height() const { return m_icon_image.height(); }
+
+        [[nodiscard]] ImTextureID texture_id() const { return m_icon_image_id; }
+
+        void destroy() {
+            m_icon_image.destroy();
+        }
+
+    private:
+        vk::texture m_icon_image;
+        ImTextureID m_icon_image_id;
+    };
+};
+
+struct material {
+    ui::experimental::icon specular;
+    ui::experimental::icon diffuse;
+};
 
 export class level_scene final : public atlas::scene {
 public:
@@ -300,6 +364,10 @@ public:
         atlas::vulkan::instance_context::submit_resource_free([this]() {
             m_play_button.destroy();
             m_stop_button.destroy();
+            for(auto&[key, value] : m_material_icons) {
+                value.specular.destroy();
+                value.diffuse.destroy();
+            }
             m_content_browser.destroy();
         });
     }
@@ -563,8 +631,213 @@ public:
                 atlas::ui::draw_component<atlas::material_metadata>(
                   "material",
                   m_selected_entity,
-                  [](atlas::material_metadata* p_source) {
-                      float speed = 0.01f;
+                  [this](atlas::material_metadata* p_source) {
+                      
+                      // TODO: Change this to have the textures (for materials be in atlas::material_metadata)
+                      /*
+                      if(m_selected_entity.has<atlas::mesh_source>()) {
+                        // loading out specular resources here
+                        if(ImGui::Begin("Materials Properties")) {
+                            const auto* source = m_selected_entity.get<atlas::mesh_source>();
+                        //     auto& material_data = m_material_icons[m_selected_entity.id()];
+
+                        //     if(ImGui::Begin("Specular")) {
+                        //         // ui::experimental::icon specular;
+                        //         if(!std::filesystem::exists(source->specular)) {
+                        //             console_log_info("Loading white texture as ui::experimental::icon!");
+                        //             // m_material_icons[m_selected_entity.id()] = ui::experimental::icon({ .width = 1, .height = 1});
+                        //             // m_material_icons.emplace(m_selected_entity.id(), vk::image_extent(1, 1));
+                        //             material_data.specular = ui::experimental::icon({.width = 1, .height = 1});
+                        //         }
+                        //         else if (!m_material_icons.contains(m_selected_entity.id())) {
+                        //             console_log_info("Loading speculra texture as ui::experimental::icon!");
+                        //             // specular = ui::experimental::icon(std::filesystem::path(source->specular));
+                        //             // m_material_icons.emplace(m_selected_entity.id(), std::filesystem::path(source->specular));
+                        //             material_data.specular = ui::experimental::icon(std::filesystem::path(source->specular));
+                        //         }
+                        //         // ImGui::Text("pointer = %x", specular.texture_id());
+                        //         const auto specular_icon = m_material_icons[m_selected_entity.id()].specular;
+                        //         ImGui::Text("size = %d x %d", specular_icon.width(), specular_icon.height());
+                        //         ImGui::Image(specular_icon.texture_id(), ImVec2(specular_icon.width(), specular_icon.height()));
+
+
+                        //         ImGui::End();
+                        //     }
+
+                        //     if(ImGui::Begin("Diffuse")) {
+                        //         if(!std::filesystem::exists(source->diffuse)) {
+                        //             console_log_info("Loading white texture as ui::experimental::icon!");
+                        //             // m_material_icons[m_selected_entity.id()] = ui::experimental::icon({ .width = 1, .height = 1});
+                        //             // m_material_icons.emplace(m_selected_entity.id(), vk::image_extent(1, 1), vk::image_extent(1, 1));
+                        //             material_data.diffuse = ui::experimental::icon({.width = 1, .height = 1});
+                        //         }
+                        //         else if (m_material_icons.contains(m_selected_entity.id())) {
+                        //             console_log_info("Loading speculra texture as ui::experimental::icon!");
+                        //             // specular = ui::experimental::icon(std::filesystem::path(source->specular));
+                        //             // m_material_icons.emplace(m_selected_entity.id(), std::filesystem::path(source->specular), std::filesystem::path(source->diffuse));
+                        //             material_data.specular = ui::experimental::icon(std::filesystem::path(source->diffuse));
+                        //         }
+                        //         // ImGui::Text("pointer = %x", specular.texture_id());
+                        //         const auto diffuse_icon = m_material_icons[m_selected_entity.id()].diffuse;
+                        //         ImGui::Text("size = %d x %d", diffuse_icon.width(), diffuse_icon.height());
+                        //         ImGui::Image(diffuse_icon.texture_id(), ImVec2(diffuse_icon.width(), diffuse_icon.height()));
+
+
+                        //         ImGui::End();
+                        //     }
+                        //     ImGui::End();
+                            const auto entity_id = m_selected_entity.id();
+                            if (!m_material_icons.contains(entity_id)) {
+                                m_material_icons[entity_id] = material{}; 
+                            }
+                            auto& material_data = m_material_icons[entity_id];
+
+                            // --- SPECULAR SECTION ---
+                            if (ImGui::Begin("Specular")) {
+                                // Lazy Load Specular if not yet initialized
+                                if (material_data.specular.texture_id() == nullptr) {
+                                    if (!std::filesystem::exists(source->specular)) {
+                                        // console_log_info("Specular file missing, loading white texture.");
+                                        material_data.specular = ui::experimental::icon(vk::image_extent(1, 1));
+                                    } else {
+                                        // console_log_info("Loading specular texture: {}", source->specular);
+                                        material_data.specular = ui::experimental::icon(std::filesystem::path(source->specular));
+                                    }
+                                }
+
+                                // Render
+                                ImGui::Text("Size: %d x %d", material_data.specular.width(), material_data.specular.height());
+                                ImGui::Image(material_data.specular.texture_id(), ImVec2(128, 128)); // Fixed display size or use .width()
+                                ImGui::End();
+                            }
+
+                            // --- DIFFUSE SECTION ---
+                            if (ImGui::Begin("Diffuse")) {
+                                // Lazy Load Diffuse if not yet initialized
+                                if (material_data.diffuse.texture_id() == nullptr) {
+                                    if (!std::filesystem::exists(source->diffuse)) {
+                                        // console_log_info("Diffuse file missing, loading white texture.");
+                                        material_data.diffuse = ui::experimental::icon(vk::image_extent(1, 1));
+                                    } else {
+                                        // console_log_info("Loading diffuse texture: {}", source->diffuse);
+                                        material_data.diffuse = ui::experimental::icon(std::filesystem::path(source->diffuse));
+                                    }
+                                }
+
+                                // Render
+                                ImGui::Text("Size: %d x %d", material_data.diffuse.width(), material_data.diffuse.height());
+                                ImGui::Image(material_data.diffuse.texture_id(), ImVec2(128, 128));
+                                ImGui::End();
+                            }
+                        }
+                      }
+                      else {
+                        // If the material icon exists within the registry
+                        // Make sure to delete this
+                        if(m_material_icons.contains(m_selected_entity.id())) {
+                            // Should implictly invoke .destroy function
+                            m_material_icons[m_selected_entity.id()].specular.destroy();
+                            m_material_icons[m_selected_entity.id()].diffuse.destroy();
+                            m_material_icons.erase(m_selected_entity.id());
+                        }
+                      }
+                    */
+                      
+                    
+                    if(m_selected_entity.has<atlas::mesh_source>()) {
+                        // 1. Get references
+                        const auto entity_id = m_selected_entity.id();
+                        const auto* source = m_selected_entity.get<atlas::mesh_source>();
+
+                        // 2. Ensure the entry exists in the map so we don't crash on first access
+                        if (!m_material_icons.contains(entity_id)) {
+                            m_material_icons[entity_id] = material{}; 
+                        }
+                        auto& material_data = m_material_icons[entity_id];
+
+                        // // --- SPECULAR SECTION ---
+                        // if (ImGui::Begin("Specular")) {
+                        //     // Lazy Load Specular if not yet initialized
+                        //     if (material_data.specular.texture_id() == nullptr) {
+                        //         if (!std::filesystem::exists(source->specular)) {
+                        //             console_log_info("Specular file missing, loading white texture.");
+                        //             material_data.specular = ui::experimental::icon(vk::image_extent(1, 1));
+                        //         } else {
+                        //             console_log_info("Loading specular texture: %s", source->specular.c_str());
+                        //             material_data.specular = ui::experimental::icon(std::filesystem::path(source->specular));
+                        //         }
+                        //     }
+
+                        //     // Render
+                        //     ImGui::Text("Size: %d x %d", material_data.specular.width(), material_data.specular.height());
+                        //     ImGui::Image(material_data.specular.texture_id(), ImVec2(128, 128)); // Fixed display size or use .width()
+                        //     ImGui::End();
+                        // }
+
+                        // // --- DIFFUSE SECTION ---
+                        // if (ImGui::Begin("Diffuse")) {
+                        //     // Lazy Load Diffuse if not yet initialized
+                        //     if (material_data.diffuse.texture_id() == nullptr) {
+                        //         if (!std::filesystem::exists(source->diffuse)) {
+                        //             console_log_info("Diffuse file missing, loading white texture.");
+                        //             material_data.diffuse = ui::experimental::icon(vk::image_extent(1, 1));
+                        //         } else {
+                        //             console_log_info("Loading diffuse texture: %s", source->diffuse.c_str());
+                        //             material_data.diffuse = ui::experimental::icon(std::filesystem::path(source->diffuse));
+                        //         }
+                        //     }
+
+                        //     // Render
+                        //     ImGui::Text("Size: %d x %d", material_data.diffuse.width(), material_data.diffuse.height());
+                        //     ImGui::Image(material_data.diffuse.texture_id(), ImVec2(128, 128));
+                        //     ImGui::End();
+                        // }
+                        if (ImGui::Begin("Material Editor")) {
+    
+                        // BeginChild arguments: (const char* str_id, ImVec2 size, bool border)
+                        if (ImGui::BeginChild("SpecularSlot", ImVec2(150, 200), true)) {
+                            ImGui::Text("Specular");
+                            ImGui::Separator();
+
+                            if (material_data.specular.texture_id() == nullptr) {
+                                if (!std::filesystem::exists(source->specular)) {
+                                    material_data.specular = ui::experimental::icon(vk::image_extent(1, 1));
+                                } else {
+                                    material_data.specular = ui::experimental::icon(std::filesystem::path(source->specular));
+                                }
+                            }
+
+                            ImGui::Image(material_data.specular.texture_id(), ImVec2(128, 128));
+                            ImGui::Text("%dx%d", material_data.specular.width(), material_data.specular.height());
+                            
+                            ImGui::EndChild();
+                        }
+
+                        // ImGui::SameLine(); // Put the next child to the right of the previous one
+                        ImGui::Spacing(); // Add a little breathing room between slots
+                        if (ImGui::BeginChild("Diffuse", ImVec2(150, 200), true)) {
+                            ImGui::Text("Diffuse");
+                            ImGui::Separator();
+
+                            if (material_data.diffuse.texture_id() == nullptr) {
+                                if (!std::filesystem::exists(source->diffuse)) {
+                                    material_data.diffuse = ui::experimental::icon(vk::image_extent(1, 1));
+                                } else {
+                                    material_data.diffuse = ui::experimental::icon(std::filesystem::path(source->diffuse));
+                                }
+                            }
+
+                            ImGui::Image(material_data.diffuse.texture_id(), ImVec2(128, 128));
+                            ImGui::Text("%dx%d", material_data.diffuse.width(), material_data.diffuse.height());
+
+                            ImGui::EndChild();
+                        }
+
+                        ImGui::End(); // End Main Parent Panel
+                    }
+                    }
+
+                    float speed = 0.01f;
                       ImGui::DragFloat4(
                         "Ambient", glm::value_ptr(p_source->ambient), speed);
                       ImGui::DragFloat4(
@@ -869,6 +1142,8 @@ private:
     ImTextureID m_stop_button_id;
 
     content_browser_panel m_content_browser;
+
+    std::unordered_map<uint64_t, material> m_material_icons;
 
     // Note -- Added this temporarily
     // ImFont* m_font;

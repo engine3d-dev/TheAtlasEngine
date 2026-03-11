@@ -271,6 +271,16 @@ namespace atlas {
                 VkRenderPass p_renderpass)
         : m_device(p_device) {
 
+            create_skybox(p_faces, p_memory_properties);
+
+            create_skybox_pipeline(p_memory_properties, p_renderpass);
+        }
+
+        // ~environment_map() {
+        //     destroy();
+        // }
+
+        void create_skybox(std::span<const std::string> p_faces, VkPhysicalDeviceMemoryProperties p_memory_properties) {
             if (p_faces.size() != 6) {
                 std::println("Cubemap requires 6 faces, got {}", p_faces.size());
                 return;
@@ -583,14 +593,7 @@ namespace atlas {
 
             vkDestroyBuffer(m_device, staging_buffer, nullptr);
             vkFreeMemory(m_device, staging_memory, nullptr);
-
-
-            create_skybox_pipeline(p_memory_properties, p_renderpass);
         }
-
-        // ~environment_map() {
-        //     destroy();
-        // }
 
 
         void create_buffers() {
