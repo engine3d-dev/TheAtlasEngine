@@ -276,6 +276,12 @@ namespace atlas {
             create_skybox_pipeline(p_memory_properties, p_renderpass);
         }
 
+        environment_map(const VkDevice& p_device, const std::filesystem::path& p_filename, VkPhysicalDeviceMemoryProperties p_memory_properties, VkRenderPass p_renderpass) : m_device(p_device) {
+            create_hdr_skybox(p_filename, p_memory_properties);
+
+            create_skybox_pipeline(p_memory_properties, p_renderpass);
+        }
+
         // ~environment_map() {
         //     destroy();
         // }
@@ -285,6 +291,8 @@ namespace atlas {
                 std::println("Cubemap requires 6 faces, got {}", p_faces.size());
                 return;
             }
+
+            stbi_set_flip_vertically_on_load(true);
 
             int w = 0;
             int h = 0;
@@ -385,20 +393,14 @@ namespace atlas {
                 .pNext = nullptr,
                 .flags = 0,
                 .image = m_skybox_image,
-                .viewType = VK_IMAGE_VIEW_TYPE_CUBE,
-                .format = texture_format,
-                .components = {
-                    .r = VK_COMPONENT_SWIZZLE_IDENTITY,
-                    .g = VK_COMPONENT_SWIZZLE_IDENTITY,
-                    .b = VK_COMPONENT_SWIZZLE_IDENTITY,
-                    .a = VK_COMPONENT_SWIZZLE_IDENTITY,
-                },
+                .viewType = VK_IMAGE_VIEW_TYPE_2D, // Use 2D for Equirectangular HDR
+                .format = VK_FORMAT_R32G32B32A32_SFLOAT, // Must match the Image format!
                 .subresourceRange = {
                     .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
                     .baseMipLevel = 0,
                     .levelCount = 1,
                     .baseArrayLayer = 0,
-                    .layerCount = 6u,
+                    .layerCount = 1,
                 },
             };
 
@@ -514,30 +516,8 @@ namespace atlas {
             // Some queue families report minImageTransferGranularity = (0,0,0),
             // meaning they only allow FULL image-subresource copies. Copying one
             // cubemap face (one layer) at a time can fail validation in that case.
-            //
             // We pack the 6 faces sequentially in the staging buffer, so we can
             // copy all 6 layers in one shot.
-            // VkBufferImageCopy region = {
-            //     .bufferOffset = 0,
-            //     .bufferRowLength = 0,
-            //     .bufferImageHeight = 0,
-            //     .imageSubresource =
-            //       VkImageSubresourceLayers{
-            //         .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-            //         .mipLevel = 0,
-            //         .baseArrayLayer = 0,
-            //         .layerCount = 6,
-            //     },
-            //     .imageOffset = VkOffset3D{ .x = 0, .y = 0, .z = 0 },
-            //     .imageExtent = VkExtent3D{ .width = width, .height = height, .depth = 1 },
-            // };
-
-            // vkCmdCopyBufferToImage(upload_cmd,
-            //                        staging_buffer,
-            //                        m_skybox_image,
-            //                        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-            //                        1,
-            //                        &region);
             std::array<VkBufferImageCopy, 6> regions;
             for (uint32_t face = 0; face < 6; face++) {
                 VkBufferImageCopy region = {
@@ -593,8 +573,189 @@ namespace atlas {
 
             vkDestroyBuffer(m_device, staging_buffer, nullptr);
             vkFreeMemory(m_device, staging_memory, nullptr);
+
+            stbi_set_flip_vertically_on_load(false);
         }
 
+
+        void create_hdr_skybox(const std::filesystem::path& p_filename, VkPhysicalDeviceMemoryProperties p_memory_properties) {
+            // 1. Load HDR data using stbi_loadf (float) instead of stbi_load (byte)
+            stbi_set_flip_vertically_on_load(true);
+            int w, h, channels;
+            float* pixels = stbi_loadf(p_filename.string().c_str(), &w, &h, &channels, STBI_rgb_alpha);
+            
+            if (!pixels) {
+                throw std::runtime_error("Failed to load HDR image at: " + p_filename.string());
+            }
+
+            const uint32_t width = static_cast<uint32_t>(w);
+            const uint32_t height = static_cast<uint32_t>(h);
+
+            // 2. Define HDR Format and Size
+            // 4 channels (RGBA) * 4 bytes per float = 16 bytes per pixel
+            VkFormat texture_format = VK_FORMAT_R32G32B32A32_SFLOAT;
+            const VkDeviceSize bytes_per_pixel = 16; 
+            const VkDeviceSize total_size_bytes = static_cast<VkDeviceSize>(width) * height * bytes_per_pixel;
+
+            // 3. Create Destination Image (2D for Equirectangular HDR)
+            VkImageCreateInfo image_ci = {
+                .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
+                .imageType = VK_IMAGE_TYPE_2D,
+                .format = texture_format,
+                .extent = { .width = width, .height = height, .depth = 1 },
+                .mipLevels = 1,
+                .arrayLayers = 1,
+                .samples = VK_SAMPLE_COUNT_1_BIT,
+                .tiling = VK_IMAGE_TILING_OPTIMAL,
+                .usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+                .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
+            };
+
+            vk::vk_check(vkCreateImage(m_device, &image_ci, nullptr, &m_skybox_image), "vkCreateImage");
+
+            // Allocate Image Memory
+            VkMemoryRequirements mem_reqs;
+            vkGetImageMemoryRequirements(m_device, m_skybox_image, &mem_reqs);
+
+            VkMemoryAllocateInfo mem_alloc = {
+                .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+                .allocationSize = mem_reqs.size,
+                .memoryTypeIndex = vk::select_memory_requirements(p_memory_properties, mem_reqs, vk::memory_property::device_local_bit)
+            };
+
+            vk::vk_check(vkAllocateMemory(m_device, &mem_alloc, nullptr, &m_skybox_dev_memory), "vkAllocateMemory(Image)");
+            vk::vk_check(vkBindImageMemory(m_device, m_skybox_image, m_skybox_dev_memory, 0), "vkBindImageMemory");
+            VkImageViewCreateInfo image_view_ci = {
+                .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+                .image = m_skybox_image,
+                .viewType = VK_IMAGE_VIEW_TYPE_2D, // Use 2D for Equirectangular HDR
+                .format = VK_FORMAT_R32G32B32A32_SFLOAT, // Must match the Image format!
+                .subresourceRange = {
+                    .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+                    .baseMipLevel = 0,
+                    .levelCount = 1,
+                    .baseArrayLayer = 0,
+                    .layerCount = 1,
+                },
+            };
+
+            vk::vk_check(vkCreateImageView(
+                        m_device, &image_view_ci, nullptr, &m_skybox_image_view),
+                        "vkCreateImageView");
+
+            VkSamplerCreateInfo sampler_info = {
+                .sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO,
+                .pNext = nullptr,
+                .flags = 0,
+                .magFilter = VK_FILTER_LINEAR,
+                .minFilter = VK_FILTER_LINEAR,
+                .mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR,
+                .addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+                .addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+                .addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE,
+                .mipLodBias = 0.0f,
+                .anisotropyEnable = false,
+                .maxAnisotropy = 1,
+                .compareEnable = false,
+                .compareOp = VK_COMPARE_OP_ALWAYS,
+                .minLod = 0.0f,
+                .maxLod = 0.0f,
+                .borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK,
+                .unnormalizedCoordinates = false
+            };
+
+            vk::vk_check(vkCreateSampler(m_device, &sampler_info, nullptr, &m_skybox_sampler), "vkCreateSampler");
+
+
+            // 4. Create Staging Buffer
+            VkBuffer staging_buffer;
+            VkDeviceMemory staging_memory;
+
+            VkBufferCreateInfo staging_ci = {
+                .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+                .size = total_size_bytes,
+                .usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
+            };
+
+            vk::vk_check(vkCreateBuffer(m_device, &staging_ci, nullptr, &staging_buffer), "vkCreateBuffer(Staging)");
+
+            VkMemoryRequirements staging_reqs;
+            vkGetBufferMemoryRequirements(m_device, staging_buffer, &staging_reqs);
+
+            const auto staging_flags = static_cast<vk::memory_property>(
+                vk::memory_property::host_visible_bit | vk::memory_property::host_coherent_bit);
+
+            VkMemoryAllocateInfo staging_alloc = {
+                .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+                .allocationSize = staging_reqs.size,
+                .memoryTypeIndex = vk::select_memory_requirements(p_memory_properties, staging_reqs, staging_flags)
+            };
+
+            vk::vk_check(vkAllocateMemory(m_device, &staging_alloc, nullptr, &staging_memory), "vkAllocateMemory(Staging)");
+            vk::vk_check(vkBindBufferMemory(m_device, staging_buffer, staging_memory, 0), "vkBindBufferMemory");
+
+            // 5. Map and Copy Data
+            void* data = nullptr;
+            vkMapMemory(m_device, staging_memory, 0, total_size_bytes, 0, &data);
+            std::memcpy(data, pixels, static_cast<size_t>(total_size_bytes));
+            vkUnmapMemory(m_device, staging_memory);
+
+            // Free CPU pixels immediately after staging copy
+            stbi_image_free(pixels);
+
+            // 6. Record and Execute Upload
+            vk::command_params upload_params = {
+                .levels = vk::command_levels::primary,
+                .queue_index = 0, // Graphics Queue
+                .flags = vk::command_pool_flags::reset,
+            };
+            vk::command_buffer upload_cmd(m_device, upload_params);
+
+            upload_cmd.begin(vk::command_usage::one_time_submit);
+
+            // Barrier 1: UNDEFINED -> TRANSFER_DST
+            memory_barrier(upload_cmd, m_skybox_image, texture_format, 
+                        VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1);
+
+            VkBufferImageCopy region = {
+                .bufferOffset = 0,
+                .bufferRowLength = 0,
+                .bufferImageHeight = 0,
+                .imageSubresource = { .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT, .mipLevel = 0, .baseArrayLayer = 0, .layerCount = 1 },
+                .imageOffset = {0, 0, 0},
+                .imageExtent = { width, height, 1 }
+            };
+
+            vkCmdCopyBufferToImage(upload_cmd, staging_buffer, m_skybox_image, 
+                                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
+
+            // Barrier 2: TRANSFER_DST -> SHADER_READ_ONLY
+            memory_barrier(upload_cmd, m_skybox_image, texture_format, 
+                        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1);
+
+            upload_cmd.end();
+
+            // Submit to Queue
+            VkQueue graphics_queue;
+            vkGetDeviceQueue(m_device, 0, 0, &graphics_queue);
+
+            VkCommandBuffer raw_cmd = upload_cmd;
+            VkSubmitInfo submit_info = {
+                .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+                .commandBufferCount = 1,
+                .pCommandBuffers = &raw_cmd,
+            };
+
+            vkQueueSubmit(graphics_queue, 1, &submit_info, VK_NULL_HANDLE);
+            vkQueueWaitIdle(graphics_queue);
+
+            // 7. Cleanup Staging Resources
+            upload_cmd.destroy();
+            vkDestroyBuffer(m_device, staging_buffer, nullptr);
+            vkFreeMemory(m_device, staging_memory, nullptr);
+            stbi_set_flip_vertically_on_load(false);
+        }
 
         void create_buffers() {
             std::vector<float> skyboxVertices = {

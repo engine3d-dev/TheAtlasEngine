@@ -268,15 +268,16 @@ export namespace atlas::vulkan {
         void preload_assets(const vk::renderpass& p_renderpass) override {
             m_final_renderpass = p_renderpass;
 
-            std::vector<std::string> faces = {
-                "assets/skybox/light_sky/right.png",
-                "assets/skybox/light_sky/left.png",
-                "assets/skybox/light_sky/top.png",
-                "assets/skybox/light_sky/bottom.png",
-                "assets/skybox/light_sky/front.png",
-                "assets/skybox/light_sky/back.png"
-            };
-            m_skybox = environment_map(m_device, faces, m_physical.memory_properties(), m_final_renderpass);
+            // std::vector<std::string> faces = {
+            //     "assets/skybox/light_sky/right.png",
+            //     "assets/skybox/light_sky/left.png",
+            //     "assets/skybox/light_sky/top.png",
+            //     "assets/skybox/light_sky/bottom.png",
+            //     "assets/skybox/light_sky/front.png",
+            //     "assets/skybox/light_sky/back.png"
+            // };
+            // m_skybox = environment_map(m_device, faces, m_physical.memory_properties(), m_final_renderpass);
+            m_skybox = environment_map(m_device, std::filesystem::path("assets/skybox/monkstown_castle_4k.hdr"), m_physical.memory_properties(), m_final_renderpass);
 
             flecs::query<> caching =
               m_current_scene->query_builder<mesh_source>().build();
