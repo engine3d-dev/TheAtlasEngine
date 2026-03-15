@@ -66,7 +66,7 @@ These are games that have been built by me and others to showcase the capabiliti
 ## Monkey Ball
 
 ### Description
-This was the first game that we made with TheAtlasEngine when the project first started.
+This was the first game that we made with TheAtlasEngine when the project first started. This was for the SFSU Game Development Club's end of the semester showcase of Fall 2024
 
 <img width="1238" height="631" alt="Screenshot 2025-12-06 025821" src="https://github.com/user-attachments/assets/b1d78746-4f1b-41db-91ae-cb84299e1f54" />
 
