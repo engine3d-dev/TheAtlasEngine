@@ -123,6 +123,11 @@ enum scene_runtime { edit, play };
 
 
 namespace ui::experimental {
+    /**
+     * @brief This is an experimental feature for setting up an image thumbnail-like abstraction
+     * TODO: This should be considered to being abstracted in another approach as this is a temporary solution for it.
+     * OR this could be the way we handle icons for the time being for simplicity.
+    */
     class icon {
     public:
         icon() = default;
@@ -173,6 +178,8 @@ namespace ui::experimental {
     };
 };
 
+// TODO: This is just a temporary solution for loading material texture icons to ImGui::Image
+// This should be replaced with something like atlas::material_manager, eventually.
 struct material {
     ui::experimental::icon specular;
     ui::experimental::icon diffuse;
