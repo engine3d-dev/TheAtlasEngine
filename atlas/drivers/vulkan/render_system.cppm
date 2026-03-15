@@ -277,7 +277,11 @@ export namespace atlas::vulkan {
             //     "assets/skybox/light_sky/back.png"
             // };
             // m_skybox = environment_map(m_device, faces, m_physical.memory_properties(), m_final_renderpass);
-            m_skybox = environment_map(m_device, std::filesystem::path("assets/skybox/monkstown_castle_4k.hdr"), m_physical.memory_properties(), m_final_renderpass);
+            // std::string filename = "assets/skybox/rogland_clear_night_24k.hdr";
+            // std::string filename = "assets/skybox/HDR_multi_nebulae_1.hdr";
+            std::string filename = "assets/skybox/HDR_silver_and_gold_nebulae.hdr";
+            // m_skybox = environment_map(m_device, std::filesystem::path("assets/skybox/monkstown_castle_4k.hdr"), m_physical.memory_properties(), m_final_renderpass);
+            m_skybox = environment_map(m_device, std::filesystem::path(filename), m_physical.memory_properties(), m_final_renderpass);
 
             flecs::query<> caching =
               m_current_scene->query_builder<mesh_source>().build();
