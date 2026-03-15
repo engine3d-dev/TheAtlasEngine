@@ -5,7 +5,16 @@
 [![GitHub forks](https://img.shields.io/github/forks/engine3d-dev/TheAtlasEngine.svg)](https://github.com/engine3d-dev/TheAtlasEngine/network)
 [![GitHub issues](https://img.shields.io/github/issues/engine3d-dev/TheAtlasEngine.svg)](https://github.com/engine3d-dev/TheAtlasEngine/issues)
 
-An open-source 3D game engine using C++ and Vulkan with native C++20 module support.
+Open-source Vulkan 3D game engine with native C++20 modules support.
+
+Using **Conan** to manage our third party dependencies with Ninja + CMake for our build system.
+
+<img width="1505" height="902" alt="Screenshot 2026-03-15 134559" src="https://github.com/user-attachments/assets/170a9ffe-4fd7-440a-93e0-c2d3172ce928" />
+
+# Major Highlights
+* HDRI Environment Map Support
+* Native Support for C++20 Modules
+* Interactive UI Editor
 
 # Setup Development Environment
 
@@ -35,8 +44,8 @@ conan atlas build . -s build_type=Debug -o enable_tests_only=False
 
 After building TheAtlasEngine has been successful. Your executable will be executed via the following path layout.
 
-* Debug build will follow with, `./build/Debug/<exe path>`
-* Release build will follow with, `./build/Release/<exe path>`
+* Debug build will follow with, `./build/Debug/<bin>`
+* Release build will follow with, `./build/Release/<bin>`
 
 Example on Windows, you'd execute the executable in the terminal as:
 
