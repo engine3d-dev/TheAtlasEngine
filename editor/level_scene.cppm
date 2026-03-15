@@ -30,6 +30,7 @@ import atlas.core.serialize;
 import atlas.physics.engine;
 import atlas.drivers.vulkan.imgui_context;
 import atlas.drivers.vulkan.instance_context;
+import atlas.core.ui.widgets.imgui_stdlib;
 import vk;
 import content_browser;
 
@@ -60,6 +61,13 @@ ui_component_list(flecs::entity& p_selected_entity) {
         if (!p_selected_entity.has<atlas::mesh_source>()) {
             if (ImGui::MenuItem("Mesh Source")) {
                 p_selected_entity.add<atlas::mesh_source>();
+                ImGui::CloseCurrentPopup();
+            }
+        }
+
+        if (!p_selected_entity.has<atlas::material_metadata>()) {
+            if (ImGui::MenuItem("Material")) {
+                p_selected_entity.add<atlas::material_metadata>();
                 ImGui::CloseCurrentPopup();
             }
         }
@@ -112,6 +120,85 @@ ui_component_list(flecs::entity& p_selected_entity) {
 }
 
 enum scene_runtime { edit, play };
+
+namespace ui::experimental {
+    /**
+     * @brief This is an experimental feature for setting up an image
+     * thumbnail-like abstraction
+     * TODO: This should be considered to being abstracted in another approach
+     * as this is a temporary solution for it. OR this could be the way we
+     * handle icons for the time being for simplicity.
+     */
+    class icon {
+    public:
+        icon() = default;
+        icon(const std::filesystem::path& p_filename) {
+            vk::texture_info config_texture = {
+                .phsyical_memory_properties =
+                  atlas::vulkan::instance_context::physical_driver()
+                    .memory_properties(),
+                .filepath = p_filename
+            };
+            m_icon_image =
+              vk::texture(atlas::vulkan::instance_context::logical_device(),
+                          config_texture);
+            if (!m_icon_image.loaded()) {
+                console_log_info("Play Button Could not be loaded!!");
+            }
+            m_icon_image_id =
+              static_cast<ImTextureID>(ImGui_ImplVulkan_AddTexture(
+                m_icon_image.image().sampler(),
+                m_icon_image.image().image_view(),
+                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
+        }
+
+        icon(const vk::image_extent& p_extent) {
+            // vk::texture_info config_texture = {
+            //     .phsyical_memory_properties =
+            //     atlas::vulkan::instance_context::physical_driver().memory_properties(),
+            //     .filepath = p_filename
+            // };
+            m_icon_image =
+              vk::texture(atlas::vulkan::instance_context::logical_device(),
+                          p_extent,
+                          atlas::vulkan::instance_context::physical_driver()
+                            .memory_properties());
+            // if (!m_icon_image.loaded()) {
+            //     console_log_info("Play Button Could not be loaded!!");
+            // }
+            m_icon_image_id =
+              static_cast<ImTextureID>(ImGui_ImplVulkan_AddTexture(
+                m_icon_image.image().sampler(),
+                m_icon_image.image().image_view(),
+                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
+        }
+
+        ~icon() {
+            // implicitly destroy
+            // destroy();
+        }
+
+        [[nodiscard]] uint32_t width() const { return m_icon_image.width(); }
+
+        [[nodiscard]] uint32_t height() const { return m_icon_image.height(); }
+
+        [[nodiscard]] ImTextureID texture_id() const { return m_icon_image_id; }
+
+        void destroy() { m_icon_image.destroy(); }
+
+    private:
+        vk::texture m_icon_image;
+        ImTextureID m_icon_image_id;
+    };
+};
+
+// TODO: This is just a temporary solution for loading material texture icons to
+// ImGui::Image This should be replaced with something like
+// atlas::material_manager, eventually.
+struct material {
+    ui::experimental::icon specular;
+    ui::experimental::icon diffuse;
+};
 
 export class level_scene final : public atlas::scene {
 public:
@@ -257,6 +344,21 @@ public:
         atlas::register_physics(this, &level_scene::physics_update);
         atlas::register_update(this, &level_scene::on_update);
         atlas::register_ui(this, &level_scene::on_ui_update);
+
+        // Just loading a default icon that has a white texture
+        // TODO: This should be considered handled differently.
+        vk::image_extent extent = {
+            .width = 1,
+            .height = 1,
+        };
+        m_default_material_icon.specular = ui::experimental::icon(extent);
+        m_default_material_icon.diffuse = ui::experimental::icon(extent);
+
+        // TEMP: This is for testing if the triggered event only occurs once
+        // whenever a signal occurs. This should be moved to the internal
+        // application... OR the renderer
+        // trigger<atlas::event::mesh_reload>(this, &level_scene::reload_mesh);
+
         // @note checking to see what state we are in. (If playing/stopping)
         // Ref<Texture2D> icon = _sceneState == SceneState::Edit ? _iconPlay :
         // _iconStop;
@@ -294,6 +396,14 @@ public:
         atlas::vulkan::instance_context::submit_resource_free([this]() {
             m_play_button.destroy();
             m_stop_button.destroy();
+            for (auto& [key, value] : m_material_icons) {
+                value.specular.destroy();
+                value.diffuse.destroy();
+            }
+
+            m_default_material_icon.specular.destroy();
+            m_default_material_icon.diffuse.destroy();
+
             m_content_browser.destroy();
         });
     }
@@ -527,17 +637,83 @@ public:
                 atlas::ui::draw_component<atlas::mesh_source>(
                   "atlas::mesh_source",
                   m_selected_entity,
-                  [](atlas::mesh_source* p_source) {
-                      std::string mesh_src = p_source->model_path;
-                      atlas::ui::draw_input_text(p_source->model_path,
-                                                 mesh_src);
+                  [this](atlas::mesh_source* p_source) {
+                      if (ImGui::InputText(
+                            "Input Label",
+                            &p_source->model_path,
+                            ImGuiInputTextFlags_EnterReturnsTrue)) {
+                          console_log_info("mesh_src = {}",
+                                           p_source->model_path);
+                          atlas::event::mesh_reload reload_request = {
+                              .entity_id = m_selected_entity.id(),
+                              .filename = p_source->model_path,
+                          };
+
+                          if (std::filesystem::exists(p_source->model_path)) {
+                              signal(reload_request);
+                          }
+                      }
                       atlas::ui::draw_vec4("Color", p_source->color);
+
+                      if (ImGui::Button("Reload Material")) {
+                          atlas::event::material_reload
+                            reload_material_request = {
+                                .entity_id = m_selected_entity.id(),
+                                .diffuse = "assets/models/viking_room.png",
+                                .specular = "",
+                            };
+
+                          signal(reload_material_request);
+                      }
                   });
 
                 atlas::ui::draw_component<atlas::material_metadata>(
                   "material",
                   m_selected_entity,
-                  [](atlas::material_metadata* p_source) {
+                  [this](atlas::material_metadata* p_source) {
+                      // We only want to load in our material textures If
+                      // requested
+                      // TODO: Move this log outside from the add component
+                      // logic. This should be automatically done rather then
+                      // explictly requested
+                      if (!m_material_icons.contains(m_selected_entity.id())) {
+                          if (m_selected_entity.has<atlas::mesh_source>()) {
+                              material new_mat = {};
+                              const auto* src =
+                                m_selected_entity.get<atlas::mesh_source>();
+                              console_log_info("Specular Path: {}",
+                                               src->specular);
+                              if (std::filesystem::exists(src->specular)) {
+                                  new_mat.specular = ui::experimental::icon(
+                                    std::filesystem::path(src->specular));
+                              }
+                              else {
+                                  console_log_info("Specular (white) Path");
+                                  vk::image_extent extent = { .width = 1,
+                                                              .height = 1 };
+                                  new_mat.specular =
+                                    ui::experimental::icon(extent);
+                              }
+
+                              if (std::filesystem::exists(src->diffuse)) {
+                                  console_log_info("Diffuse Path: {}",
+                                                   src->diffuse);
+                                  new_mat.diffuse = ui::experimental::icon(
+                                    std::filesystem::path(src->diffuse));
+                              }
+                              else {
+                                  console_log_info("Diffuse (white) Path");
+                                  vk::image_extent extent = { .width = 1,
+                                                              .height = 1 };
+                                  new_mat.diffuse =
+                                    ui::experimental::icon(extent);
+                              }
+
+                              m_material_icons.emplace(m_selected_entity.id(),
+                                                       new_mat);
+                          }
+                      }
+
                       float speed = 0.01f;
                       ImGui::DragFloat4(
                         "Ambient", glm::value_ptr(p_source->ambient), speed);
@@ -668,6 +844,64 @@ public:
             }
 
             ImGui::End();
+
+            // Material Properties Panel
+            // TODO: Make this an abstraction to map out the materials
+            if (ImGui::Begin("Material Editor")) {
+
+                // Specular
+                if (ImGui::BeginChild("Specular", ImVec2(150, 200), true)) {
+                    if (m_material_icons.contains(m_selected_entity.id())) {
+                        ImGui::Text("Specular");
+                        ImGui::Separator();
+                        const auto specular_icon =
+                          m_material_icons[m_selected_entity.id()].specular;
+                        ImGui::Text("size = %d x %d",
+                                    specular_icon.width(),
+                                    specular_icon.height());
+                        ImGui::Image(specular_icon.texture_id(),
+                                     ImVec2(128, 128));
+                    }
+                    else {
+                        const auto specular_icon =
+                          m_default_material_icon.specular;
+                        ImGui::Text("size = %d x %d",
+                                    specular_icon.width(),
+                                    specular_icon.height());
+                        ImGui::Image(specular_icon.texture_id(),
+                                     ImVec2(128, 128));
+                    }
+                    ImGui::EndChild();
+
+                    // Diffuse
+                    ImGui::Spacing();
+                    if (ImGui::BeginChild("Diffuse", ImVec2(150, 200), true)) {
+                        ImGui::Text("Diffuse");
+                        ImGui::Separator();
+                        if (m_material_icons.contains(m_selected_entity.id())) {
+                            const auto diffuse_icon =
+                              m_material_icons[m_selected_entity.id()].diffuse;
+                            ImGui::Text("size = %d x %d",
+                                        diffuse_icon.width(),
+                                        diffuse_icon.height());
+                            ImGui::Image(diffuse_icon.texture_id(),
+                                         ImVec2(128, 128));
+                        }
+                        else {
+                            const auto diffuse_icon =
+                              m_default_material_icon.diffuse;
+                            ImGui::Text("size = %d x %d",
+                                        diffuse_icon.width(),
+                                        diffuse_icon.height());
+                            ImGui::Image(diffuse_icon.texture_id(),
+                                         ImVec2(128, 128));
+                        }
+                        ImGui::EndChild();
+                    }
+                }
+
+                ImGui::End();
+            }
 
             // Note --- just added this temporarily for testing
             // auto time = atlas::application::delta_time();
@@ -834,6 +1068,8 @@ private:
 
     atlas::ui::dockspace m_editor_dockspace;
     atlas::ui::menu_item m_editor_menu;
+    // ui::experimental::icon m_default_icon;
+    material m_default_material_icon;
 
     scene_runtime m_scene_state = scene_runtime::edit;
     vk::texture m_play_button;
@@ -842,6 +1078,8 @@ private:
     ImTextureID m_stop_button_id;
 
     content_browser_panel m_content_browser;
+
+    std::unordered_map<uint64_t, material> m_material_icons;
 
     // Note -- Added this temporarily
     // ImFont* m_font;

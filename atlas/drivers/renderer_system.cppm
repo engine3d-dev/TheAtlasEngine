@@ -3,6 +3,7 @@ module;
 #include <vulkan/vulkan.h>
 #include <array>
 #include <glm/glm.hpp>
+#include <filesystem>
 
 export module atlas.drivers.renderer_system;
 
@@ -55,13 +56,15 @@ export namespace atlas {
                          const window_params& p_params,
                          const vk::renderpass& p_renderpass,
                          const VkFramebuffer& p_framebuffer,
-                         const glm::mat4& p_proj_view,
+                         const glm::mat4& p_projection,
+                         const glm::mat4& p_view,
                          uint32_t p_current_frame) {
             return start_frame(p_current,
                                p_params,
                                p_renderpass,
                                p_framebuffer,
-                               p_proj_view,
+                               p_projection,
+                               p_view,
                                p_current_frame);
         }
 
@@ -83,6 +86,11 @@ export namespace atlas {
             return current_scene(std::move(p_scene));
         }
 
+        void invalidate_mesh(uint32_t p_entity_id,
+                             std::filesystem::path p_filename) {
+            return render_invalidate_mesh(p_entity_id, p_filename);
+        }
+
     private:
         virtual void preload_assets(const vk::renderpass& p_renderpass) = 0;
 
@@ -90,12 +98,17 @@ export namespace atlas {
                                  const window_params& p_params,
                                  const vk::renderpass& p_renderpass,
                                  const VkFramebuffer& p_framebuffer,
-                                 const glm::mat4& p_proj_view,
+                                 const glm::mat4& p_projection,
+                                 const glm::mat4& p_view,
                                  uint32_t p_current_frame) = 0;
         virtual void post_frame() = 0;
 
         virtual void background_color(const glm::vec4& p_color) = 0;
 
         virtual void current_scene(ref<scene>) = 0;
+
+        virtual void render_invalidate_mesh(
+          uint32_t p_entity_id,
+          std::filesystem::path p_filename) = 0;
     };
 };

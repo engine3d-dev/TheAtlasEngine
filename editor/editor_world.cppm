@@ -21,11 +21,7 @@ public:
     editor_world(const std::string& p_tag,
                  atlas::event::bus& p_bus,
                  atlas::level_streamer& p_level_streamer)
-      : atlas::world(p_tag, p_level_streamer)
-      , m_bus(&p_bus) {
-        m_bus->create_listener<atlas::event::collision_enter>();
-        m_bus->create_listener<atlas::event::collision_persisted>();
-        m_bus->create_listener<atlas::event::collision_exit>();
+      : atlas::world(p_tag, p_level_streamer) {
 
         // Create defualt scene to level streamer
         // Does polymorphic allocations for these customized scenes
@@ -41,5 +37,4 @@ public:
     ~editor_world() override = default;
 
 private:
-    atlas::event::bus* m_bus = nullptr;
 };

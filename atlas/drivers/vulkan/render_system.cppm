@@ -28,6 +28,7 @@ import atlas.core.scene;
 import atlas.drivers.vulkan.uniforms;
 import atlas.drivers.vulkan.mesh;
 import atlas.core.scene.components;
+import atlas.drivers.vulkan.environment_map;
 
 export namespace atlas::vulkan {
     /**
@@ -252,6 +253,8 @@ export namespace atlas::vulkan {
                         descriptor.destroy();
                     }
                 }
+
+                m_skybox.destroy();
                 m_main_pipeline.destroy();
             });
 
@@ -264,6 +267,28 @@ export namespace atlas::vulkan {
     private:
         void preload_assets(const vk::renderpass& p_renderpass) override {
             m_final_renderpass = p_renderpass;
+
+            // std::vector<std::string> faces = {
+            //     "assets/skybox/light_sky/right.png",
+            //     "assets/skybox/light_sky/left.png",
+            //     "assets/skybox/light_sky/top.png",
+            //     "assets/skybox/light_sky/bottom.png",
+            //     "assets/skybox/light_sky/front.png",
+            //     "assets/skybox/light_sky/back.png"
+            // };
+            // m_skybox = environment_map(m_device, faces,
+            // m_physical.memory_properties(), m_final_renderpass); std::string
+            // filename = "assets/skybox/rogland_clear_night_24k.hdr";
+            // std::string filename = "assets/skybox/HDR_multi_nebulae_1.hdr";
+            std::string filename =
+              "assets/skybox/HDR_silver_and_gold_nebulae.hdr";
+            // m_skybox = environment_map(m_device,
+            // std::filesystem::path("assets/skybox/monkstown_castle_4k.hdr"),
+            // m_physical.memory_properties(), m_final_renderpass);
+            m_skybox = environment_map(m_device,
+                                       std::filesystem::path(filename),
+                                       m_physical.memory_properties(),
+                                       m_final_renderpass);
 
             flecs::query<> caching =
               m_current_scene->query_builder<mesh_source>().build();
@@ -473,10 +498,12 @@ export namespace atlas::vulkan {
                          const window_params& p_settings,
                          const vk::renderpass& p_renderpass,
                          const VkFramebuffer& p_framebuffer,
-                         const glm::mat4& p_proj_view,
+                         const glm::mat4& p_projection,
+                         const glm::mat4& p_view,
                          uint32_t p_current_frame) override {
-            m_proj_view = p_proj_view;
-            // m_current_frame = application::current_frame();
+            m_proj_view = p_projection * p_view;
+            m_skybox_proj_view = p_projection * glm::mat4(glm::mat3(p_view));
+
             m_current_frame = p_current_frame;
             m_final_renderpass = p_renderpass;
 
@@ -550,6 +577,12 @@ export namespace atlas::vulkan {
             // std::span<uint8_t> bytes_data = to_bytes(global_frame_ubo);
             // m_global_uniforms.update(bytes_data.data());
             m_global_uniforms.update(&global_frame_ubo);
+
+            skybox_uniform skybox_ubo = {
+                .proj_view = m_skybox_proj_view,
+            };
+
+            m_skybox.update_uniform(skybox_ubo);
 
             // query all entities that have a point light
             flecs::query<point_light> query_point_lights =
@@ -626,6 +659,9 @@ export namespace atlas::vulkan {
                 }
             });
 
+            m_skybox.bind(m_current_command_buffer);
+            m_skybox.draw(m_current_command_buffer);
+
             vkCmdEndRenderPass(m_current_command_buffer);
             // Do not end the command buffer here when using offscreen +
             // swapchain two-pass: the application will begin the swapchain
@@ -637,10 +673,16 @@ export namespace atlas::vulkan {
             m_current_scene = p_scene_ctx;
         }
 
+        void render_invalidate_mesh(uint32_t p_entity_id,
+                                    std::filesystem::path p_filename) override {
+            m_cached_meshes[p_entity_id].reload_mesh(p_filename);
+        }
+
     private:
         VkDevice m_device = nullptr;
         physical_device m_physical;
         glm::mat4 m_proj_view;
+        glm::mat4 m_skybox_proj_view;
         vk::renderpass m_final_renderpass;
         window_params m_window_extent;
         vk::command_buffer m_current_command_buffer{};
@@ -666,6 +708,8 @@ export namespace atlas::vulkan {
         glm::mat4 m_model = { 1.f };
 
         vk::texture m_white_texture;
+
+        environment_map m_skybox;
 
         ref<scene> m_current_scene;
     };
