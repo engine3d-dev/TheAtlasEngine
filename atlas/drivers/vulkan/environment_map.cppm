@@ -271,7 +271,7 @@ namespace atlas {
                 VkRenderPass p_renderpass)
         : m_device(p_device) {
 
-            create_skybox(p_faces, p_memory_properties);
+            // create_skybox(p_faces, p_memory_properties);
 
             create_skybox_pipeline(p_memory_properties, p_renderpass);
         }
@@ -285,7 +285,7 @@ namespace atlas {
         // ~environment_map() {
         //     destroy();
         // }
-
+        /*
         void create_skybox(std::span<const std::string> p_faces, VkPhysicalDeviceMemoryProperties p_memory_properties) {
             if (p_faces.size() != 6) {
                 std::println("Cubemap requires 6 faces, got {}", p_faces.size());
@@ -551,7 +551,7 @@ namespace atlas {
             upload_cmd.end();
 
             VkQueue graphics_queue = nullptr;
-            vkGetDeviceQueue(m_device, /*queueFamilyIndex*/ 0, /*queueIndex*/ 0, &graphics_queue);
+            vkGetDeviceQueue(m_device, 0, 0, &graphics_queue);
             const VkCommandBuffer cmd = upload_cmd;
             VkSubmitInfo submit = {
                 .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
@@ -576,7 +576,7 @@ namespace atlas {
 
             stbi_set_flip_vertically_on_load(false);
         }
-
+        */
 
         void create_hdr_skybox(const std::filesystem::path& p_filename, VkPhysicalDeviceMemoryProperties p_memory_properties) {
             // 1. Load HDR data using stbi_loadf (float) instead of stbi_load (byte)
@@ -594,10 +594,12 @@ namespace atlas {
             // 2. Define HDR Format and Size
             // 4 channels (RGBA) * 4 bytes per float = 16 bytes per pixel
             VkFormat texture_format = VK_FORMAT_R32G32B32A32_SFLOAT;
-            const VkDeviceSize bytes_per_pixel = 16; 
-            const VkDeviceSize total_size_bytes = static_cast<VkDeviceSize>(width) * height * bytes_per_pixel;
+            const uint64_t bytes_per_pixel = 16; 
+            const uint64_t total_size_bytes = static_cast<uint64_t>(width) * height * bytes_per_pixel;
+            const uint64_t image_size = total_size_bytes;
 
             // 3. Create Destination Image (2D for Equirectangular HDR)
+            /*
             VkImageCreateInfo image_ci = {
                 .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
                 .imageType = VK_IMAGE_TYPE_2D,
@@ -683,8 +685,7 @@ namespace atlas {
             VkMemoryRequirements staging_reqs;
             vkGetBufferMemoryRequirements(m_device, staging_buffer, &staging_reqs);
 
-            const auto staging_flags = static_cast<vk::memory_property>(
-                vk::memory_property::host_visible_bit | vk::memory_property::host_coherent_bit);
+            const auto staging_flags = static_cast<vk::memory_property>(vk::memory_property::host_visible_bit | vk::memory_property::host_coherent_bit);
 
             VkMemoryAllocateInfo staging_alloc = {
                 .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
@@ -694,12 +695,37 @@ namespace atlas {
 
             vk::vk_check(vkAllocateMemory(m_device, &staging_alloc, nullptr, &staging_memory), "vkAllocateMemory(Staging)");
             vk::vk_check(vkBindBufferMemory(m_device, staging_buffer, staging_memory, 0), "vkBindBufferMemory");
+            */
+
+            // Creating staging buffer
+            uint32_t property_flag = vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit;
+            vk::buffer_parameters staging_buffer_params = {
+                .device_size = static_cast<uint32_t>(image_size),
+                .physical_memory_properties = p_memory_properties,
+                .property_flags = static_cast<vk::memory_property>(property_flag),
+                .usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+            };
+
+            vk::buffer_stream staging_buffer = vk::buffer_stream(m_device, staging_buffer_params);
+
+            // Creating HDR image opaque handle
+            vk::image_params skybox_image_params = {
+                .extent = { .width = width, .height = height },
+                .format = texture_format,
+                .property = vk::memory_property::device_local_bit,
+                .aspect = vk::image_aspect_flags::color_bit,
+                .usage = vk::image_usage::transfer_dst_bit | vk::image_usage::sampled_bit,
+                .phsyical_memory_properties = p_memory_properties,
+            };
+            m_skybox_image = vk::sample_image(m_device, skybox_image_params);
 
             // 5. Map and Copy Data
-            void* data = nullptr;
-            vkMapMemory(m_device, staging_memory, 0, total_size_bytes, 0, &data);
-            std::memcpy(data, pixels, static_cast<size_t>(total_size_bytes));
-            vkUnmapMemory(m_device, staging_memory);
+            // void* data = nullptr;
+            // vkMapMemory(m_device, staging_memory, 0, total_size_bytes, 0, &data);
+            // std::memcpy(data, pixels, static_cast<size_t>(total_size_bytes));
+            // vkUnmapMemory(m_device, staging_memory);
+            std::span<const uint8_t> pixels_data(reinterpret_cast<const uint8_t*>(pixels), image_size);
+            staging_buffer.write(pixels_data);
 
             // Free CPU pixels immediately after staging copy
             stbi_image_free(pixels);
@@ -715,8 +741,9 @@ namespace atlas {
             upload_cmd.begin(vk::command_usage::one_time_submit);
 
             // Barrier 1: UNDEFINED -> TRANSFER_DST
-            memory_barrier(upload_cmd, m_skybox_image, texture_format, 
-                        VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1);
+            // memory_barrier(upload_cmd, m_skybox_image, texture_format, 
+            //             VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1);
+            m_skybox_image.memory_barrier(upload_cmd, texture_format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
             VkBufferImageCopy region = {
                 .bufferOffset = 0,
@@ -731,8 +758,8 @@ namespace atlas {
                                 VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 
             // Barrier 2: TRANSFER_DST -> SHADER_READ_ONLY
-            memory_barrier(upload_cmd, m_skybox_image, texture_format, 
-                        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1);
+            // memory_barrier(upload_cmd, m_skybox_image, texture_format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1);
+            m_skybox_image.memory_barrier(upload_cmd, texture_format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
             upload_cmd.end();
 
@@ -752,8 +779,9 @@ namespace atlas {
 
             // 7. Cleanup Staging Resources
             upload_cmd.destroy();
-            vkDestroyBuffer(m_device, staging_buffer, nullptr);
-            vkFreeMemory(m_device, staging_memory, nullptr);
+            // vkDestroyBuffer(m_device, staging_buffer, nullptr);
+            // vkFreeMemory(m_device, staging_memory, nullptr);
+            staging_buffer.destroy();
             stbi_set_flip_vertically_on_load(false);
         }
 
@@ -989,8 +1017,8 @@ namespace atlas {
 
             const std::array<vk::write_image, 1> image_writes = {
                 vk::write_image{
-                .sampler = m_skybox_sampler,
-                .view = m_skybox_image_view,
+                .sampler = m_skybox_image.sampler(),
+                .view = m_skybox_image.image_view(),
                 .layout = vk::image_layout::shader_read_only_optimal,
                 },
             };
@@ -1079,6 +1107,7 @@ namespace atlas {
 
         void destroy() {
 
+            m_skybox_image.destroy();
             if (m_skybox_pipeline.alive()) {
                 m_skybox_pipeline.destroy();
             }
@@ -1087,9 +1116,10 @@ namespace atlas {
             m_skybox_shaders.destroy();
             m_skybox_vbo.destroy();
 
-            destroy_image();
+            // destroy_image();
         }
 
+        /*
         void destroy_image() {
             if (m_skybox_image_view != nullptr) {
                 vkDestroyImageView(m_device, m_skybox_image_view, nullptr);
@@ -1113,14 +1143,17 @@ namespace atlas {
                 vkFreeMemory(m_device, m_skybox_dev_memory, nullptr);
             }
         }
+            */
 
     private:
         VkDevice m_device = nullptr;
 
-        VkImage m_skybox_image = nullptr;
-        VkImageView m_skybox_image_view = nullptr;
-        VkDeviceMemory m_skybox_dev_memory = nullptr;
-        VkSampler m_skybox_sampler = nullptr;
+        // VkImage m_skybox_image = nullptr;
+        // VkImageView m_skybox_image_view = nullptr;
+        // VkDeviceMemory m_skybox_dev_memory = nullptr;
+        // VkSampler m_skybox_sampler = nullptr;
+
+        vk::sample_image m_skybox_image;
 
         vk::shader_resource m_skybox_shaders{};
         vk::uniform_buffer m_skybox_ubo{};
