@@ -323,6 +323,15 @@ public:
         atlas::register_update(this, &level_scene::on_update);
         atlas::register_ui(this, &level_scene::on_ui_update);
 
+        // Just loading a default icon that has a white texture
+        // TODO: This should be considered handled differently.
+        vk::image_extent extent = {
+            .width = 1,
+            .height = 1,
+        };
+        m_default_material_icon.specular = ui::experimental::icon(extent);
+        m_default_material_icon.diffuse = ui::experimental::icon(extent);
+
         // TEMP: This is for testing if the triggered event only occurs once whenever a signal occurs.
         // This should be moved to the internal application... OR the renderer
         // trigger<atlas::event::mesh_reload>(this, &level_scene::reload_mesh);
@@ -368,6 +377,10 @@ public:
                 value.specular.destroy();
                 value.diffuse.destroy();
             }
+
+            m_default_material_icon.specular.destroy();
+            m_default_material_icon.diffuse.destroy();
+            
             m_content_browser.destroy();
         });
     }
@@ -632,209 +645,37 @@ public:
                   "material",
                   m_selected_entity,
                   [this](atlas::material_metadata* p_source) {
-                      
-                      // TODO: Change this to have the textures (for materials be in atlas::material_metadata)
-                      /*
-                      if(m_selected_entity.has<atlas::mesh_source>()) {
-                        // loading out specular resources here
-                        if(ImGui::Begin("Materials Properties")) {
-                            const auto* source = m_selected_entity.get<atlas::mesh_source>();
-                        //     auto& material_data = m_material_icons[m_selected_entity.id()];
 
-                        //     if(ImGui::Begin("Specular")) {
-                        //         // ui::experimental::icon specular;
-                        //         if(!std::filesystem::exists(source->specular)) {
-                        //             console_log_info("Loading white texture as ui::experimental::icon!");
-                        //             // m_material_icons[m_selected_entity.id()] = ui::experimental::icon({ .width = 1, .height = 1});
-                        //             // m_material_icons.emplace(m_selected_entity.id(), vk::image_extent(1, 1));
-                        //             material_data.specular = ui::experimental::icon({.width = 1, .height = 1});
-                        //         }
-                        //         else if (!m_material_icons.contains(m_selected_entity.id())) {
-                        //             console_log_info("Loading speculra texture as ui::experimental::icon!");
-                        //             // specular = ui::experimental::icon(std::filesystem::path(source->specular));
-                        //             // m_material_icons.emplace(m_selected_entity.id(), std::filesystem::path(source->specular));
-                        //             material_data.specular = ui::experimental::icon(std::filesystem::path(source->specular));
-                        //         }
-                        //         // ImGui::Text("pointer = %x", specular.texture_id());
-                        //         const auto specular_icon = m_material_icons[m_selected_entity.id()].specular;
-                        //         ImGui::Text("size = %d x %d", specular_icon.width(), specular_icon.height());
-                        //         ImGui::Image(specular_icon.texture_id(), ImVec2(specular_icon.width(), specular_icon.height()));
-
-
-                        //         ImGui::End();
-                        //     }
-
-                        //     if(ImGui::Begin("Diffuse")) {
-                        //         if(!std::filesystem::exists(source->diffuse)) {
-                        //             console_log_info("Loading white texture as ui::experimental::icon!");
-                        //             // m_material_icons[m_selected_entity.id()] = ui::experimental::icon({ .width = 1, .height = 1});
-                        //             // m_material_icons.emplace(m_selected_entity.id(), vk::image_extent(1, 1), vk::image_extent(1, 1));
-                        //             material_data.diffuse = ui::experimental::icon({.width = 1, .height = 1});
-                        //         }
-                        //         else if (m_material_icons.contains(m_selected_entity.id())) {
-                        //             console_log_info("Loading speculra texture as ui::experimental::icon!");
-                        //             // specular = ui::experimental::icon(std::filesystem::path(source->specular));
-                        //             // m_material_icons.emplace(m_selected_entity.id(), std::filesystem::path(source->specular), std::filesystem::path(source->diffuse));
-                        //             material_data.specular = ui::experimental::icon(std::filesystem::path(source->diffuse));
-                        //         }
-                        //         // ImGui::Text("pointer = %x", specular.texture_id());
-                        //         const auto diffuse_icon = m_material_icons[m_selected_entity.id()].diffuse;
-                        //         ImGui::Text("size = %d x %d", diffuse_icon.width(), diffuse_icon.height());
-                        //         ImGui::Image(diffuse_icon.texture_id(), ImVec2(diffuse_icon.width(), diffuse_icon.height()));
-
-
-                        //         ImGui::End();
-                        //     }
-                        //     ImGui::End();
-                            const auto entity_id = m_selected_entity.id();
-                            if (!m_material_icons.contains(entity_id)) {
-                                m_material_icons[entity_id] = material{}; 
+                    // We only want to load in our material textures If requested
+                    // TODO: Move this log outside from the add component logic.
+                    // This should be automatically done rather then explictly requested
+                    if(!m_material_icons.contains(m_selected_entity.id())) {
+                        if(m_selected_entity.has<atlas::mesh_source>()) {
+                            material new_mat = {};
+                            const auto* src = m_selected_entity.get<atlas::mesh_source>();
+                            console_log_info("Specular Path: {}", src->specular);
+                            if(std::filesystem::exists(src->specular)) {
+                                new_mat.specular = ui::experimental::icon(std::filesystem::path(src->specular));
                             }
-                            auto& material_data = m_material_icons[entity_id];
-
-                            // --- SPECULAR SECTION ---
-                            if (ImGui::Begin("Specular")) {
-                                // Lazy Load Specular if not yet initialized
-                                if (material_data.specular.texture_id() == nullptr) {
-                                    if (!std::filesystem::exists(source->specular)) {
-                                        // console_log_info("Specular file missing, loading white texture.");
-                                        material_data.specular = ui::experimental::icon(vk::image_extent(1, 1));
-                                    } else {
-                                        // console_log_info("Loading specular texture: {}", source->specular);
-                                        material_data.specular = ui::experimental::icon(std::filesystem::path(source->specular));
-                                    }
-                                }
-
-                                // Render
-                                ImGui::Text("Size: %d x %d", material_data.specular.width(), material_data.specular.height());
-                                ImGui::Image(material_data.specular.texture_id(), ImVec2(128, 128)); // Fixed display size or use .width()
-                                ImGui::End();
+                            else {
+                                console_log_info("Specular (white) Path");
+                                vk::image_extent extent = { .width = 1, .height = 1};
+                                new_mat.specular = ui::experimental::icon(extent);
                             }
 
-                            // --- DIFFUSE SECTION ---
-                            if (ImGui::Begin("Diffuse")) {
-                                // Lazy Load Diffuse if not yet initialized
-                                if (material_data.diffuse.texture_id() == nullptr) {
-                                    if (!std::filesystem::exists(source->diffuse)) {
-                                        // console_log_info("Diffuse file missing, loading white texture.");
-                                        material_data.diffuse = ui::experimental::icon(vk::image_extent(1, 1));
-                                    } else {
-                                        // console_log_info("Loading diffuse texture: {}", source->diffuse);
-                                        material_data.diffuse = ui::experimental::icon(std::filesystem::path(source->diffuse));
-                                    }
-                                }
-
-                                // Render
-                                ImGui::Text("Size: %d x %d", material_data.diffuse.width(), material_data.diffuse.height());
-                                ImGui::Image(material_data.diffuse.texture_id(), ImVec2(128, 128));
-                                ImGui::End();
+                            if(std::filesystem::exists(src->diffuse)) {
+                                console_log_info("Diffuse Path: {}", src->diffuse);
+                                new_mat.diffuse = ui::experimental::icon(std::filesystem::path(src->diffuse));
                             }
-                        }
-                      }
-                      else {
-                        // If the material icon exists within the registry
-                        // Make sure to delete this
-                        if(m_material_icons.contains(m_selected_entity.id())) {
-                            // Should implictly invoke .destroy function
-                            m_material_icons[m_selected_entity.id()].specular.destroy();
-                            m_material_icons[m_selected_entity.id()].diffuse.destroy();
-                            m_material_icons.erase(m_selected_entity.id());
-                        }
-                      }
-                    */
-                      
-                    
-                    if(m_selected_entity.has<atlas::mesh_source>()) {
-                        // 1. Get references
-                        const auto entity_id = m_selected_entity.id();
-                        const auto* source = m_selected_entity.get<atlas::mesh_source>();
-
-                        // 2. Ensure the entry exists in the map so we don't crash on first access
-                        if (!m_material_icons.contains(entity_id)) {
-                            m_material_icons[entity_id] = material{}; 
-                        }
-                        auto& material_data = m_material_icons[entity_id];
-
-                        // // --- SPECULAR SECTION ---
-                        // if (ImGui::Begin("Specular")) {
-                        //     // Lazy Load Specular if not yet initialized
-                        //     if (material_data.specular.texture_id() == nullptr) {
-                        //         if (!std::filesystem::exists(source->specular)) {
-                        //             console_log_info("Specular file missing, loading white texture.");
-                        //             material_data.specular = ui::experimental::icon(vk::image_extent(1, 1));
-                        //         } else {
-                        //             console_log_info("Loading specular texture: %s", source->specular.c_str());
-                        //             material_data.specular = ui::experimental::icon(std::filesystem::path(source->specular));
-                        //         }
-                        //     }
-
-                        //     // Render
-                        //     ImGui::Text("Size: %d x %d", material_data.specular.width(), material_data.specular.height());
-                        //     ImGui::Image(material_data.specular.texture_id(), ImVec2(128, 128)); // Fixed display size or use .width()
-                        //     ImGui::End();
-                        // }
-
-                        // // --- DIFFUSE SECTION ---
-                        // if (ImGui::Begin("Diffuse")) {
-                        //     // Lazy Load Diffuse if not yet initialized
-                        //     if (material_data.diffuse.texture_id() == nullptr) {
-                        //         if (!std::filesystem::exists(source->diffuse)) {
-                        //             console_log_info("Diffuse file missing, loading white texture.");
-                        //             material_data.diffuse = ui::experimental::icon(vk::image_extent(1, 1));
-                        //         } else {
-                        //             console_log_info("Loading diffuse texture: %s", source->diffuse.c_str());
-                        //             material_data.diffuse = ui::experimental::icon(std::filesystem::path(source->diffuse));
-                        //         }
-                        //     }
-
-                        //     // Render
-                        //     ImGui::Text("Size: %d x %d", material_data.diffuse.width(), material_data.diffuse.height());
-                        //     ImGui::Image(material_data.diffuse.texture_id(), ImVec2(128, 128));
-                        //     ImGui::End();
-                        // }
-                        if (ImGui::Begin("Material Editor")) {
-    
-                        // BeginChild arguments: (const char* str_id, ImVec2 size, bool border)
-                        if (ImGui::BeginChild("SpecularSlot", ImVec2(150, 200), true)) {
-                            ImGui::Text("Specular");
-                            ImGui::Separator();
-
-                            if (material_data.specular.texture_id() == nullptr) {
-                                if (!std::filesystem::exists(source->specular)) {
-                                    material_data.specular = ui::experimental::icon(vk::image_extent(1, 1));
-                                } else {
-                                    material_data.specular = ui::experimental::icon(std::filesystem::path(source->specular));
-                                }
+                            else {
+                                console_log_info("Diffuse (white) Path");
+                                vk::image_extent extent = { .width = 1, .height = 1};
+                                new_mat.diffuse = ui::experimental::icon(extent);
                             }
 
-                            ImGui::Image(material_data.specular.texture_id(), ImVec2(128, 128));
-                            ImGui::Text("%dx%d", material_data.specular.width(), material_data.specular.height());
-                            
-                            ImGui::EndChild();
+                            m_material_icons.emplace(m_selected_entity.id(), new_mat);
                         }
 
-                        // ImGui::SameLine(); // Put the next child to the right of the previous one
-                        ImGui::Spacing(); // Add a little breathing room between slots
-                        if (ImGui::BeginChild("Diffuse", ImVec2(150, 200), true)) {
-                            ImGui::Text("Diffuse");
-                            ImGui::Separator();
-
-                            if (material_data.diffuse.texture_id() == nullptr) {
-                                if (!std::filesystem::exists(source->diffuse)) {
-                                    material_data.diffuse = ui::experimental::icon(vk::image_extent(1, 1));
-                                } else {
-                                    material_data.diffuse = ui::experimental::icon(std::filesystem::path(source->diffuse));
-                                }
-                            }
-
-                            ImGui::Image(material_data.diffuse.texture_id(), ImVec2(128, 128));
-                            ImGui::Text("%dx%d", material_data.diffuse.width(), material_data.diffuse.height());
-
-                            ImGui::EndChild();
-                        }
-
-                        ImGui::End(); // End Main Parent Panel
-                    }
                     }
 
                     float speed = 0.01f;
@@ -967,6 +808,48 @@ public:
             }
 
             ImGui::End();
+
+            // Material Properties Panel
+            // TODO: Make this an abstraction to map out the materials
+            if(ImGui::Begin("Material Editor")) {
+
+                // Specular
+                if(ImGui::BeginChild("Specular", ImVec2(150, 200), true)) {
+                    if(m_material_icons.contains(m_selected_entity.id())) {
+                        ImGui::Text("Specular");
+                        ImGui::Separator();
+                        const auto specular_icon = m_material_icons[m_selected_entity.id()].specular;
+                        ImGui::Text("size = %d x %d", specular_icon.width(), specular_icon.height());
+                        ImGui::Image(specular_icon.texture_id(), ImVec2(128, 128));
+                    }
+                    else {
+                        const auto specular_icon = m_default_material_icon.specular;
+                        ImGui::Text("size = %d x %d", specular_icon.width(), specular_icon.height());
+                        ImGui::Image(specular_icon.texture_id(), ImVec2(128, 128));
+                    }
+                    ImGui::EndChild();
+
+                    // Diffuse
+                    ImGui::Spacing();
+                    if(ImGui::BeginChild("Diffuse", ImVec2(150, 200), true)) {
+                        ImGui::Text("Diffuse");
+                        ImGui::Separator();
+                        if(m_material_icons.contains(m_selected_entity.id())) {
+                            const auto diffuse_icon = m_material_icons[m_selected_entity.id()].diffuse;
+                            ImGui::Text("size = %d x %d", diffuse_icon.width(), diffuse_icon.height());
+                            ImGui::Image(diffuse_icon.texture_id(), ImVec2(128, 128));
+                        }
+                        else {
+                            const auto diffuse_icon = m_default_material_icon.diffuse;
+                            ImGui::Text("size = %d x %d", diffuse_icon.width(), diffuse_icon.height());
+                            ImGui::Image(diffuse_icon.texture_id(), ImVec2(128, 128));
+                        }
+                        ImGui::EndChild();
+                    }
+                }
+
+                ImGui::End();
+            }
 
             // Note --- just added this temporarily for testing
             // auto time = atlas::application::delta_time();
@@ -1134,6 +1017,8 @@ private:
 
     atlas::ui::dockspace m_editor_dockspace;
     atlas::ui::menu_item m_editor_menu;
+    // ui::experimental::icon m_default_icon;
+    material m_default_material_icon;
 
     scene_runtime m_scene_state = scene_runtime::edit;
     vk::texture m_play_button;
