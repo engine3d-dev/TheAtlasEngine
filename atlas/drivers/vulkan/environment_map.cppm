@@ -43,7 +43,7 @@ namespace atlas {
     export class environment_map {
     public:
         environment_map() = default;
-        
+
         environment_map(const VkDevice& p_device,
                         const std::filesystem::path& p_filename,
                         VkPhysicalDeviceMemoryProperties p_memory_properties,
@@ -584,6 +584,9 @@ namespace atlas {
             // vkCmdDrawIndexed(p_current, 36, 1, 0, 0, 0);
         }
 
+        //! @brief Retreving the sample image of the environment map.
+        [[nodiscard]] vk::sample_image image() const { return m_skybox_image; }
+
         void destroy() {
 
             m_skybox_image.destroy();
@@ -595,34 +598,11 @@ namespace atlas {
             m_skybox_shaders.destroy();
             m_skybox_vbo.destroy();
 
-            // destroy_image();
         }
 
-        /*
-        void destroy_image() {
-            if (m_skybox_image_view != nullptr) {
-                vkDestroyImageView(m_device, m_skybox_image_view, nullptr);
-            }
+        //! TODO: Logic for converting the HDR image handles to a skybox samplerCube
+        void process_to_cubemap() {}
 
-            // Boolean check is to make sure we might only want
-            // to destroy vk::sample_image resources.
-
-            // Example of this is the swapchain may pass in
-            // its images and we should only destruct the VkImageView
-            // and not the swapchain's images directly
-            if (m_skybox_image != nullptr) {
-                vkDestroyImage(m_device, m_skybox_image, nullptr);
-            }
-
-            if (m_skybox_sampler != nullptr) {
-                vkDestroySampler(m_device, m_skybox_sampler, nullptr);
-            }
-
-            if (m_skybox_dev_memory != nullptr) {
-                vkFreeMemory(m_device, m_skybox_dev_memory, nullptr);
-            }
-        }
-        */
 
     private:
         VkDevice m_device = nullptr;
