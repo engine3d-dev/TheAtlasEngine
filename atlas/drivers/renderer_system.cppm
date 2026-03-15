@@ -56,8 +56,8 @@ export namespace atlas {
                          const window_params& p_params,
                          const vk::renderpass& p_renderpass,
                          const VkFramebuffer& p_framebuffer,
-                        const glm::mat4& p_projection,
-                        const glm::mat4& p_view,
+                         const glm::mat4& p_projection,
+                         const glm::mat4& p_view,
                          uint32_t p_current_frame) {
             return start_frame(p_current,
                                p_params,
@@ -86,7 +86,8 @@ export namespace atlas {
             return current_scene(std::move(p_scene));
         }
 
-        void invalidate_mesh(uint32_t p_entity_id, std::filesystem::path p_filename) {
+        void invalidate_mesh(uint32_t p_entity_id,
+                             std::filesystem::path p_filename) {
             return render_invalidate_mesh(p_entity_id, p_filename);
         }
 
@@ -97,8 +98,8 @@ export namespace atlas {
                                  const window_params& p_params,
                                  const vk::renderpass& p_renderpass,
                                  const VkFramebuffer& p_framebuffer,
-                                const glm::mat4& p_projection,
-                                const glm::mat4& p_view,
+                                 const glm::mat4& p_projection,
+                                 const glm::mat4& p_view,
                                  uint32_t p_current_frame) = 0;
         virtual void post_frame() = 0;
 
@@ -106,6 +107,8 @@ export namespace atlas {
 
         virtual void current_scene(ref<scene>) = 0;
 
-        virtual void render_invalidate_mesh(uint32_t p_entity_id, std::filesystem::path p_filename) = 0;
+        virtual void render_invalidate_mesh(
+          uint32_t p_entity_id,
+          std::filesystem::path p_filename) = 0;
     };
 };

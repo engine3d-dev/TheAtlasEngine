@@ -597,12 +597,11 @@ namespace atlas {
             m_skybox_ubo.destroy();
             m_skybox_shaders.destroy();
             m_skybox_vbo.destroy();
-
         }
 
-        //! TODO: Logic for converting the HDR image handles to a skybox samplerCube
+        //! TODO: Logic for converting the HDR image handles to a skybox
+        //! samplerCube
         void process_to_cubemap() {}
-
 
     private:
         VkDevice m_device = nullptr;

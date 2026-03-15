@@ -10,7 +10,8 @@ import atlas.core.event;
 
 // Defined in the user-application side
 [[nodiscard]] atlas::ref<atlas::application> initialize_application(
-  atlas::ref<atlas::graphics_context> p_context, atlas::event::bus& p_bus);
+  atlas::ref<atlas::graphics_context> p_context,
+  atlas::event::bus& p_bus);
 
 int
 main() {
@@ -20,12 +21,13 @@ main() {
         console_log_fatal("GLFW: Initialization failed!!");
         return -1;
     }
-    
+
     atlas::event::bus event_bus;
     atlas::ref<atlas::graphics_context> context =
       atlas::initialize_context("vulkan", atlas::graphics_api::vulkan);
 
-    atlas::ref<atlas::application> app = initialize_application(context, event_bus);
+    atlas::ref<atlas::application> app =
+      initialize_application(context, event_bus);
 
     app->execute();
 

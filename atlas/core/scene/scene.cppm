@@ -43,7 +43,8 @@ export namespace atlas {
          */
         scene(const std::string& p_name, event::bus& p_bus, uuid p_uuid)
           : m_name(p_name)
-          , m_bus(&p_bus), m_scene_uuid(p_uuid) {}
+          , m_bus(&p_bus)
+          , m_scene_uuid(p_uuid) {}
 
         virtual ~scene() = default;
 
@@ -122,42 +123,44 @@ export namespace atlas {
          * ```
          */
         template<typename... Comps, typename... Args>
-        [[nodiscard]] flecs::query_builder<Comps...> query_builder(Args&&... args) const {
+        [[nodiscard]] flecs::query_builder<Comps...> query_builder(
+          Args&&... args) const {
             return flecs::query_builder<Comps...>(m_registry,
                                                   std::forward(args)...);
         }
 
         /**
-        * @brief systems in flecs are queries + a given callback
-        * 
-        * Which can be ran manually following up to the `.progress` API function
-        * 
-        * Example Usage:
-        * 
-        * We specify a filter at compile-time. Then anything that matches. We run
-        * this callback on that particular filter.
-        * 
-        * This systems filter must be set before the registry is used and not after.
-        * 
-        * ```C++
-        * m_scene.system<flecs::pair<tag::editor, projection_view>,
-        *   transform,
-        *   perspective_camera>()
-        *   .each([&](flecs::pair<tag::editor, projection_view> p_pair,
-        *   transform& p_transform,
-        *   perspective_camera& p_camera) {
-        * }
-        * ```
-        * 
-        */
-        template <typename... Components>
-        flecs::system_builder<Components...> system(const char* name = nullptr) {
+         * @brief systems in flecs are queries + a given callback
+         *
+         * Which can be ran manually following up to the `.progress` API
+         * function
+         *
+         * Example Usage:
+         *
+         * We specify a filter at compile-time. Then anything that matches. We
+         * run this callback on that particular filter.
+         *
+         * This systems filter must be set before the registry is used and not
+         * after.
+         *
+         * ```C++
+         * m_scene.system<flecs::pair<tag::editor, projection_view>,
+         *   transform,
+         *   perspective_camera>()
+         *   .each([&](flecs::pair<tag::editor, projection_view> p_pair,
+         *   transform& p_transform,
+         *   perspective_camera& p_camera) {
+         * }
+         * ```
+         *
+         */
+        template<typename... Components>
+        flecs::system_builder<Components...> system(
+          const char* name = nullptr) {
             return flecs::system_builder<Components...>(m_registry, name);
         }
 
-        void progress(float p_delta_time) {
-            m_registry.progress(p_delta_time);
-        }
+        void progress(float p_delta_time) { m_registry.progress(p_delta_time); }
 
         /**
          * @return the number of children entities
@@ -222,8 +225,8 @@ export namespace atlas {
         [[nodiscard]] event::bus* event_handle() const { return m_bus; }
 
         /**
-        * @return the unique scene ID
-        */
+         * @return the unique scene ID
+         */
         [[nodiscard]] uint64_t unique_id() const { return m_scene_uuid; }
 
         /**

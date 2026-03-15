@@ -64,7 +64,9 @@ export namespace atlas {
          * how the application may be setup
          */
         application(/*NOLINT*/ ref<graphics_context> p_context,
-                    const application_settings& p_params, event::bus& p_bus) : m_bus(&p_bus) {
+                    const application_settings& p_params,
+                    event::bus& p_bus)
+          : m_bus(&p_bus) {
             console_log_info(
               "application(const application_settings&) initialized!!!");
 
@@ -102,7 +104,8 @@ export namespace atlas {
             m_bus->create_immediate_listener<atlas::event::material_reload>();
 
             m_bus->trigger<event::mesh_reload>(this, &application::reload_mesh);
-            m_bus->trigger<event::material_reload>(this, &application::reload_material);
+            m_bus->trigger<event::material_reload>(
+              this, &application::reload_material);
         }
 
         ~application() { m_window->close(); }
@@ -234,9 +237,9 @@ export namespace atlas {
                           return;
                       }
 
-                    //   m_proj_view = p_pair->projection * p_pair->view;
-                    m_projection = p_pair->projection;
-                    m_view = p_pair->view;
+                      //   m_proj_view = p_pair->projection * p_pair->view;
+                      m_projection = p_pair->projection;
+                      m_view = p_pair->view;
                   });
 
                 // invalidate imgui context
@@ -345,13 +348,14 @@ export namespace atlas {
 
         void current_world(ref<world> p_world) { m_current_world = p_world; }
 
-
         void reload_mesh(event::mesh_reload&) {
-            console_log_info("application::trigger<UEvent> invoked from core/application!");
+            console_log_info(
+              "application::trigger<UEvent> invoked from core/application!");
         }
 
         void reload_material(event::material_reload&) {
-            console_log_info("application::trigger<material> invoked from core/application!");
+            console_log_info(
+              "application::trigger<material> invoked from core/application!");
         }
 
     protected:
@@ -369,7 +373,7 @@ export namespace atlas {
         glm::mat4 m_view;
         uint32_t m_current_frame_index = -1;
         vulkan::imgui_context m_ui_context;
-        event::bus* m_bus=nullptr;
+        event::bus* m_bus = nullptr;
         static application* s_instance;
     };
 

@@ -34,9 +34,9 @@ export namespace atlas::event {
     };
 
     /**
-    * @param entity_id is the entity to reload the mesh for
-    * @param filename is the filename to reload the mesh into
-    */
+     * @param entity_id is the entity to reload the mesh for
+     * @param filename is the filename to reload the mesh into
+     */
     struct mesh_reload {
         uint64_t entity_id;
         std::string_view filename;

@@ -30,7 +30,8 @@ private:
 
 atlas::ref<atlas::application>
 initialize_application(
-  /*NOLINT*/ atlas::ref<atlas::graphics_context> p_contetxt, atlas::event::bus& p_bus) {
+  /*NOLINT*/ atlas::ref<atlas::graphics_context> p_contetxt,
+  atlas::event::bus& p_bus) {
     atlas::application_settings settings = {
         .name = "Editor",
         .width = 1510,
