@@ -15,6 +15,7 @@ Using **Conan** to manage our third party dependencies with Ninja + CMake for ou
 * HDRI Environment Map Support
 * Native Support for C++20 Modules
 * Interactive UI Editor
+* 3D Rigid Body Physics Simulation (Collisions, Shape Colliders)
 
 # Setup Development Environment
 
