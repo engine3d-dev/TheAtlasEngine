@@ -665,12 +665,7 @@ public:
 
                           signal(reload_material_request);
                       }
-                  });
 
-                atlas::ui::draw_component<atlas::material_metadata>(
-                  "material",
-                  m_selected_entity,
-                  [this](atlas::material_metadata* p_source) {
                       // We only want to load in our material textures If
                       // requested
                       // TODO: Move this log outside from the add component
@@ -713,6 +708,12 @@ public:
                                                        new_mat);
                           }
                       }
+                  });
+
+                atlas::ui::draw_component<atlas::material_metadata>(
+                  "material",
+                  m_selected_entity,
+                  [this](atlas::material_metadata* p_source) {
 
                       float speed = 0.01f;
                       ImGui::DragFloat4(
