@@ -9,6 +9,12 @@ Open-source Vulkan 3D game engine with native C++20 modules support.
 
 <img width="1505" height="902" alt="Screenshot 2026-03-15 134559" src="https://github.com/user-attachments/assets/170a9ffe-4fd7-440a-93e0-c2d3172ce928" />
 
+## 🧩 Major Highlights
+* HDRI Environment Map Support
+* Native Support for C++20 Modules
+* Interactive UI Editor
+* 3D Rigid Body Physics Simulation (Collisions, Shape Colliders)
+
 ## 📦 Build System
 
 | Tool | Version | Description |
@@ -28,12 +34,6 @@ These are dependencies to make it developing TheAtlasEngine possible
 | **[Dear ImGui](https://github.com/ocornut/imgui)** | 1.92.6+ | Bloat-free Immediate Mode Graphical User Interface for real-time tooling and debugging. |
 | **[JoltPhysics](https://github.com/jrouwe/JoltPhysics)** | 5.5.0+ | Multi-core friendly rigid body physics and collision detection library. Written in C++ Suitable for games. |
 | **[vulkan-cpp](https://github.com/engine3d-dev/vulkan-cpp)** | 6.0+ | Custom modern C++ abstraction layer using C++20 to develop and simplify using the Vulkan graphics API. |
-
-## 🧩 Major Highlights
-* HDRI Environment Map Support
-* Native Support for C++20 Modules
-* Interactive UI Editor
-* 3D Rigid Body Physics Simulation (Collisions, Shape Colliders)
 
 ## 🛠️ Setup Development Environment
 
@@ -75,22 +75,20 @@ Example on Windows, you'd execute the executable in the terminal as:
 
 ## 🎮 Games Built using TheAtlasEngine
 
-These are games that have been built by me and others to showcase the capabilities of the game engine. Demonstrating capabilities and progression made by the team.
+These games were build by me (Aaron) and others to demonstrate the earlier capabilities of TheAtlasEngine made by the team.
 
 > [!NOTE]
-> TheAtlasEngine is quite early in its development, therefore some of the games may be buggy or have missing features in the games released.
-> We believe to test the capabilities of TheAtlasEngine is to continue and building games with it by participating in game jams to learn what works for the project.
-
+> TheAtlasEngine was quite early in its development when these games were first built, therefore having some definite flaws and missing features.
+> We believe being able to build games and continue participating in game jams will help us continue to learn what works best for TheAtlasEngine.
 
 ## Monkey Ball
 
-### Description
 This was the first game that we made with TheAtlasEngine when the project first started. This was for the SFSU Game Development Club's end of the semester showcase of Fall 2024
 
 <img width="1238" height="631" alt="Screenshot 2025-12-06 025821" src="https://github.com/user-attachments/assets/b1d78746-4f1b-41db-91ae-cb84299e1f54" />
 
 ## Wallace and Grommit Rocket Game
-### Description
+
 Developed during the SFSU Game Dev Club Spring 2025 Game Jam, this project serves as a technical demonstration of TheAtlasEngine core capabilities. Inspired by similar projects from creators like TheCherno -- to test the game engine's capabilities.
 
 * [itch.io link](https://niccoll-dyson.itch.io/wallace-and-grommit-spaceship-game) to out game jam submission
