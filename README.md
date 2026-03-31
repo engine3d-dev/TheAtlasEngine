@@ -7,21 +7,43 @@
 
 Open-source Vulkan 3D game engine with native C++20 modules support.
 
-Using **Conan** to manage our third party dependencies with Ninja + CMake for our build system.
-
 <img width="1505" height="902" alt="Screenshot 2026-03-15 134559" src="https://github.com/user-attachments/assets/170a9ffe-4fd7-440a-93e0-c2d3172ce928" />
 
-# Major Highlights
+# 📦 Build System
+
+| Tool | Version | Description |
+| :--- | :--- | :--- |
+| **[CMake](https://www.glfw.org/)** | 4.0+ | Major build system for configuration and build generation |
+| **[Ninja](https://github.com/g-truc/glm)** | 1.13+ | Small, high-speed build execution |
+| **[Conan](https://github.com/ocornut/imgui)** | 2.23+ | C/C++ Package Manager for dependency resolution |
+
+# 🗺️ Project Dependencies
+
+These are dependencies to make it developing TheAtlasEngine possible
+
+| Library | Version | Description |
+| :--- | :--- | :--- |
+| **[GLFW](https://www.glfw.org/)** | 3.4+ | Multi-platform library for OpenGL, OpenGL ES, and Vulkan window/surface management. |
+| **[GLM](https://github.com/g-truc/glm)** | 1.0.1+ | A header-only C++ mathematics library for graphics software based on GLSL specifications. |
+| **[Dear ImGui](https://github.com/ocornut/imgui)** | 1.92.6+ | Bloat-free Immediate Mode Graphical User Interface for real-time tooling and debugging. |
+| **[JoltPhysics](https://github.com/jrouwe/JoltPhysics)** | 5.5.0+ | Multi-core friendly rigid body physics and collision detection library. Written in C++ Suitable for games. |
+| **[vulkan-cpp](https://github.com/engine3d-dev/vulkan-cpp)** | 6.0+ | Custom modern C++ abstraction layer using C++20 to develop and simplify using the Vulkan graphics API. |
+
+# 🧩 Major Highlights
 * HDRI Environment Map Support
 * Native Support for C++20 Modules
 * Interactive UI Editor
 * 3D Rigid Body Physics Simulation (Collisions, Shape Colliders)
 
-# Setup Development Environment
+# 🛠️ Setup Development Environment
 
-New here? We use the C++ package manager, Conan. Follow the [Getting Started Guide](https://engine3d-dev.github.io/0.1/getting_started/) to setup your environment.
+New here? Follow the [Getting Started](https://engine3d-dev.github.io/0.1/getting_started/) page to setup the dev environment.
 
-## How to Build the Editor
+## 🔩 Building the Project
+
+> [!TIP]
+> `-s build_type=Debug` is recommended to compile the project as a Debug build for development.
+> For development to disable the testing environment.
 
 Since there isn't a way to officially to building the editor. In the CMakeLists.txt file.
 
@@ -31,17 +53,14 @@ Just uncomment the `editor` into your CMakeLists.txt file as shown in this examp
 add_subdirectory(editor)
 ```
 
-## Building the Project
-
-> [!TIP]
-> `-s build_type=Debug` is recommended to compile the project as a Debug build for development.
-> For development to disable the testing environment.
+Then build using the following commands:
 
 ```
 conan atlas build . -s build_type=Debug -o enable_tests_only=False
 ```
 
-## Executable Location
+
+## 💾 Executing the Editor
 
 After building TheAtlasEngine has been successful. Your executable will be executed via the following path layout.
 
@@ -54,7 +73,7 @@ Example on Windows, you'd execute the executable in the terminal as:
 .\build\Debug\editor\editor.exe
 ```
 
-# Games Built using TheAtlasEngine
+# 🎮 Games Built using TheAtlasEngine
 
 These are games that have been built by me and others to showcase the capabilities of the game engine. Demonstrating capabilities and progression made by the team.
 
