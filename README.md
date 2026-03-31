@@ -1,5 +1,5 @@
 # The Atlas Engine
-[![C++](https://img.shields.io/badge/C%2B%2B-20%2F23-blue)]()
+<!-- [![C++](https://img.shields.io/badge/C%2B%2B-20%2F23-blue)]() -->
 [![✅CI](https://github.com/engine3d-dev/TheAtlasEngine/actions/workflows/clang-format-deploy.yml/badge.svg)](https://github.com/engine3d-dev/TheAtlasEngine/actions/workflows/clang-format-deploy.yml)
 [![GitHub stars](https://img.shields.io/github/stars/engine3d-dev/TheAtlasEngine.svg)](https://github.com/engine3d-dev/TheAtlasEngine/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/engine3d-dev/TheAtlasEngine.svg)](https://github.com/engine3d-dev/TheAtlasEngine/network)
