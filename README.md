@@ -1,5 +1,5 @@
 # The Atlas Engine
-
+[![C++](https://img.shields.io/badge/C%2B%2B-20%2F23-blue)]()
 [![✅CI](https://github.com/engine3d-dev/TheAtlasEngine/actions/workflows/clang-format-deploy.yml/badge.svg)](https://github.com/engine3d-dev/TheAtlasEngine/actions/workflows/clang-format-deploy.yml)
 [![GitHub stars](https://img.shields.io/github/stars/engine3d-dev/TheAtlasEngine.svg)](https://github.com/engine3d-dev/TheAtlasEngine/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/engine3d-dev/TheAtlasEngine.svg)](https://github.com/engine3d-dev/TheAtlasEngine/network)
@@ -19,9 +19,9 @@ Open-source Vulkan 3D game engine with native C++20 modules support.
 
 | Tool | Version | Description |
 | :--- | :--- | :--- |
-| **[CMake](https://www.glfw.org/)** | 4.0+ | Major build system for configuration and build generation |
-| **[Ninja](https://github.com/g-truc/glm)** | 1.13+ | Small, high-speed build execution |
-| **[Conan](https://github.com/ocornut/imgui)** | 2.23+ | C/C++ Package Manager for dependency resolution |
+| **[CMake](https://cmake.org/)** | 4.0+ | Major build system for configuration and build generation |
+| **[Ninja](https://ninja-build.org/)** | 1.13+ | Small, high-speed build execution |
+| **[Conan](https://conan.io/)** | 2.23+ | C/C++ Package Manager for dependency resolution |
 
 ## 🗺️ Project Dependencies
 
