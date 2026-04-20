@@ -1,5 +1,5 @@
 Scene: LevelScene
-Environment: assets/skybox/mirrored_hall_8k.hdr
+Environment: assets/skybox/monkstown_castle_4k.hdr
 Entities:
   - Entity: Point Light 1
     Transform:
