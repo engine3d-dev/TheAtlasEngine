@@ -9,6 +9,7 @@ import atlas.core.utilities;
 import atlas.core.event;
 import atlas.core.scene.game_object;
 import atlas.core.scene.uuid;
+import atlas.core.scene.components;
 
 export namespace atlas {
     /**
@@ -228,6 +229,20 @@ export namespace atlas {
          * @return the unique scene ID
          */
         [[nodiscard]] uint64_t unique_id() const { return m_scene_uuid; }
+
+
+        void set_environment_map(const std::string& p_filepath) {
+            environment environment_mapping = {
+                .filepath = p_filepath,
+            };
+
+            m_registry.set(environment_mapping);
+        }
+
+        template<typename T>
+        [[nodiscard]] const T* get() const {
+            return m_registry.get<T>();
+        }
 
         /**
          * @brief Requires to return flecs::world is returned by reference to

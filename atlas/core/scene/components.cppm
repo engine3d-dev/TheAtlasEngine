@@ -25,6 +25,10 @@ export namespace atlas {
         }
     };
 
+    struct environment {
+        std::string filepath="";
+    };
+
     struct material_metadata {
         glm::vec4 ambient{ 0.2f };
         glm::vec4 diffuse{ 0.5f };

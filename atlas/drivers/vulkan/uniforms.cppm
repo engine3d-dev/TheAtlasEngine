@@ -1,6 +1,7 @@
 module;
 
 #include <glm/glm.hpp>
+#include <array>
 
 export module atlas.drivers.vulkan.uniforms;
 
@@ -42,7 +43,6 @@ export namespace atlas::vulkan {
     struct geometry_uniform {
         glm::mat4 model{ 1.f };
         glm::vec4 color{ 1.f };
-        // std::vector<std::string> texture_paths;
     };
 
     /**
@@ -70,7 +70,6 @@ export namespace atlas::vulkan {
 
     struct light_scene_ubo {
         alignas(16) uint32_t num_lights;
-        // alignas(16) std::array<point_light, 10> light_sources;
-        alignas(16) point_light_ubo light_sources[10];
+        alignas(16) std::array<point_light_ubo, 10> light_sources;
     };
 };

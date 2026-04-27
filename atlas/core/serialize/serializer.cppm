@@ -16,6 +16,7 @@ import atlas.common;
 import atlas.core.scene;
 import atlas.core.serialize.types;
 import atlas.core.scene.components;
+import atlas.logger;
 
 namespace atlas {
     // used to serialize entities
@@ -233,6 +234,16 @@ namespace atlas {
             if (!data["Scene"]) {
                 return false;
             }
+
+            console_log_info("Before loading environment mappings!");
+            std::string environment_map_data="";
+            if(data["Environment"]) {
+                environment_map_data = data["Environment"].as<std::string>();
+
+                console_log_info("Environment Map Loaded Path (from yaml): {}", environment_map_data);
+            }
+
+            p_registry.set<environment>({ .filepath = environment_map_data });
 
             YAML::Node entity_objects = data["Entities"];
 

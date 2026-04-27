@@ -126,6 +126,8 @@ export namespace atlas {
 
             ref<scene> current_scene = m_current_world->current();
 
+            invoke_start(current_scene.get());
+
             m_renderer->current_scene_context(current_scene);
 
             // Bug-prone API.
@@ -134,8 +136,6 @@ export namespace atlas {
             // `current_scene_context` sets a new scene (for invalidation)
             m_renderer->preload(
               m_window->current_swapchain().swapchain_renderpass());
-
-            invoke_start(current_scene.get());
 
             /*
                 - flecs::system is how your able to schedule changes for given

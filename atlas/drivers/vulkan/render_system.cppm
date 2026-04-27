@@ -278,15 +278,10 @@ export namespace atlas::vulkan {
             // };
             // m_skybox = environment_map(m_device, faces,
             // m_physical.memory_properties(), m_final_renderpass); std::string
-            // filename = "assets/skybox/rogland_clear_night_24k.hdr";
-            // std::string filename = "assets/skybox/HDR_multi_nebulae_1.hdr";
-            std::string filename =
-              "assets/skybox/HDR_silver_and_gold_nebulae.hdr";
-            // m_skybox = environment_map(m_device,
-            // std::filesystem::path("assets/skybox/monkstown_castle_4k.hdr"),
-            // m_physical.memory_properties(), m_final_renderpass);
+
+            const environment* environment_data = m_current_scene->get<environment>();
             m_skybox = environment_map(m_device,
-                                       std::filesystem::path(filename),
+                                       std::filesystem::path(environment_data->filepath),
                                        m_physical.memory_properties(),
                                        m_final_renderpass);
 

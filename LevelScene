@@ -1,0 +1,77 @@
+Scene: LevelScene
+Environment: assets/skybox/monkstown_castle_4k.hdr
+Entities:
+  - Entity: Point Light 1
+    Transform:
+      Position: [-0.400000006, 7.69999981, -10.1999998]
+      Scale: [0.899999976, 0.899999976, -3.70000005]
+      Rotation: [0, 0, 0]
+      Quaternion: [0, 0, 0, 1]
+    Mesh Source:
+      Model Path: ""
+      Diffuse: ""
+      Specular: ""
+    Point Light:
+      Color: [1, 1.55999994, 2.92000008, 1.90999997]
+      Attenuation: 10.0769997
+      Ambient: [1, 1, 1, 1]
+      Diffuse: [1, 1, 1, 1]
+      Specular: [1, 1, 1, 1]
+  - Entity: Viking Room
+    Transform:
+      Position: [-8, 1.79999995, 1.5]
+      Scale: [1, 1, 1]
+      Rotation: [2.29999995, 95.9000015, 91.8000031]
+      Quaternion: [0, 0, 0, 1]
+    Mesh Source:
+      Model Path: assets/models/viking_room.obj
+      Diffuse: assets/models/viking_room.png
+      Specular: ""
+    Point Light:
+      Color: [1, 1, 1, 1]
+      Attenuation: 1
+      Ambient: [1, 1, 1, 1]
+      Diffuse: [1, 1, 1, 1]
+      Specular: [1, 1, 1, 1]
+    Physics Body:
+      Linear Velocity: [0, 10, 0]
+      Angular Velocity: [-0.100000001, 0, 0]
+      Force: [0, 0, 0]
+      Impulse: [0, 10, 0]
+      Torque: [0, 0, 0]
+      Mass Factor: 1
+      Center Mass Position: [0, 0, 0]
+      Friction: 15
+      Restitution: 0.300000012
+      Body Movement Type: 2
+      Body Layer Type: 1
+    Box Collider:
+      Half Extent: [0.5, 0.5, 0.5]
+    Sphere Collider:
+      Radius: 1
+  - Entity: Cube
+    Transform:
+      Position: [-7.5999999, 4.67999983, -1.79999995]
+      Scale: [1, 1, 1]
+      Rotation: [2.9000001, 16.5, 0.600000024]
+      Quaternion: [-1.5550123e-08, -1.33205403e-05, -1.63867355e-08, 1]
+    Mesh Source:
+      Model Path: assets/models/cube.obj
+      Diffuse: assets/models/container_diffuse.png
+      Specular: assets/models/wallace_gromit_image.jpg
+    Physics Body:
+      Linear Velocity: [-7.65907615e-11, -2.44006509e-10, 2.08939643e-10]
+      Angular Velocity: [2.11050205e-10, -3.93799064e-16, 7.73631575e-11]
+      Force: [0, 0, 0]
+      Impulse: [0, 0, 0]
+      Torque: [0, 0, 0]
+      Mass Factor: 1
+      Center Mass Position: [-2.70028043, 1.2799989, 4.10127163]
+      Friction: 0.800000012
+      Restitution: 0.200000003
+      Body Movement Type: 2
+      Body Layer Type: 1
+    Box Collider:
+      Half Extent: [1, 1, 1]
+    Sphere Collider:
+      Radius: 0.5
