@@ -11,6 +11,7 @@ module;
 #include <imgui/backends/imgui_impl_vulkan.h>
 #include <format>
 #include <filesystem>
+#include <unordered_map>
 
 export module level_scene;
 
