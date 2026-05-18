@@ -1,42 +1,19 @@
+module;
 #include <boost/ut.hpp>
-// #include <core/math/types.hpp>
 #include <flecs.h>
 
 #include <Jolt/Jolt.h>
 #include <Jolt/Math/Vec4.h>
-// #include <core/scene/scene.hpp>
+#include <glm/glm.hpp>
+export module atlas.tests:entity_component_system;
+
 import atlas.core.scene;
 import atlas.core.scene.game_object;
 import atlas.core.math.types;
 import atlas.core.event;
-
-#include <glm/glm.hpp>
+import atlas.drivers.jolt_cpp.types;
 
 namespace atlas {
-
-    template<>
-    struct vector3<JPH::Vec3> {
-        vector3() = default;
-
-        vector3(const JPH::Vec3& p_other) {
-            m_value = { p_other.GetX(), p_other.GetY(), p_other.GetZ() };
-        }
-
-        operator glm::vec3() { return m_value; }
-
-        glm::vec3 operator=(const JPH::Vec3& p_other) {
-            return { p_other.GetX(), p_other.GetY(), p_other.GetZ() };
-        }
-
-        bool operator==(const glm::vec3& p_other) {
-            return (m_value.x == p_other.x and m_value.y == p_other.y and
-                    m_value.z == p_other.z);
-        }
-
-    private:
-        glm::vec3 m_value;
-    };
-
     /**
      * @name Mock Projectile Missle Test
      * @note Essentially an active component
@@ -82,7 +59,9 @@ namespace atlas {
     struct test_velocity {
         glm::vec3 position;
     };
+};
 
+export void test_entity_component_system() {
     boost::ut::suite<"ecs::component"> ecs_test = []() {
         using namespace boost::ut;
 
@@ -97,30 +76,30 @@ namespace atlas {
 
             // expect(entity.is_alive());
 
-            entity.add<test_tag_component>();
-            expect(entity.has<test_tag_component>());
+            entity.add<atlas::test_tag_component>();
+            expect(entity.has<atlas::test_tag_component>());
         };
 
         "create_entity::get"_test = [&test_scene]() {
             atlas::game_object entity = test_scene.entity("Mock Entity 2");
-            entity.add<test_tag_component>();
+            entity.add<atlas::test_tag_component>();
             // flecs requires reading only operations are through the get<T> API
             // to write or set new parameters you can use get_mut<T> or
             // set<T>(T&&); in this case, I use set<T> in this test case
-            entity.set<test_tag_component>({ .tag = "New Entity" });
+            entity.set<atlas::test_tag_component>({ .tag = "New Entity" });
 
-            const test_tag_component* get_tag =
-              entity.get<test_tag_component>();
+            const atlas::test_tag_component* get_tag =
+              entity.get<atlas::test_tag_component>();
             expect(get_tag->tag == "New Entity");
         };
 
         "create_entity::set"_test = [&test_scene]() {
             atlas::game_object entity = test_scene.entity("New Entity");
-            mock_projectile projectile;
+            atlas::mock_projectile projectile;
             projectile.on_update();
-            entity.set<mock_projectile>(projectile);
+            entity.set<atlas::mock_projectile>(projectile);
 
-            expect(entity.has<mock_projectile>());
+            expect(entity.has<atlas::mock_projectile>());
 
             // test_transform transform;
             // transform.position = projectile.position();
@@ -134,4 +113,4 @@ namespace atlas {
             //        entity.get<test_velocity>().position);
         };
     };
-}; // namespace atlas
+}

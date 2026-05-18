@@ -8,15 +8,24 @@ import atlas.drivers.graphics_context;
 import atlas.renderer.context_loader;
 import atlas.core.event;
 
+#ifdef ENABLE_TESTS_ONLY
+#include <boost/ut.hpp>
+import atlas.tests;
+#endif
+
 // Defined in the user-application side
+#ifndef ENABLE_TESTS_ONLY
 [[nodiscard]] atlas::ref<atlas::application> initialize_application(
   atlas::ref<atlas::graphics_context> p_context,
   atlas::event::bus& p_bus);
+#endif
 
 int
 main() {
+#ifndef ENABLE_TESTS_ONLY
+    // We should not have our core system start up during testing environment
+    // execution
     atlas::console_log_manager manager = atlas::console_log_manager();
-
     if (!glfwInit()) {
         console_log_fatal("GLFW: Initialization failed!!");
         return -1;
@@ -34,5 +43,8 @@ main() {
     app->post_destroy();
 
     context->destroy();
+#else
+    initialize_tests();
+#endif
     return 0;
 }
