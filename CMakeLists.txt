@@ -54,17 +54,8 @@ add_library(${PROJECT_NAME} STATIC)
 # add_subdirectory(editor)
 
 if(${ENABLE_TESTS_ONLY})
-    build_unit_test(
-        TEST_SOURCES
-        tests/main.test.cpp
-        tests/basic_add.test.cpp
-        tests/entity_component_system.test.cpp
-        tests/math.test.cpp
-        tests/scene.test.cpp
-
-        LINK_PACKAGES
-        atlas
-    )
+    set(FIND_BOOST_UT ut)
+    set(LINK_BOOST_UT boost-ext-ut::ut)
 endif()
 
 set_packages(
@@ -85,6 +76,7 @@ set_packages(
     watcher
     vulkan-cpp
     nfd
+    ${FIND_BOOST_UT}
 
     LINK_PACKAGES
     glfw
@@ -102,6 +94,7 @@ set_packages(
     watcher::watcher
     vulkan-cpp
     nfd::nfd
+    ${LINK_BOOST_UT}
 )
 
 if(APPLE)
@@ -116,6 +109,18 @@ target_compile_options(
     PUBLIC
     -g -Wall -Wextra -Wno-missing-field-initializers -Wshadow -msse4.1 -mavx
 )
+endif()
+
+
+if(${ENABLE_TESTS_ONLY})
+    set(
+        unit_test_sources
+        tests/tests.cppm
+        tests/basic_add.test.cppm
+        tests/entity_component_system.test.cppm
+        tests/math.test.cppm
+        tests/scene.test.cppm
+    )
 endif()
 
 target_sources(${PROJECT_NAME} PUBLIC
@@ -200,8 +205,6 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas/drivers/jolt_cpp/context.cppm
 
     # drivers
-    # atlas/drivers/window_context.cppm
-    # atlas/drivers/vulkan/vulkan.cppm
     atlas/drivers/vulkan/utilities.cppm
     atlas/drivers/vulkan/instance_context.cppm
     atlas/drivers/vulkan/window_context.cppm
@@ -209,6 +212,9 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas/drivers/vulkan/device.cppm
     atlas/drivers/vulkan/swapchain.cppm
     atlas/drivers/vulkan/environment_map.cppm
+
+    # Adding unit tests if ENABLE_TESTS_ONLY is set
+    ${unit_test_sources}
 )
 
 target_sources(${PROJECT_NAME} PUBLIC
@@ -219,7 +225,6 @@ target_sources(${PROJECT_NAME} PUBLIC
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)
 
-# install(TARGETS ${PROJECT_NAME})
 install(
     TARGETS ${PROJECT_NAME}
     EXPORT atlas_targets
