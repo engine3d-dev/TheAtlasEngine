@@ -54,8 +54,27 @@ add_library(${PROJECT_NAME} STATIC)
 # add_subdirectory(editor)
 
 if(${ENABLE_TESTS_ONLY})
-    set(FIND_BOOST_UT ut)
-    set(LINK_BOOST_UT boost-ext-ut::ut)
+    add_executable(
+        unit_test
+        tests/main.test.cpp
+    )
+
+    find_package(ut REQUIRED)
+    target_link_libraries(unit_test PRIVATE boost-ext-ut::ut atlas)
+
+    target_sources(unit_test PUBLIC
+        FILE_SET CXX_MODULES
+        TYPE CXX_MODULES
+        FILES
+        tests/tests.cppm
+        tests/basic_add.test.cppm
+        tests/entity_component_system.test.cppm
+        tests/math.test.cppm
+        tests/scene.test.cppm
+    )
+
+    add_custom_target(run_tests ALL DEPENDS unit_test COMMAND unit_test)
+
 endif()
 
 set_packages(
@@ -76,7 +95,6 @@ set_packages(
     watcher
     vulkan-cpp
     nfd
-    ${FIND_BOOST_UT}
 
     LINK_PACKAGES
     glfw
@@ -94,7 +112,6 @@ set_packages(
     watcher::watcher
     vulkan-cpp
     nfd::nfd
-    ${LINK_BOOST_UT}
 )
 
 if(APPLE)
@@ -109,18 +126,6 @@ target_compile_options(
     PUBLIC
     -g -Wall -Wextra -Wno-missing-field-initializers -Wshadow -msse4.1 -mavx
 )
-endif()
-
-
-if(${ENABLE_TESTS_ONLY})
-    set(
-        unit_test_sources
-        tests/tests.cppm
-        tests/basic_add.test.cppm
-        tests/entity_component_system.test.cppm
-        tests/math.test.cppm
-        tests/scene.test.cppm
-    )
 endif()
 
 target_sources(${PROJECT_NAME} PUBLIC
@@ -212,9 +217,6 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas/drivers/vulkan/device.cppm
     atlas/drivers/vulkan/swapchain.cppm
     atlas/drivers/vulkan/environment_map.cppm
-
-    # Adding unit tests if ENABLE_TESTS_ONLY is set
-    ${unit_test_sources}
 )
 
 target_sources(${PROJECT_NAME} PUBLIC
