@@ -2,6 +2,7 @@
 
 import atlas.tests;
 
-int main() {
+int
+main() {
     initialize_tests();
 }

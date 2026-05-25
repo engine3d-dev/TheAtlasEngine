@@ -2,7 +2,8 @@ module;
 #include <boost/ut.hpp>
 export module atlas.tests:basic_add;
 
-export void test_basic_add() {
+export void
+test_basic_add() {
     boost::ut::suite<"basic_add"> add_test = []() {
         using namespace boost::ut;
 

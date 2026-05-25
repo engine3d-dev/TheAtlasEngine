@@ -61,7 +61,8 @@ namespace atlas {
     };
 };
 
-export void test_entity_component_system() {
+export void
+test_entity_component_system() {
     boost::ut::suite<"ecs::component"> ecs_test = []() {
         using namespace boost::ut;
 

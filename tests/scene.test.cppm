@@ -7,9 +7,8 @@ import atlas.core.scene.game_object;
 import atlas.core.scene.components;
 import atlas.core.event;
 
-
-
-export void test_scenes() {
+export void
+test_scenes() {
     boost::ut::suite<"::scene"> scene_test = []() {
         using namespace boost::ut;
         atlas::event::bus test_event_bus;

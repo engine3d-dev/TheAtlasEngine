@@ -55,7 +55,8 @@ private:
  * vec3, or vec4 and other glm types
  */
 
-export void math_test() {
+export void
+math_test() {
     boost::ut::suite<"::basic_vec3"> original_vec3_test = []() {
         using namespace boost::ut;
 
