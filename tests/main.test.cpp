@@ -1,5 +1,8 @@
+#include <boost/ut.hpp>
 
-namespace engine3d {};
+import atlas.tests;
 
 int
-main() {}
+main() {
+    initialize_tests();
+}

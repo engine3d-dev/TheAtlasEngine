@@ -46,7 +46,9 @@ class AtlasRecipe(ConanFile):
 
         self.requires("nfd/3.0")
         self.requires("watcher/0.12.0")
-        self.requires("boost-ext-ut/2.3.1")
+
+        if self.options.enable_tests_only:
+            self.requires("boost-ext-ut/2.3.1")
 
     def config_options(self):
         if self.settings.os == "Windows":

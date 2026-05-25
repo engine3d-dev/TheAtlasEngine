@@ -15,8 +15,9 @@ import atlas.core.event;
 
 int
 main() {
+    // We should not have our core system start up during testing environment
+    // execution
     atlas::console_log_manager manager = atlas::console_log_manager();
-
     if (!glfwInit()) {
         console_log_fatal("GLFW: Initialization failed!!");
         return -1;

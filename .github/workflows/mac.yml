@@ -1,10 +1,9 @@
-name: Macos Platform Build
+name: MacOS
 
-on: [pull_request]
+on: [workflow_call]
 
 jobs:
-    macos-build:
-        name: "M1 Mac Build"
+    armv8:
         runs-on: macos-latest
         steps:
             - uses: actions/checkout@v4

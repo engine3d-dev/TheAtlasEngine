@@ -54,17 +54,27 @@ add_library(${PROJECT_NAME} STATIC)
 # add_subdirectory(editor)
 
 if(${ENABLE_TESTS_ONLY})
-    build_unit_test(
-        TEST_SOURCES
+    add_executable(
+        unit_test
         tests/main.test.cpp
-        tests/basic_add.test.cpp
-        tests/entity_component_system.test.cpp
-        tests/math.test.cpp
-        tests/scene.test.cpp
-
-        LINK_PACKAGES
-        atlas
     )
+
+    find_package(ut REQUIRED)
+    target_link_libraries(unit_test PRIVATE boost-ext-ut::ut atlas)
+
+    target_sources(unit_test PUBLIC
+        FILE_SET CXX_MODULES
+        TYPE CXX_MODULES
+        FILES
+        tests/tests.cppm
+        tests/basic_add.test.cppm
+        tests/entity_component_system.test.cppm
+        tests/math.test.cppm
+        tests/scene.test.cppm
+    )
+
+    add_custom_target(run_tests ALL DEPENDS unit_test COMMAND unit_test)
+
 endif()
 
 set_packages(
@@ -200,8 +210,6 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas/drivers/jolt_cpp/context.cppm
 
     # drivers
-    # atlas/drivers/window_context.cppm
-    # atlas/drivers/vulkan/vulkan.cppm
     atlas/drivers/vulkan/utilities.cppm
     atlas/drivers/vulkan/instance_context.cppm
     atlas/drivers/vulkan/window_context.cppm
@@ -219,7 +227,6 @@ target_sources(${PROJECT_NAME} PUBLIC
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)
 
-# install(TARGETS ${PROJECT_NAME})
 install(
     TARGETS ${PROJECT_NAME}
     EXPORT atlas_targets
