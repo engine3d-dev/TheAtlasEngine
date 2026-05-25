@@ -1,10 +1,9 @@
-name: Windows Platform Build
+name: Windows
 
-on: [pull_request, workflow_dispatch]
+on: [workflow_call]
 
 jobs:
-  windows-build:
-      name: "Windows-Build"
+  x86_64:
       runs-on: windows-latest
       steps:
           - uses: actions/checkout@v4
