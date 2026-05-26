@@ -38,7 +38,8 @@ export namespace atlas {
          * with it
          */
         world(const std::string& p_name, level_streamer& p_level_streamer)
-          : m_name(p_name), m_level_streamer(&p_level_streamer) {}
+          : m_name(p_name)
+          , m_level_streamer(&p_level_streamer) {}
 
         virtual ~world() = default;
 
@@ -46,17 +47,16 @@ export namespace atlas {
         [[nodiscard]] std::string name() const { return m_name; }
 
         /**
-        * @brief Retrieves the currently active scene
-        */
-        ref<scene> current() {
-            return m_current;
-        }
+         * @brief Retrieves the currently active scene
+         */
+        ref<scene> current() { return m_current; }
 
         /**
-        * @brief sets the default scene to an implementation-specific scene
-        */
+         * @brief sets the default scene to an implementation-specific scene
+         */
         template<typename UScene>
-        void default_custom_scene(const std::string& p_name, event::bus& p_bus) {
+        void default_custom_scene(const std::string& p_name,
+                                  event::bus& p_bus) {
             m_level_streamer->default_scene<UScene>(p_name, p_bus);
         }
 
@@ -67,6 +67,6 @@ export namespace atlas {
     private:
         ref<scene> m_current;
         std::string m_name = "Undefined Tag";
-        level_streamer* m_level_streamer=nullptr;
+        level_streamer* m_level_streamer = nullptr;
     };
 };

@@ -26,7 +26,7 @@ export namespace atlas {
     };
 
     struct environment {
-        std::string filepath="";
+        std::string filepath = "";
     };
 
     struct material_metadata {
