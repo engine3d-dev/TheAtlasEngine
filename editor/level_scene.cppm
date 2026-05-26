@@ -420,7 +420,8 @@ public:
 
         flecs::world registry = *this;
 
-        // TODO: Should consider having this be a custom UI property to the editor.
+        // TODO: Should consider having this be a custom UI property to the
+        // editor.
         auto viking_room = entity("Viking Room");
         atlas::mesh_source* src = viking_room.get_mut<atlas::mesh_source>();
         src->flip = true;
