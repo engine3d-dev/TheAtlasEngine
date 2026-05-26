@@ -10,20 +10,20 @@ jobs:
   windows:
     uses: engine3d-dev/ci/.github/workflows/windows.yml@main
     with:
-      package_name: "vulkan-cpp"
-      version: "6.0"
+      package_name: "TheAtlasEngine"
+      version: "0.5"
     secrets: inherit
 
   linux:
     uses: engine3d-dev/ci/.github/workflows/linux.yml@main
     with:
-      package_name: "vulkan-cpp"
-      version: "6.0"
+      package_name: "TheAtlasEngine"
+      version: "0.5"
     secrets: inherit
 
   mac:
     uses: engine3d-dev/ci/.github/workflows/mac.yml@main
     with:
-      package_name: "vulkan-cpp"
-      version: "6.0"
+      package_name: "TheAtlasEngine"
+      version: "0.5"
     secrets: inherit
