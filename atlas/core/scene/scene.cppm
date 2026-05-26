@@ -230,7 +230,6 @@ export namespace atlas {
          */
         [[nodiscard]] uint64_t unique_id() const { return m_scene_uuid; }
 
-
         void set_environment_map(const std::string& p_filepath) {
             environment environment_mapping = {
                 .filepath = p_filepath,

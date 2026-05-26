@@ -279,11 +279,13 @@ export namespace atlas::vulkan {
             // m_skybox = environment_map(m_device, faces,
             // m_physical.memory_properties(), m_final_renderpass); std::string
 
-            const environment* environment_data = m_current_scene->get<environment>();
-            m_skybox = environment_map(m_device,
-                                       std::filesystem::path(environment_data->filepath),
-                                       m_physical.memory_properties(),
-                                       m_final_renderpass);
+            const environment* environment_data =
+              m_current_scene->get<environment>();
+            m_skybox =
+              environment_map(m_device,
+                              std::filesystem::path(environment_data->filepath),
+                              m_physical.memory_properties(),
+                              m_final_renderpass);
 
             flecs::query<> caching =
               m_current_scene->query_builder<mesh_source>().build();

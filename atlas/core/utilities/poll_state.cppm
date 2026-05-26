@@ -7,11 +7,16 @@ module;
 export module atlas.core.utilities.poll_state;
 
 export namespace atlas {
-    inline std::unordered_map<void*, std::vector<std::function<void(float)>>> s_update{};
-    inline std::unordered_map<void*, std::vector<std::function<void()>>> s_defer_update{};
-    inline std::unordered_map<void*, std::vector<std::function<void()>>> s_ui_update{};
-    inline std::unordered_map<void*, std::vector<std::function<void()>>> s_physica_update{};
-    inline std::unordered_map<void*, std::vector<std::function<void()>>> s_start{};
+    inline std::unordered_map<void*, std::vector<std::function<void(float)>>>
+      s_update{};
+    inline std::unordered_map<void*, std::vector<std::function<void()>>>
+      s_defer_update{};
+    inline std::unordered_map<void*, std::vector<std::function<void()>>>
+      s_ui_update{};
+    inline std::unordered_map<void*, std::vector<std::function<void()>>>
+      s_physica_update{};
+    inline std::unordered_map<void*, std::vector<std::function<void()>>>
+      s_start{};
 
     void poll_update(void* p_address,
                      const std::function<void(float)>& p_callback) {
@@ -81,7 +86,7 @@ export namespace atlas {
         //     on_update(p_delta_time);
         // }
 
-        for(auto& on_update : s_update[p_scene]) {
+        for (auto& on_update : s_update[p_scene]) {
             on_update(p_delta_time);
         }
     }

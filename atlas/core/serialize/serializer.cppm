@@ -236,11 +236,12 @@ namespace atlas {
             }
 
             console_log_info("Before loading environment mappings!");
-            std::string environment_map_data="";
-            if(data["Environment"]) {
+            std::string environment_map_data = "";
+            if (data["Environment"]) {
                 environment_map_data = data["Environment"].as<std::string>();
 
-                console_log_info("Environment Map Loaded Path (from yaml): {}", environment_map_data);
+                console_log_info("Environment Map Loaded Path (from yaml): {}",
+                                 environment_map_data);
             }
 
             p_registry.set<environment>({ .filepath = environment_map_data });
