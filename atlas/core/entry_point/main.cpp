@@ -157,6 +157,8 @@ main() {
 
     app->execute();
 
+    logical_device->wait();
+
     app->post_destroy();
 
     context->post_cleanup();

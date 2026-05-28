@@ -234,8 +234,6 @@ export namespace atlas {
                 m_window->submit(commands);
                 m_window->present(m_next_image_frame_idx);
             }
-
-            m_device->wait();
         }
 
         void post_destroy() {
