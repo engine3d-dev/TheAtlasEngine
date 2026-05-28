@@ -216,23 +216,19 @@ public:
         // trigger<atlas::event::mesh_reload>(this, &level_scene::reload_mesh);
 
         vk::texture_info config_texture = {
-            .phsyical_memory_properties =
-              atlas::vulkan::instance_context::physical_driver()
-                .memory_properties(),
-            .filepath = std::filesystem::path("assets/icons/PlayButton.png")
+            .phsyical_memory_properties = m_physical.memory_properties(),
+            .filepath = std::filesystem::path("assets/icons/PlayButton.png"),
         };
         m_play_button = vk::texture(
           atlas::vulkan::instance_context::logical_device(), config_texture);
         if (!m_play_button.loaded()) {
             console_log_info("Play Button Could not be loaded!!");
         }
-        config_texture = { .phsyical_memory_properties =
-                             atlas::vulkan::instance_context::physical_driver()
-                               .memory_properties(),
-                           .filepath = std::filesystem::path(
-                             "assets/icons/StopButton.png") };
-        m_stop_button = vk::texture(
-          atlas::vulkan::instance_context::logical_device(), config_texture);
+        config_texture = {
+            .phsyical_memory_properties = m_physical.memory_properties(),
+            .filepath = std::filesystem::path("assets/icons/StopButton.png"),
+        };
+        m_stop_button = vk::texture(m_device, config_texture);
         if (!m_stop_button.loaded()) {
             console_log_info("Stop Button Could not be loaded!!");
         }
@@ -246,7 +242,8 @@ public:
           m_stop_button.image().image_view(),
           VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
 
-        m_content_browser = content_browser_panel(m_device, m_physical.memory_properties());
+        m_content_browser =
+          content_browser_panel(m_device, m_physical.memory_properties());
 
         atlas::vulkan::instance_context::submit_resource_free([this]() {
             m_play_button.destroy();
@@ -353,14 +350,11 @@ public:
 
             if (ImGui::BeginMenu("File")) {
                 if (ImGui::MenuItem("Save")) {
-                    // m_deserializer_test.save("LevelScene");
                 }
 
                 ImGui::Separator();
 
                 if (ImGui::MenuItem("Exit")) {
-                    // glfwSetWindowShouldClose(atlas::application::close(),
-                    // true);
                 }
 
                 ImGui::EndMenu();
@@ -372,26 +366,9 @@ public:
         ImGui::SetNextWindowDockID(dockspace_id, ImGuiCond_FirstUseEver);
         if (ImGui::Begin("Viewport")) {
             ImVec2 viewport_size = ImGui::GetContentRegionAvail();
-            // ImGui::Image(m_viewport_image_id,
-            // {static_cast<float>(m_extent.width),
-            // static_cast<float>(m_extent.height)});
-            if (atlas::vulkan::g_viewport_image_id == nullptr) {
-                console_log_error("atlas::vulkan::g_viewport_image_id is "
-                                  "nullptr!!!!!!!!!!!!!!!!!!!");
-            }
             ImGui::Image(atlas::vulkan::g_viewport_image_id, viewport_size);
             ImGui::End();
         }
-
-        // if (ImGui::Begin("Viewport")) {
-        //     // TODO: Consider doing this a different way, but not with
-        //     static.
-        //     // glm::vec2 viewport_panel_size =
-        //     // glm::vec2{ atlas::application::params().width,
-        //     //             atlas::application::params().height };
-
-        //     ImGui::End();
-        // }
 
         defer_begin();
         auto query_builder = this->query_builder<atlas::transform>().build();
@@ -542,8 +519,6 @@ public:
                               material new_mat = {};
                               const auto* src =
                                 m_selected_entity.get<atlas::mesh_source>();
-                              console_log_info("Specular Path: {}",
-                                               src->specular);
                               if (std::filesystem::exists(src->specular)) {
                                   new_mat.specular = ui::experimental::icon(
                                     m_device,
@@ -551,9 +526,10 @@ public:
                                     std::filesystem::path(src->specular));
                               }
                               else {
-                                  console_log_info("Specular (white) Path");
-                                  vk::image_extent extent = { .width = 1,
-                                                              .height = 1 };
+                                  vk::image_extent extent = {
+                                      .width = 1,
+                                      .height = 1,
+                                  };
                                   new_mat.specular = ui::experimental::icon(
                                     m_device,
                                     m_physical.memory_properties(),
@@ -561,8 +537,6 @@ public:
                               }
 
                               if (std::filesystem::exists(src->diffuse)) {
-                                  console_log_info("Diffuse Path: {}",
-                                                   src->diffuse);
                                   new_mat.diffuse = ui::experimental::icon(
                                     m_device,
                                     m_physical.memory_properties(),
@@ -570,8 +544,10 @@ public:
                               }
                               else {
                                   console_log_info("Diffuse (white) Path");
-                                  vk::image_extent extent = { .width = 1,
-                                                              .height = 1 };
+                                  vk::image_extent extent = {
+                                      .width = 1,
+                                      .height = 1,
+                                  };
                                   new_mat.diffuse = ui::experimental::icon(
                                     m_device,
                                     m_physical.memory_properties(),
@@ -592,23 +568,6 @@ public:
                         "Specular", glm::value_ptr(p_source->specular), speed);
                       atlas::ui::draw_float("Shininess", p_source->shininess);
                   });
-
-                /*
-                atlas::ui::draw_component<atlas::directional_light>("Directional
-                Light", m_selected_entity, [](atlas::directional_light*
-                p_dir_light){ ImGui::DragFloat4("Direction",
-                glm::value_ptr(p_dir_light->direction)); ImGui::DragFloat4("View
-                Pos", glm::value_ptr(p_dir_light->view_position));
-                    ImGui::DragFloat4("Color",
-                glm::value_ptr(p_dir_light->color));
-                    ImGui::DragFloat4("Ambient",
-                glm::value_ptr(p_dir_light->ambient));
-                ImGui::DragFloat4("Diffuse",
-                glm::value_ptr(p_dir_light->diffuse));
-                ImGui::DragFloat4("Specular",
-                glm::value_ptr(p_dir_light->specular));
-                });
-                */
 
                 atlas::ui::draw_component<atlas::point_light>(
                   "Point Light",
@@ -716,7 +675,7 @@ public:
 
             // Material Properties Panel
             // TODO: Make this an abstraction to map out the materials
-            
+
             if (ImGui::Begin("Material Editor")) {
 
                 // Specular
@@ -772,38 +731,6 @@ public:
 
                 ImGui::End();
             }
-            
-
-            // Note --- just added this temporarily for testing
-            // auto time = atlas::application::delta_time();
-
-            // if((int)(time * 10.0f) % 8 > 4) {
-            // 	m_blink = !m_blink;
-            // }
-
-            // auto width = atlas::application::get_window().width();
-            // auto height = atlas::application::get_window().height();
-
-            // ImGui::SetNextWindowPos(ImVec2(static_cast<float>(width) * 0.5f,
-            // static_cast<float>(height) * 0.5f), ImGuiCond_Always,
-            // ImVec2(0.5f, 0.5f)); ImGui::SetNextWindowSize(ImVec2(200, 20),
-            // ImGuiCond_Always); ImGuiWindowFlags flags =
-            // ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground |
-            // ImGuiWindowFlags_NoInputs; ImGui::SetNextWindowBgAlpha(0.f);
-
-            // if(ImGui::Begin("Testing", nullptr, flags)) {
-            // ImGui::ProgressBar(10.f);
-
-            // 	auto pos = ImGui::GetWindowPos();
-            // 	pos.x += (float)width * 0.5f - 300.0f;
-            // 	pos.y += 50.0f;
-            // 	if(m_blink){
-            // 		ImGui::GetForegroundDrawList()->AddText(m_font, 120.0f,
-            // pos, 0xffffffff, "Click to Play!");
-            // 	}
-
-            // 	ImGui::End();
-            // }
         }
 
         ui_toolbar();

@@ -6,7 +6,6 @@ import atlas.application;
 import atlas.common;
 import atlas.core.level_streamer;
 import atlas.core.event;
-// import editor_world;
 import editor;
 
 import atlas.drivers.graphics_context;

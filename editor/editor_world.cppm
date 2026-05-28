@@ -30,8 +30,6 @@ public:
         // Set what our current scene is
         // TODO: Probably have `default_custom_scene<UScene>() set this
         current("LevelScene");
-
-        console_log_error("editor_world initialized successfully!!!");
     }
 
     ~editor_world() override = default;
