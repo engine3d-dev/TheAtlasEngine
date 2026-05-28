@@ -50,6 +50,12 @@ export namespace atlas {
             m_physical = p_context->physical_device();
             m_device = p_context->logical_device();
 
+            m_bus->create_listener<atlas::event::collision_enter>();
+            m_bus->create_listener<atlas::event::collision_persisted>();
+            m_bus->create_listener<atlas::event::collision_exit>();
+            // m_bus->create_immediate_listener<atlas::event::mesh_reload>();
+            // m_bus->create_immediate_listener<atlas::event::material_reload>();
+
             // Constructing the application
             std::println("Constructing application");
             window_params params = {
@@ -126,15 +132,11 @@ export namespace atlas {
             }
 
             std::println("images.size() = {}", images.size());
-
-            std::println("After constructing atlas::window");
         }
 
         void execute() {
-            std::println("Executing mainloop");
-
             VkClearValue clear_color = {
-                { 0.f, 0.5f, 0.5f, 1.f },
+                {{ 0.f, 0.5f, 0.5f, 1.f }},
             };
 
             VkClearValue depth_value = {
