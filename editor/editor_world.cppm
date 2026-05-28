@@ -2,7 +2,7 @@ module;
 
 #include <string>
 
-export module editor_world;
+export module editor:world;
 
 import atlas.core.utilities;
 import atlas.core.scene.world;
@@ -11,7 +11,7 @@ import atlas.drivers.renderer_system;
 import atlas.core.scene.uuid;
 import atlas.core.level_streamer;
 import atlas.core.scene;
-import level_scene;
+import :level_scene;
 
 /**
  * @brief editor_world is where a lot of the editor logic will be handled

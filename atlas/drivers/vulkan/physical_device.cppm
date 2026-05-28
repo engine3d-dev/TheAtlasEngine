@@ -19,6 +19,7 @@ export module atlas.drivers.vulkan.physical_device;
 
 import atlas.logger;
 import atlas.drivers.vulkan.utilities;
+import vk;
 
 export namespace atlas::vulkan {
     struct surface_properties {
@@ -123,6 +124,28 @@ export namespace atlas::vulkan {
                                                 &physical_memory_properties);
             return physical_memory_properties;
         }
+
+        /*
+        [[nodiscard]] uint32_t memory_properties(
+          vk::memory_property p_property_required) {
+            vk::allocation_params return_params = {};
+
+            VkPhysicalDeviceMemoryProperties memory_properties;
+            vkGetPhysicalDeviceMemoryProperties(m_physical_driver,
+                                                &memory_properties);
+
+            uint32_t mask = 0;
+            for (uint32_t i = 0; i < memory_properties.memoryTypeCount; i++) {
+                auto type_flags =
+                  memory_properties.memoryTypes[i].propertyFlags;
+
+                if ((type_flags & p_property_required) == p_property_required) {
+                    mask |= ((1 << i));
+                }
+            }
+            return mask;
+        }
+        */
 
         /**
          * @return uint32_t is the index to the presentation index of the

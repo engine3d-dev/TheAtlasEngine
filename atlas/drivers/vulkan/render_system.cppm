@@ -292,7 +292,7 @@ export namespace atlas::vulkan {
 
             caching.each([this](flecs::entity p_entity) {
                 const mesh_source* target = p_entity.get<mesh_source>();
-                mesh new_mesh(std::filesystem::path(target->model_path),
+                mesh new_mesh(m_device, m_physical.memory_properties(), std::filesystem::path(target->model_path),
                               target->flip);
 
                 // we do a check if the geometry uniform associated with this
@@ -571,8 +571,6 @@ export namespace atlas::vulkan {
 
             // TODO: Make to_bytes be part of utilities. This can be useful in
             // sending the amount of bytes in batches for batch-rendering
-            // std::span<uint8_t> bytes_data = to_bytes(global_frame_ubo);
-            // m_global_uniforms.update(bytes_data.data());
             m_global_uniforms.update(&global_frame_ubo);
 
             skybox_uniform skybox_ubo = {
@@ -651,15 +649,48 @@ export namespace atlas::vulkan {
                     m_mesh_descriptors[p_entity.id()]["materials"].bind(
                       m_current_command_buffer, m_main_pipeline.layout());
 
-                    m_cached_meshes[p_entity.id()].draw(
-                      m_current_command_buffer);
+                    // m_cached_meshes[p_entity.id()].draw(
+                    //   m_current_command_buffer);
+
+                    // binding/draw calls
+                    const VkBuffer vertex = m_cached_meshes[p_entity.id()].vertex_handle();
+                    const VkBuffer index = m_cached_meshes[p_entity.id()].index_handle();
+                    
+                    std::array<VkBuffer, 1> handler = {vertex};
+                    std::array<VkDeviceSize, 1> offsets = {0};
+                    vkCmdBindVertexBuffers(m_current_command_buffer,
+                                       0,
+                                       1,
+                                       handler.data(),
+                                       offsets.data());
+
+                    if(m_cached_meshes[p_entity.id()].indices_size() != 0) {
+                        vkCmdBindIndexBuffer(m_current_command_buffer,
+                                     index,
+                                     0,
+                                     VK_INDEX_TYPE_UINT32);
+                        vkCmdDrawIndexed(m_current_command_buffer, static_cast<uint32_t>(m_cached_meshes[p_entity.id()].indices_size()), 1, 0, 0, 0);
+                    }
+                    else {
+                        vkCmdDraw(m_current_command_buffer, m_cached_meshes[p_entity.id()].vertices_size(), 1, 0, 0);
+                    }
                 }
             });
 
-            m_skybox.bind(m_current_command_buffer);
-            m_skybox.draw(m_current_command_buffer);
+            std::array<VkDeviceSize, 1> offsets = {0};
+            vkCmdBindPipeline(m_current_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_skybox.pipeline());
+            m_skybox.descriptor_bind(m_current_command_buffer, m_skybox.pipeline_layout());
+
+            const VkBuffer skybox_vertex = m_skybox.vertex_handle();
+            vkCmdBindVertexBuffers(m_current_command_buffer,
+                                       0,
+                                       1,
+                                       &skybox_vertex,
+                                       offsets.data());
+            vkCmdDraw(m_current_command_buffer, m_skybox.vertices_size(), 1, 0, 0);
 
             vkCmdEndRenderPass(m_current_command_buffer);
+
             // Do not end the command buffer here when using offscreen +
             // swapchain two-pass: the application will begin the swapchain
             // render pass for ImGui, then end the command buffer.
@@ -670,6 +701,7 @@ export namespace atlas::vulkan {
             m_current_scene = p_scene_ctx;
         }
 
+        // Remove this API
         void render_invalidate_mesh(uint32_t p_entity_id,
                                     std::filesystem::path p_filename) override {
             m_cached_meshes[p_entity_id].reload_mesh(p_filename);

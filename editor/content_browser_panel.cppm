@@ -6,7 +6,7 @@ module;
 #include <imgui/backends/imgui_impl_glfw.h>
 #include <imgui/backends/imgui_impl_vulkan.h>
 
-export module content_browser;
+export module editor:content_browser;
 
 import atlas.logger;
 import atlas.drivers.vulkan.instance_context;
@@ -15,35 +15,32 @@ import vk;
 
 export class content_browser_panel {
 public:
-    content_browser_panel() {
+    content_browser_panel() = default;
+
+    content_browser_panel(
+      const VkDevice& p_device,
+      VkPhysicalDeviceMemoryProperties p_memory_properties) {
         vk::texture_info config_texture = {
-            .phsyical_memory_properties =
-              atlas::vulkan::instance_context::physical_driver()
-                .memory_properties(),
-            .filepath = std::filesystem::path("assets/icons/FileIcon.png")
+            .phsyical_memory_properties = p_memory_properties,
+            .filepath = std::filesystem::path("assets/icons/FileIcon.png"),
         };
-        m_file_icon = vk::texture(
-          atlas::vulkan::instance_context::logical_device(), config_texture);
+        m_file_icon = vk::texture(p_device, config_texture);
         if (!m_file_icon.loaded()) {
             console_log_info("Play Button Could not be loaded!!");
         }
-        config_texture = { .phsyical_memory_properties =
-                             atlas::vulkan::instance_context::physical_driver()
-                               .memory_properties(),
-                           .filepath = std::filesystem::path(
-                             "assets/icons/DirectoryIcon.png") };
-        m_directory_icon = vk::texture(
-          atlas::vulkan::instance_context::logical_device(), config_texture);
+        config_texture = {
+            .phsyical_memory_properties = p_memory_properties,
+            .filepath = std::filesystem::path("assets/icons/DirectoryIcon.png"),
+        };
+        m_directory_icon = vk::texture(p_device, config_texture);
         if (!m_directory_icon.loaded()) {
             console_log_info("Stop Button Could not be loaded!!");
         }
-        config_texture = { .phsyical_memory_properties =
-                             atlas::vulkan::instance_context::physical_driver()
-                               .memory_properties(),
-                           .filepath =
-                             std::filesystem::path("assets/icons/Back.png") };
-        m_back_icon = vk::texture(
-          atlas::vulkan::instance_context::logical_device(), config_texture);
+        config_texture = {
+            .phsyical_memory_properties = p_memory_properties,
+            .filepath = std::filesystem::path("assets/icons/Back.png"),
+        };
+        m_back_icon = vk::texture(p_device, config_texture);
         if (!m_back_icon.loaded()) {
             console_log_info("Stop Button Could not be loaded!!");
         }
@@ -166,7 +163,7 @@ private:
     ImTextureID m_file_icon_id;
     ImTextureID m_directory_icon_id;
     ImTextureID m_back_icon_id;
-    const std::filesystem::path m_asset_path =
+    std::filesystem::path m_asset_path =
       std::filesystem::current_path() / "assets";
     std::filesystem::path m_current_directory = m_asset_path;
 };

@@ -13,7 +13,7 @@ module;
 #include <filesystem>
 #include <unordered_map>
 
-export module level_scene;
+export module editor:level_scene;
 
 import atlas.core.utilities;
 import atlas.application;
@@ -31,167 +31,15 @@ import atlas.core.serialize;
 import atlas.physics.engine;
 import atlas.drivers.vulkan.imgui_context;
 import atlas.drivers.vulkan.instance_context;
+import atlas.drivers.vulkan.physical_device;
+import atlas.drivers.vulkan.device;
 import atlas.core.ui.widgets.imgui_stdlib;
 import vk;
-import content_browser;
-
-static void
-ui_component_list(flecs::entity& p_selected_entity) {
-    std::string entity_name = p_selected_entity.name().c_str();
-    std::string new_entity_name = "";
-    atlas::ui::draw_input_text(new_entity_name, entity_name);
-
-    p_selected_entity.set_name(new_entity_name.c_str());
-
-    ImGui::SameLine();
-    ImGui::PushItemWidth(-1);
-    if (ImGui::Button("Add Component")) {
-        ImGui::OpenPopup("Add Component");
-    }
-
-    if (ImGui::BeginPopup("Add Component")) {
-        if (!p_selected_entity.has<atlas::perspective_camera>()) {
-            if (ImGui::MenuItem("Perspective Camera")) {
-                p_selected_entity.add<
-                  flecs::pair<atlas::tag::editor, atlas::projection_view>>();
-                p_selected_entity.add<atlas::perspective_camera>();
-                ImGui::CloseCurrentPopup();
-            }
-        }
-
-        if (!p_selected_entity.has<atlas::mesh_source>()) {
-            if (ImGui::MenuItem("Mesh Source")) {
-                p_selected_entity.add<atlas::mesh_source>();
-                ImGui::CloseCurrentPopup();
-            }
-        }
-
-        if (!p_selected_entity.has<atlas::material_metadata>()) {
-            if (ImGui::MenuItem("Material")) {
-                p_selected_entity.add<atlas::material_metadata>();
-                ImGui::CloseCurrentPopup();
-            }
-        }
-
-        if (!p_selected_entity.has<atlas::point_light>()) {
-            if (ImGui::MenuItem("Point Light")) {
-                p_selected_entity.add<atlas::point_light>();
-                ImGui::CloseCurrentPopup();
-            }
-        }
-
-        if (!p_selected_entity.has<atlas::tag::serialize>()) {
-            if (ImGui::MenuItem("Serialize")) {
-                p_selected_entity.add<atlas::tag::serialize>();
-                ImGui::CloseCurrentPopup();
-            }
-        }
-
-        if (!p_selected_entity.has<atlas::physics_body>()) {
-            if (ImGui::MenuItem("Physics Body")) {
-                p_selected_entity.add<atlas::physics_body>();
-                ImGui::CloseCurrentPopup();
-            }
-        }
-
-        if (!p_selected_entity.has<atlas::box_collider>()) {
-            if (ImGui::MenuItem("Box Collider")) {
-                p_selected_entity.add<atlas::box_collider>();
-                ImGui::CloseCurrentPopup();
-            }
-        }
-
-        if (!p_selected_entity.has<atlas::sphere_collider>()) {
-            if (ImGui::MenuItem("Sphere Collider")) {
-                p_selected_entity.add<atlas::sphere_collider>();
-                ImGui::CloseCurrentPopup();
-            }
-        }
-
-        if (!p_selected_entity.has<atlas::capsule_collider>()) {
-            if (ImGui::MenuItem("Capsule Collider")) {
-                p_selected_entity.add<atlas::capsule_collider>();
-                ImGui::CloseCurrentPopup();
-            }
-        }
-        ImGui::EndPopup();
-    }
-
-    ImGui::PopItemWidth();
-}
+import :content_browser;
+import :icon;
+import :utilities;
 
 enum scene_runtime { edit, play };
-
-namespace ui::experimental {
-    /**
-     * @brief This is an experimental feature for setting up an image
-     * thumbnail-like abstraction
-     * TODO: This should be considered to being abstracted in another approach
-     * as this is a temporary solution for it. OR this could be the way we
-     * handle icons for the time being for simplicity.
-     */
-    class icon {
-    public:
-        icon() = default;
-        icon(const std::filesystem::path& p_filename) {
-            vk::texture_info config_texture = {
-                .phsyical_memory_properties =
-                  atlas::vulkan::instance_context::physical_driver()
-                    .memory_properties(),
-                .filepath = p_filename
-            };
-            m_icon_image =
-              vk::texture(atlas::vulkan::instance_context::logical_device(),
-                          config_texture);
-            if (!m_icon_image.loaded()) {
-                console_log_info("Play Button Could not be loaded!!");
-            }
-            m_icon_image_id =
-              static_cast<ImTextureID>(ImGui_ImplVulkan_AddTexture(
-                m_icon_image.image().sampler(),
-                m_icon_image.image().image_view(),
-                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
-        }
-
-        icon(const vk::image_extent& p_extent) {
-            // vk::texture_info config_texture = {
-            //     .phsyical_memory_properties =
-            //     atlas::vulkan::instance_context::physical_driver().memory_properties(),
-            //     .filepath = p_filename
-            // };
-            m_icon_image =
-              vk::texture(atlas::vulkan::instance_context::logical_device(),
-                          p_extent,
-                          atlas::vulkan::instance_context::physical_driver()
-                            .memory_properties());
-            // if (!m_icon_image.loaded()) {
-            //     console_log_info("Play Button Could not be loaded!!");
-            // }
-            m_icon_image_id =
-              static_cast<ImTextureID>(ImGui_ImplVulkan_AddTexture(
-                m_icon_image.image().sampler(),
-                m_icon_image.image().image_view(),
-                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
-        }
-
-        ~icon() {
-            // implicitly destroy
-            // destroy();
-        }
-
-        [[nodiscard]] uint32_t width() const { return m_icon_image.width(); }
-
-        [[nodiscard]] uint32_t height() const { return m_icon_image.height(); }
-
-        [[nodiscard]] ImTextureID texture_id() const { return m_icon_image_id; }
-
-        void destroy() { m_icon_image.destroy(); }
-
-    private:
-        vk::texture m_icon_image;
-        ImTextureID m_icon_image_id;
-    };
-};
 
 // TODO: This is just a temporary solution for loading material texture icons to
 // ImGui::Image This should be replaced with something like
@@ -205,6 +53,9 @@ export class level_scene final : public atlas::scene {
 public:
     level_scene(const std::string& p_name, atlas::event::bus& p_bus)
       : atlas::scene(p_name, p_bus) {
+        m_device = atlas::vulkan::instance_context::logical_device();
+        m_physical = atlas::vulkan::instance_context::physical_driver();
+
         auto editor_camera = entity("Editor Camera");
         editor_camera
           .add<flecs::pair<atlas::tag::editor, atlas::projection_view>>();
@@ -304,30 +155,32 @@ public:
         });
         point_light.add<atlas::tag::serialize>();
 
-        // for(size_t i = 0; i < 26; i++) {
-        // 	auto obj = entity(std::format("Object #{}", i));
-        // 	obj.set<atlas::physics_body>({
-        // 		.restitution = 1.25f,
-        // 		.body_movement_type = atlas::dynamic,
-        // 	});
+        /*
+        for(size_t i = 0; i < 26; i++) {
+                auto obj = entity(std::format("Object #{}", i));
+                obj.set<atlas::physics_body>({
+                        .restitution = 1.25f,
+                        .body_movement_type = atlas::dynamic,
+                });
 
-        // 	obj.set<atlas::sphere_collider>(
-        // 		{
-        // 		.radius = 1.0f,
-        // 	});
+                obj.set<atlas::sphere_collider>(
+                        {
+                        .radius = 1.0f,
+                });
 
-        // 	glm::vec3 pos = {float(0*1.4),float(0 * 1.4),float(0 * -3) };
+                glm::vec3 pos = {float(0*1.4),float(0 * 1.4),float(0 * -3) };
 
-        // 	obj.set<atlas::transform>({
-        // 		.position = pos,
-        // 		.rotation = {.3f, 0.0f, 0.0f},
-        // 	});
+                obj.set<atlas::transform>({
+                        .position = pos,
+                        .rotation = {.3f, 0.0f, 0.0f},
+                });
 
-        // 	obj.set<atlas::mesh_source>({
-        // 		.model_path = "assets/models/Ball OBJ.obj",
-        // 		.diffuse = "assets/models/clear.png",
-        // 	});
-        // }
+                obj.set<atlas::mesh_source>({
+                        .model_path = "assets/models/Ball OBJ.obj",
+                        .diffuse = "assets/models/clear.png",
+                });
+        }
+        */
 
         m_editor_dockspace.fullscreen(false);
         m_editor_dockspace.dockspace_open(true);
@@ -352,17 +205,16 @@ public:
             .width = 1,
             .height = 1,
         };
-        m_default_material_icon.specular = ui::experimental::icon(extent);
-        m_default_material_icon.diffuse = ui::experimental::icon(extent);
+        m_default_material_icon.specular = ui::experimental::icon(
+          m_device, m_physical.memory_properties(), extent);
+        m_default_material_icon.diffuse = ui::experimental::icon(
+          m_device, m_physical.memory_properties(), extent);
 
         // TEMP: This is for testing if the triggered event only occurs once
         // whenever a signal occurs. This should be moved to the internal
         // application... OR the renderer
         // trigger<atlas::event::mesh_reload>(this, &level_scene::reload_mesh);
 
-        // @note checking to see what state we are in. (If playing/stopping)
-        // Ref<Texture2D> icon = _sceneState == SceneState::Edit ? _iconPlay :
-        // _iconStop;
         vk::texture_info config_texture = {
             .phsyical_memory_properties =
               atlas::vulkan::instance_context::physical_driver()
@@ -393,6 +245,8 @@ public:
           m_stop_button.image().sampler(),
           m_stop_button.image().image_view(),
           VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
+
+        m_content_browser = content_browser_panel(m_device, m_physical.memory_properties());
 
         atlas::vulkan::instance_context::submit_resource_free([this]() {
             m_play_button.destroy();
@@ -692,28 +546,36 @@ public:
                                                src->specular);
                               if (std::filesystem::exists(src->specular)) {
                                   new_mat.specular = ui::experimental::icon(
+                                    m_device,
+                                    m_physical.memory_properties(),
                                     std::filesystem::path(src->specular));
                               }
                               else {
                                   console_log_info("Specular (white) Path");
                                   vk::image_extent extent = { .width = 1,
                                                               .height = 1 };
-                                  new_mat.specular =
-                                    ui::experimental::icon(extent);
+                                  new_mat.specular = ui::experimental::icon(
+                                    m_device,
+                                    m_physical.memory_properties(),
+                                    extent);
                               }
 
                               if (std::filesystem::exists(src->diffuse)) {
                                   console_log_info("Diffuse Path: {}",
                                                    src->diffuse);
                                   new_mat.diffuse = ui::experimental::icon(
+                                    m_device,
+                                    m_physical.memory_properties(),
                                     std::filesystem::path(src->diffuse));
                               }
                               else {
                                   console_log_info("Diffuse (white) Path");
                                   vk::image_extent extent = { .width = 1,
                                                               .height = 1 };
-                                  new_mat.diffuse =
-                                    ui::experimental::icon(extent);
+                                  new_mat.diffuse = ui::experimental::icon(
+                                    m_device,
+                                    m_physical.memory_properties(),
+                                    extent);
                               }
 
                               m_material_icons.emplace(m_selected_entity.id(),
@@ -854,6 +716,7 @@ public:
 
             // Material Properties Panel
             // TODO: Make this an abstraction to map out the materials
+            
             if (ImGui::Begin("Material Editor")) {
 
                 // Specular
@@ -909,6 +772,7 @@ public:
 
                 ImGui::End();
             }
+            
 
             // Note --- just added this temporarily for testing
             // auto time = atlas::application::delta_time();
@@ -1065,6 +929,8 @@ private:
     }
 
 private:
+    VkDevice m_device;
+    atlas::vulkan::physical_device m_physical;
     atlas::serializer m_deserializer_test;
     flecs::entity m_selected_entity;
 
