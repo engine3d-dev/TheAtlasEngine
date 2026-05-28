@@ -18,6 +18,7 @@ module;
 #endif
 
 #include <GLFW/glfw3.h>
+#include <span>
 
 export module atlas.window;
 
@@ -147,13 +148,31 @@ export namespace atlas {
             m_surface = std::make_shared<vk::surface>(p_context->instance_handle(), m_window);
             
             center_window();
+            vk::swapchain_params swapchain_params = {
+                .width = static_cast<uint32_t>(m_params.width),
+                .height = static_cast<uint32_t>(m_params.height),
+                .present_index = 0,
+            };
+
+            const VkSurfaceKHR surface = *m_surface;
+            m_swapchain = std::make_shared<vk::swapchain>(*p_context->logical_device(), surface, swapchain_params, p_context->physical_device().request_surface(surface));
 
 
 
-            graphics_context::submit_resource_free([this](){
-                std::println("atlas::window submit resource free");
-                // m_surface->destruct();
-            });
+            // graphics_context::submit_resource_free([this](){
+            //     std::println("atlas::window submit resource free");
+            //     // m_swapchain.destruct();
+            // });
+        }
+
+        ~window() {
+            // glfwDestroyWindow(m_window);
+            m_surface->destruct();
+            glfwDestroyWindow(m_window);
+        }
+
+        void destruct() {
+            m_swapchain->destruct();
         }
 
         GLFWwindow* glfw_window() const { return m_window; }
@@ -168,6 +187,9 @@ export namespace atlas {
                              static_cast<int>(height));
         }
 
+        void present(std::span<const VkCommandBuffer> p_commands) {
+        }
+
         [[nodiscard]] bool available() const {
             return !glfwWindowShouldClose(m_window);
         }
@@ -176,6 +198,7 @@ export namespace atlas {
         vk::instance m_instance;
         std::shared_ptr<vk::device> m_device=nullptr;
         std::shared_ptr<vk::surface> m_surface;
+        std::shared_ptr<vk::swapchain> m_swapchain;
         GLFWwindow* m_window = nullptr;
         window_params m_params{};
     };

@@ -267,10 +267,14 @@ export namespace atlas {
             while(m_window->available()) {
                 event::flush_events();
             }
+
+            m_device->wait();
         }
 
         void post_destroy() {
             std::println("Post destroy!");
+            m_window->destruct();
+            m_device->destruct();
         }
 
     private:
