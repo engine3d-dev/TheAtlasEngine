@@ -6,11 +6,14 @@ module;
 
 export module atlas.core.utilities.types;
 
+import vk;
+
 export namespace atlas {
     struct window_params {
         uint32_t width;
         uint32_t height;
         std::string name = "";
+        vk::surface_params surface_properties{};
     };
 
     // TODO: Move this into atlas.drivers.vulkan.utilities

@@ -58,6 +58,8 @@ export namespace atlas::vulkan {
             uint32_t device_count = 0;
             vkEnumeratePhysicalDevices(p_instance, &device_count, nullptr);
 
+            console_log_info("physical_device after enumerations!");
+
             if (device_count == 0) {
                 console_log_fatal("Device Count is {} and no devices found!!!",
                                   device_count);
@@ -125,11 +127,8 @@ export namespace atlas::vulkan {
             return physical_memory_properties;
         }
 
-        /*
         [[nodiscard]] uint32_t memory_properties(
           vk::memory_property p_property_required) {
-            vk::allocation_params return_params = {};
-
             VkPhysicalDeviceMemoryProperties memory_properties;
             vkGetPhysicalDeviceMemoryProperties(m_physical_driver,
                                                 &memory_properties);
@@ -145,7 +144,6 @@ export namespace atlas::vulkan {
             }
             return mask;
         }
-        */
 
         /**
          * @return uint32_t is the index to the presentation index of the

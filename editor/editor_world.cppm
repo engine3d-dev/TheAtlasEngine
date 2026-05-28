@@ -25,11 +25,11 @@ public:
 
         // Create defualt scene to level streamer
         // Does polymorphic allocations for these customized scenes
-        default_custom_scene<level_scene>("LevelScene", p_bus);
+        // default_custom_scene<level_scene>("LevelScene", p_bus);
 
         // Set what our current scene is
         // TODO: Probably have `default_custom_scene<UScene>() set this
-        current("LevelScene");
+        // current("LevelScene");
     }
 
     ~editor_world() override = default;

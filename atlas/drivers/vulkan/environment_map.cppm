@@ -27,10 +27,11 @@ module;
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
 #include <print>
+#include <span>
 
 export module atlas.drivers.vulkan.environment_map;
 
-import atlas.drivers.vulkan.instance_context;
+import atlas.drivers.vulkan.physical_device;
 
 import vk;
 
@@ -45,10 +46,12 @@ namespace atlas {
         environment_map() = default;
 
         environment_map(const VkDevice& p_device,
+                        vulkan::physical_device& p_physical,
                         const std::filesystem::path& p_filename,
-                        VkPhysicalDeviceMemoryProperties p_memory_properties,
+                        uint32_t p_memory_properties,
                         VkRenderPass p_renderpass)
-          : m_device(p_device) {
+          : m_device(p_device)
+          , m_physical(&p_physical) {
             m_memory_properties = p_memory_properties;
             create_hdr_skybox(p_filename);
 
@@ -77,21 +80,24 @@ namespace atlas {
             const uint64_t image_size = total_size_bytes;
 
             // Creating staging buffer
-            uint32_t property_flag = vk::memory_property::host_visible_bit |
-                                     vk::memory_property::host_cached_bit;
             vk::buffer_parameters staging_buffer_params = {
-                .device_size = static_cast<uint32_t>(image_size),
+                // .device_size = static_cast<uint32_t>(image_size),
                 // Replace with .memory_mask
-                .physical_memory_properties = m_memory_properties,
+                .memory_mask = m_physical->memory_properties(
+                  vk::memory_property::host_visible_bit |
+                  vk::memory_property::host_cached_bit),
                 // Replace with .memory_mask
-                .property_flags =
-                  static_cast<vk::memory_property>(property_flag),
-                .usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                // .property_flags =
+                //   static_cast<vk::memory_property>(property_flag),
+                // .usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                .usage = vk::buffer_usage::transfer_src_bit,
             };
 
             // Replace to be vk::buffer
-            vk::buffer_stream staging_buffer =
-              vk::buffer_stream(m_device, staging_buffer_params);
+            vk::buffer staging_buffer =
+              vk::buffer(m_device,
+                                static_cast<uint32_t>(image_size),
+                                staging_buffer_params);
 
             // Creating image handle to storing the HDR
             vk::image_params skybox_image_params = {
@@ -101,12 +107,12 @@ namespace atlas {
                 },
                 .format = texture_format,
                 // Replace with .memory_mask
-                .property = vk::memory_property::device_local_bit,
+                .memory_mask = m_memory_properties,
+                // Replace with .memory_mask
+                // .property = vk::memory_property::device_local_bit,
                 .aspect = vk::image_aspect_flags::color_bit,
                 .usage = vk::image_usage::transfer_dst_bit |
                          vk::image_usage::sampled_bit,
-                // Replace with .memory_mask
-                .phsyical_memory_properties = m_memory_properties,
             };
             m_skybox_image = vk::sample_image(m_device, skybox_image_params);
 
@@ -114,7 +120,7 @@ namespace atlas {
             // Replace to using staging_buffer.transfer API
             std::span<const uint8_t> pixels_data(
               reinterpret_cast<const uint8_t*>(pixels), image_size);
-            staging_buffer.write(pixels_data);
+            staging_buffer.transfer(pixels_data);
 
             // Free CPU pixels immediately after staging copy
             stbi_image_free(pixels);
@@ -134,9 +140,13 @@ namespace atlas {
                                           texture_format,
                                           VK_IMAGE_LAYOUT_UNDEFINED,
                                           VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-
+            
+            vk::buffer_image_copy image_copy = {
+                .image_offset = { .width = 0, .height = 0, .depth = 0, },
+                .image_extent = { .width = skybox_image_params.extent.width, .height = skybox_image_params.extent.height, .depth = 1, },
+            };
             staging_buffer.copy_to_image(
-              upload_cmd, m_skybox_image, skybox_image_params.extent);
+              upload_cmd, m_skybox_image, std::span<const vk::buffer_image_copy>(&image_copy, 1));
 
             // Begin Memory Barrier: TRANSFER_DST to SHADER_READ_ONLY
             m_skybox_image.memory_barrier(
@@ -160,12 +170,15 @@ namespace atlas {
             vkQueueSubmit(graphics_queue, 1, &submit_info, nullptr);
             vkQueueWaitIdle(graphics_queue);
 
-            upload_cmd.destroy();
-            staging_buffer.destroy();
+            upload_cmd.destruct();
+            staging_buffer.destruct();
             stbi_set_flip_vertically_on_load(false);
         }
 
         void create_buffers() {
+            const auto property_flags = static_cast<vk::memory_property>(
+              vk::memory_property::host_visible_bit |
+              vk::memory_property::host_cached_bit);
             std::vector<vk::vertex_input> vertices = {
                 // Front Face
                 vk::vertex_input{ { -1.0f, 1.0f, -1.0f },
@@ -323,13 +336,17 @@ namespace atlas {
                                   { 0.0f, 0.0f, 0.0f },
                                   { 0.0f, 0.0f } }
             };
-            vk::vertex_params vbo_params = {
-                // Replace with .memory_mask
-                .phsyical_memory_properties = m_memory_properties,
-                .vertices = vertices
+
+            vk::buffer_parameters vertex_params = {
+                .memory_mask = m_physical->memory_properties(property_flags),
+                .property_flags = vk::memory_property::device_local_bit,
+                .usage = vk::buffer_usage::transfer_dst_bit |
+                         vk::buffer_usage::vertex_buffer_bit,
             };
 
-            m_skybox_vbo = vk::vertex_buffer(m_device, vbo_params);
+            m_skybox_vbo = vk::vertex_buffer(m_device, vertices, vertex_params);
+
+            m_vertices_size = static_cast<uint32_t>(vertices.size());
         }
 
         void create_skybox_pipeline(const VkRenderPass& p_renderpass) {
@@ -384,35 +401,39 @@ namespace atlas {
             m_skybox_shaders.vertex_attributes(attribute);
 
             // set=0 binding=0 UBO: mat4 VP
-            vk::uniform_params ubo_params = {
-                .phsyical_memory_properties = m_memory_properties,
-                .size_bytes = sizeof(skybox_uniform),
-                .debug_name = "skybox_ubo",
-                .vkSetDebugUtilsObjectNameEXT = nullptr,
+            vk::buffer_parameters uniform_params = {
+                .memory_mask = m_physical->memory_properties(
+                  vk::memory_property::host_visible_bit |
+                  vk::memory_property::host_cached_bit),
+                .usage = vk::buffer_usage::uniform_buffer_bit |
+                         vk::buffer_usage::shader_device_address_bit,
+                .allocate_flags =
+                  vk::memory_allocate_flags::device_address_bit_khr,
             };
             // Replace vk::uniform_params with vk::buffer_parameters(m_device,
             // sizeof(skybox_uniform), ubo_params);
-            m_skybox_ubo = vk::uniform_buffer(m_device, ubo_params);
+            m_skybox_ubo = vk::uniform_buffer(m_device, sizeof(skybox_uniform), uniform_params);
 
             skybox_uniform identity = { .proj_view = glm::mat4(1.0f) };
             identity.proj_view[1][1] *= -1;
 
             // Replace with m_skybox_ubo.transfer<T>
-            m_skybox_ubo.update(&identity);
+            m_skybox_ubo.transfer<skybox_uniform>(
+              std::span<skybox_uniform>(&identity, 1));
 
             // set=0 bindings:
             //  - binding 0: UBO (vertex)
             //  - binding 1: samplerCube (fragment)
             std::array<vk::descriptor_entry, 2> entries = {
                 vk::descriptor_entry{
-                  .type = vk::buffer::uniform,
+                  .type = vk::descriptor_type::uniform,
                   .binding_point =
                     vk::descriptor_binding_point{
                       .binding = 0, .stage = vk::shader_stage::vertex },
                   .descriptor_count = 1,
                 },
                 vk::descriptor_entry{
-                  .type = vk::buffer::combined_image_sampler,
+                  .type = vk::descriptor_type::combined_image_sampler,
                   .binding_point =
                     vk::descriptor_binding_point{
                       .binding = 1, .stage = vk::shader_stage::fragment },
@@ -518,7 +539,8 @@ namespace atlas {
 
         void update_uniform(const skybox_uniform& p_ubo) {
             // Replace with m_skybox_ubo.transfer<T>(...)
-            m_skybox_ubo.update(&p_ubo);
+            // m_skybox_ubo.update(&p_ubo);
+            m_skybox_ubo.transfer<skybox_uniform>(std::span<const skybox_uniform>(&p_ubo, 1));
         }
 
         [[nodiscard]] VkPipelineLayout pipeline_layout() const {
@@ -533,17 +555,17 @@ namespace atlas {
 
         void descriptor_bind(const VkCommandBuffer& p_command,
                              const VkPipelineLayout& p_pipeline_layout) {
-            m_skybox_descriptors.bind(p_command, p_pipeline_layout);
+            // m_skybox_descriptors.bind(p_command, p_pipeline_layout);
         }
 
         [[nodiscard]] VkBuffer vertex_handle() const { return m_skybox_vbo; }
 
         [[nodiscard]] uint32_t vertices_size() const {
-            return m_skybox_vbo.size();
+            return m_vertices_size;
         }
 
         void draw(const VkCommandBuffer& p_current) {
-            vkCmdDraw(p_current, m_skybox_vbo.size(), 1, 0, 0);
+            vkCmdDraw(p_current, m_vertices_size, 1, 0, 0);
             // vkCmdDrawIndexed(p_current, 36, 1, 0, 0, 0);
         }
 
@@ -552,25 +574,27 @@ namespace atlas {
 
         void destroy() {
 
-            m_skybox_image.destroy();
+            m_skybox_image.destruct();
             if (m_skybox_pipeline.alive()) {
-                m_skybox_pipeline.destroy();
+                m_skybox_pipeline.destruct();
             }
-            m_skybox_descriptors.destroy();
-            m_skybox_ubo.destroy();
-            m_skybox_shaders.destroy();
-            m_skybox_vbo.destroy();
+            m_skybox_descriptors.destruct();
+            m_skybox_ubo.destruct();
+            m_skybox_shaders.destruct();
+            m_skybox_vbo.destruct();
         }
 
     private:
         VkDevice m_device = nullptr;
-        VkPhysicalDeviceMemoryProperties m_memory_properties;
+        vulkan::physical_device* m_physical;
+        uint32_t m_memory_properties;
         vk::sample_image m_skybox_image;
         vk::shader_resource m_skybox_shaders{};
         vk::uniform_buffer m_skybox_ubo{};
         vk::descriptor_resource m_skybox_descriptors{};
         vk::pipeline m_skybox_pipeline{};
         vk::vertex_buffer m_skybox_vbo;
+        uint32_t m_vertices_size=0;
     };
 
 };

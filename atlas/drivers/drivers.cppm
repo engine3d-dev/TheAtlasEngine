@@ -28,14 +28,14 @@ export namespace atlas {
      *
      * @return shared_ptr<atlas::window>
      */
-    ref<window> initialize_window(ref<graphics_context> p_context,
-                                  const window_params& p_params,
-                                  graphics_api p_api) {
-        switch (p_api) {
-            case graphics_api::vulkan:
-                return create_ref<vulkan::window_context>(p_context, p_params);
-            default:
-                return nullptr;
-        }
-    }
+    // ref<window> initialize_window(ref<graphics_context> p_context,
+    //                               const window_params& p_params,
+    //                               graphics_api p_api) {
+    //     switch (p_api) {
+    //         case graphics_api::vulkan:
+    //             return create_ref<vulkan::window_context>(p_context, p_params);
+    //         default:
+    //             return nullptr;
+    //     }
+    // }
 };

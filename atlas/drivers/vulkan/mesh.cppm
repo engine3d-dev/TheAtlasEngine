@@ -13,11 +13,11 @@ module;
 export module atlas.drivers.vulkan.mesh;
 import vk;
 
-import atlas.logger;
-import atlas.drivers.vulkan.instance_context;
+import atlas.logger;\
 import atlas.drivers.vulkan.physical_device;
 import atlas.drivers.vulkan.device;
 import atlas.drivers.vulkan.hash;
+import atlas.drivers.vulkan.stb_image;
 
 export namespace atlas::vulkan {
     /**
@@ -39,22 +39,40 @@ export namespace atlas::vulkan {
         mesh(const VkDevice& p_device,
              std::span<vk::vertex_input> p_vertices,
              std::span<uint32_t> p_indices,
-             VkPhysicalDeviceMemoryProperties p_memory_properties)
+             uint32_t p_memory_properties)
           : m_device(p_device) {
-            // m_physical = instance_context::physical_driver();
-            // m_device = instance_context::logical_device();
             m_memory_properties = p_memory_properties;
 
-            vk::vertex_params vbo_settings = {
-                .phsyical_memory_properties = m_memory_properties,
-                .vertices = p_vertices,
+            // vk::vertex_params vbo_settings = {
+            //     .phsyical_memory_properties = m_memory_properties,
+            //     .vertices = p_vertices,
+            // };
+            // vk::index_params ibo_settings = {
+            //     .phsyical_memory_properties = m_memory_properties,
+            //     .indices = p_indices,
+            // };
+            // const auto property_flags = static_cast<vk::memory_property>(
+            //   vk::memory_property::host_visible_bit |
+            //   vk::memory_property::host_cached_bit);
+
+            vk::buffer_parameters vertex_params = {
+                // .memory_mask = p_physical.memory_properties(property_flags),
+                .memory_mask = p_memory_properties,
+                .property_flags = vk::memory_property::device_local_bit,
+                .usage = vk::buffer_usage::transfer_dst_bit |
+                         vk::buffer_usage::vertex_buffer_bit,
             };
-            vk::index_params ibo_settings = {
-                .phsyical_memory_properties = m_memory_properties,
-                .indices = p_indices,
+
+            vk::buffer_parameters index_params = {
+                // .memory_mask = p_physical.memory_properties(property_flags),
+                .memory_mask = p_memory_properties,
+                .property_flags = static_cast<vk::memory_property>(
+                  vk::memory_property::host_visible_bit |
+                  vk::memory_property::host_cached_bit),
+                .usage = vk::buffer_usage::index_buffer_bit,
             };
-            m_vbo = vk::vertex_buffer(m_device, vbo_settings);
-            m_ibo = vk::index_buffer(m_device, ibo_settings);
+            m_vbo = vk::vertex_buffer(m_device, p_vertices, vertex_params);
+            m_ibo = vk::index_buffer(m_device, p_indices, index_params);
 
             // m_vertices_size = p_vertices.size();
             m_vertices_size = static_cast<uint32_t>(p_vertices.size());
@@ -63,7 +81,7 @@ export namespace atlas::vulkan {
         }
 
         mesh(const VkDevice& p_device,
-             VkPhysicalDeviceMemoryProperties p_memory_properties,
+             uint32_t p_memory_properties,
              const std::filesystem::path& p_filename,
              bool p_flip = false)
           : m_device(p_device)
@@ -81,27 +99,28 @@ export namespace atlas::vulkan {
 
         [[nodiscard]] VkBuffer index_handle() const { return m_ibo; }
 
-        [[nodiscard]] uint32_t vertices_size() const { return m_vbo.size(); }
+        [[nodiscard]] uint32_t vertices_size() const { return m_vertices_size; }
 
-        [[nodiscard]] uint32_t indices_size() const { return m_ibo.size(); }
+        [[nodiscard]] uint32_t indices_size() const { return m_indices_size; }
 
         void destroy() {
-            m_vbo.destroy();
-            m_ibo.destroy();
+            m_vbo.destruct();
+            m_ibo.destruct();
 
-            m_diffuse.destroy();
-            m_specular.destroy();
-            m_geoemtry_ubo.destroy();
-            m_material_ubo.destroy();
+            m_diffuse.destruct();
+            m_specular.destruct();
+            m_geoemtry_ubo.destruct();
+            m_material_ubo.destruct();
         }
 
         //! @brief Loading single texture with specified std::filesystem::path
         void add_diffuse(const std::filesystem::path& p_path) {
-            ::vk::texture_info config_texture = {
-                .phsyical_memory_properties = m_memory_properties,
-                .filepath = p_path,
+            vk::texture_params config_texture = {
+                .memory_mask = m_memory_properties,
             };
-            m_diffuse = ::vk::texture(m_device, config_texture);
+
+            atlas::vulkan::stb_image diffuse(p_path.string(), config_texture);
+            m_diffuse = ::vk::texture(m_device, &diffuse, config_texture);
 
             if (!m_diffuse.loaded()) {
                 console_log_info("Diffuse Texture {} is NOT loaded!!!",
@@ -111,11 +130,11 @@ export namespace atlas::vulkan {
         }
 
         void add_specular(const std::filesystem::path& p_path) {
-            vk::texture_info config_texture = {
-                .phsyical_memory_properties = m_memory_properties,
-                .filepath = p_path,
+            vk::texture_params config_texture = {
+                .memory_mask = m_memory_properties,
             };
-            m_specular = vk::texture(m_device, config_texture);
+            atlas::vulkan::stb_image specular(p_path.string(), config_texture);
+            m_specular = vk::texture(m_device, &specular, config_texture);
 
             if (!m_specular.loaded()) {
                 console_log_error("Specular Texture {} is NOT loaded!!!",
@@ -131,16 +150,16 @@ export namespace atlas::vulkan {
             return m_specular.image();
         }
 
-        void draw(const VkCommandBuffer& p_command_buffer) {
-            m_vbo.bind(p_command_buffer);
-            if (m_ibo.size() > 0) {
-                m_ibo.bind(p_command_buffer);
-                vkCmdDrawIndexed(p_command_buffer, m_ibo.size(), 1, 0, 0, 0);
-            }
-            else {
-                vkCmdDraw(p_command_buffer, m_vbo.size(), 1, 0, 0);
-            }
-        }
+        // void draw(const VkCommandBuffer& p_command_buffer) {
+        //     m_vbo.bind(p_command_buffer);
+        //     if (m_ibo.size() > 0) {
+        //         m_ibo.bind(p_command_buffer);
+        //         vkCmdDrawIndexed(p_command_buffer, m_ibo.size(), 1, 0, 0, 0);
+        //     }
+        //     else {
+        //         vkCmdDraw(p_command_buffer, m_vbo.size(), 1, 0, 0);
+        //     }
+        // }
 
         //! @return true if mesh geometry model loaded succesfully
         [[nodiscard]] bool loaded() const { return m_model_loaded; }
@@ -254,14 +273,29 @@ export namespace atlas::vulkan {
                 }
             }
 
-            ::vk::vertex_params vbo_settings = { .phsyical_memory_properties =
-                                                   m_memory_properties,
-                                                 .vertices = vertices };
-            ::vk::index_params ibo_settings = { .phsyical_memory_properties =
-                                                  m_memory_properties,
-                                                .indices = indices };
-            m_vbo = ::vk::vertex_buffer(m_device, vbo_settings);
-            m_ibo = ::vk::index_buffer(m_device, ibo_settings);
+            vk::buffer_parameters vertex_params = {
+                .memory_mask = m_memory_properties,
+                .property_flags = vk::memory_property::device_local_bit,
+                .usage = vk::buffer_usage::transfer_dst_bit |
+                        vk::buffer_usage::vertex_buffer_bit,
+            };
+
+            vk::buffer_parameters index_params = {
+                .memory_mask = m_memory_properties,
+                .property_flags = static_cast<vk::memory_property>(
+                vk::memory_property::host_visible_bit |
+                vk::memory_property::host_cached_bit),
+                .usage = vk::buffer_usage::index_buffer_bit,
+            };
+
+            // ::vk::vertex_params vbo_settings = { .phsyical_memory_properties =
+            //                                        m_memory_properties,
+            //                                      .vertices = vertices };
+            // ::vk::index_params ibo_settings = { .phsyical_memory_properties =
+            //                                       m_memory_properties,
+            //                                     .indices = indices };
+            m_vbo = ::vk::vertex_buffer(m_device, vertices, vertex_params);
+            m_ibo = ::vk::index_buffer(m_device, indices, index_params);
 
             m_vertices_size = vertices.size();
             m_indices_size = indices.size();
@@ -269,7 +303,7 @@ export namespace atlas::vulkan {
         }
 
     private:
-        VkPhysicalDeviceMemoryProperties m_memory_properties{};
+        uint32_t m_memory_properties=0;
         VkDevice m_device = nullptr;
         vk::texture m_diffuse;
         vk::texture m_specular;

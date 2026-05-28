@@ -246,10 +246,12 @@ namespace atlas::vulkan {
                 // setting up vertex binding
                 const ::vk::vertex_attribute attribute = p_attributes[i];
                 m_vertex_attributes.resize(attribute.entries.size());
-                m_vertex_binding_attributes[i] = { .binding = attribute.binding,
-                                                   .stride = attribute.stride,
-                                                   .inputRate = to_input_rate(
-                                                     attribute.input_rate) };
+                m_vertex_binding_attributes[i] = {
+                    .binding = attribute.binding,
+                    .stride = attribute.stride,
+                    .inputRate =
+                      static_cast<VkVertexInputRate>(attribute.input_rate),
+                };
 
                 // then setting up the vertex attributes for the vertex data
                 // layouts

@@ -8,6 +8,7 @@ module;
 #include <flecs.h>
 #include <stdexcept>
 #include <filesystem>
+#include <span>
 
 #include <glm/ext.hpp>
 
@@ -18,7 +19,6 @@ import atlas.core.utilities;
 import vk;
 import atlas.core.scene;
 import atlas.drivers.graphics_context;
-import atlas.drivers.vulkan.instance_context;
 import atlas.drivers.vulkan.physical_device;
 import atlas.drivers.vulkan.device;
 import atlas.drivers.vulkan.mesh;
@@ -57,6 +57,7 @@ export namespace atlas::vulkan {
      *      * Idea is the std::string is the geometries within this scene, the
      * data format is: <scene_str, <mesh_str, mesh_metadata>>
      */
+    /*
     class render_system : public renderer_system {
     public:
         render_system(ref<graphics_context> p_context,
@@ -143,7 +144,7 @@ export namespace atlas::vulkan {
             std::vector<vk::descriptor_entry> set0_entries = {
                 vk::descriptor_entry{
                     // specifies "layout (set = 0, binding = 0) uniform GlobalUbo"
-                    .type = vk::buffer::uniform,
+                    .type = vk::descriptor_type::uniform,
                     .binding_point = {
                         .binding = 0,
                         .stage = vk::shader_stage::vertex,
@@ -152,7 +153,7 @@ export namespace atlas::vulkan {
                 },
                 vk::descriptor_entry{
                     // specifies "layout (set = 0, binding = 1) uniform light_ubo"
-                    .type = vk::buffer::uniform,
+                    .type = vk::descriptor_type::uniform,
                     .binding_point = {
                         .binding = 1,
                         .stage = vk::shader_stage::fragment,
@@ -170,29 +171,49 @@ export namespace atlas::vulkan {
             m_global_descriptors =
               vk::descriptor_resource(m_device, set0_layout);
 
-            vk::uniform_params global_info = {
-                .phsyical_memory_properties = m_physical.memory_properties(),
-                .size_bytes = sizeof(global_ubo),
-                .debug_name = "\nm_global_uniforms\n",
-                .vkSetDebugUtilsObjectNameEXT =
-                  instance_context::get_debug_object_name()
+            // vk::uniform_params global_info = {
+            //     .phsyical_memory_properties = m_physical.memory_properties(),
+            //     .size_bytes = sizeof(global_ubo),
+            //     .debug_name = "\nm_global_uniforms\n",
+            //     .vkSetDebugUtilsObjectNameEXT =
+            //       instance_context::get_debug_object_name()
+            // };
+            vk::buffer_parameters global_uniforms = {
+                .memory_mask = m_physical.memory_properties(
+                  vk::memory_property::host_visible_bit |
+                  vk::memory_property::host_cached_bit),
+                .usage = vk::buffer_usage::uniform_buffer_bit |
+                         vk::buffer_usage::shader_device_address_bit,
+                .allocate_flags =
+                  vk::memory_allocate_flags::device_address_bit_khr,
             };
-            m_global_uniforms = vk::uniform_buffer(m_device, global_info);
+            m_global_uniforms =
+              vk::uniform_buffer(m_device, sizeof(global_ubo), global_uniforms);
 
             // setting up our light uniforms as the global uniforms rather then
             // per-object basis
-            vk::uniform_params light_ubo_params = {
-                .phsyical_memory_properties = m_physical.memory_properties(),
-                .size_bytes = sizeof(light_scene_ubo),
+            // vk::uniform_params light_ubo_params = {
+            //     .phsyical_memory_properties = m_physical.memory_properties(),
+            //     .size_bytes = sizeof(light_scene_ubo),
+            // };
+            vk::buffer_parameters light_ubo_params = {
+                .memory_mask = m_physical.memory_properties(
+                  vk::memory_property::host_visible_bit |
+                  vk::memory_property::host_cached_bit),
+                .usage = vk::buffer_usage::uniform_buffer_bit |
+                         vk::buffer_usage::shader_device_address_bit,
+                .allocate_flags =
+                  vk::memory_allocate_flags::device_address_bit_khr,
             };
-            m_point_light_uniforms =
-              vk::uniform_buffer(m_device, light_ubo_params);
+            m_point_light_uniforms = vk::uniform_buffer(
+              m_device, sizeof(light_scene_ubo), light_ubo_params);
 
             std::array<vk::write_buffer, 1> binding0_uniforms = {
                 vk::write_buffer{
                   .buffer = m_global_uniforms,
                   .offset = 0,
-                  .range = m_global_uniforms.size_bytes(),
+                  .range =
+                    static_cast<uint32_t>(m_global_uniforms.size_bytes()),
                 },
             };
 
@@ -200,7 +221,8 @@ export namespace atlas::vulkan {
                 vk::write_buffer{
                   .buffer = m_point_light_uniforms,
                   .offset = 0,
-                  .range = m_point_light_uniforms.size_bytes(),
+                  .range =
+                    static_cast<uint32_t>(m_point_light_uniforms.size_bytes()),
                 },
             };
 
@@ -224,16 +246,22 @@ export namespace atlas::vulkan {
                 .width = 1,
                 .height = 1,
             };
+            std::array<uint8_t, 4> white_color = { 0xff, 0xff, 0xff, 0xff };
             m_white_texture =
-              vk::texture(m_device, extent, m_physical.memory_properties());
+              vk::texture(m_device,
+                          extent,
+                          white_color,
+                          m_physical.memory_properties(
+                            vk::memory_property::host_visible_bit |
+                            vk::memory_property::host_cached_bit));
 
             p_context->submit_resource_free([this]() {
                 console_log_info("vulkan::render_system destructin invoked!!");
-                m_white_texture.destroy();
+                m_white_texture.destruct();
                 m_shader_group.destroy();
-                m_global_descriptors.destroy();
-                m_global_uniforms.destroy();
-                m_point_light_uniforms.destroy();
+                m_global_descriptors.destruct();
+                m_global_uniforms.destruct();
+                m_point_light_uniforms.destruct();
                 for (auto& [id, mesh] : m_cached_meshes) {
                     console_log_trace(
                       "Entity \"{}\" Destroyed in vk_renderer!!!", id);
@@ -241,21 +269,21 @@ export namespace atlas::vulkan {
                 }
 
                 for (auto& [id, uniform] : m_mesh_geometry_set) {
-                    uniform.destroy();
+                    uniform.destruct();
                 }
 
                 for (auto& [id, material_uniform] : m_mesh_material_set) {
-                    material_uniform.destroy();
+                    material_uniform.destruct();
                 }
 
                 for (auto& [key, descriptor_map] : m_mesh_descriptors) {
                     for (auto& [descriptor_type, descriptor] : descriptor_map) {
-                        descriptor.destroy();
+                        descriptor.destruct();
                     }
                 }
 
                 m_skybox.destroy();
-                m_main_pipeline.destroy();
+                m_main_pipeline.destruct();
             });
 
             console_log_info(
@@ -283,8 +311,11 @@ export namespace atlas::vulkan {
               m_current_scene->get<environment>();
             m_skybox =
               environment_map(m_device,
+                              m_physical,
                               std::filesystem::path(environment_data->filepath),
-                              m_physical.memory_properties(),
+                              m_physical.memory_properties(
+                                vk::memory_property::host_visible_bit |
+                                vk::memory_property::host_cached_bit),
                               m_final_renderpass);
 
             flecs::query<> caching =
@@ -292,31 +323,53 @@ export namespace atlas::vulkan {
 
             caching.each([this](flecs::entity p_entity) {
                 const mesh_source* target = p_entity.get<mesh_source>();
-                mesh new_mesh(m_device, m_physical.memory_properties(), std::filesystem::path(target->model_path),
+                mesh new_mesh(m_device,
+                              m_physical.memory_properties(
+                                vk::memory_property::host_visible_bit |
+                                vk::memory_property::host_cached_bit),
+                              std::filesystem::path(target->model_path),
                               target->flip);
 
                 // we do a check if the geometry uniform associated with this
                 // game object is valid
                 if (!m_mesh_geometry_set.contains(p_entity.id())) {
-                    vk::uniform_params geo_info = {
-                        .phsyical_memory_properties =
-                          m_physical.memory_properties(),
-                        .size_bytes = sizeof(material_uniform),
+                    // vk::uniform_params geo_info = {
+                    //     .phsyical_memory_properties =
+                    //       m_physical.memory_properties(),
+                    //     .size_bytes = sizeof(material_uniform),
+                    // };
+                    vk::buffer_parameters geo_params = {
+                        .memory_mask = m_physical.memory_properties(
+                          vk::memory_property::host_visible_bit |
+                          vk::memory_property::host_cached_bit),
+                        .usage = vk::buffer_usage::uniform_buffer_bit |
+                                 vk::buffer_usage::shader_device_address_bit,
+                        // .allocate_flags =
+                        // vk::memory_allocate_flags::device_address_bit_khr,
                     };
-                    m_mesh_geometry_set[p_entity.id()] =
-                      vk::uniform_buffer(m_device, geo_info);
+                    m_mesh_geometry_set[p_entity.id()] = vk::uniform_buffer(
+                      m_device, sizeof(material_uniform), geo_params);
                 }
 
                 // check if material is already associated with this particular
                 // game object
                 if (!m_mesh_material_set.contains(p_entity.id())) {
-                    vk::uniform_params mat_info = {
-                        .phsyical_memory_properties =
-                          m_physical.memory_properties(),
-                        .size_bytes = sizeof(material_metadata),
+                    // vk::uniform_params mat_info = {
+                    //     .phsyical_memory_properties =
+                    //       m_physical.memory_properties(),
+                    //     .size_bytes = sizeof(material_metadata),
+                    // };
+                    vk::buffer_parameters mat_params = {
+                        .memory_mask = m_physical.memory_properties(
+                          vk::memory_property::host_visible_bit |
+                          vk::memory_property::host_cached_bit),
+                        .usage = vk::buffer_usage::uniform_buffer_bit |
+                                 vk::buffer_usage::shader_device_address_bit,
+                        .allocate_flags =
+                          vk::memory_allocate_flags::device_address_bit_khr,
                     };
-                    m_mesh_material_set[p_entity.id()] =
-                      vk::uniform_buffer(m_device, mat_info);
+                    m_mesh_material_set[p_entity.id()] = vk::uniform_buffer(
+                      m_device, sizeof(material_metadata), mat_params);
                 }
 
                 new_mesh.add_diffuse(std::filesystem::path(target->diffuse));
@@ -328,7 +381,7 @@ export namespace atlas::vulkan {
                     std::vector<vk::descriptor_entry> set1_entries = {
                         vk::descriptor_entry{
                             // specifies "layout (set = 1, binding = 0) uniform geometry_uniform"
-                            .type = vk::buffer::uniform,
+                            .type = vk::descriptor_type::uniform,
                             .binding_point = {
                                 .binding = 0,
                                 .stage = vk::shader_stage::vertex,
@@ -337,7 +390,7 @@ export namespace atlas::vulkan {
                         },
                         vk::descriptor_entry{
                             // specifies "layout (set = 1, binding = 1) uniform sampler2D diffuse_texture"
-                            .type = vk::buffer::combined_image_sampler,
+                            .type = vk::descriptor_type::combined_image_sampler,
                             .binding_point = {
                                 .binding = 1,
                                 .stage = vk::shader_stage::fragment,
@@ -346,7 +399,7 @@ export namespace atlas::vulkan {
                         },
                         vk::descriptor_entry{
                             // specifies "layout (set = 1, binding = 2) uniform sampler2D specular_texture"
-                            .type = vk::buffer::combined_image_sampler,
+                            .type = vk::descriptor_type::combined_image_sampler,
                             .binding_point = {
                                 .binding = 2,
                                 .stage = vk::shader_stage::fragment,
@@ -355,7 +408,7 @@ export namespace atlas::vulkan {
                         },
                         vk::descriptor_entry{
                             // specifies "layout (set = 1, binding = 3) uniform sampler2D material_ubo"
-                            .type = vk::buffer::uniform,
+                            .type = vk::descriptor_type::uniform,
                             .binding_point = {
                                 .binding = 3,
                                 .stage = vk::shader_stage::fragment,
@@ -379,8 +432,8 @@ export namespace atlas::vulkan {
                         vk::write_buffer{
                           .buffer = m_mesh_geometry_set[p_entity.id()],
                           .offset = 0,
-                          .range =
-                            m_mesh_geometry_set[p_entity.id()].size_bytes(),
+                          .range = static_cast<uint32_t>(
+                            m_mesh_geometry_set[p_entity.id()].size_bytes()),
                         }
                     };
 
@@ -388,8 +441,8 @@ export namespace atlas::vulkan {
                         vk::write_buffer{
                           .buffer = m_mesh_material_set[p_entity.id()],
                           .offset = 0,
-                          .range =
-                            m_mesh_material_set[p_entity.id()].size_bytes(),
+                          .range = static_cast<uint32_t>(
+                            m_mesh_material_set[p_entity.id()].size_bytes()),
                         }
                     };
 
@@ -571,7 +624,9 @@ export namespace atlas::vulkan {
 
             // TODO: Make to_bytes be part of utilities. This can be useful in
             // sending the amount of bytes in batches for batch-rendering
-            m_global_uniforms.update(&global_frame_ubo);
+            // m_global_uniforms.update(&global_frame_ubo);
+            m_global_uniforms.transfer<global_ubo>(
+              std::span<global_ubo>(&global_frame_ubo, 1));
 
             skybox_uniform skybox_ubo = {
                 .proj_view = m_skybox_proj_view,
@@ -606,7 +661,9 @@ export namespace atlas::vulkan {
               });
             test_light.num_lights = index;
 
-            m_point_light_uniforms.update(&test_light);
+            // m_point_light_uniforms.update(&test_light);
+            m_point_light_uniforms.transfer<light_scene_ubo>(
+              std::span<light_scene_ubo>(&test_light, 1));
 
             // query all objects with a specified 3d mesh source
             flecs::query<> query_targets =
@@ -615,8 +672,17 @@ export namespace atlas::vulkan {
             m_main_pipeline.bind(m_current_command_buffer);
 
             // Bind global camera data here
-            m_global_descriptors.bind(m_current_command_buffer,
-                                      m_main_pipeline.layout());
+            // m_global_descriptors.bind(m_current_command_buffer,
+            //                           m_main_pipeline.layout());
+            std::array<VkDescriptorSet, 1> descriptors = {
+                m_global_descriptors,
+            };
+
+            m_current_command_buffer.bind_descriptors(
+              m_main_pipeline.layout(),
+              VK_PIPELINE_BIND_POINT_GRAPHICS,
+              descriptors);
+
             query_targets.each([this](flecs::entity p_entity) {
                 const transform* transform_component =
                   p_entity.get<transform>();
@@ -637,57 +703,80 @@ export namespace atlas::vulkan {
                                                 material_component->color };
 
                 if (m_cached_meshes[p_entity.id()].loaded()) {
-                    m_mesh_geometry_set[p_entity.id()].update(&mesh_ubo);
+                    // m_mesh_geometry_set[p_entity.id()].update(&mesh_ubo);
+                    m_mesh_geometry_set[p_entity.id()].transfer<geometry_uniform>(std::span<geometry_uniform>(&mesh_ubo, 1));
 
                     material_metadata data = {};
 
                     if (p_entity.has<material_metadata>()) {
                         data = *p_entity.get<material_metadata>();
                     }
-                    m_mesh_material_set[p_entity.id()].update(&data);
+                    // m_mesh_material_set[p_entity.id()].update(&data);
+                    m_mesh_material_set[p_entity.id()].transfer<material_metadata>(std::span<material_metadata>(&data, 1));
 
-                    m_mesh_descriptors[p_entity.id()]["materials"].bind(
-                      m_current_command_buffer, m_main_pipeline.layout());
+
+                    // m_mesh_descriptors[p_entity.id()]["materials"].bind(
+                    //   m_current_command_buffer, m_main_pipeline.layout());
+
+                    // descriptors.push_back(m_mesh_descriptors[p_entity.id()]["materials"]);
+                    const VkDescriptorSet descriptors = m_mesh_descriptors[p_entity.id()]["materials"];
+                    m_current_command_buffer.bind_descriptors(m_main_pipeline.layout(), VK_PIPELINE_BIND_POINT_GRAPHICS, std::span<const VkDescriptorSet>(&descriptors, 1));
+
 
                     // m_cached_meshes[p_entity.id()].draw(
                     //   m_current_command_buffer);
 
                     // binding/draw calls
-                    const VkBuffer vertex = m_cached_meshes[p_entity.id()].vertex_handle();
-                    const VkBuffer index = m_cached_meshes[p_entity.id()].index_handle();
-                    
-                    std::array<VkBuffer, 1> handler = {vertex};
-                    std::array<VkDeviceSize, 1> offsets = {0};
-                    vkCmdBindVertexBuffers(m_current_command_buffer,
-                                       0,
-                                       1,
-                                       handler.data(),
-                                       offsets.data());
+                    const VkBuffer vertex =
+                      m_cached_meshes[p_entity.id()].vertex_handle();
+                    const VkBuffer index =
+                      m_cached_meshes[p_entity.id()].index_handle();
 
-                    if(m_cached_meshes[p_entity.id()].indices_size() != 0) {
+                    std::array<VkBuffer, 1> handler = { vertex };
+                    std::array<VkDeviceSize, 1> offsets = { 0 };
+                    vkCmdBindVertexBuffers(m_current_command_buffer,
+                                           0,
+                                           1,
+                                           handler.data(),
+                                           offsets.data());
+
+                    if (m_cached_meshes[p_entity.id()].indices_size() != 0) {
                         vkCmdBindIndexBuffer(m_current_command_buffer,
-                                     index,
-                                     0,
-                                     VK_INDEX_TYPE_UINT32);
-                        vkCmdDrawIndexed(m_current_command_buffer, static_cast<uint32_t>(m_cached_meshes[p_entity.id()].indices_size()), 1, 0, 0, 0);
+                                             index,
+                                             0,
+                                             VK_INDEX_TYPE_UINT32);
+                        vkCmdDrawIndexed(
+                          m_current_command_buffer,
+                          static_cast<uint32_t>(
+                            m_cached_meshes[p_entity.id()].indices_size()),
+                          1,
+                          0,
+                          0,
+                          0);
                     }
                     else {
-                        vkCmdDraw(m_current_command_buffer, m_cached_meshes[p_entity.id()].vertices_size(), 1, 0, 0);
+                        vkCmdDraw(
+                          m_current_command_buffer,
+                          m_cached_meshes[p_entity.id()].vertices_size(),
+                          1,
+                          0,
+                          0);
                     }
                 }
             });
 
-            std::array<VkDeviceSize, 1> offsets = {0};
-            vkCmdBindPipeline(m_current_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_skybox.pipeline());
-            m_skybox.descriptor_bind(m_current_command_buffer, m_skybox.pipeline_layout());
+            std::array<VkDeviceSize, 1> offsets = { 0 };
+            vkCmdBindPipeline(m_current_command_buffer,
+                              VK_PIPELINE_BIND_POINT_GRAPHICS,
+                              m_skybox.pipeline());
+            m_skybox.descriptor_bind(m_current_command_buffer,
+                                     m_skybox.pipeline_layout());
 
             const VkBuffer skybox_vertex = m_skybox.vertex_handle();
-            vkCmdBindVertexBuffers(m_current_command_buffer,
-                                       0,
-                                       1,
-                                       &skybox_vertex,
-                                       offsets.data());
-            vkCmdDraw(m_current_command_buffer, m_skybox.vertices_size(), 1, 0, 0);
+            vkCmdBindVertexBuffers(
+              m_current_command_buffer, 0, 1, &skybox_vertex, offsets.data());
+            vkCmdDraw(
+              m_current_command_buffer, m_skybox.vertices_size(), 1, 0, 0);
 
             vkCmdEndRenderPass(m_current_command_buffer);
 
@@ -742,4 +831,5 @@ export namespace atlas::vulkan {
 
         ref<scene> m_current_scene;
     };
+    */
 };

@@ -9,8 +9,8 @@ module;
 export module editor:content_browser;
 
 import atlas.logger;
-import atlas.drivers.vulkan.instance_context;
 import atlas.drivers.vulkan.imgui_context;
+import atlas.drivers.vulkan.stb_image;
 import vk;
 
 export class content_browser_panel {
@@ -19,31 +19,34 @@ public:
 
     content_browser_panel(
       const VkDevice& p_device,
-      VkPhysicalDeviceMemoryProperties p_memory_properties) {
-        vk::texture_info config_texture = {
-            .phsyical_memory_properties = p_memory_properties,
-            .filepath = std::filesystem::path("assets/icons/FileIcon.png"),
+      uint32_t p_memory_properties) {
+        vk::texture_params config_texture = {
+            .memory_mask = p_memory_properties,
         };
-        m_file_icon = vk::texture(p_device, config_texture);
-        if (!m_file_icon.loaded()) {
-            console_log_info("Play Button Could not be loaded!!");
-        }
+
+        atlas::vulkan::stb_image play_button("assets/icons/FileIcon.png", config_texture);
+        m_file_icon = vk::texture(p_device, &play_button, config_texture);
+        // if (!m_file_icon.loaded()) {
+        //     console_log_info("Play Button Could not be loaded!!");
+        // }
         config_texture = {
-            .phsyical_memory_properties = p_memory_properties,
-            .filepath = std::filesystem::path("assets/icons/DirectoryIcon.png"),
+            .memory_mask = p_memory_properties,
         };
-        m_directory_icon = vk::texture(p_device, config_texture);
-        if (!m_directory_icon.loaded()) {
-            console_log_info("Stop Button Could not be loaded!!");
-        }
+
+        atlas::vulkan::stb_image file_icon("assets/icons/FileIcon.png", config_texture);
+        m_directory_icon = vk::texture(p_device, &file_icon, config_texture);
+        // if (!m_directory_icon.loaded()) {
+        //     console_log_info("Stop Button Could not be loaded!!");
+        // }
         config_texture = {
-            .phsyical_memory_properties = p_memory_properties,
-            .filepath = std::filesystem::path("assets/icons/Back.png"),
+            .memory_mask = p_memory_properties,
         };
-        m_back_icon = vk::texture(p_device, config_texture);
-        if (!m_back_icon.loaded()) {
-            console_log_info("Stop Button Could not be loaded!!");
-        }
+
+        atlas::vulkan::stb_image back_icon("assets/icons/Back.png", config_texture);
+        m_back_icon = vk::texture(p_device, &back_icon, config_texture);
+        // if (!back_icon.loaded()) {
+        //     console_log_info("Stop Button Could not be loaded!!");
+        // }
 
         m_file_icon_id = static_cast<ImTextureID>(ImGui_ImplVulkan_AddTexture(
           m_file_icon.image().sampler(),
@@ -151,9 +154,9 @@ public:
     }
 
     void destroy() {
-        m_file_icon.destroy();
-        m_directory_icon.destroy();
-        m_back_icon.destroy();
+        m_file_icon.destruct();
+        m_directory_icon.destruct();
+        m_back_icon.destruct();
     }
 
 private:

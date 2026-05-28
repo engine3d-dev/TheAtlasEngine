@@ -9,11 +9,11 @@ target_sources(editor PUBLIC
     TYPE CXX_MODULES
     FILES
     editor.cppm
-    editor_world.cppm
-    level_scene.cppm
-    content_browser_panel.cppm
-    icon.cppm
-    utilities.cppm
+    # editor_world.ppm
+    # level_scene.cppm
+    # content_browser_panel.cppm
+    # icon.cppm
+    # utilities.cppm
 )
 
 find_package(glfw3 REQUIRED)
