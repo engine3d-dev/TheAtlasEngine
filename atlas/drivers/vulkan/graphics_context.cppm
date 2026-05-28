@@ -19,7 +19,7 @@ module;
 #include <vulkan/vulkan.h>
 #endif
 
-export module atlas.drivers.graphics_context;
+export module atlas.drivers.vulkan:graphics_context;
 
 import vk;
 

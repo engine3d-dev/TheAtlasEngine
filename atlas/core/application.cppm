@@ -25,8 +25,7 @@ import atlas.core.utilities;
 import atlas.core.utilities.poll_state;
 import atlas.core.event;
 import vk;
-import atlas.drivers.graphics_context;
-import atlas.window;
+import atlas.drivers.vulkan;
 
 export namespace atlas {
 
@@ -219,8 +218,9 @@ export namespace atlas {
 
                 current.begin_rendering(begin_params);
 
-                // Do rendering stuff...
 
+                
+                // Do rendering stuff...
                 current.end_rendering();
 
                 m_images[m_next_image_frame_idx].memory_barrier(

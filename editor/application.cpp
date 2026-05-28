@@ -7,8 +7,7 @@ import atlas.common;
 import atlas.core.level_streamer;
 import atlas.core.event;
 // import editor;
-
-import atlas.drivers.graphics_context;
+import atlas.drivers.vulkan;
 
 class editor_application : public atlas::application {
 public:

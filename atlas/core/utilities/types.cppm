@@ -4,7 +4,7 @@ module;
 #include <string>
 #include <vulkan/vulkan.h>
 
-export module atlas.core.utilities.types;
+export module atlas.core.utilities:types;
 
 import vk;
 

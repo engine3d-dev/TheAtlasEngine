@@ -14,9 +14,6 @@ export module atlas.drivers.vulkan.imgui_context;
 import atlas.common;
 import vk;
 
-import atlas.drivers.vulkan.physical_device;
-import atlas.drivers.vulkan.device;
-import atlas.drivers.vulkan.swapchain;
 import atlas.core.utilities;
 
 namespace atlas::vulkan {

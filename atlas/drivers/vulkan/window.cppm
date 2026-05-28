@@ -20,13 +20,13 @@ module;
 #include <GLFW/glfw3.h>
 #include <span>
 
-export module atlas.window;
+// export module atlas.window;
+export module atlas.drivers.vulkan:window;
 
 import atlas.common;
-import atlas.core.utilities.types;
 import atlas.core.utilities;
 import vk;
-import atlas.drivers.graphics_context;
+import :graphics_context;
 
 export namespace atlas {
 

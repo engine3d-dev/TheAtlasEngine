@@ -13,9 +13,7 @@ module;
 export module atlas.drivers.vulkan.mesh;
 import vk;
 
-import atlas.logger;\
-import atlas.drivers.vulkan.physical_device;
-import atlas.drivers.vulkan.device;
+import atlas.logger;
 import atlas.drivers.vulkan.hash;
 import atlas.drivers.vulkan.stb_image;
 

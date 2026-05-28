@@ -142,7 +142,6 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas/core/core.cppm
     atlas/core/logger.cppm
     atlas/core/application.cppm
-    atlas/core/window.cppm
 
     # math
     atlas/core/math/types.cppm
@@ -179,20 +178,9 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas/core/serialize/serializer.cppm
 
     # renderer
-    atlas/renderer/context_loader.cppm
     atlas/renderer/renderer.cppm
     
-    atlas/drivers/drivers.cppm
-    atlas/drivers/graphics_context.cppm
-
     atlas/drivers/renderer_system.cppm
-
-
-    atlas/drivers/vulkan/hash.cppm
-    atlas/drivers/vulkan/mesh.cppm
-    atlas/drivers/vulkan/shader_resource_group.cppm
-    atlas/drivers/vulkan/render_system.cppm
-    atlas/drivers/vulkan/uniforms.cppm
 
     # imgui/UI
     atlas/drivers/vulkan/imgui_context.cppm
@@ -209,15 +197,19 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas/drivers/jolt_cpp/contact_listener.cppm
     atlas/drivers/jolt_cpp/context.cppm
 
-    # drivers
+    # drivers/vulkan
+    atlas/drivers/vulkan/vulkan.cppm
+    atlas/drivers/vulkan/graphics_context.cppm
+    atlas/drivers/vulkan/window.cppm
     atlas/drivers/vulkan/utilities.cppm
-    atlas/drivers/vulkan/instance_context.cppm
-    atlas/drivers/vulkan/window_context.cppm
-    atlas/drivers/vulkan/physical_device.cppm
-    atlas/drivers/vulkan/device.cppm
-    atlas/drivers/vulkan/swapchain.cppm
     atlas/drivers/vulkan/environment_map.cppm
-    # atlas/drivers/vulkan/stb_image.cppm
+    atlas/drivers/vulkan/stb_image.cppm
+
+    atlas/drivers/vulkan/hash.cppm
+    atlas/drivers/vulkan/mesh.cppm
+    atlas/drivers/vulkan/shader_resource_group.cppm
+    atlas/drivers/vulkan/render_system.cppm
+    atlas/drivers/vulkan/uniforms.cppm
 )
 
 target_sources(${PROJECT_NAME} PUBLIC

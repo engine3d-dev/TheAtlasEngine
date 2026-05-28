@@ -21,8 +21,7 @@ import atlas.application;
 import atlas.common;
 import atlas.logger;
 import atlas.graphics_api;
-import atlas.drivers.graphics_context;
-import atlas.renderer.context_loader;
+import atlas.drivers.vulkan;
 import atlas.core.event;
 import vk;
 
@@ -87,12 +86,8 @@ main() {
     std::vector<const char*> global_extensions = get_instance_extensions();
 
     vk::debug_message_utility debug_callback_info = {
-        // .severity essentially takes in vk::message::verbose,
-        // vk::message::warning, vk::message::error
         .severity =
           vk::message::verbose | vk::message::warning | vk::message::error,
-        // .message_type essentially takes in vk::debug. Like:
-        // vk::debug::general, vk::debug::validation, vk::debug::performance
         .message_type =
           vk::debug::general | vk::debug::validation | vk::debug::performance,
         .callback = debug_callback
@@ -100,11 +95,14 @@ main() {
 
     vk::application_params config = {
         .name = "vulkan instance",
-        .version = vk::api_version::vk_1_3, // specify to using vulkan 1.3
+        // specify to using vulkan 1.4
+        .version = vk::api_version::vk_1_4,
+        // .validation takes in a std::span<const char*>
         .validations =
-          validation_layers, // .validation takes in a std::span<const char*>
+          validation_layers,
+        // .extensions also takes in std::span<const char*>
         .extensions =
-          global_extensions // .extensions also takes in std::span<const char*>
+          global_extensions
     };
 
     // 1. Setting up vk instance

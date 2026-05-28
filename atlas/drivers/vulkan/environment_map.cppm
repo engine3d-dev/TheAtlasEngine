@@ -31,10 +31,10 @@ module;
 
 export module atlas.drivers.vulkan.environment_map;
 
-import atlas.drivers.vulkan.physical_device;
-
 import vk;
 
+
+/*
 namespace atlas {
 
     export struct skybox_uniform {
@@ -598,3 +598,4 @@ namespace atlas {
     };
 
 };
+*/
