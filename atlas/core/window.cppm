@@ -155,9 +155,14 @@ export namespace atlas {
             };
 
             const VkSurfaceKHR surface = *m_surface;
+            m_surface_properties = p_context->physical_device().request_surface(surface);
             m_swapchain = std::make_shared<vk::swapchain>(*p_context->logical_device(), surface, swapchain_params, p_context->physical_device().request_surface(surface));
 
-
+            vk::queue_params present_params = {
+                .family = 0,
+                .index = 0,
+            };
+            m_present_queue = vk::device_present_queue(*p_context->logical_device(), *m_swapchain, present_params);
 
             // graphics_context::submit_resource_free([this](){
             //     std::println("atlas::window submit resource free");
@@ -166,13 +171,30 @@ export namespace atlas {
         }
 
         ~window() {
-            // glfwDestroyWindow(m_window);
+            // At the end of the lifetime of this window, we can destroy any
+            // resources that any of the concurrent resources this window
+            // owns is no longer using
             m_surface->destruct();
             glfwDestroyWindow(m_window);
         }
 
+        [[nodiscard]] std::span<const VkImage> request_images() const {
+            return m_swapchain->get_images();
+        }
+
+        [[nodiscard]] vk::surface_params surface_properties() const { return m_surface_properties; }
+
+
+        [[nodiscard]] uint32_t acquire_next_frame() {
+            return m_present_queue.acquire_next_image();
+        }
+
         void destruct() {
+            // Any dependent resources that must be invoked
+            // before the primary resources like VkSurfaceKHR
+            // are destructed
             m_swapchain->destruct();
+            m_present_queue.destruct();
         }
 
         GLFWwindow* glfw_window() const { return m_window; }
@@ -187,7 +209,12 @@ export namespace atlas {
                              static_cast<int>(height));
         }
 
-        void present(std::span<const VkCommandBuffer> p_commands) {
+        void submit(std::span<const VkCommandBuffer> p_commands) {
+            m_present_queue.submit_async(p_commands);
+        }
+
+        void present(uint32_t p_frame_idx) {
+            m_present_queue.present_frame(p_frame_idx);
         }
 
         [[nodiscard]] bool available() const {
@@ -199,6 +226,8 @@ export namespace atlas {
         std::shared_ptr<vk::device> m_device=nullptr;
         std::shared_ptr<vk::surface> m_surface;
         std::shared_ptr<vk::swapchain> m_swapchain;
+        vk::surface_params m_surface_properties;
+        vk::device_present_queue m_present_queue;
         GLFWwindow* m_window = nullptr;
         window_params m_params{};
     };

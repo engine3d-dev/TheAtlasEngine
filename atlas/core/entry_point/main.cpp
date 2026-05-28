@@ -124,16 +124,6 @@ main() {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME,
     };
 #endif
-    std::array<vk::format, 3> format_support = {
-        vk::format::d32_sfloat,
-        vk::format::d32_sfloat_s8_uint,
-        vk::format::d24_unorm_s8_uint
-    };
-
-    // We provide a selection of format support that we want to check is
-    // supported on current hardware device.
-    VkFormat depth_format =
-      physical_device.request_depth_format(format_support);
 
     vk::device_features device_features{
         vk::dynamic_rendering_feature{ {
@@ -147,8 +137,6 @@ main() {
         .extensions = extensions,
         .queue_family_index = 0,
     };
-
-    // pmr::monotonic_memory_resource for allocation
 
     std::array<uint8_t, 2048> bytes{};
     std::pmr::monotonic_buffer_resource memory_resource{ bytes.data(),
