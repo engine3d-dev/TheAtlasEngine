@@ -27,6 +27,9 @@ import atlas.core.event;
 import vk;
 import atlas.drivers.vulkan;
 
+import atlas.core.scene;
+import atlas.core.scene.world;
+
 export namespace atlas {
 
     /**
@@ -146,13 +149,26 @@ export namespace atlas {
                 .depthStencil = { .depth = 1.f, .stencil = 0 },
             };
 
+            std::shared_ptr<scene> current_scene = m_world->current();
+
+            auto start_time = std::chrono::high_resolution_clock::now();
+            invoke_start(current_scene.get());
+
             while(m_window->available()) {
+                auto current_time = std::chrono::high_resolution_clock::now();
+                m_delta_time = std::chrono::duration<float, std::chrono::seconds::period>(current_time - start_time).count();
+
+                start_time = current_time;
                 event::flush_events();
 
                 m_next_image_frame_idx = m_window->acquire_next_frame();
                 const auto current_extent = m_window->surface_properties().capabilities.currentExtent;
 
                 vk::command_buffer current = m_command_buffers[m_next_image_frame_idx];
+
+                invoke_physics_update(current_scene.get());
+
+                invoke_on_update(current_scene.get(), m_delta_time);
 
                 current.begin(vk::command_usage::simulatneous_use_bit);
 
@@ -243,8 +259,6 @@ export namespace atlas {
         }
 
         void post_destroy() {
-            std::println("Post destroy!");
-
             m_render_context.destruct();
 
             for(auto& command : m_command_buffers) {
@@ -262,6 +276,10 @@ export namespace atlas {
             m_device->destruct();
         }
 
+        void current_world(std::shared_ptr<world> p_world) {
+            m_world = p_world;
+        }
+
     private:
         uint32_t m_next_image_frame_idx=0;
         VkFormat m_color_format;
@@ -272,6 +290,8 @@ export namespace atlas {
 
         render_context m_render_context;
 
+        std::shared_ptr<world> m_world;
+
         // vulkan-cpp specific handles
         vk::instance m_instance;
         std::optional<vk::physical_device> m_physical;
@@ -280,6 +300,7 @@ export namespace atlas {
         std::vector<vk::sample_image> m_images;
         std::vector<vk::sample_image> m_depth_images;
         std::vector<vk::command_buffer> m_command_buffers;
+        float m_delta_time=0.f;
         static application* s_instance;
     };
 

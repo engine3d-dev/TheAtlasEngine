@@ -42,7 +42,6 @@ export namespace atlas {
         ~graphics_context() = default;
 
         void post_cleanup() {
-            std::println("post_cleanup!");
             for (const auto& callback : m_submit_resource_free) {
                 callback();
             }

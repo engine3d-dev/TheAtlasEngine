@@ -1,6 +1,7 @@
 module;
 
 #include <string>
+#include <print>
 
 export module editor:level_scene;
 
@@ -24,14 +25,11 @@ public:
     ~level_scene() override = default;
 
     void start() {
-        console_log_info("preload_start invoked!");
     }
 
     void on_update(float) {
-        console_log_info("on_update invoked!");
     }
 
     void physics_update() {
-        console_log_info("physics_update invoked!");
     }
 };
