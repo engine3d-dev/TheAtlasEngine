@@ -131,6 +131,8 @@ export namespace atlas {
                 m_command_buffers[i] = vk::command_buffer(*m_device, command_params);
             }
 
+            m_render_context = render_context(m_context);
+
             std::println("images.size() = {}", images.size());
         }
 
@@ -259,16 +261,20 @@ export namespace atlas {
     private:
         uint32_t m_next_image_frame_idx=0;
         VkFormat m_depth_format;
+        std::shared_ptr<graphics_context> m_context;
+        std::shared_ptr<window> m_window=nullptr;
+        event::bus* m_bus = nullptr;
+
+        render_context m_render_context;
+
+        // vulkan-cpp specific handles
         vk::instance m_instance;
         std::optional<vk::physical_device> m_physical;
         std::shared_ptr<vk::device> m_device;
-        std::shared_ptr<graphics_context> m_context;
-        std::shared_ptr<window> m_window=nullptr;
         vk::image_extent m_extent{};
         std::vector<vk::sample_image> m_images;
         std::vector<vk::sample_image> m_depth_images;
         std::vector<vk::command_buffer> m_command_buffers;
-        event::bus* m_bus = nullptr;
         static application* s_instance;
     };
 
