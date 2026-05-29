@@ -245,6 +245,8 @@ export namespace atlas {
         void post_destroy() {
             std::println("Post destroy!");
 
+            m_render_context.destruct();
+
             for(auto& command : m_command_buffers) {
                 command.destruct();
             }
