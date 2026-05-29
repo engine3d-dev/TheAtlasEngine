@@ -77,6 +77,7 @@ export namespace atlas {
                 vk::format::d24_unorm_s8_uint
             };
 
+            m_color_format = m_window->surface_properties().format.format;
             // We provide a selection of format support that we want to check is
             // supported on current hardware device.
             m_depth_format = m_physical->request_depth_format(format_support);
@@ -131,7 +132,7 @@ export namespace atlas {
                 m_command_buffers[i] = vk::command_buffer(*m_device, command_params);
             }
 
-            m_render_context = render_context(m_context);
+            m_render_context = render_context(m_context, m_color_format, m_depth_format);
 
             std::println("images.size() = {}", images.size());
         }
@@ -221,10 +222,11 @@ export namespace atlas {
                 current.set_scissor(0, 1, std::span<const vk::scissor_params>(&scissor, 1));
 
                 current.begin_rendering(begin_params);
+                m_render_context.set_command(current);
+                // Do drawing stuff...
 
+                m_render_context.bind_pipeline();
 
-                
-                // Do rendering stuff...
                 current.end_rendering();
 
                 m_images[m_next_image_frame_idx].memory_barrier(
@@ -260,6 +262,7 @@ export namespace atlas {
 
     private:
         uint32_t m_next_image_frame_idx=0;
+        VkFormat m_color_format;
         VkFormat m_depth_format;
         std::shared_ptr<graphics_context> m_context;
         std::shared_ptr<window> m_window=nullptr;
