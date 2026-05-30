@@ -15,7 +15,7 @@ export module atlas.drivers.vulkan.stb_image;
 
 import vk;
 
-export namespace atlas::vulkan {
+export namespace atlas {
     class stb_image : public vk::image {
     public:
         stb_image() = default;

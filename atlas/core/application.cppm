@@ -151,8 +151,15 @@ export namespace atlas {
 
             std::shared_ptr<scene> current_scene = m_world->current();
 
+            // Setting the current scene for the renderer to start rendering the objects
+            m_render_context.current_scene(*current_scene);
+
             auto start_time = std::chrono::high_resolution_clock::now();
             invoke_start(current_scene.get());
+
+
+
+            m_render_context.prebake();
 
             while(m_window->available()) {
                 auto current_time = std::chrono::high_resolution_clock::now();

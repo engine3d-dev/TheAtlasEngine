@@ -5,25 +5,57 @@ module;
 #include <array>
 #include <span>
 #include <unordered_map>
+#include <optional>
+#include <chrono>
 
 #include <vulkan/vulkan.h>
 #include <flecs.h>
-
+#define GLM_FORCE_RADIANS
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/hash.hpp>
 export module atlas.drivers.vulkan:render_context;
 import atlas.core.scene;
+
+import atlas.drivers.importer;
+import atlas.core.scene;
+import atlas.core.scene.components;
+import atlas.drivers.vulkan.stb_image;
 
 import :graphics_context;
 import vk;
 
 export namespace atlas {
+
+    struct gpu_push_constant {
+        glm::mat4 proj;
+        glm::mat4 view;
+        glm::mat4 model;
+    };
+
     struct gpu_mesh_data {
-        vk::buffer vertex;
-        vk::buffer index;
+        vk::vertex_buffer vertex;
+        vk::index_buffer index;
         uint32_t index_count=0;
         uint32_t instance=1;
         uint32_t first_index=0;
         uint32_t vertex_offset=0;
         uint32_t first_instance=0;
+        bool has_indices_buffer=false;
+        uint32_t vertices_size = 0;
+        uint32_t indices_size=0;
+    };
+
+    struct push_constant_data {
+        int32_t texture_index=0;
+        uint64_t buffer_address=0;
+    };
+
+    struct global_uniform {
+        glm::mat4 model=glm::mat4(1.f);
+        glm::mat4 view=glm::mat4(1.f);
+        glm::mat4 proj=glm::mat4(1.f);
     };
 
     /**
@@ -35,17 +67,48 @@ export namespace atlas {
     public:
         render_context() = default;
         render_context(std::shared_ptr<graphics_context> p_context, VkFormat p_color_format, VkFormat p_depth_format) {
+            m_physical = p_context->physical_device();
             m_device = p_context->logical_device();
-            
-            // Loading graphics pipeline
+
+            // Vertex Attributes Parameters
+            std::array<vk::vertex_attribute_entry, 4> attribute_entries = {
+                vk::vertex_attribute_entry{
+                    .location = 0,
+                    .format = vk::format::rgb32_sfloat,
+                    .stride = offsetof(vk::vertex_input, position),
+                },
+                vk::vertex_attribute_entry{
+                    .location = 1,
+                    .format = vk::format::rgb32_sfloat,
+                    .stride = offsetof(vk::vertex_input, color),
+                },
+                vk::vertex_attribute_entry{
+                    .location = 2,
+                    .format = vk::format::rg32_sfloat,
+                    .stride = offsetof(vk::vertex_input, uv),
+                },
+                vk::vertex_attribute_entry{
+                    .location = 3,
+                    .format = vk::format::rgb32_sfloat,
+                    .stride = offsetof(vk::vertex_input, normals),
+                }
+            };
+            std::array<vk::vertex_attribute, 1> attributes = {
+                vk::vertex_attribute{
+                    .binding = 0,
+                    .entries = attribute_entries,
+                    .stride = sizeof(vk::vertex_input),
+                    .input_rate = vk::input_rate::vertex,
+                },
+            };
             std::array<vk::shader_source, 2> shader_sources = {
                 vk::shader_source{
-                .filename = "builtin.shaders/pbr.vert.spv",
-                .stage = vk::shader_stage::vertex,
+                    .filename = "builtin.shaders/pbr.vert.spv",
+                    .stage = vk::shader_stage::vertex,
                 },
                 vk::shader_source{
-                .filename = "builtin.shaders/pbr.frag.spv",
-                .stage = vk::shader_stage::fragment,
+                    .filename = "builtin.shaders/pbr.frag.spv",
+                    .stage = vk::shader_stage::fragment,
                 },
             };
 
@@ -53,33 +116,136 @@ export namespace atlas {
             vk::shader_resource_info shader_info = {
                 .sources = shader_sources,
             };
-            // vk::shader_resource geometry_resource(logical_device, shader_info);
             m_shader_resource = vk::shader_resource(*m_device, shader_info);
+            m_shader_resource.vertex_attributes(attributes);
+
+
+            // Configuring Descriptor Set 0 -- specify to vk::pipeline
+            // Descriptor Set 0
+            std::array<vk::descriptor_entry, 1> entries_set1 = {
+                vk::descriptor_entry{
+                    // layout (set = 0, binding = 1) uniform sampler2D textures[];
+                    .type = vk::descriptor_type::combined_image_sampler,
+                    .binding_point = {
+                        .binding = 1,
+                        .stage = vk::shader_stage::fragment,
+                    },
+                    .descriptor_count = 1,
+                    .flags = vk::descriptor_bind_flags::partially_bound_bit |
+                            vk::descriptor_bind_flags::variable_descriptor_count_bit |
+                            vk::descriptor_bind_flags::update_after_bind,
+                }
+            };
+
+            // layout(set = 0, ...)
+            uint32_t max_descriptor = 1;
+            vk::descriptor_layout set0_layout = {
+                .slot = 0,
+                .max_sets = 3,
+                .entries = entries_set1, // descriptor layout entries description
+                .descriptor_counts = std::span<const uint32_t>(&max_descriptor, 1),
+            };
+            set0_resource = vk::descriptor_resource(*m_device, set0_layout, vk::descriptor_layout_flags::update_after_bind_pool);
+
             std::array<vk::color_blend_attachment_state, 1> color_blend_attachments = {
                 vk::color_blend_attachment_state{},
             };
 
             std::array<vk::dynamic_state, 2> dynamic_states = {
-                vk::dynamic_state::viewport, vk::dynamic_state::scissor
+                vk::dynamic_state::viewport, vk::dynamic_state::scissor,
             };
 
-            uint32_t format = static_cast<uint32_t>(p_color_format);
+            m_format = static_cast<uint32_t>(p_color_format);
+            uint32_t vertex_mask = static_cast<uint32_t>(vk::shader_stage::vertex);
+            uint32_t fragment_mask = static_cast<uint32_t>(vk::shader_stage::fragment);
+            uint32_t stage_mask = vertex_mask | fragment_mask;
+            m_stage = static_cast<vk::shader_stage>(stage_mask);
+            vk::push_constant_range range = {
+                .stage = m_stage,
+                .offset = 0,
+                .range = sizeof(push_constant_data),
+            };
+
+            // const VkDescriptorSetLayout layout = set0_resource.layout();
+            std::array<VkDescriptorSetLayout, 1> layouts = {set0_resource.layout()};
             vk::pipeline_params pipeline_configuration = {
                 .use_render_pipeline = true,
-                .color_attachment_formats = std::span<const uint32_t>(&format, 1),
+                .color_attachment_formats = std::span<const uint32_t>(&m_format, 1),
                 .depth_format = static_cast<uint32_t>(p_depth_format),
                 .stencil_format = static_cast<uint32_t>(p_depth_format),
                 .renderpass = nullptr,
                 .shader_modules = m_shader_resource.handles(),
                 .vertex_attributes = m_shader_resource.vertex_attributes(),
                 .vertex_bind_attributes = m_shader_resource.vertex_bind_attributes(),
+                .descriptor_layouts = layouts,
                 .color_blend = {
                     .attachments = color_blend_attachments,
                 },
                 .depth_stencil_enabled = true,
                 .dynamic_states = dynamic_states,
+                .push_constants = std::span<const vk::push_constant_range>(&range, 1),
             };
             m_main_pipeline = vk::pipeline(*m_device, pipeline_configuration);
+
+            vk::buffer_parameters uniform_params = {
+                .memory_mask = m_physical->memory_properties(vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit),
+                .usage = vk::buffer_usage::uniform_buffer_bit | vk::buffer_usage::shader_device_address_bit,
+                .allocate_flags = vk::memory_allocate_flags::device_address_bit_khr,
+            };
+            m_test_ubo = vk::dyn::buffer(*m_device, sizeof(global_uniform), uniform_params);
+
+
+            // testing texture
+            vk::texture_params config_texture = {
+                .memory_mask = m_physical->memory_properties(vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit),
+            };
+
+            // Loading texture and setting up VkSampler and VkImageView
+            stb_image img = stb_image("assets/models/viking_room.png", config_texture);
+            m_viking_room_texture = vk::texture(*m_device, &img, config_texture);
+
+            // Updating descriptor 0 with the texture data
+            std::array<vk::write_image, 1> samplers = {
+                vk::write_image{
+                    .sampler = m_viking_room_texture.image().sampler(),
+                    .view = m_viking_room_texture.image().image_view(),
+                    .layout = vk::image_layout::shader_read_only_optimal,
+                },
+            };
+
+            std::array<vk::write_image_descriptor, 1> set0_samples = {
+                vk::write_image_descriptor{
+                    .dst_binding = 1,
+                    .sample_images = samplers,
+                }
+            };
+
+            set0_resource.update({}, set0_samples);
+
+            obj_importer importer("assets/models/viking_room.obj");
+            const auto property_flags = vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit;
+
+            vk::buffer_parameters vertex_params = {
+                .memory_mask = m_physical->memory_properties(property_flags),
+                .property_flags = vk::memory_property::device_local_bit,
+                .usage = vk::buffer_usage::transfer_dst_bit | vk::buffer_usage::vertex_buffer_bit,
+            };
+
+            vk::buffer_parameters index_params = {
+                .memory_mask = m_physical->memory_properties(property_flags),
+                .property_flags = vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit,
+                .usage = vk::buffer_usage::index_buffer_bit,
+            };
+            m_viking_room_data.vertex = vk::vertex_buffer(*m_device, importer.vertices(), vertex_params);
+            m_viking_room_data.index = vk::index_buffer(*m_device, importer.indices(), index_params);
+            m_viking_room_data.has_indices_buffer = (importer.indices().size() >= 0) ? true : false;
+            m_viking_room_data.vertices_size = importer.vertices().size();
+            m_viking_room_data.indices_size = importer.indices().size();
+
+            std::println("has_indices = {}", m_viking_room_data.has_indices_buffer);
+        }
+
+        void prebake() {
         }
 
         void begin(vk::rendering_begin_parameters p_begin_params, const auto& p_extent) {
@@ -102,11 +268,55 @@ export namespace atlas {
             m_current_command->begin_rendering(p_begin_params);
 
             m_main_pipeline.bind(*m_current_command);
+            static auto start_time = std::chrono::high_resolution_clock::now();
 
-            vkCmdDraw(*m_current_command, 3, 1, 0, 0);
+            auto current_time = std::chrono::high_resolution_clock::now();
+            float time = std::chrono::duration<float, std::chrono::seconds::period>(
+                        current_time - start_time)
+                        .count();
+            global_uniform ubo = {
+                .model = glm::rotate(glm::mat4(1.0f),
+                                    time * glm::radians(90.0f),
+                                    glm::vec3(0.0f, 0.0f, 1.0f)),
+                .view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f),
+                                    glm::vec3(0.0f, 0.0f, 0.0f),
+                                    glm::vec3(0.0f, 0.0f, 1.0f)),
+                .proj = glm::perspective(glm::radians(45.0f),
+                                        static_cast<float>(p_extent.width) /
+                                        static_cast<float>(p_extent.height),
+                                        0.1f,
+                                        10.0f)
+            };
+            ubo.proj[1][1] *= -1;
+
+            m_test_ubo.transfer<global_uniform>(std::span<const global_uniform>(&ubo, 1));
+
+             const uint64_t ubo_address = m_test_ubo.get_device_address();
+            push_constant_data push = {
+                .texture_index = 0,
+                .buffer_address = ubo_address,
+            };
+            m_main_pipeline.push_constant<push_constant_data>(*m_current_command, push, m_stage, 0);
+        
+            const VkDescriptorSet set0 = set0_resource;
+            m_current_command->bind_descriptors(m_main_pipeline.layout(), VK_PIPELINE_BIND_POINT_GRAPHICS, std::span<const VkDescriptorSet>(&set0, 1));
+
+            const VkBuffer vertex = m_viking_room_data.vertex;
+            uint64_t offset = 0;
+            m_current_command->bind_vertex_buffers(std::span<const VkBuffer>(&vertex, 1), std::span<const uint64_t>(&offset, 1));
+            if (m_viking_room_data.has_indices_buffer) {
+                m_current_command->bind_index_buffers32(m_viking_room_data.index);
+            }
         }
-
+        
         void end() {
+
+            if (m_viking_room_data.has_indices_buffer) {
+                vkCmdDrawIndexed(*m_current_command, m_viking_room_data.indices_size, 1, 0, 0, 0);
+            }
+            else {
+                vkCmdDraw(*m_current_command, m_viking_room_data.vertices_size, 1, 0, 0);
+            }
             m_current_command->end_rendering();
         }
 
@@ -114,24 +324,38 @@ export namespace atlas {
             m_current_command = &p_command;
         }
 
-
         void current_scene(flecs::world& p_world) {
             m_world = &p_world;
         }
 
         void destruct() {
+            m_test_ubo.reset();
+            m_viking_room_data.vertex.destruct();
+            m_viking_room_data.index.destruct();
+            m_viking_room_texture.destruct();
+            set0_resource.destruct();
             m_shader_resource.destruct();
             m_main_pipeline.destruct();
         }
     
     private:
+        uint32_t m_format;
+        // Should change this but for now this will act as our mesh index
+        uint32_t m_mesh_idx_count = 0;
+        std::optional<vk::physical_device> m_physical;
         std::shared_ptr<vk::device> m_device;
         vk::command_buffer* m_current_command=nullptr;
         vk::shader_resource m_shader_resource;
         vk::pipeline m_main_pipeline;
         std::vector<VkDrawIndexedIndirectCommand> m_indirect_commands;
-        // std::vector<gpu_mesh_data> m_mesh_metadata;
-        std::unordered_map<uint64_t, gpu_mesh_data> m_mesh_metadata;
+        vk::descriptor_resource set0_resource;
+
+        vk::dyn::buffer m_test_ubo;
+        vk::texture m_viking_room_texture;
+        vk::shader_stage m_stage;
+
         flecs::world* m_world=nullptr;
+
+        gpu_mesh_data m_viking_room_data;
     };
 };

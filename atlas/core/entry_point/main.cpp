@@ -127,6 +127,16 @@ main() {
         vk::dynamic_rendering_feature{ {
           .dynamicRendering = true,
         } },
+        vk::descriptor_indexing_feature{ {
+          .shaderSampledImageArrayNonUniformIndexing = true,
+          .descriptorBindingSampledImageUpdateAfterBind = true,
+          .descriptorBindingPartiallyBound = true,
+          .descriptorBindingVariableDescriptorCount = true,
+          .runtimeDescriptorArray = true,
+        } },
+        vk::buffer_device_address{ {
+          .bufferDeviceAddress = true,
+        } },
     };
 
     vk::device_params logical_device_params = {
