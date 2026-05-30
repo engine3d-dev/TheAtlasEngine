@@ -4,6 +4,7 @@ module;
 #include <print>
 #include <array>
 #include <span>
+#include <unordered_map>
 
 #include <vulkan/vulkan.h>
 #include <flecs.h>
@@ -15,18 +16,14 @@ import :graphics_context;
 import vk;
 
 export namespace atlas {
-
-    struct mesh {
-        uint32_t index_count=0;
-        uint32_t instance=0;
-        uint32_t first_index=0;
-        uint32_t vertex_offset=0;
-        uint32_t first_instance=0;
-    };
-
     struct gpu_mesh_data {
         vk::buffer vertex;
         vk::buffer index;
+        uint32_t index_count=0;
+        uint32_t instance=1;
+        uint32_t first_index=0;
+        uint32_t vertex_offset=0;
+        uint32_t first_instance=0;
     };
 
     /**
@@ -39,7 +36,7 @@ export namespace atlas {
         render_context() = default;
         render_context(std::shared_ptr<graphics_context> p_context, VkFormat p_color_format, VkFormat p_depth_format) {
             m_device = p_context->logical_device();
-
+            
             // Loading graphics pipeline
             std::array<vk::shader_source, 2> shader_sources = {
                 vk::shader_source{
@@ -85,6 +82,33 @@ export namespace atlas {
             m_main_pipeline = vk::pipeline(*m_device, pipeline_configuration);
         }
 
+        void begin(vk::rendering_begin_parameters p_begin_params, const auto& p_extent) {
+            vk::viewport_params viewport = {
+                .x = 0.0f,
+                .y = 0.0f,
+                .width = static_cast<float>(p_extent.width),
+                .height = static_cast<float>(p_extent.height),
+                .min_depth = 0.0f,
+                .max_depth = 1.0f,
+            };
+            m_current_command->set_viewport(0, 1, std::span<const vk::viewport_params>(&viewport, 1));
+
+            vk::scissor_params scissor = {
+                .offset = { 0, 0 },
+                .extent = p_extent,
+            };
+            m_current_command->set_scissor(0, 1, std::span<const vk::scissor_params>(&scissor, 1));
+
+            m_current_command->begin_rendering(p_begin_params);
+
+            m_main_pipeline.bind(*m_current_command);
+
+            vkCmdDraw(*m_current_command, 3, 1, 0, 0);
+        }
+
+        void end() {
+            m_current_command->end_rendering();
+        }
 
         void set_command(vk::command_buffer& p_command) {
             m_current_command = &p_command;
@@ -94,13 +118,6 @@ export namespace atlas {
         void current_scene(flecs::world& p_world) {
             m_world = &p_world;
         }
-
-        void bind_pipeline() {
-            m_main_pipeline.bind(*m_current_command);
-
-            vkCmdDraw(*m_current_command, 3, 1, 0, 0);
-        }
-
 
         void destruct() {
             m_shader_resource.destruct();
@@ -113,7 +130,8 @@ export namespace atlas {
         vk::shader_resource m_shader_resource;
         vk::pipeline m_main_pipeline;
         std::vector<VkDrawIndexedIndirectCommand> m_indirect_commands;
-        std::vector<gpu_mesh_data> m_mesh_metadata;
+        // std::vector<gpu_mesh_data> m_mesh_metadata;
+        std::unordered_map<uint64_t, gpu_mesh_data> m_mesh_metadata;
         flecs::world* m_world=nullptr;
     };
 };

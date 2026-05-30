@@ -172,6 +172,8 @@ export namespace atlas {
 
                 current.begin(vk::command_usage::simulatneous_use_bit);
 
+                m_render_context.set_command(current);
+
                 m_images[m_next_image_frame_idx].memory_barrier(
                     current,
                     m_window->surface_properties().format.format,
@@ -220,30 +222,9 @@ export namespace atlas {
                     .stencil_attachment = depth_stencil_attachment,
                 };
 
-                vk::viewport_params viewport = {
-                    .x = 0.0f,
-                    .y = 0.0f,
-                    .width = static_cast<float>(current_extent.width),
-                    .height = static_cast<float>(current_extent.height),
-                    .min_depth = 0.0f,
-                    .max_depth = 1.0f,
-                };
-                current.set_viewport(0, 1, std::span<const vk::viewport_params>(&viewport, 1));
+                m_render_context.begin(begin_params, current_extent);
 
-                vk::scissor_params scissor = {
-                    .offset = { 0, 0 },
-                    .extent = current_extent,
-                };
-
-                current.set_scissor(0, 1, std::span<const vk::scissor_params>(&scissor, 1));
-
-                current.begin_rendering(begin_params);
-                m_render_context.set_command(current);
-                // Do drawing stuff...
-
-                m_render_context.bind_pipeline();
-
-                current.end_rendering();
+                m_render_context.end();
 
                 m_images[m_next_image_frame_idx].memory_barrier(
                     current,
@@ -252,8 +233,8 @@ export namespace atlas {
                     VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
                 current.end();
 
-                std::array<const VkCommandBuffer, 1> commands = {current};
-                m_window->submit(commands);
+                const VkCommandBuffer command = current;
+                m_window->submit(std::span<const VkCommandBuffer>(&command, 1));
                 m_window->present(m_next_image_frame_idx);
             }
         }
