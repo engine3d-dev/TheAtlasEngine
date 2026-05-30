@@ -199,6 +199,15 @@ export namespace atlas {
 
         GLFWwindow* glfw_window() const { return m_window; }
 
+        std::shared_ptr<vk::swapchain> swapchain_handle() { return m_swapchain; }
+
+        [[nodiscard]] vk::device_present_queue present_queue() const { return m_present_queue; }
+
+
+        float aspect_ratio() {
+            return static_cast<float>(m_params.width / m_params.height);
+        }
+
         void center_window() {
             GLFWmonitor* monitor = glfwGetPrimaryMonitor();
             const GLFWvidmode* mode = glfwGetVideoMode(monitor);

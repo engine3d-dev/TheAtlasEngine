@@ -227,13 +227,13 @@ export namespace atlas {
 
             vk::buffer_parameters vertex_params = {
                 .memory_mask = m_physical->memory_properties(property_flags),
-                .property_flags = vk::memory_property::device_local_bit,
+                // .property_flags = vk::memory_property::device_local_bit,
                 .usage = vk::buffer_usage::transfer_dst_bit | vk::buffer_usage::vertex_buffer_bit,
             };
 
             vk::buffer_parameters index_params = {
                 .memory_mask = m_physical->memory_properties(property_flags),
-                .property_flags = vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit,
+                // .property_flags = vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit,
                 .usage = vk::buffer_usage::index_buffer_bit,
             };
             m_viking_room_data.vertex = vk::vertex_buffer(*m_device, importer.vertices(), vertex_params);
@@ -248,7 +248,9 @@ export namespace atlas {
         void prebake() {
         }
 
-        void begin(vk::rendering_begin_parameters p_begin_params, const auto& p_extent) {
+        void begin(vk::rendering_begin_parameters p_begin_params, const auto& p_extent, const glm::mat4& p_proj, const glm::mat4& p_view) {
+            m_proj_view = p_proj * p_view;
+            flecs::entity viking_room = m_world->entity("Viking Room");
             vk::viewport_params viewport = {
                 .x = 0.0f,
                 .y = 0.0f,
@@ -268,24 +270,34 @@ export namespace atlas {
             m_current_command->begin_rendering(p_begin_params);
 
             m_main_pipeline.bind(*m_current_command);
+            const transform* t = viking_room.get<transform>();
+
             static auto start_time = std::chrono::high_resolution_clock::now();
 
             auto current_time = std::chrono::high_resolution_clock::now();
             float time = std::chrono::duration<float, std::chrono::seconds::period>(
                         current_time - start_time)
                         .count();
+            // Setting up viking room 
+            glm::mat4 model = glm::mat4(1.f);
+            model = glm::translate(model, t->position);
+            model = glm::scale(model, t->scale);
+
             global_uniform ubo = {
-                .model = glm::rotate(glm::mat4(1.0f),
-                                    time * glm::radians(90.0f),
-                                    glm::vec3(0.0f, 0.0f, 1.0f)),
-                .view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f),
-                                    glm::vec3(0.0f, 0.0f, 0.0f),
-                                    glm::vec3(0.0f, 0.0f, 1.0f)),
-                .proj = glm::perspective(glm::radians(45.0f),
-                                        static_cast<float>(p_extent.width) /
-                                        static_cast<float>(p_extent.height),
-                                        0.1f,
-                                        10.0f)
+                // .model = glm::rotate(glm::mat4(1.0f),
+                //                     time * glm::radians(90.0f),
+                //                     glm::vec3(0.0f, 0.0f, 1.0f)),
+                // .view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f),
+                //                     glm::vec3(0.0f, 0.0f, 0.0f),
+                //                     glm::vec3(0.0f, 0.0f, 1.0f)),
+                // .proj = glm::perspective(glm::radians(45.0f),
+                //                         static_cast<float>(p_extent.width) /
+                //                         static_cast<float>(p_extent.height),
+                //                         0.1f,
+                //                         10.0f)
+                .model = model,
+                .view = p_view,
+                .proj = p_proj,
             };
             ubo.proj[1][1] *= -1;
 
@@ -342,6 +354,7 @@ export namespace atlas {
         uint32_t m_format;
         // Should change this but for now this will act as our mesh index
         uint32_t m_mesh_idx_count = 0;
+        glm::mat4 m_proj_view=glm::mat4(1.f); // Combination of the projection * view matrix result
         std::optional<vk::physical_device> m_physical;
         std::shared_ptr<vk::device> m_device;
         vk::command_buffer* m_current_command=nullptr;
@@ -351,6 +364,9 @@ export namespace atlas {
         vk::descriptor_resource set0_resource;
 
         vk::dyn::buffer m_test_ubo;
+
+        std::unordered_map<uint64_t, vk::dyn::buffer> m_entity_uniforms;
+
         vk::texture m_viking_room_texture;
         vk::shader_stage m_stage;
 

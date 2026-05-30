@@ -1,23 +1,25 @@
 module;
 
 #include <cstdint>
-#include <glm/ext.hpp>
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/quaternion.hpp>
-#include <vulkan/vulkan.h>
 #include <string>
 #include <print>
 #include <chrono>
 #include <utility>
-#include <flecs.h>
-#include <GLFW/glfw3.h>
-#include <imgui.h>
 
 #include <array>
 #include <memory>
 #include <memory_resource>
 #include <optional>
 #include <span>
+
+#include <glm/ext.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/quaternion.hpp>
+
+#include <flecs.h>
+#include <GLFW/glfw3.h>
+#include <imgui.h>
+#include <vulkan/vulkan.h>
 
 export module atlas.application;
 
@@ -29,6 +31,8 @@ import atlas.drivers.vulkan;
 
 import atlas.core.scene;
 import atlas.core.scene.world;
+import atlas.core.scene.components;
+import atlas.core.math;
 
 export namespace atlas {
 
@@ -72,6 +76,14 @@ export namespace atlas {
             };
             // m_window = std::allocate_shared<window>(, m_context->instance_handle(), params);
             m_window = std::make_shared<window>(p_context, params);
+
+            event::set_window_size(m_window->glfw_window());
+
+            // m_imgui_context = std::make_shared<imgui_context>(p_context,
+            //                     m_window->glfw_window(),
+            //                     m_window->swapchain_handle(),
+            //                     m_window->request_images().size(),
+            //                     m_window->present_queue());
 
             // Requesting depth format
             std::array<vk::format, 3> format_support = {
@@ -151,13 +163,49 @@ export namespace atlas {
 
             std::shared_ptr<scene> current_scene = m_world->current();
 
+            // Handling camera system execution
+            current_scene
+              ->system<flecs::pair<tag::editor, projection_view>,
+                       transform,
+                       perspective_camera>()
+              .each([&](flecs::pair<tag::editor, projection_view> p_pair,
+                        transform& p_transform,
+                        perspective_camera& p_camera) {
+                  float aspect_ratio = m_window->aspect_ratio();
+                  if (!p_camera.is_active) {
+                      return;
+                  }
+
+                  p_pair->projection = glm::mat4(1.f);
+
+                  p_pair->projection =
+                    glm::perspective(glm::radians(p_camera.field_of_view),
+                                     aspect_ratio,
+                                     p_camera.plane.x,
+                                     p_camera.plane.y);
+                  p_pair->projection[1][1] *= -1;
+                  p_pair->view = glm::mat4(1.f);
+
+                  // This is converting a glm::highp_vec4 to a glm::quat
+                  glm::quat quaternion = to_quat(p_transform.quaternion);
+
+                  p_pair->view =
+                    glm::translate(p_pair->view, p_transform.position) *
+                    glm::mat4_cast(quaternion);
+
+                  p_pair->view = glm::inverse(p_pair->view);
+              });
+
             // Setting the current scene for the renderer to start rendering the objects
             m_render_context.current_scene(*current_scene);
 
             auto start_time = std::chrono::high_resolution_clock::now();
             invoke_start(current_scene.get());
 
-
+            
+            // Querying editor cameras specific objects
+            // Then using this to execute specific main cameras.
+            auto query_camera_objects = current_scene->query_builder<flecs::pair<tag::editor, projection_view>, perspective_camera>().build();
 
             m_render_context.prebake();
 
@@ -168,6 +216,11 @@ export namespace atlas {
                 start_time = current_time;
                 event::flush_events();
 
+                // Progresses the flecs::world by one tick (or replaced with
+                // using the delta time) This also invokes the following
+                // system<T...> call  before the mainloop
+                current_scene->progress(m_delta_time);
+
                 m_next_image_frame_idx = m_window->acquire_next_frame();
                 const auto current_extent = m_window->surface_properties().capabilities.currentExtent;
 
@@ -176,6 +229,22 @@ export namespace atlas {
                 invoke_physics_update(current_scene.get());
 
                 invoke_on_update(current_scene.get(), m_delta_time);
+
+                // We want this to be called after late update
+                // This queries all camera objects within the camera system
+                // TODO: Should consider changing this from
+                // using tags in flecs for specifying active cameras.
+                query_camera_objects.each(
+                  [&](flecs::entity,
+                      flecs::pair<tag::editor, projection_view> p_pair,
+                      perspective_camera& p_camera) {
+                      if (!p_camera.is_active) {
+                          return;
+                      }
+
+                      m_projection = p_pair->projection;
+                      m_view = p_pair->view;
+                  });
 
                 current.begin(vk::command_usage::simulatneous_use_bit);
 
@@ -229,7 +298,7 @@ export namespace atlas {
                     .stencil_attachment = depth_stencil_attachment,
                 };
 
-                m_render_context.begin(begin_params, current_extent);
+                m_render_context.begin(begin_params, current_extent, m_projection, m_view);
 
                 m_render_context.end();
 
@@ -275,10 +344,14 @@ export namespace atlas {
         std::shared_ptr<graphics_context> m_context;
         std::shared_ptr<window> m_window=nullptr;
         event::bus* m_bus = nullptr;
+        glm::mat4 m_view=glm::mat4(1.f);
+        glm::mat4 m_projection=glm::mat4(1.f);
 
         render_context m_render_context;
 
         std::shared_ptr<world> m_world;
+
+        // std::shared_ptr<imgui_context> m_imgui_context;
 
         // vulkan-cpp specific handles
         vk::instance m_instance;
