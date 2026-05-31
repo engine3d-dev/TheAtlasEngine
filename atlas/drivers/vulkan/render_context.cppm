@@ -63,6 +63,11 @@ export namespace atlas {
         vk::dyn::buffer index;
     };
 
+    struct gpu_image {
+        uint64_t texture_slot_index=0;
+        vk::texture specular;
+    };
+
     /**
      * @brief Core render context to schedule images and barriers for coordinating rendering operations
      * 
@@ -206,21 +211,30 @@ export namespace atlas {
 
             // Loading texture and setting up VkSampler and VkImageView
             stb_image img = stb_image("assets/models/viking_room.png", config_texture);
-            m_viking_room_texture = vk::texture(*m_device, &img, config_texture);
 
-            // Updating descriptor 0 with the texture data
-            std::array<vk::write_image, 1> samplers = {
-                vk::write_image{
-                    .sampler = m_viking_room_texture.image().sampler(),
-                    .view = m_viking_room_texture.image().image_view(),
-                    .layout = vk::image_layout::shader_read_only_optimal,
-                },
+            // Reminder: Use texture_slot_index
+            gpu_image store_image = {
+                .texture_slot_index = 0,
+                .specular = vk::texture(*m_device, &img, config_texture),
             };
+
+            m_gpu_storage_images.emplace(0, store_image);
+
+            // Preparing the texture data before we update descriptor set 0
+            // Storing all of our texture via one contiguous array of textures
+            for(const auto&[id, image] : m_gpu_storage_images) {
+                vk::write_image viking_room_texture = {
+                    .sampler = image.specular.image().sampler(),
+                    .view = image.specular.image().image_view(),
+                    .layout = vk::image_layout::shader_read_only_optimal,
+                };
+                m_gpu_images.emplace_back(viking_room_texture);
+            }
 
             std::array<vk::write_image_descriptor, 1> set0_samples = {
                 vk::write_image_descriptor{
                     .dst_binding = 1,
-                    .sample_images = samplers,
+                    .sample_images = m_gpu_images,
                 }
             };
 
@@ -232,21 +246,18 @@ export namespace atlas {
 
             all_meshes.each([this](flecs::entity p_entity){
                 const mesh_source* src = p_entity.get<mesh_source>();
-                const auto property_flags = vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit;
 
                 vk::buffer_parameters vertex_params = {
-                    .memory_mask = m_physical->memory_properties(property_flags),
-                    // .property_flags = vk::memory_property::device_local_bit,
+                    .memory_mask = m_physical->memory_properties(vk::memory_property::device_local_bit),
                     .usage = vk::buffer_usage::transfer_dst_bit | vk::buffer_usage::vertex_buffer_bit,
                 };
 
                 vk::buffer_parameters index_params = {
-                    .memory_mask = m_physical->memory_properties(property_flags),
-                    // .property_flags = vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit,
+                    .memory_mask = m_physical->memory_properties(vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit),
                     .usage = vk::buffer_usage::index_buffer_bit,
                 };
 
-                // obj_importer importer("assets/models/viking_room.obj");
+                // import .obj 3d model and setting up vertices/indices
                 obj_importer importer(src->model_path);
                 gpu_mesh_data gpu_mesh{};
                 gpu_mesh.vertex = vk::vertex_buffer(*m_device, importer.vertices(), vertex_params);
@@ -264,7 +275,6 @@ export namespace atlas {
 
         void begin(vk::rendering_begin_parameters p_begin_params, const auto& p_extent, const glm::mat4& p_proj, const glm::mat4& p_view) {
             m_proj_view = p_proj * p_view;
-            flecs::entity viking_room = m_world->entity("Viking Room");
             vk::viewport_params viewport = {
                 .x = 0.0f,
                 .y = 0.0f,
@@ -299,15 +309,9 @@ export namespace atlas {
             }
 
             */
-
+            flecs::entity viking_room = m_world->entity("Viking Room");
             const transform* t = viking_room.get<transform>();
 
-            // static auto start_time = std::chrono::high_resolution_clock::now();
-
-            // auto current_time = std::chrono::high_resolution_clock::now();
-            // float time = std::chrono::duration<float, std::chrono::seconds::period>(
-            //             current_time - start_time)
-            //             .count();
             // Setting up viking room 
             glm::mat4 model = glm::mat4(1.f);
             model = glm::translate(model, t->position);
@@ -336,14 +340,6 @@ export namespace atlas {
             const VkDescriptorSet set0 = set0_resource;
             m_current_command->bind_descriptors(m_main_pipeline.layout(), VK_PIPELINE_BIND_POINT_GRAPHICS, std::span<const VkDescriptorSet>(&set0, 1));
 
-            /*
-            const VkBuffer vertex = m_viking_room_data.vertex;
-            uint64_t offset = 0;
-            m_current_command->bind_vertex_buffers(std::span<const VkBuffer>(&vertex, 1), std::span<const uint64_t>(&offset, 1));
-            if (m_viking_room_data.has_indices_buffer) {
-                m_current_command->bind_index_buffers32(m_viking_room_data.index);
-            }
-            */
 
             for(auto[id, mesh] : m_meshes) {
                 const VkBuffer vertex = mesh.vertex;
@@ -359,15 +355,7 @@ export namespace atlas {
         
         void end() {
 
-            /*
-            if (m_viking_room_data.has_indices_buffer) {
-                vkCmdDrawIndexed(*m_current_command, m_viking_room_data.indices_size, 1, 0, 0, 0);
-            }
-            else {
-                vkCmdDraw(*m_current_command, m_viking_room_data.vertices_size, 1, 0, 0);
-            }
-            */
-
+            // TODO: Use Vulkan Indirect Command Draw call for this to reduce draw calls
             for(auto[id, mesh] : m_meshes) {
                 if (mesh.has_indices_buffer) {
                     vkCmdDrawIndexed(*m_current_command, mesh.indices_size, 1, 0, 0, 0);
@@ -389,15 +377,15 @@ export namespace atlas {
 
         void destruct() {
             m_scene_uniforms.reset();
-            // m_viking_room_data.vertex.destruct();
-            // m_viking_room_data.index.destruct();
-            // m_viking_room_texture.destruct();
+            for(auto&[id, image] : m_gpu_storage_images) {
+                image.specular.destruct();
+            }
+
             for(auto&[id, mesh] : m_meshes) {
                 mesh.vertex.destruct();
                 mesh.index.destruct();
             }
 
-            m_viking_room_texture.destruct();
             set0_resource.destruct();
             m_shader_resource.destruct();
             m_main_pipeline.destruct();
@@ -405,8 +393,6 @@ export namespace atlas {
     
     private:
         uint32_t m_format;
-        // Should change this but for now this will act as our mesh index
-        uint32_t m_mesh_idx_count = 0;
         glm::mat4 m_proj_view=glm::mat4(1.f); // Combination of the projection * view matrix result
         std::optional<vk::physical_device> m_physical;
         std::shared_ptr<vk::device> m_device;
@@ -425,7 +411,10 @@ export namespace atlas {
         uint32_t m_texture_slot_index = 0;
         std::unordered_map<uint64_t, uint32_t> m_texture_storage;
 
-        vk::texture m_viking_room_texture;
+        // GPU sampled images
+        // <slot_index, gpu_sample_texture_image>
+        std::unordered_map<uint64_t, gpu_image> m_gpu_storage_images;
+        std::vector<vk::write_image> m_gpu_images;
         vk::shader_stage m_stage;
 
         flecs::world* m_world=nullptr;
