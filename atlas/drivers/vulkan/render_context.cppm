@@ -58,6 +58,11 @@ export namespace atlas {
         glm::mat4 proj=glm::mat4(1.f);
     };
 
+    struct storage_geometry {
+        vk::dyn::buffer vertex;
+        vk::dyn::buffer index;
+    };
+
     /**
      * @brief Core render context to schedule images and barriers for coordinating rendering operations
      * 
@@ -166,8 +171,7 @@ export namespace atlas {
                 .range = sizeof(push_constant_data),
             };
 
-            // const VkDescriptorSetLayout layout = set0_resource.layout();
-            std::array<VkDescriptorSetLayout, 1> layouts = {set0_resource.layout()};
+            VkDescriptorSetLayout descriptor0_layout = set0_resource.layout();
             vk::pipeline_params pipeline_configuration = {
                 .use_render_pipeline = true,
                 .color_attachment_formats = std::span<const uint32_t>(&m_format, 1),
@@ -177,7 +181,7 @@ export namespace atlas {
                 .shader_modules = m_shader_resource.handles(),
                 .vertex_attributes = m_shader_resource.vertex_attributes(),
                 .vertex_bind_attributes = m_shader_resource.vertex_bind_attributes(),
-                .descriptor_layouts = layouts,
+                .descriptor_layouts = std::span<VkDescriptorSetLayout>(&descriptor0_layout, 1),
                 .color_blend = {
                     .attachments = color_blend_attachments,
                 },
@@ -192,7 +196,7 @@ export namespace atlas {
                 .usage = vk::buffer_usage::uniform_buffer_bit | vk::buffer_usage::shader_device_address_bit,
                 .allocate_flags = vk::memory_allocate_flags::device_address_bit_khr,
             };
-            m_test_ubo = vk::dyn::buffer(*m_device, sizeof(global_uniform), uniform_params);
+            m_scene_uniforms = vk::dyn::buffer(*m_device, sizeof(global_uniform), uniform_params);
 
 
             // testing texture
@@ -221,31 +225,41 @@ export namespace atlas {
             };
 
             set0_resource.update({}, set0_samples);
-
-            obj_importer importer("assets/models/viking_room.obj");
-            const auto property_flags = vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit;
-
-            vk::buffer_parameters vertex_params = {
-                .memory_mask = m_physical->memory_properties(property_flags),
-                // .property_flags = vk::memory_property::device_local_bit,
-                .usage = vk::buffer_usage::transfer_dst_bit | vk::buffer_usage::vertex_buffer_bit,
-            };
-
-            vk::buffer_parameters index_params = {
-                .memory_mask = m_physical->memory_properties(property_flags),
-                // .property_flags = vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit,
-                .usage = vk::buffer_usage::index_buffer_bit,
-            };
-            m_viking_room_data.vertex = vk::vertex_buffer(*m_device, importer.vertices(), vertex_params);
-            m_viking_room_data.index = vk::index_buffer(*m_device, importer.indices(), index_params);
-            m_viking_room_data.has_indices_buffer = (importer.indices().size() >= 0) ? true : false;
-            m_viking_room_data.vertices_size = importer.vertices().size();
-            m_viking_room_data.indices_size = importer.indices().size();
-
-            std::println("has_indices = {}", m_viking_room_data.has_indices_buffer);
         }
 
         void prebake() {
+            flecs::query<> all_meshes = m_world->query_builder<mesh_source>().build();
+
+            all_meshes.each([this](flecs::entity p_entity){
+                const mesh_source* src = p_entity.get<mesh_source>();
+                const auto property_flags = vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit;
+
+                vk::buffer_parameters vertex_params = {
+                    .memory_mask = m_physical->memory_properties(property_flags),
+                    // .property_flags = vk::memory_property::device_local_bit,
+                    .usage = vk::buffer_usage::transfer_dst_bit | vk::buffer_usage::vertex_buffer_bit,
+                };
+
+                vk::buffer_parameters index_params = {
+                    .memory_mask = m_physical->memory_properties(property_flags),
+                    // .property_flags = vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit,
+                    .usage = vk::buffer_usage::index_buffer_bit,
+                };
+
+                // obj_importer importer("assets/models/viking_room.obj");
+                obj_importer importer(src->model_path);
+                gpu_mesh_data gpu_mesh{};
+                gpu_mesh.vertex = vk::vertex_buffer(*m_device, importer.vertices(), vertex_params);
+                gpu_mesh.index = vk::index_buffer(*m_device, importer.indices(), index_params);
+                gpu_mesh.has_indices_buffer = (importer.indices().size() >= 0) ? true : false;
+                gpu_mesh.vertices_size = importer.vertices().size();
+                gpu_mesh.indices_size = importer.indices().size();
+
+                m_meshes.emplace(p_entity.id(), gpu_mesh);
+
+                std::println("Entity ID: {}", p_entity.id());
+            });
+
         }
 
         void begin(vk::rendering_begin_parameters p_begin_params, const auto& p_extent, const glm::mat4& p_proj, const glm::mat4& p_view) {
@@ -270,40 +284,49 @@ export namespace atlas {
             m_current_command->begin_rendering(p_begin_params);
 
             m_main_pipeline.bind(*m_current_command);
+
+            /*
+            TODO (TEMP): Consider having transform to be changed as an unbounded array on the shader
+            struct shader_transform_struct {
+                // Where we will have an unbounded array of 3D object
+                // transforms that can already be accessible when being modified
+                mat4 models[];
+            } object_transform;
+
+
+            void main() {
+                gl_Position = ubo.view * ubo.proj * object_transform.models[gl_VertexIndex] * vec4(inPosition, 1.0);
+            }
+
+            */
+
             const transform* t = viking_room.get<transform>();
 
-            static auto start_time = std::chrono::high_resolution_clock::now();
+            // static auto start_time = std::chrono::high_resolution_clock::now();
 
-            auto current_time = std::chrono::high_resolution_clock::now();
-            float time = std::chrono::duration<float, std::chrono::seconds::period>(
-                        current_time - start_time)
-                        .count();
+            // auto current_time = std::chrono::high_resolution_clock::now();
+            // float time = std::chrono::duration<float, std::chrono::seconds::period>(
+            //             current_time - start_time)
+            //             .count();
             // Setting up viking room 
             glm::mat4 model = glm::mat4(1.f);
             model = glm::translate(model, t->position);
             model = glm::scale(model, t->scale);
 
             global_uniform ubo = {
-                // .model = glm::rotate(glm::mat4(1.0f),
-                //                     time * glm::radians(90.0f),
-                //                     glm::vec3(0.0f, 0.0f, 1.0f)),
-                // .view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f),
-                //                     glm::vec3(0.0f, 0.0f, 0.0f),
-                //                     glm::vec3(0.0f, 0.0f, 1.0f)),
-                // .proj = glm::perspective(glm::radians(45.0f),
-                //                         static_cast<float>(p_extent.width) /
-                //                         static_cast<float>(p_extent.height),
-                //                         0.1f,
-                //                         10.0f)
                 .model = model,
                 .view = p_view,
                 .proj = p_proj,
             };
             ubo.proj[1][1] *= -1;
 
-            m_test_ubo.transfer<global_uniform>(std::span<const global_uniform>(&ubo, 1));
+            m_scene_uniforms.transfer<global_uniform>(std::span<const global_uniform>(&ubo, 1));
 
-             const uint64_t ubo_address = m_test_ubo.get_device_address();
+            // Retrieving the buffer address that can be looked up from the glsl shader
+            const uint64_t ubo_address = m_scene_uniforms.get_device_address();
+
+            // push constant retrieve the buffer that is transferring data to
+            // Then we set the texture index.
             push_constant_data push = {
                 .texture_index = 0,
                 .buffer_address = ubo_address,
@@ -313,21 +336,45 @@ export namespace atlas {
             const VkDescriptorSet set0 = set0_resource;
             m_current_command->bind_descriptors(m_main_pipeline.layout(), VK_PIPELINE_BIND_POINT_GRAPHICS, std::span<const VkDescriptorSet>(&set0, 1));
 
+            /*
             const VkBuffer vertex = m_viking_room_data.vertex;
             uint64_t offset = 0;
             m_current_command->bind_vertex_buffers(std::span<const VkBuffer>(&vertex, 1), std::span<const uint64_t>(&offset, 1));
             if (m_viking_room_data.has_indices_buffer) {
                 m_current_command->bind_index_buffers32(m_viking_room_data.index);
             }
+            */
+
+            for(auto[id, mesh] : m_meshes) {
+                const VkBuffer vertex = mesh.vertex;
+                uint64_t offset = 0;
+                m_current_command->bind_vertex_buffers(std::span<const VkBuffer>(&vertex, 1), std::span<const uint64_t>(&offset, 1));
+                if (mesh.has_indices_buffer) {
+                    m_current_command->bind_index_buffers32(mesh.index);
+                }
+            }
+
+
         }
         
         void end() {
 
+            /*
             if (m_viking_room_data.has_indices_buffer) {
                 vkCmdDrawIndexed(*m_current_command, m_viking_room_data.indices_size, 1, 0, 0, 0);
             }
             else {
                 vkCmdDraw(*m_current_command, m_viking_room_data.vertices_size, 1, 0, 0);
+            }
+            */
+
+            for(auto[id, mesh] : m_meshes) {
+                if (mesh.has_indices_buffer) {
+                    vkCmdDrawIndexed(*m_current_command, mesh.indices_size, 1, 0, 0, 0);
+                }
+                else {
+                    vkCmdDraw(*m_current_command, mesh.vertices_size, 1, 0, 0);
+                }
             }
             m_current_command->end_rendering();
         }
@@ -341,9 +388,15 @@ export namespace atlas {
         }
 
         void destruct() {
-            m_test_ubo.reset();
-            m_viking_room_data.vertex.destruct();
-            m_viking_room_data.index.destruct();
+            m_scene_uniforms.reset();
+            // m_viking_room_data.vertex.destruct();
+            // m_viking_room_data.index.destruct();
+            // m_viking_room_texture.destruct();
+            for(auto&[id, mesh] : m_meshes) {
+                mesh.vertex.destruct();
+                mesh.index.destruct();
+            }
+
             m_viking_room_texture.destruct();
             set0_resource.destruct();
             m_shader_resource.destruct();
@@ -363,15 +416,18 @@ export namespace atlas {
         std::vector<VkDrawIndexedIndirectCommand> m_indirect_commands;
         vk::descriptor_resource set0_resource;
 
-        vk::dyn::buffer m_test_ubo;
+        vk::dyn::buffer m_scene_uniforms;
 
-        std::unordered_map<uint64_t, vk::dyn::buffer> m_entity_uniforms;
+        // std::unordered_map<uint64_t, vk::dyn::buffer> m_entity_uniforms;
+        std::unordered_map<uint64_t, gpu_mesh_data> m_meshes;
+
+        // Index to lookup for speci
+        uint32_t m_texture_slot_index = 0;
+        std::unordered_map<uint64_t, uint32_t> m_texture_storage;
 
         vk::texture m_viking_room_texture;
         vk::shader_stage m_stage;
 
         flecs::world* m_world=nullptr;
-
-        gpu_mesh_data m_viking_room_data;
     };
 };
