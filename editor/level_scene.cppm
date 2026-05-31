@@ -45,6 +45,11 @@ public:
           .scale{ 1.f },
         });
 
+        viking_room.set<atlas::mesh_source>({
+            .model_path = "assets/models/viking_room.obj",
+            .diffuse = "assets/models/viking_room.png",
+        });
+
         atlas::register_start(this, &level_scene::start);
         atlas::register_physics(this, &level_scene::physics_update);
         atlas::register_update(this, &level_scene::on_update);
@@ -107,6 +112,7 @@ public:
         t->set_rotation(t->rotation);
     }
 
+    // TODO: Have this physics_update be executed during the physics fixed-update framerate
     void physics_update() {
     }
 
