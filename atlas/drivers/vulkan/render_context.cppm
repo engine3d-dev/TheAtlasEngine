@@ -248,7 +248,7 @@ export namespace atlas {
                 const mesh_source* src = p_entity.get<mesh_source>();
 
                 vk::buffer_parameters vertex_params = {
-                    .memory_mask = m_physical->memory_properties(vk::memory_property::device_local_bit),
+                    .memory_mask = m_physical->memory_properties(vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit),
                     .usage = vk::buffer_usage::transfer_dst_bit | vk::buffer_usage::vertex_buffer_bit,
                 };
 
