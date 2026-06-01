@@ -1,6 +1,7 @@
 module;
 
 #include <string>
+#include <print>
 
 export module editor:world;
 
@@ -12,6 +13,8 @@ import atlas.core.scene.uuid;
 import atlas.core.level_streamer;
 import atlas.core.scene;
 import :level_scene;
+// import :level_scene2;
+// import atlas.core.event;
 
 /**
  * @brief editor_world is where a lot of the editor logic will be handled
@@ -27,6 +30,9 @@ public:
         // Does polymorphic allocations for these customized scenes
         default_custom_scene<level_scene>("LevelScene", p_bus);
 
+        // Experimental for loading a second scene.
+        // create_scene<level_scene2>("Level Scene 2", p_bus);
+
         // Set what our current scene is
         // TODO: Probably have `default_custom_scene<UScene>() set this
         current("LevelScene");
@@ -34,5 +40,4 @@ public:
 
     ~editor_world() override = default;
 
-private:
 };

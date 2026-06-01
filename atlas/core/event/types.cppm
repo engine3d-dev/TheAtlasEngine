@@ -1,7 +1,7 @@
 module;
 
 #include <cstdint>
-#include <string_view>
+#include <string>
 
 export module atlas.core.event:types;
 
@@ -29,8 +29,8 @@ export namespace atlas::event {
      * @param to_scene is the new scene that is going to be transitioned to
      */
     struct scene_transition {
-        const void* from_scene;
-        const void* to_scene;
+        std::string from_scene;
+        std::string next_scene;
     };
 
     /**

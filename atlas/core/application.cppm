@@ -57,12 +57,6 @@ export namespace atlas {
             m_physical = p_context->physical_device();
             m_device = p_context->logical_device();
 
-            m_bus->create_listener<atlas::event::collision_enter>();
-            m_bus->create_listener<atlas::event::collision_persisted>();
-            m_bus->create_listener<atlas::event::collision_exit>();
-            // m_bus->create_immediate_listener<atlas::event::mesh_reload>();
-            // m_bus->create_immediate_listener<atlas::event::material_reload>();
-
             // Constructing the application
             std::println("Constructing application");
             window_params params = {
@@ -78,6 +72,13 @@ export namespace atlas {
             m_window = std::make_shared<window>(p_context, params);
 
             event::set_window_size(m_window->glfw_window());
+
+            m_bus->create_listener<atlas::event::collision_enter>();
+            m_bus->create_listener<atlas::event::collision_persisted>();
+            m_bus->create_listener<atlas::event::collision_exit>();
+            // m_bus->create_immediate_listener<atlas::event::scene_transition>();
+            // m_bus->create_immediate_listener<atlas::event::mesh_reload>();
+            // m_bus->create_immediate_listener<atlas::event::material_reload>();
 
             // m_imgui_context = std::make_shared<imgui_context>(p_context,
             //                     m_window->glfw_window(),
@@ -150,6 +151,8 @@ export namespace atlas {
             m_render_context = render_context(m_context, m_color_format, m_depth_format);
 
             std::println("images.size() = {}", images.size());
+
+            // m_bus->trigger<event::scene_transition>(this, &application::on_scene_transition);
         }
 
         void execute() {
@@ -161,10 +164,10 @@ export namespace atlas {
                 .depthStencil = { .depth = 1.f, .stencil = 0 },
             };
 
-            std::shared_ptr<scene> current_scene = m_world->current();
+            m_current_scene = m_world->current();
 
             // Handling camera system execution
-            current_scene
+            m_current_scene
               ->system<flecs::pair<tag::editor, projection_view>,
                        transform,
                        perspective_camera>()
@@ -197,15 +200,15 @@ export namespace atlas {
               });
 
             // Setting the current scene for the renderer to start rendering the objects
-            m_render_context.current_scene(*current_scene);
+            m_render_context.current_scene(*m_current_scene);
 
             auto start_time = std::chrono::high_resolution_clock::now();
-            invoke_start(current_scene.get());
+            invoke_start(m_current_scene.get());
 
             
             // Querying editor cameras specific objects
             // Then using this to execute specific main cameras.
-            auto query_camera_objects = current_scene->query_builder<flecs::pair<tag::editor, projection_view>, perspective_camera>().build();
+            auto query_camera_objects = m_current_scene->query_builder<flecs::pair<tag::editor, projection_view>, perspective_camera>().build();
 
             m_render_context.prebake();
 
@@ -219,16 +222,16 @@ export namespace atlas {
                 // Progresses the flecs::world by one tick (or replaced with
                 // using the delta time) This also invokes the following
                 // system<T...> call  before the mainloop
-                current_scene->progress(m_delta_time);
+                m_current_scene->progress(m_delta_time);
 
                 m_next_image_frame_idx = m_window->acquire_next_frame();
                 const auto current_extent = m_window->surface_properties().capabilities.currentExtent;
 
                 vk::command_buffer current = m_command_buffers[m_next_image_frame_idx];
 
-                invoke_physics_update(current_scene.get());
+                invoke_physics_update(m_current_scene.get());
 
-                invoke_on_update(current_scene.get(), m_delta_time);
+                invoke_on_update(m_current_scene.get(), m_delta_time);
 
                 // We want this to be called after late update
                 // This queries all camera objects within the camera system
@@ -315,6 +318,19 @@ export namespace atlas {
             }
         }
 
+
+        // Experimental: Will look into later once we dive into scene transitioning
+        // void on_scene_transition(event::scene_transition& p_scene_transition) {
+        //     m_world->current(p_scene_transition.next_scene);
+        //     std::println("Attempting to switch to the scene: {}", p_scene_transition.next_scene);
+
+        //     // We only want to set the current scene if that specific scene is valid
+        //     if(m_world->current() != nullptr) {
+        //         m_current_scene = m_world->current();
+        //         m_render_context.current_scene(*m_current_scene);
+        //     }
+        // }
+
         void post_destroy() {
             m_render_context.destruct();
 
@@ -352,6 +368,7 @@ export namespace atlas {
         std::shared_ptr<world> m_world;
 
         // std::shared_ptr<imgui_context> m_imgui_context;
+        std::shared_ptr<scene> m_current_scene=nullptr;
 
         // vulkan-cpp specific handles
         vk::instance m_instance;

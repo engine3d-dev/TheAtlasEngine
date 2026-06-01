@@ -28,12 +28,6 @@ import vk;
 
 export namespace atlas {
 
-    struct gpu_push_constant {
-        glm::mat4 proj;
-        glm::mat4 view;
-        glm::mat4 model;
-    };
-
     struct gpu_mesh_data {
         vk::vertex_buffer vertex;
         vk::index_buffer index;
@@ -58,13 +52,9 @@ export namespace atlas {
         glm::mat4 proj=glm::mat4(1.f);
     };
 
-    struct storage_geometry {
-        vk::dyn::buffer vertex;
-        vk::dyn::buffer index;
-    };
 
     struct gpu_image {
-        uint64_t texture_slot_index=0;
+        uint64_t diffuse_idx=0;
         vk::texture specular;
     };
 
@@ -76,7 +66,7 @@ export namespace atlas {
     class render_context {
     public:
         render_context() = default;
-        render_context(std::shared_ptr<graphics_context> p_context, VkFormat p_color_format, VkFormat p_depth_format) {
+        render_context(/*NOLINT*/std::shared_ptr<graphics_context> p_context, VkFormat p_color_format, VkFormat p_depth_format) {
             m_physical = p_context->physical_device();
             m_device = p_context->logical_device();
 
@@ -155,7 +145,7 @@ export namespace atlas {
                 .entries = entries_set1, // descriptor layout entries description
                 .descriptor_counts = std::span<const uint32_t>(&max_descriptor, 1),
             };
-            set0_resource = vk::descriptor_resource(*m_device, set0_layout, vk::descriptor_layout_flags::update_after_bind_pool);
+            m_set0_resource = vk::descriptor_resource(*m_device, set0_layout, vk::descriptor_layout_flags::update_after_bind_pool);
 
             std::array<vk::color_blend_attachment_state, 1> color_blend_attachments = {
                 vk::color_blend_attachment_state{},
@@ -176,7 +166,7 @@ export namespace atlas {
                 .range = sizeof(push_constant_data),
             };
 
-            VkDescriptorSetLayout descriptor0_layout = set0_resource.layout();
+            VkDescriptorSetLayout descriptor0_layout = m_set0_resource.layout();
             vk::pipeline_params pipeline_configuration = {
                 .use_render_pipeline = true,
                 .color_attachment_formats = std::span<const uint32_t>(&m_format, 1),
@@ -212,9 +202,9 @@ export namespace atlas {
             // Loading texture and setting up VkSampler and VkImageView
             stb_image img = stb_image("assets/models/viking_room.png", config_texture);
 
-            // Reminder: Use texture_slot_index
+            // Reminder: Use diffuse_idx
             gpu_image store_image = {
-                .texture_slot_index = 0,
+                .diffuse_idx = 0,
                 .specular = vk::texture(*m_device, &img, config_texture),
             };
 
@@ -238,7 +228,7 @@ export namespace atlas {
                 }
             };
 
-            set0_resource.update({}, set0_samples);
+            m_set0_resource.update({}, set0_samples);
         }
 
         void prebake() {
@@ -337,7 +327,7 @@ export namespace atlas {
             };
             m_main_pipeline.push_constant<push_constant_data>(*m_current_command, push, m_stage, 0);
         
-            const VkDescriptorSet set0 = set0_resource;
+            const VkDescriptorSet set0 = m_set0_resource;
             m_current_command->bind_descriptors(m_main_pipeline.layout(), VK_PIPELINE_BIND_POINT_GRAPHICS, std::span<const VkDescriptorSet>(&set0, 1));
 
 
@@ -386,7 +376,7 @@ export namespace atlas {
                 mesh.index.destruct();
             }
 
-            set0_resource.destruct();
+            m_set0_resource.destruct();
             m_shader_resource.destruct();
             m_main_pipeline.destruct();
         }
@@ -400,15 +390,14 @@ export namespace atlas {
         vk::shader_resource m_shader_resource;
         vk::pipeline m_main_pipeline;
         std::vector<VkDrawIndexedIndirectCommand> m_indirect_commands;
-        vk::descriptor_resource set0_resource;
+        vk::descriptor_resource m_set0_resource;
 
         vk::dyn::buffer m_scene_uniforms;
 
-        // std::unordered_map<uint64_t, vk::dyn::buffer> m_entity_uniforms;
         std::unordered_map<uint64_t, gpu_mesh_data> m_meshes;
 
         // Index to lookup for speci
-        uint32_t m_texture_slot_index = 0;
+        // uint32_t m_texture_slot_index = 0;
         std::unordered_map<uint64_t, uint32_t> m_texture_storage;
 
         // GPU sampled images

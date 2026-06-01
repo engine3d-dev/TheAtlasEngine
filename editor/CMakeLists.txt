@@ -11,6 +11,7 @@ target_sources(editor PUBLIC
     editor.cppm
     editor_world.cppm
     level_scene.cppm
+    level_scene2.cppm
     # content_browser_panel.cppm
     # icon.cppm
     # utilities.cppm

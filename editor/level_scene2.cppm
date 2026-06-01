@@ -10,7 +10,7 @@ module;
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-export module editor:level_scene;
+export module editor:level_scene2;
 
 import atlas.application;
 import atlas.core.event;
@@ -20,9 +20,10 @@ import atlas.core.scene.components;
 import atlas.core.utilities;
 import atlas.core.math;
 
-export class level_scene final : public atlas::scene {
+// Creating this class for experimentation
+export class level_scene2 final : public atlas::scene {
 public:
-    level_scene(const std::string& p_name, atlas::event::bus& p_bus)
+    level_scene2(const std::string& p_name, atlas::event::bus& p_bus)
       : atlas::scene(p_name, p_bus) {
 
 
@@ -38,49 +39,24 @@ public:
           .field_of_view = 45.f,
         });
 
-        atlas::game_object viking_room = entity("Viking Room");
-        viking_room.set<atlas::transform>({
+        atlas::game_object cube = entity("Cube");
+        cube.set<atlas::transform>({
           .position = { -2.70f, 2.70, -8.30f },
           .rotation = { 2.30f, 95.90f, 91.80f },
           .scale{ 1.f },
         });
 
-        viking_room.set<atlas::mesh_source>({
-            .model_path = "assets/models/viking_room.obj",
-            .diffuse = "assets/models/viking_room.png",
+        cube.set<atlas::mesh_source>({
+            .model_path = "assets/models/cube.obj",
+            .diffuse = "assets/models/container_diffuse.png",
         });
 
-        // for(size_t i = 0; i < 31; i++) {
-        // 	atlas::game_object obj = entity(std::format("Object #{}", i));
-        // 	obj.set<atlas::physics_body>({
-        // 		.restitution = 1.25f,
-        // 		.body_movement_type = atlas::dynamic,
-        // 	});
-
-        // 	obj.set<atlas::sphere_collider>(
-        // 		{
-        // 		.radius = 1.0f,
-        // 	});
-
-        // 	glm::vec3 pos = {float(0.5 * 1.4), float(0.5 * 1.4), float(0.5 * 1.4) };
-
-        // 	obj.set<atlas::transform>({
-        // 		.position = pos,
-        // 		.rotation = {.3f, 0.0f, 0.0f},
-        // 	});
-
-        // 	obj.set<atlas::mesh_source>({
-        // 		.model_path = "assets/models/Ball OBJ.obj",
-        // 		.diffuse = "assets/models/clear.png",
-        // 	});
-        // }
-
-        atlas::register_start(this, &level_scene::start);
-        atlas::register_physics(this, &level_scene::physics_update);
-        atlas::register_update(this, &level_scene::on_update);
+        atlas::register_start(this, &level_scene2::start);
+        atlas::register_physics(this, &level_scene2::physics_update);
+        atlas::register_update(this, &level_scene2::on_update);
     }
 
-    ~level_scene() override = default;
+    ~level_scene2() override = default;
 
     void start() {
     }
@@ -135,14 +111,13 @@ public:
         }
 
         // Signal to trigger this kind of scene transition
-        // Experimental: This was used for testing.
-        // if(atlas::event::is_key_pressed(key_n)) {
-        //     std::println("Signaling to transition to next_scene");
-        //     atlas::event::scene_transition scene_transition = {
-        //         .next_scene = "Level Scene 2",
-        //     };
-        //     signal<atlas::event::scene_transition>(scene_transition);
-        // }
+        if(atlas::event::is_key_pressed(key_n)) {
+            std::println("Signaling to transition to level scene");
+            atlas::event::scene_transition scene_transition = {
+                .next_scene = "Level Scene",
+            };
+            signal(scene_transition);
+        }
 
         t->set_rotation(t->rotation);
     }
@@ -150,6 +125,10 @@ public:
     // TODO: Have this physics_update be executed during the physics fixed-update framerate
     void physics_update() {
     }
+
+    // void on_signal(atlas::event::scene_transition& p_transition) {
+    //     p_transition.next_scene = "Level Scene 2";
+    // }
 
 private:
     std::optional<atlas::game_object> m_editor_camera;
