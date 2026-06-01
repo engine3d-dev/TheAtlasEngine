@@ -49,7 +49,7 @@ export namespace atlas {
     class application {
     public:
         application() = default;
-        application(std::shared_ptr<graphics_context> p_context,
+        application(/*NOLINT*/std::shared_ptr<graphics_context> p_context,
                     const application_settings& p_params,
                     event::bus& p_bus)
           : m_context(p_context), m_bus(&p_bus) {
@@ -350,7 +350,7 @@ export namespace atlas {
         }
 
         void current_world(std::shared_ptr<world> p_world) {
-            m_world = p_world;
+            m_world = std::move(p_world);
         }
 
     private:
