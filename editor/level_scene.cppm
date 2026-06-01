@@ -50,6 +50,31 @@ public:
             .diffuse = "assets/models/viking_room.png",
         });
 
+        // for(size_t i = 0; i < 31; i++) {
+        // 	atlas::game_object obj = entity(std::format("Object #{}", i));
+        // 	obj.set<atlas::physics_body>({
+        // 		.restitution = 1.25f,
+        // 		.body_movement_type = atlas::dynamic,
+        // 	});
+
+        // 	obj.set<atlas::sphere_collider>(
+        // 		{
+        // 		.radius = 1.0f,
+        // 	});
+
+        // 	glm::vec3 pos = {float(0.5 * 1.4), float(0.5 * 1.4), float(0.5 * 1.4) };
+
+        // 	obj.set<atlas::transform>({
+        // 		.position = pos,
+        // 		.rotation = {.3f, 0.0f, 0.0f},
+        // 	});
+
+        // 	obj.set<atlas::mesh_source>({
+        // 		.model_path = "assets/models/Ball OBJ.obj",
+        // 		.diffuse = "assets/models/clear.png",
+        // 	});
+        // }
+
         atlas::register_start(this, &level_scene::start);
         atlas::register_physics(this, &level_scene::physics_update);
         atlas::register_update(this, &level_scene::on_update);
