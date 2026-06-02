@@ -41,7 +41,8 @@ export namespace atlas {
     };
 
     struct push_constant_data {
-        uint64_t texture_index=0;
+        uint64_t diffuse_idx=0;
+        uint64_t specular_idx=0;
         uint64_t buffer_address=0;
     };
 
@@ -51,10 +52,11 @@ export namespace atlas {
         glm::mat4 proj=glm::mat4(1.f);
     };
 
+
     struct gpu_material {
         uint64_t diffuse_idx=0;
+        // uint64_t specular_idx=0;
     };
-
 
     /**
      * 
@@ -63,7 +65,6 @@ export namespace atlas {
      * vk::texture is the texture data to configure the GPU-visible image resource
     */
     struct gpu_image {
-        uint64_t slot=0;
         vk::texture texture_data;
     };
 
@@ -131,6 +132,7 @@ export namespace atlas {
 
             // Configuring Descriptor Set 0 -- specify to vk::pipeline
             // Descriptor Set 0
+            uint32_t max_descriptor = 3;
             std::array<vk::descriptor_entry, 1> entries_set1 = {
                 vk::descriptor_entry{
                     // layout (set = 0, binding = 1) uniform sampler2D textures[];
@@ -139,7 +141,7 @@ export namespace atlas {
                         .binding = 1,
                         .stage = vk::shader_stage::fragment,
                     },
-                    .descriptor_count = 1,
+                    .descriptor_count = max_descriptor,
                     .flags = vk::descriptor_bind_flags::partially_bound_bit |
                             vk::descriptor_bind_flags::variable_descriptor_count_bit |
                             vk::descriptor_bind_flags::update_after_bind,
@@ -147,10 +149,9 @@ export namespace atlas {
             };
 
             // layout(set = 0, ...)
-            uint32_t max_descriptor = 1;
             vk::descriptor_layout set0_layout = {
                 .slot = 0,
-                .max_sets = 3,
+                .max_sets = max_descriptor,
                 .entries = entries_set1, // descriptor layout entries description
                 .descriptor_counts = std::span<const uint32_t>(&max_descriptor, 1),
             };
@@ -202,14 +203,14 @@ export namespace atlas {
             };
             m_scene_uniforms = vk::dyn::buffer(*m_device, sizeof(global_uniform), uniform_params);
 
-            // Index 0 will default to a white texture
-            // vk::image_extent extent = {
-            //     .width = 1,
-            //     .height = 1,
-            // };
-            // std::array<uint8_t, 4> white_color = {0xff, 0xff, 0xff, 0xff};
-            // m_gpu_textures.emplace_back(*m_device,  extent, white_color, m_physical->memory_properties(vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit));
-
+            vk::image_extent extent = {
+                .width = 1,
+                .height = 1,
+            };
+            std::array<uint8_t, 4> white_color = {0xff, 0xff, 0xff, 0xff};
+            // At index = 0 will default to white texture
+            m_storage_images_arrays.emplace_back(*m_device, extent, white_color, m_physical->memory_properties(vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit));
+            
         }
 
         void prebake() {
@@ -250,65 +251,38 @@ export namespace atlas {
                 // Loading texture and setting up VkSampler and VkImageView
                 // stb_image img = stb_image("assets/models/viking_room.png", config_texture);
                 stb_image diffuse_img = stb_image(src->diffuse, config_texture);
-                stb_image specular_img = stb_image(src->specular, config_texture);
-
-                // Reminder: Use diffuse_idx
-                gpu_material material = {};
+                gpu_material material_index = {};
                 if(!src->diffuse.empty()) {
                     std::println("Loading diffuse: {}", src->diffuse);
-                    material.diffuse_idx = m_texture_slot_index++;
-                    // gpu_image diffuse_store_image = {
-                    //     .slot = m_texture_slot_index++,
-                    //     .texture_data = vk::texture(*m_device, &diffuse_img, config_texture),
-                    // };
-
-                    // m_gpu_storage_images.emplace(m_texture_slot_index, diffuse_store_image);
-                    m_gpu_textures.emplace_back(*m_device, &diffuse_img, config_texture);
+                    material_index.diffuse_idx = m_texture_slot_index++;
+                    // vk::texture diffuse(*m_device, &diffuse_img, config_texture);
+                    m_storage_images_arrays.emplace_back(*m_device, &diffuse_img, config_texture);
                 }
 
-                m_material_table.emplace(p_entity.id(), material);
-                /*
-                if(!src->diffuse.empty()) {
-                    std::println("Loading diffuse: {}", src->diffuse);
-                    gpu_image diffuse_store_image = {
-                        .slot = m_texture_slot_index++,
-                        .texture_data = vk::texture(*m_device, &diffuse_img, config_texture),
-                    };
+                // if(!src->specular.empty()) {
+                //     std::println("Loading specular: {}", src->specular);
+                //     material_index.specular_idx = m_texture_slot_index++;
+                //     stb_image specular_img = stb_image(src->specular, config_texture);
+                //     vk::texture specular(*m_device, &specular_img, config_texture);
+                //     // m_storage_images_arrays.emplace_back(*m_device, &specular_img, config_texture);
+                //     m_storage_images_arrays.emplace_back(specular);
+                // }
 
-                    m_gpu_storage_images.emplace(m_texture_slot_index, diffuse_store_image);
-                }
 
-                if(!src->specular.empty()) {
-                    std::println("Loading specular: {}", src->specular);
-                    gpu_image specular_store_image {
-                        .slot = m_texture_slot_index++,
-                        .texture_data = vk::texture(*m_device, &specular_img, config_texture),
-                    };
-
-                    m_gpu_storage_images.emplace(p_entity.id(), specular_store_image);
-                }
-                */
+                m_mesh_materials.emplace(p_entity.id(), material_index);
             });
 
             // Preparing the texture data before we update descriptor set 0
             // Storing all of our texture via one contiguous array of textures
             // for(const auto&[id, image] : m_gpu_storage_images) {
-            //     vk::write_image viking_room_texture = {
-            //         .sampler = image.texture_data.image().sampler(),
-            //         .view = image.texture_data.image().image_view(),
-            //         .layout = vk::image_layout::shader_read_only_optimal,
-            //     };
-            //     m_gpu_images.emplace_back(viking_room_texture);
-            // }
-            for(auto& image : m_gpu_textures) {
-                vk::write_image viking_room_texture = {
+            for(auto image : m_storage_images_arrays) {
+                vk::write_image write_gpu_image = {
                     .sampler = image.image().sampler(),
                     .view = image.image().image_view(),
                     .layout = vk::image_layout::shader_read_only_optimal,
                 };
-                m_gpu_images.emplace_back(viking_room_texture);
+                m_gpu_images.push_back(write_gpu_image);
             }
-
 
             std::array<vk::write_image_descriptor, 1> set0_samples = {
                 vk::write_image_descriptor{
@@ -380,20 +354,24 @@ export namespace atlas {
             // push constant retrieve the buffer that is transferring data to
             // Then we set the texture index.
 
-            flecs::query<> all_meshes = m_world->query_builder<mesh_source>().build();
+            // flecs::query<> all_meshes = m_world->query_builder<mesh_source>().build();
 
-            all_meshes.each([this, ubo_address](flecs::entity p_entity){
-                push_constant_data push = {
-                    .texture_index = m_gpu_storage_images[p_entity.id()].slot, // slot = index to access specific diffuse texture
-                    .buffer_address = ubo_address,
-                };
-                m_main_pipeline.push_constant<push_constant_data>(*m_current_command, push, m_stage, 0);
-            });
-            // push_constant_data push = {
-            //     .texture_index = 0,
-            //     .buffer_address = ubo_address,
-            // };
-            // m_main_pipeline.push_constant<push_constant_data>(*m_current_command, push, m_stage, 0);
+            // all_meshes.each([this, ubo_address](flecs::entity p_entity){
+            //     if(!p_entity.has<material_metadata>()) {
+            //         return;
+            //     }
+            //     push_constant_data push = {
+            //         .diffuse_idx = m_mesh_materials[p_entity.id()].diffuse_idx,
+            //         // .specular_idx = m_mesh_materials[p_entity.id()].specular_idx,
+            //         .buffer_address = ubo_address,
+            //     };
+            //     m_main_pipeline.push_constant<push_constant_data>(*m_current_command, push, m_stage, 0);
+            // });
+            push_constant_data push = {
+                .diffuse_idx = 0,
+                .buffer_address = ubo_address,
+            };
+            m_main_pipeline.push_constant<push_constant_data>(*m_current_command, push, m_stage, 0);
         
             const VkDescriptorSet set0 = m_set0_resource;
             m_current_command->bind_descriptors(m_main_pipeline.layout(), VK_PIPELINE_BIND_POINT_GRAPHICS, std::span<const VkDescriptorSet>(&set0, 1));
@@ -435,11 +413,9 @@ export namespace atlas {
 
         void destruct() {
             m_scene_uniforms.reset();
-
-            // destroying vector<vk::texture>
-            for(auto& image : m_gpu_textures) {
-                image.destruct();
-            }
+            // for(auto&[id, image] : m_gpu_storage_images) {
+            //     image.texture_data.destruct();
+            // }
 
             for(auto&[id, mesh] : m_meshes) {
                 mesh.vertex.destruct();
@@ -466,15 +442,15 @@ export namespace atlas {
 
         std::unordered_map<uint64_t, gpu_mesh_data> m_meshes;
 
-        uint64_t m_texture_slot_index = 0;
-        // <entity_id, gpu_material> is to search for specific indices that correspond to various material surfaces
-        // indices to search inside of vector<vk::texture>
-        std::unordered_map<uint64_t, gpu_material> m_material_table;
-        std::vector<vk::texture> m_gpu_textures;
+        // Index to lookup for specific texture (image) resource
+        // Index 0 default to a white texture if no textures found
+        uint32_t m_texture_slot_index = 1;
 
         // GPU sampled images
         // <slot_index, gpu_sample_texture_image>
-        std::unordered_map<uint64_t, gpu_image> m_gpu_storage_images;
+        // std::unordered_map<uint64_t, gpu_image> m_gpu_storage_images;
+        std::unordered_map<uint64_t, gpu_material> m_mesh_materials;
+        std::vector<vk::texture> m_storage_images_arrays;
         std::vector<vk::write_image> m_gpu_images;
         vk::shader_stage m_stage;
 
