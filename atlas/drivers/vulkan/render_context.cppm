@@ -206,9 +206,11 @@ export namespace atlas {
                 .allocate_flags = vk::memory_allocate_flags::device_address_bit_khr,
             };
 
-            uint32_t max_objects = 10'000;
             m_scene_uniforms = vk::dyn::buffer(*m_device, sizeof(scene_uniforms), uniform_params);
 
+            // We are setting to the maximum of objects that should be managed in this uniform buffer
+            // This uniform buffer is responsible for managing the model matrices of every object in a given scene.
+            uint32_t max_objects = 10'000;
             m_object_model_uniforms = vk::dyn::buffer(*m_device, sizeof(objects_uniform) * max_objects, uniform_params);
 
             // Index 0 will default to a white texture
@@ -237,34 +239,27 @@ export namespace atlas {
                     .usage = vk::buffer_usage::index_buffer_bit,
                 };
 
-                // import .obj 3d model and setting up vertices/indices
+                // importing .obj 3d models here
                 obj_importer importer(src->model_path);
                 gpu_mesh_data gpu_mesh{};
                 gpu_mesh.vertex = vk::vertex_buffer(*m_device, importer.vertices(), vertex_params);
                 gpu_mesh.index = vk::index_buffer(*m_device, importer.indices(), index_params);
                 gpu_mesh.has_indices_buffer = (importer.indices().size() >= 0) ? true : false;
-                gpu_mesh.vertices_size = importer.vertices().size_bytes();
-                gpu_mesh.indices_size = importer.indices().size_bytes();
+                gpu_mesh.vertices_size = importer.vertices().size();
+                gpu_mesh.indices_size = importer.indices().size();
 
                 m_meshes.emplace(p_entity.id(), gpu_mesh);
-
-                std::println("Entity ID: {}", p_entity.id());
-
-                // const material_metadata* mat = p_entity.get<material_metadata>();
-                // loading textures
+                
                 vk::texture_params config_texture = {
                     .memory_mask = m_physical->memory_properties(vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit),
                 };
-
                 // Loading texture and setting up VkSampler and VkImageView
-                // stb_image img = stb_image("assets/models/viking_room.png", config_texture);
                 stb_image diffuse_img = stb_image(src->diffuse, config_texture);
                 stb_image specular_img = stb_image(src->specular, config_texture);
 
                 // Reminder: Use diffuse_idx
                 gpu_material material = {};
                 if(!src->diffuse.empty()) {
-                    std::println("Loading diffuse: {}", src->diffuse);
                     material.diffuse_idx = m_texture_slot_index++;
                     m_gpu_textures.emplace_back(*m_device, &diffuse_img, config_texture);
                 }
@@ -328,8 +323,6 @@ export namespace atlas {
 
             m_main_pipeline.bind(*m_current_command);
 
-            // Calculating model matrix based on object's transforms specifications (pos, scale, rotation)
-
             flecs::query<> all_meshes = m_world->query_builder<mesh_source>().build();
 
             // Camera projection/view matrices calculated for worldspace calculation
@@ -341,12 +334,12 @@ export namespace atlas {
 
             m_scene_uniforms.transfer<scene_uniforms>(std::span<scene_uniforms>(&scene_ubo, 1));
 
+            // Calculating model matrix based on object's transforms specifications (pos, scale, rotation)
             all_meshes.each([this](flecs::entity p_entity){
                 const transform* t = p_entity.get<transform>();
                 glm::mat4 model = glm::mat4(1.f);
                 model = glm::translate(model, t->position);
                 model = glm::scale(model, t->scale);
-                // m_model_matrix_index_count
 
                 if(m_model_matrices_lookup.contains(p_entity.id())) {
                     // hash table to lookup specific index, using the entitys main ID has a hash key
@@ -362,20 +355,9 @@ export namespace atlas {
                 }
             });
 
-            // objects_uniform object_ubo = {
-            //     .model_matrices = m_model_matrices,
-            // };
-            // m_object_model_uniforms.transfer<objects_uniform>(std::span<objects_uniform>(&object_ubo, 1));
             m_object_model_uniforms.transfer<glm::mat4>(std::span<glm::mat4>(m_model_matrices.data(), m_model_matrices.size()));
 
             // Retrieving the buffer address that can be looked up from the glsl shader
-            // struct push_constant_data {
-            //     uint64_t scene_address=0;
-            //     uint64_t model_mat_array_address=0;
-            //     uint64_t model_idx=0;
-            //     uint64_t material_address=0;
-            // };
-
             all_meshes.each([this](flecs::entity p_entity) {
                 const uint64_t scene_ubo_address = m_scene_uniforms.get_device_address();
                 const uint64_t objects_ubo_address = m_object_model_uniforms.get_device_address();
@@ -386,46 +368,30 @@ export namespace atlas {
                     .material_address = static_cast<uint32_t>(m_material_table[p_entity.id()].diffuse_idx),
                 };
 
-                // std::println("scene_address = {}", static_cast<int>(push.scene_address));
-                // std::println("Model Array Addr = {}", static_cast<int>(push.model_mat_array_address));
-                // std::println("Model Index = {}", push.model_idx);
-                // std::println("Material Diffuse Index = {}", push.material_address);
-
                 m_main_pipeline.push_constant<push_constant_data>(*m_current_command, push, m_stage, 0);
             });
-            // push_constant_data push = {
-            //     .texture_index = 0,
-            //     .buffer_address = ubo_address,
-            // };
-            // m_main_pipeline.push_constant<push_constant_data>(*m_current_command, push, m_stage, 0);
             
             const VkDescriptorSet set0 = m_set0_resource;
             m_current_command->bind_descriptors(m_main_pipeline.layout(), VK_PIPELINE_BIND_POINT_GRAPHICS, std::span<const VkDescriptorSet>(&set0, 1));
-
-
-            for(auto[id, mesh] : m_meshes) {
-                const VkBuffer vertex = mesh.vertex;
-                uint64_t offset = 0;
-                m_current_command->bind_vertex_buffers(std::span<const VkBuffer>(&vertex, 1), std::span<const uint64_t>(&offset, 1));
-                if (mesh.has_indices_buffer) {
-                    m_current_command->bind_index_buffers32(mesh.index);
-                }
-            }
-
-
         }
         
         void end() {
 
             // TODO: Use Vulkan Indirect Command Draw call for this to reduce draw calls
-            for(auto[id, mesh] : m_meshes) {
+            flecs::query<> all_meshes = m_world->query_builder<mesh_source>().build();
+            all_meshes.each([this](flecs::entity p_entity) {
+                auto& mesh = m_meshes[p_entity.id()];
+                const VkBuffer vertex = mesh.vertex;
+                uint64_t offset = 0;
+                m_current_command->bind_vertex_buffers(std::span<const VkBuffer>(&vertex, 1), std::span<const uint64_t>(&offset, 1));
                 if (mesh.has_indices_buffer) {
+                    m_current_command->bind_index_buffers32(mesh.index);
                     vkCmdDrawIndexed(*m_current_command, mesh.indices_size, 1, 0, 0, 0);
                 }
                 else {
                     vkCmdDraw(*m_current_command, mesh.vertices_size, 1, 0, 0);
                 }
-            }
+            });
             m_current_command->end_rendering();
         }
 

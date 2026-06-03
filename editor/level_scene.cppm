@@ -25,9 +25,9 @@ public:
     level_scene(const std::string& p_name, atlas::event::bus& p_bus)
       : atlas::scene(p_name, p_bus) {
 
-
         m_editor_camera = entity("Editor Camera");
-        m_editor_camera->add<flecs::pair<atlas::tag::editor, atlas::projection_view>>();
+        m_editor_camera
+          ->add<flecs::pair<atlas::tag::editor, atlas::projection_view>>();
         m_editor_camera->set<atlas::transform>({
           .position = { 3.50f, 4.90f, 36.40f },
           .scale{ 1.f },
@@ -41,13 +41,18 @@ public:
         atlas::game_object viking_room = entity("Viking Room");
         viking_room.set<atlas::transform>({
           .position = { -2.70f, 2.70, -8.30f },
+        //   .position = { 1.f, 1.f, 1.f },
           .rotation = { 2.30f, 95.90f, 91.80f },
+        //   .rotation = { 1.f, 1.f, 1.f },
           .scale{ 1.f },
         });
 
         viking_room.set<atlas::mesh_source>({
-            .model_path = "assets/models/viking_room.obj",
-            .diffuse = "assets/models/viking_room.png",
+          .model_path = "assets/models/viking_room.obj",
+          .diffuse = "assets/models/viking_room.png",
+        //   .model_path = "assets/models/cube.obj",
+        //   .diffuse = "assets/models/container_diffuse.png",
+        //   .diffuse = "assets/models/container_specular.png",
         });
 
         // for(size_t i = 0; i < 31; i++) {
@@ -62,7 +67,8 @@ public:
         // 		.radius = 1.0f,
         // 	});
 
-        // 	glm::vec3 pos = {float(0.5 * 1.4), float(0.5 * 1.4), float(0.5 * 1.4) };
+        // 	glm::vec3 pos = {float(0.5 * 1.4), float(0.5 * 1.4), float(0.5
+        // * 1.4) };
 
         // 	obj.set<atlas::transform>({
         // 		.position = pos,
@@ -70,8 +76,10 @@ public:
         // 	});
 
         // 	obj.set<atlas::mesh_source>({
-        // 		.model_path = "assets/models/Ball OBJ.obj",
-        // 		.diffuse = "assets/models/clear.png",
+        // 		// .model_path = "assets/models/Ball OBJ.obj",
+        //         .model_path = "assets/models/cube.obj",
+        // 		// .diffuse = "assets/models/clear.png",
+        //         .diffuse = "assets/models/container_diffuse.png",
         // 	});
         // }
 
@@ -82,8 +90,7 @@ public:
 
     ~level_scene() override = default;
 
-    void start() {
-    }
+    void start() {}
 
     void on_update(float p_delta_time) {
         atlas::transform* t = m_editor_camera->get_mut<atlas::transform>();
@@ -147,9 +154,9 @@ public:
         t->set_rotation(t->rotation);
     }
 
-    // TODO: Have this physics_update be executed during the physics fixed-update framerate
-    void physics_update() {
-    }
+    // TODO: Have this physics_update be executed during the physics
+    // fixed-update framerate
+    void physics_update() {}
 
 private:
     std::optional<atlas::game_object> m_editor_camera;
