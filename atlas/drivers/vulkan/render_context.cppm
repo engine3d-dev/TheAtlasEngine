@@ -41,14 +41,19 @@ export namespace atlas {
     };
 
     struct push_constant_data {
-        uint64_t texture_index=0;
-        uint64_t buffer_address=0;
+        uint64_t scene_address=0;
+        uint64_t model_mat_array_address=0;
+        uint32_t model_idx=0;
+        uint32_t material_address=0;
     };
 
-    struct global_uniform {
-        glm::mat4 model=glm::mat4(1.f);
+    struct scene_uniforms {
         glm::mat4 view=glm::mat4(1.f);
         glm::mat4 proj=glm::mat4(1.f);
+    };
+
+    struct objects_uniform {
+        std::span<glm::mat4> model_matrices;
     };
 
     struct gpu_material {
@@ -131,7 +136,7 @@ export namespace atlas {
 
             // Configuring Descriptor Set 0 -- specify to vk::pipeline
             // Descriptor Set 0
-            uint32_t max_descriptors = 10;
+            uint32_t max_descriptors = 1000;
             std::array<vk::descriptor_entry, 1> entries_set1 = {
                 vk::descriptor_entry{
                     // layout (set = 0, binding = 1) uniform sampler2D textures[];
@@ -200,7 +205,11 @@ export namespace atlas {
                 .usage = vk::buffer_usage::uniform_buffer_bit | vk::buffer_usage::shader_device_address_bit,
                 .allocate_flags = vk::memory_allocate_flags::device_address_bit_khr,
             };
-            m_scene_uniforms = vk::dyn::buffer(*m_device, sizeof(global_uniform), uniform_params);
+
+            uint32_t max_objects = 10'000;
+            m_scene_uniforms = vk::dyn::buffer(*m_device, sizeof(scene_uniforms), uniform_params);
+
+            m_object_model_uniforms = vk::dyn::buffer(*m_device, sizeof(objects_uniform) * max_objects, uniform_params);
 
             // Index 0 will default to a white texture
             vk::image_extent extent = {
@@ -234,8 +243,8 @@ export namespace atlas {
                 gpu_mesh.vertex = vk::vertex_buffer(*m_device, importer.vertices(), vertex_params);
                 gpu_mesh.index = vk::index_buffer(*m_device, importer.indices(), index_params);
                 gpu_mesh.has_indices_buffer = (importer.indices().size() >= 0) ? true : false;
-                gpu_mesh.vertices_size = importer.vertices().size();
-                gpu_mesh.indices_size = importer.indices().size();
+                gpu_mesh.vertices_size = importer.vertices().size_bytes();
+                gpu_mesh.indices_size = importer.indices().size_bytes();
 
                 m_meshes.emplace(p_entity.id(), gpu_mesh);
 
@@ -319,50 +328,69 @@ export namespace atlas {
 
             m_main_pipeline.bind(*m_current_command);
 
-            /*
-            TODO (TEMP): Consider having transform to be changed as an unbounded array on the shader
-            struct shader_transform_struct {
-                // Where we will have an unbounded array of 3D object
-                // transforms that can already be accessible when being modified
-                mat4 models[];
-            } object_transform;
-
-
-            void main() {
-                gl_Position = ubo.view * ubo.proj * object_transform.models[gl_VertexIndex] * vec4(inPosition, 1.0);
-            }
-
-            */
-            flecs::entity viking_room = m_world->entity("Viking Room");
-            const transform* t = viking_room.get<transform>();
-
-            // Setting up viking room 
-            glm::mat4 model = glm::mat4(1.f);
-            model = glm::translate(model, t->position);
-            model = glm::scale(model, t->scale);
-
-            global_uniform ubo = {
-                .model = model,
-                .view = p_view,
-                .proj = p_proj,
-            };
-            ubo.proj[1][1] *= -1;
-
-            m_scene_uniforms.transfer<global_uniform>(std::span<const global_uniform>(&ubo, 1));
-
-            // Retrieving the buffer address that can be looked up from the glsl shader
-            const uint64_t ubo_address = m_scene_uniforms.get_device_address();
-
-            // push constant retrieve the buffer that is transferring data to
-            // Then we set the texture index.
+            // Calculating model matrix based on object's transforms specifications (pos, scale, rotation)
 
             flecs::query<> all_meshes = m_world->query_builder<mesh_source>().build();
 
-            all_meshes.each([this, ubo_address](flecs::entity p_entity){
+            // Camera projection/view matrices calculated for worldspace calculation
+            scene_uniforms scene_ubo = {
+                .view = p_view,
+                .proj = p_proj,
+            };
+            scene_ubo.proj[1][1] *= -1;
+
+            m_scene_uniforms.transfer<scene_uniforms>(std::span<scene_uniforms>(&scene_ubo, 1));
+
+            all_meshes.each([this](flecs::entity p_entity){
+                const transform* t = p_entity.get<transform>();
+                glm::mat4 model = glm::mat4(1.f);
+                model = glm::translate(model, t->position);
+                model = glm::scale(model, t->scale);
+                // m_model_matrix_index_count
+
+                if(m_model_matrices_lookup.contains(p_entity.id())) {
+                    // hash table to lookup specific index, using the entitys main ID has a hash key
+                    // This way we can use the hash value as the location in the index to modify that model matrix.
+                    m_model_matrices[m_model_matrices_lookup[p_entity.id()]] = model;
+                }
+                else {
+                    // Add model matrix if non existant in the array
+                    m_model_matrices.push_back(model);
+
+                    // Keeping track of the location to that model matrix for book keeping.
+                    m_model_matrices_lookup.emplace(p_entity.id(), m_model_matrix_index_count++);
+                }
+            });
+
+            // objects_uniform object_ubo = {
+            //     .model_matrices = m_model_matrices,
+            // };
+            // m_object_model_uniforms.transfer<objects_uniform>(std::span<objects_uniform>(&object_ubo, 1));
+            m_object_model_uniforms.transfer<glm::mat4>(std::span<glm::mat4>(m_model_matrices.data(), m_model_matrices.size()));
+
+            // Retrieving the buffer address that can be looked up from the glsl shader
+            // struct push_constant_data {
+            //     uint64_t scene_address=0;
+            //     uint64_t model_mat_array_address=0;
+            //     uint64_t model_idx=0;
+            //     uint64_t material_address=0;
+            // };
+
+            all_meshes.each([this](flecs::entity p_entity) {
+                const uint64_t scene_ubo_address = m_scene_uniforms.get_device_address();
+                const uint64_t objects_ubo_address = m_object_model_uniforms.get_device_address();
                 push_constant_data push = {
-                    .texture_index = m_material_table[p_entity.id()].diffuse_idx, // slot = index to access specific diffuse texture
-                    .buffer_address = ubo_address,
+                    .scene_address = scene_ubo_address,
+                    .model_mat_array_address = objects_ubo_address,
+                    .model_idx = static_cast<uint32_t>(m_model_matrices_lookup[p_entity.id()]),
+                    .material_address = static_cast<uint32_t>(m_material_table[p_entity.id()].diffuse_idx),
                 };
+
+                // std::println("scene_address = {}", static_cast<int>(push.scene_address));
+                // std::println("Model Array Addr = {}", static_cast<int>(push.model_mat_array_address));
+                // std::println("Model Index = {}", push.model_idx);
+                // std::println("Material Diffuse Index = {}", push.material_address);
+
                 m_main_pipeline.push_constant<push_constant_data>(*m_current_command, push, m_stage, 0);
             });
             // push_constant_data push = {
@@ -411,6 +439,7 @@ export namespace atlas {
 
         void destruct() {
             m_scene_uniforms.reset();
+            m_object_model_uniforms.reset();
 
             // destroying vector<vk::texture>
             for(auto& image : m_gpu_textures) {
@@ -438,11 +467,32 @@ export namespace atlas {
         std::vector<VkDrawIndexedIndirectCommand> m_indirect_commands;
         vk::descriptor_resource m_set0_resource;
 
+        /**
+         * 3 Specific Buffers for accessing data
+         * 1.) Scene Uniform Buffer (proj/view)
+         * 2.) Object Uniforms (model matrix): Another use is for instancing having multiple mat4's referencing to instancing copies
+         * 3.) Material Uniforms (diffuse/specular/etc...)
+        */
         vk::dyn::buffer m_scene_uniforms;
+
+        // uniform buffer to write all of our objects mat4 model matrices in
+        vk::dyn::buffer m_object_model_uniforms;
 
         std::unordered_map<uint64_t, gpu_mesh_data> m_meshes;
 
         uint64_t m_texture_slot_index = 1;
+
+        // Represents the index to retrieve the location to access the model matrix
+        //  inside of the vector<glm::mat4> array
+        uint64_t m_model_matrix_index_count = 0;
+
+        // <entity_id, model_matrix_arr_index>
+        std::unordered_map<uint64_t, uint64_t> m_model_matrices_lookup;
+        std::vector<glm::mat4> m_model_matrices;
+
+
+        // material lookups
+
         // <entity_id, gpu_material> is to search for specific indices that correspond to various material surfaces
         // indices to search inside of vector<vk::texture>
         std::unordered_map<uint64_t, gpu_material> m_material_table;
