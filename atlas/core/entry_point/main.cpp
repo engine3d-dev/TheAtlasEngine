@@ -63,11 +63,6 @@ get_instance_extensions() {
     return extension_names;
 }
 
-// using device_features = vk::feature_trait<VkPhysicalDeviceFeatures, {}>;
-// using robustness2_features_ext = vk::feature_trait<VkPhysicalDeviceRobustness2FeaturesEXT, VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT>;
-
-
-
 int
 main() {
     // We should not have our core system start up during testing environment
@@ -128,11 +123,6 @@ main() {
     };
 #endif
 
-    // VkPhysicalDeviceRobustness2FeaturesEXT robustness2Features{};
-    // robustness2Features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT;
-    // robustness2Features.robustBufferAccess2 = VK_TRUE; // <--- This enables the feature
-    // robustness2Features.robustImageAccess2  = VK_FALSE; // (Optional: enable if you want it for images too)
-    // robustness2Features.nullDescriptor      = VK_FALSE; // (Optional: allows binding null descriptors)
     vk::device_features device_features{
         vk::dynamic_rendering_feature{ {
           .dynamicRendering = true,
@@ -147,11 +137,6 @@ main() {
         vk::buffer_device_address{ {
           .bufferDeviceAddress = true,
         } },
-        // robustness2_features_ext{ {
-        //     .robustBufferAccess2 = true,
-        //     .robustImageAccess2  = false,
-        //     .nullDescriptor = false,
-        // } },
     };
 
     vk::device_params logical_device_params = {
