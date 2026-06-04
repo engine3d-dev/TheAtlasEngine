@@ -10,6 +10,10 @@ module;
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <imgui.h>
+#include <imgui/backends/imgui_impl_glfw.h>
+#include <imgui/backends/imgui_impl_vulkan.h>
+
 export module editor:level_scene;
 
 import atlas.application;
@@ -40,7 +44,7 @@ public:
 
         atlas::game_object viking_room = entity("Viking Room");
         viking_room.set<atlas::transform>({
-          .position = { -2.70f, 2.70, -8.30f },
+          .position = { 5, 5, 0.f },
         //   .position = { 1.f, 1.f, 1.f },
           .rotation = { 2.30f, 95.90f, 91.80f },
         //   .rotation = { 1.f, 1.f, 1.f },
@@ -55,32 +59,30 @@ public:
         //   .diffuse = "assets/models/container_specular.png",
         });
 
-        // for(size_t i = 0; i < 31; i++) {
-        // 	atlas::game_object obj = entity(std::format("Object #{}", i));
-        // 	obj.set<atlas::physics_body>({
-        // 		.restitution = 1.25f,
-        // 		.body_movement_type = atlas::dynamic,
-        // 	});
 
-        // 	obj.set<atlas::sphere_collider>(
-        // 		{
-        // 		.radius = 1.0f,
-        // 	});
+        // const size_t grid_width = 5; 
+        // const float spacing = 5;
 
-        // 	glm::vec3 pos = {float(0.5 * 1.4), float(0.5 * 1.4), float(0.5
-        // * 1.4) };
+        // for(size_t i = 0; i < 40; i++) {
+        //     atlas::game_object obj = entity(std::format("Object #{}", i));
 
-        // 	obj.set<atlas::transform>({
-        // 		.position = pos,
-        // 		.rotation = {.3f, 0.0f, 0.0f},
-        // 	});
+        //     size_t col = i % grid_width; // X axis
+        //     size_t row = i / grid_width; // Z axis
 
-        // 	obj.set<atlas::mesh_source>({
-        // 		// .model_path = "assets/models/Ball OBJ.obj",
-        //         .model_path = "assets/models/cube.obj",
-        // 		// .diffuse = "assets/models/clear.png",
-        //         .diffuse = "assets/models/container_diffuse.png",
-        // 	});
+        //     glm::vec3 pos = {
+        //         float(static_cast<float>(col) * spacing), 
+        //         0.0f,                  // Keep Y flat on the ground
+        //         float(static_cast<float>(row) * -spacing)  // Use row for Z depth (negative moves it away from camera)
+        //     };
+
+        //     obj.set<atlas::transform>({
+        //         .position = pos,
+        //         .rotation = {.3f, 0.0f, 0.0f},
+        //     });
+        //     obj.set<atlas::mesh_source>({
+        //         .model_path = "assets/models/Ball OBJ.obj",
+        //         .diffuse = "assets/models/clear.png",
+        //     });
         // }
 
         atlas::register_start(this, &level_scene::start);

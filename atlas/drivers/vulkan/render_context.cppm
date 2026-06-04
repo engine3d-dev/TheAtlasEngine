@@ -357,9 +357,15 @@ export namespace atlas {
             });
 
             m_object_model_uniforms.transfer<glm::mat4>(std::span<glm::mat4>(m_model_matrices.data(), m_model_matrices.size()));
-
-            // Retrieving the buffer address that can be looked up from the glsl shader
+            
+            const VkDescriptorSet set0 = m_set0_resource;
+            m_current_command->bind_descriptors(m_main_pipeline.layout(), VK_PIPELINE_BIND_POINT_GRAPHICS, std::span<const VkDescriptorSet>(&set0, 1));
+        }
+        
+        void end() {
+            flecs::query<> all_meshes = m_world->query_builder<mesh_source>().build();
             all_meshes.each([this](flecs::entity p_entity) {
+                // Retrieving the buffer address that can be looked up from the glsl shader
                 const uint64_t scene_ubo_address = m_scene_uniforms.get_device_address();
                 const uint64_t objects_ubo_address = m_object_model_uniforms.get_device_address();
                 push_constant_data push = {
@@ -370,17 +376,8 @@ export namespace atlas {
                 };
 
                 m_main_pipeline.push_constant<push_constant_data>(*m_current_command, push, m_stage, 0);
-            });
-            
-            const VkDescriptorSet set0 = m_set0_resource;
-            m_current_command->bind_descriptors(m_main_pipeline.layout(), VK_PIPELINE_BIND_POINT_GRAPHICS, std::span<const VkDescriptorSet>(&set0, 1));
-        }
-        
-        void end() {
 
-            // TODO: Use Vulkan Indirect Command Draw call for this to reduce draw calls
-            flecs::query<> all_meshes = m_world->query_builder<mesh_source>().build();
-            all_meshes.each([this](flecs::entity p_entity) {
+                // TODO: Use Vulkan Indirect Command Draw call for this to reduce draw calls
                 const auto& mesh = m_meshes[p_entity.id()];
                 const VkBuffer vertex = mesh.vertex;
                 uint64_t offset = 0;
