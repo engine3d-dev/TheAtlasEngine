@@ -63,16 +63,16 @@ public:
         // const size_t grid_width = 5; 
         // const float spacing = 5;
 
-        // for(size_t i = 0; i < 40; i++) {
+        // for(size_t i = 0; i < 100; i++) {
         //     atlas::game_object obj = entity(std::format("Object #{}", i));
 
-        //     size_t col = i % grid_width; // X axis
-        //     size_t row = i / grid_width; // Z axis
+        //     size_t col = i % grid_width;
+        //     size_t row = i / grid_width;
 
         //     glm::vec3 pos = {
-        //         float(static_cast<float>(col) * spacing), 
-        //         0.0f,                  // Keep Y flat on the ground
-        //         float(static_cast<float>(row) * -spacing)  // Use row for Z depth (negative moves it away from camera)
+        //         float(static_cast<float>(col) * spacing),
+        //         0.0f,
+        //         float(static_cast<float>(row) * -spacing) 
         //     };
 
         //     obj.set<atlas::transform>({
@@ -114,11 +114,13 @@ public:
         glm::vec3 forward = glm::rotate(to_quaternion, atlas::math::backward());
         glm::vec3 right = glm::rotate(to_quaternion, atlas::math::right());
 
-        if (atlas::event::is_key_pressed(key_left_shift)) {
+        // Q = UP
+        if (atlas::event::is_key_pressed(key_q)) {
             t->position += up * velocity;
         }
 
-        if (atlas::event::is_key_pressed(key_space)) {
+        // E = DOWN
+        if (atlas::event::is_key_pressed(key_e)) {
             t->position -= up * velocity;
         }
 
@@ -143,6 +145,25 @@ public:
             t->rotation.y -= rotation_velocity;
         }
 
+        glm::vec2 current_cursor_pos = atlas::event::cursor_position();
+        if(atlas::event::is_key_pressed(key_left_shift)) {
+            glm::vec2 cursor_dt = current_cursor_pos - m_last_cursor_pos;
+            float mouse_sensitivity = 0.1;
+
+            // Update Euler angles
+
+            if(atlas::event::is_mouse_pressed(mouse_button_left)) {
+                t->rotation.y -= (cursor_dt.x * mouse_sensitivity) * dt;
+            }
+
+            if(atlas::event::is_mouse_pressed(mouse_button_right)) {
+                t->rotation.x -= (cursor_dt.y * mouse_sensitivity) * dt;
+            }
+
+            // Clamp pitch to prevent the camera from flipping completely upside down (optional but recommended)
+            t->rotation.x = glm::clamp(t->rotation.x, -89.0f, 89.0f);
+        }
+
         // Signal to trigger this kind of scene transition
         // Experimental: This was used for testing.
         // if(atlas::event::is_key_pressed(key_n)) {
@@ -152,8 +173,9 @@ public:
         //     };
         //     signal<atlas::event::scene_transition>(scene_transition);
         // }
-
         t->set_rotation(t->rotation);
+
+        m_last_cursor_pos = current_cursor_pos;
     }
 
     // TODO: Have this physics_update be executed during the physics
@@ -163,4 +185,5 @@ public:
 private:
     std::optional<atlas::game_object> m_editor_camera;
     float m_movement_speed = 10.f;
+    glm::vec2 m_last_cursor_pos{};
 };
