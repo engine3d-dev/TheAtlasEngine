@@ -189,10 +189,24 @@ namespace atlas {
             m_current_command = &p_command;
         }
 
-        // uint32_t = p_frame_ifx
-        void begin(uint32_t) {}
+        void begin() {
+            ImGui_ImplVulkan_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
+        }
 
-        void end() {}
+        void end() {
+            ImGui::Render();
+
+            ImDrawData* draw_data = ImGui::GetDrawData();
+            ImGui_ImplVulkan_RenderDrawData(draw_data, *m_current_command);
+
+            ImGuiIO& io = ImGui::GetIO();
+            if(io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+                ImGui::UpdatePlatformWindows();
+                ImGui::RenderPlatformWindowsDefault();
+            }
+        }
 
         void destruct() {
             ImGui_ImplVulkan_Shutdown();

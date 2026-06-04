@@ -69,7 +69,7 @@ export namespace atlas {
             // m_context->instance_handle(), params);
             m_window = std::make_shared<window>(p_context, params);
 
-            m_aspect_ratio = static_cast<float>(params.width / params.height);
+            m_aspect_ratio = static_cast<float>(params.width) / static_cast<float>(params.height);
             event::set_window_size(m_window->glfw_window());
 
             m_bus->create_listener<atlas::event::collision_enter>();
@@ -267,6 +267,8 @@ export namespace atlas {
 
                 m_render_context.set_command(current);
 
+                m_imgui_context->set_current_command(current);
+
                 m_images[m_next_image_frame_idx].memory_barrier(
                   current,
                   m_window->surface_properties().format.format,
@@ -314,8 +316,14 @@ export namespace atlas {
 
                 m_render_context.begin(
                   begin_params, m_window->extent(), m_projection, m_view);
-
+                
                 m_render_context.end();
+
+                // Performing UI Context Rendering
+
+                m_imgui_context->begin();
+                invoke_ui_update(m_current_scene.get());
+                m_imgui_context->end();
 
                 m_images[m_next_image_frame_idx].memory_barrier(
                   current,
