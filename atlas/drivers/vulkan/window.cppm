@@ -2,8 +2,8 @@ module;
 
 #include <string>
 #include <cstdint>
-#include <print>
 #include <memory>
+#include <span>
 
 #define GLFW_INCLUDE_VULKAN
 #if _WIN32
@@ -16,9 +16,6 @@ module;
 #include <GLFW/glfw3.h>
 #include <vulkan/vulkan.h>
 #endif
-
-#include <GLFW/glfw3.h>
-#include <span>
 
 export module atlas.drivers.vulkan:window;
 
@@ -39,8 +36,6 @@ export namespace atlas {
 
             glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
             glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-
-            std::println("Creating window with width: {} and height: {}", p_params.width, p_params.height);
 
             m_window = glfwCreateWindow(static_cast<int>(p_params.width),
                                         static_cast<int>(p_params.height),
