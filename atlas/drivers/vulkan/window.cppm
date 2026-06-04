@@ -45,22 +45,18 @@ export namespace atlas {
                                         nullptr,
                                         nullptr);
 
-            int w = 0;
-            int h =0;
-
-            glfwGetFramebufferSize(m_window, &w, &h);
-
-            m_params = {
-                .width = static_cast<uint32_t>(w),
-                .height = static_cast<uint32_t>(h),
-            };
-
             glfwMakeContextCurrent(m_window);
             std::println("Constructing atlas::window");
 
             m_surface = std::make_shared<vk::surface>(p_context->instance_handle(), m_window);
             
             center_window();
+
+            m_params = {
+                .width = p_params.width,
+                .height = p_params.height,
+            };
+            
             vk::swapchain_params swapchain_params = {
                 .width = static_cast<uint32_t>(m_params.width),
                 .height = static_cast<uint32_t>(m_params.height),

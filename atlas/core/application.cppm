@@ -106,8 +106,8 @@ export namespace atlas {
             for (uint32_t i = 0; i < m_images.size(); i++) {
                 vk::image_params color_img_params = {
                     .extent = {
-                        .width = p_params.width,
-                        .height = p_params.height,
+                        .width = m_window->extent().width,
+                        .height = m_window->extent().height,
                     },
                     .format = m_window->surface_properties().format.format,
                     .memory_mask = m_physical->memory_properties(
@@ -122,8 +122,8 @@ export namespace atlas {
 
                 vk::image_params depth_img_params = {
                     .extent = {
-                        .width = p_params.width,
-                        .height = p_params.height,
+                        .width = m_window->extent().width,
+                        .height = m_window->extent().height,
                     },
                     .format = m_depth_format,
                     .memory_mask = m_physical->memory_properties(

@@ -316,7 +316,7 @@ export namespace atlas {
 
             vk::scissor_params scissor = {
                 .offset = { 0, 0 },
-                .extent = {p_extent.width, p_extent.height},
+                .extent = {static_cast<uint32_t>(p_extent.width), static_cast<uint32_t>(p_extent.height)},
             };
             m_current_command->set_scissor(0, 1, std::span<const vk::scissor_params>(&scissor, 1));
 
