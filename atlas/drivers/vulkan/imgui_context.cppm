@@ -12,6 +12,7 @@ module;
 #include <print>
 #include <memory>
 #include <optional>
+#include <span>
 
 export module atlas.drivers.vulkan:imgui_context;
 
@@ -58,14 +59,34 @@ namespace atlas {
           ImVec4{ 0.1f, 0.150f, 0.951f, 1.0f };
     }
 
+    VkPipelineRenderingCreateInfo pipeline_rendering_info(
+      std::span<const uint32_t> p_color_attachment_formats,
+      const uint32_t p_depth_format,
+      const uint32_t p_stencil_format) {
+        VkPipelineRenderingCreateInfo rendering_ci = {
+            .sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO_KHR,
+            .pNext = nullptr,
+            .colorAttachmentCount =
+              static_cast<uint32_t>(p_color_attachment_formats.size()),
+            .pColorAttachmentFormats = reinterpret_cast<const VkFormat*>(
+              p_color_attachment_formats.data()),
+            .depthAttachmentFormat = static_cast<VkFormat>(p_depth_format),
+            .stencilAttachmentFormat = static_cast<VkFormat>(p_stencil_format),
+        };
+
+        return rendering_ci;
+    }
+
     export class imgui_context {
     public:
         imgui_context() = delete;
-        imgui_context(std::shared_ptr<graphics_context> p_context,
+        imgui_context(/*NOLINT*/ std::shared_ptr<graphics_context> p_context,
                       GLFWwindow* p_window,
-                      std::shared_ptr<vk::swapchain> p_swapchain,
+                      /*NOLINT*/ std::shared_ptr<vk::swapchain> p_swapchain,
                       uint32_t p_image_count,
-                      const vk::device_present_queue& p_queue) {
+                      const vk::device_present_queue& p_queue,
+                      /*NOLINT*/ const VkFormat& p_color_format,
+                      /*NOLINT*/ const VkFormat& p_depth_format) {
             m_instance = p_context->instance_handle();
             m_device = p_context->logical_device();
             m_physical = p_context->physical_device();
@@ -128,15 +149,19 @@ namespace atlas {
             // VkDescriptorPool imgui_pool;
             vk::vk_check(
               vkCreateDescriptorPool(
-                *m_device, &desc_pool_create_info, nullptr, &m_descriptor_pool), "vkCreateDescriptorPool");
+                *m_device, &desc_pool_create_info, nullptr, &m_descriptor_pool),
+              "vkCreateDescriptorPool");
 
-            construct(p_window, p_swapchain, p_image_count, p_queue);
+            construct(p_window, /*NOLINT*/ p_swapchain, p_image_count, p_queue, p_color_format, p_depth_format);
         }
 
         void construct(GLFWwindow* p_window,
-                       std::shared_ptr<vk::swapchain> p_swapchain,
+                       /*NOLINT*/ std::shared_ptr<vk::swapchain> p_swapchain,
                        uint32_t p_image_count,
-                       const vk::device_present_queue& p_queue) {
+                       const vk::device_present_queue& p_queue,
+                       /*NOLINT*/ const VkFormat& p_color_format,
+                       /*NOLINT*/ const VkFormat& p_depth_format) {
+
             ImGui_ImplGlfw_InitForVulkan(p_window, true);
             ImGui_ImplVulkan_InitInfo init_info = {};
             init_info.Instance = m_instance.value();
@@ -150,6 +175,13 @@ namespace atlas {
             init_info.ImageCount = p_image_count;
             init_info.UseDynamicRendering = true;
             init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
+
+            const uint32_t color_format = static_cast<uint32_t>(p_color_format);
+            const uint32_t depth_format = static_cast<uint32_t>(p_depth_format);
+            init_info.PipelineRenderingCreateInfo = pipeline_rendering_info(
+              std::span<const uint32_t>(&color_format, 1),
+              depth_format,
+              depth_format);
             ImGui_ImplVulkan_Init(&init_info);
         }
 
@@ -171,10 +203,11 @@ namespace atlas {
         }
 
     private:
-        VkDescriptorPool m_descriptor_pool=nullptr;
+        VkDescriptorPool m_descriptor_pool = nullptr;
         vk::command_buffer* m_current_command;
         std::optional<vk::instance> m_instance;
         std::optional<vk::physical_device> m_physical;
         std::shared_ptr<vk::device> m_device = nullptr;
+        vk::surface_params m_surface_properties;
     };
 };

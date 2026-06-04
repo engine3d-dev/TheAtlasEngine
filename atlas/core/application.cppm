@@ -79,12 +79,6 @@ export namespace atlas {
             // m_bus->create_immediate_listener<atlas::event::mesh_reload>();
             // m_bus->create_immediate_listener<atlas::event::material_reload>();
 
-            // m_imgui_context = std::make_shared<imgui_context>(p_context,
-            //                     m_window->glfw_window(),
-            //                     m_window->swapchain_handle(),
-            //                     m_window->request_images().size(),
-            //                     m_window->present_queue());
-
             // Requesting depth format
             std::array<vk::format, 3> format_support = {
                 vk::format::d32_sfloat,
@@ -96,6 +90,14 @@ export namespace atlas {
             // We provide a selection of format support that we want to check is
             // supported on current hardware device.
             m_depth_format = m_physical->request_depth_format(format_support);
+
+            m_imgui_context = std::make_shared<imgui_context>(p_context,
+                                m_window->glfw_window(),
+                                m_window->swapchain_handle(),
+                                m_window->request_images().size(),
+                                m_window->present_queue(),
+                                m_color_format,
+                                m_depth_format);
 
             // Initializing command buffers
             std::span<const VkImage> images = m_window->request_images();
@@ -343,6 +345,7 @@ export namespace atlas {
         // }
 
         void post_destroy() {
+            m_imgui_context->destruct();
             m_render_context.destruct();
 
             for (auto& command : m_command_buffers) {
@@ -379,7 +382,7 @@ export namespace atlas {
 
         std::shared_ptr<world> m_world;
 
-        // std::shared_ptr<imgui_context> m_imgui_context;
+        std::shared_ptr<imgui_context> m_imgui_context;
         std::shared_ptr<scene> m_current_scene = nullptr;
 
         // vulkan-cpp specific handles
