@@ -38,8 +38,6 @@ export namespace atlas {
 
             glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
             glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-            m_params = p_params;
-
             
             m_window = glfwCreateWindow(static_cast<int>(p_params.width),
                                         static_cast<int>(p_params.height),
@@ -51,6 +49,12 @@ export namespace atlas {
             int h =0;
 
             glfwGetFramebufferSize(m_window, &w, &h);
+
+            m_params = {
+                .width = static_cast<uint32_t>(w),
+                .height = static_cast<uint32_t>(h),
+            };
+
             glfwMakeContextCurrent(m_window);
             std::println("Constructing atlas::window");
 
@@ -138,6 +142,8 @@ export namespace atlas {
         [[nodiscard]] bool available() const {
             return !glfwWindowShouldClose(m_window);
         }
+
+        [[nodiscard]] window_params extent() const { return m_params; }
 
     private:
         vk::instance m_instance;

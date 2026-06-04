@@ -21,6 +21,7 @@ import atlas.drivers.importer;
 import atlas.core.scene;
 import atlas.core.scene.components;
 import atlas.drivers.vulkan.stb_image;
+import atlas.core.utilities;
 
 import :graphics_context;
 import vk;
@@ -301,7 +302,7 @@ export namespace atlas {
 
         }
 
-        void begin(vk::rendering_begin_parameters p_begin_params, const auto& p_extent, const glm::mat4& p_proj, const glm::mat4& p_view) {
+        void begin(vk::rendering_begin_parameters p_begin_params, const window_params& p_extent, const glm::mat4& p_proj, const glm::mat4& p_view) {
             m_proj_view = p_proj * p_view;
             vk::viewport_params viewport = {
                 .x = 0.0f,
@@ -315,7 +316,7 @@ export namespace atlas {
 
             vk::scissor_params scissor = {
                 .offset = { 0, 0 },
-                .extent = p_extent,
+                .extent = {p_extent.width, p_extent.height},
             };
             m_current_command->set_scissor(0, 1, std::span<const vk::scissor_params>(&scissor, 1));
 

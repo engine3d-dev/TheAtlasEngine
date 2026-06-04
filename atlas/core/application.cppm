@@ -49,10 +49,11 @@ export namespace atlas {
     class application {
     public:
         application() = default;
-        application(/*NOLINT*/std::shared_ptr<graphics_context> p_context,
+        application(/*NOLINT*/ std::shared_ptr<graphics_context> p_context,
                     const application_settings& p_params,
                     event::bus& p_bus)
-          : m_context(p_context), m_bus(&p_bus) {
+          : m_context(p_context)
+          , m_bus(&p_bus) {
             m_instance = p_context->instance_handle();
             m_physical = p_context->physical_device();
             m_device = p_context->logical_device();
@@ -64,11 +65,9 @@ export namespace atlas {
                 .height = p_params.height,
                 .name = p_params.name,
             };
-            m_extent = {
-                .width = p_params.width,
-                .height = p_params.height,
-            };
-            // m_window = std::allocate_shared<window>(, m_context->instance_handle(), params);
+            
+            // m_window = std::allocate_shared<window>(,
+            // m_context->instance_handle(), params);
             m_window = std::make_shared<window>(p_context, params);
 
             event::set_window_size(m_window->glfw_window());
@@ -104,7 +103,7 @@ export namespace atlas {
             m_images.resize(images.size());
             m_depth_images.resize(images.size());
 
-            for(uint32_t i = 0; i < m_images.size(); i++) {
+            for (uint32_t i = 0; i < m_images.size(); i++) {
                 vk::image_params color_img_params = {
                     .extent = {
                         .width = p_params.width,
@@ -118,7 +117,8 @@ export namespace atlas {
                     .mip_levels = 1,
                     .layer_count = 1,
                 };
-                m_images[i] = vk::sample_image(*m_device, images[i], color_img_params);
+                m_images[i] =
+                  vk::sample_image(*m_device, images[i], color_img_params);
 
                 vk::image_params depth_img_params = {
                     .extent = {
@@ -134,30 +134,34 @@ export namespace atlas {
                     .layer_count = 1,
                 };
 
-                m_depth_images[i] = vk::sample_image(*m_device, depth_img_params);
+                m_depth_images[i] =
+                  vk::sample_image(*m_device, depth_img_params);
             }
 
             m_command_buffers.resize(images.size());
 
-            for(uint32_t i = 0; i < m_command_buffers.size(); i++) {
+            for (uint32_t i = 0; i < m_command_buffers.size(); i++) {
                 vk::command_params command_params = {
                     .levels = vk::command_levels::primary,
                     .queue_index = 0,
                     .flags = vk::command_pool_flags::reset,
                 };
-                m_command_buffers[i] = vk::command_buffer(*m_device, command_params);
+                m_command_buffers[i] =
+                  vk::command_buffer(*m_device, command_params);
             }
 
-            m_render_context = render_context(m_context, m_color_format, m_depth_format);
+            m_render_context =
+              render_context(m_context, m_color_format, m_depth_format);
 
             std::println("images.size() = {}", images.size());
 
-            // m_bus->trigger<event::scene_transition>(this, &application::on_scene_transition);
+            // m_bus->trigger<event::scene_transition>(this,
+            // &application::on_scene_transition);
         }
 
         void execute() {
             VkClearValue clear_color = {
-                {{ 0.f, 0.5f, 0.5f, 1.f }},
+                { { 0.f, 0.5f, 0.5f, 1.f } },
             };
 
             VkClearValue depth_value = {
@@ -199,22 +203,29 @@ export namespace atlas {
                   p_pair->view = glm::inverse(p_pair->view);
               });
 
-            // Setting the current scene for the renderer to start rendering the objects
+            // Setting the current scene for the renderer to start rendering the
+            // objects
             m_render_context.current_scene(*m_current_scene);
 
             auto start_time = std::chrono::high_resolution_clock::now();
             invoke_start(m_current_scene.get());
 
-            
             // Querying editor cameras specific objects
             // Then using this to execute specific main cameras.
-            auto query_camera_objects = m_current_scene->query_builder<flecs::pair<tag::editor, projection_view>, perspective_camera>().build();
+            auto query_camera_objects =
+              m_current_scene
+                ->query_builder<flecs::pair<tag::editor, projection_view>,
+                                perspective_camera>()
+                .build();
 
             m_render_context.prebake();
 
-            while(m_window->available()) {
+            while (m_window->available()) {
                 auto current_time = std::chrono::high_resolution_clock::now();
-                m_delta_time = std::chrono::duration<float, std::chrono::seconds::period>(current_time - start_time).count();
+                m_delta_time =
+                  std::chrono::duration<float, std::chrono::seconds::period>(
+                    current_time - start_time)
+                    .count();
 
                 start_time = current_time;
                 event::flush_events();
@@ -225,9 +236,9 @@ export namespace atlas {
                 m_current_scene->progress(m_delta_time);
 
                 m_next_image_frame_idx = m_window->acquire_next_frame();
-                const auto current_extent = m_window->surface_properties().capabilities.currentExtent;
 
-                vk::command_buffer current = m_command_buffers[m_next_image_frame_idx];
+                vk::command_buffer current =
+                  m_command_buffers[m_next_image_frame_idx];
 
                 invoke_physics_update(m_current_scene.get());
 
@@ -254,18 +265,18 @@ export namespace atlas {
                 m_render_context.set_command(current);
 
                 m_images[m_next_image_frame_idx].memory_barrier(
-                    current,
-                    m_window->surface_properties().format.format,
-                    VK_IMAGE_LAYOUT_UNDEFINED,
-                    VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-                
+                  current,
+                  m_window->surface_properties().format.format,
+                  VK_IMAGE_LAYOUT_UNDEFINED,
+                  VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+
                 m_depth_images[m_next_image_frame_idx].memory_barrier(
-                    current,
-                    m_depth_format,
-                    VK_IMAGE_LAYOUT_UNDEFINED,
-                    VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
-                    VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT);
-                
+                  current,
+                  m_depth_format,
+                  VK_IMAGE_LAYOUT_UNDEFINED,
+                  VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+                  VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT);
+
                 vk::rendering_attachment color_render_attachment = {
                     .image_view = m_images[m_next_image_frame_idx].image_view(),
                     .layout = vk::image_layout::color_optimal,
@@ -278,7 +289,8 @@ export namespace atlas {
                 };
 
                 vk::rendering_attachment depth_stencil_attachment = {
-                    .image_view = m_depth_images[m_next_image_frame_idx].image_view(),
+                    .image_view =
+                      m_depth_images[m_next_image_frame_idx].image_view(),
                     .layout = vk::image_layout::depth_stencil_optimal,
                     .resolve_mode = vk::resolved_mode_flags::none,
                     .resolve_image_view = nullptr,
@@ -291,8 +303,8 @@ export namespace atlas {
                 vk::rendering_begin_parameters begin_params = {
                     .render_area = { { 0, 0 },
                                     {
-                                    current_extent.width,
-                                    current_extent.height,
+                                    m_window->extent().width,
+                                    m_window->extent().height,
                                     }, },
                     .layer_count = 1,
                     .color_attachments = std::span<const vk::rendering_attachment>(
@@ -301,15 +313,16 @@ export namespace atlas {
                     .stencil_attachment = depth_stencil_attachment,
                 };
 
-                m_render_context.begin(begin_params, current_extent, m_projection, m_view);
+                m_render_context.begin(
+                  begin_params, m_window->extent(), m_projection, m_view);
 
                 m_render_context.end();
 
                 m_images[m_next_image_frame_idx].memory_barrier(
-                    current,
-                    m_window->surface_properties().format.format,
-                    VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-                    VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+                  current,
+                  m_window->surface_properties().format.format,
+                  VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+                  VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
                 current.end();
 
                 const VkCommandBuffer command = current;
@@ -318,14 +331,15 @@ export namespace atlas {
             }
         }
 
-
-        // Experimental: Will look into later once we dive into scene transitioning
-        // void on_scene_transition(event::scene_transition& p_scene_transition) {
+        // Experimental: Will look into later once we dive into scene
+        // transitioning void on_scene_transition(event::scene_transition&
+        // p_scene_transition) {
         //     m_world->current(p_scene_transition.next_scene);
-        //     std::println("Attempting to switch to the scene: {}", p_scene_transition.next_scene);
+        //     std::println("Attempting to switch to the scene: {}",
+        //     p_scene_transition.next_scene);
 
-        //     // We only want to set the current scene if that specific scene is valid
-        //     if(m_world->current() != nullptr) {
+        //     // We only want to set the current scene if that specific scene
+        //     is valid if(m_world->current() != nullptr) {
         //         m_current_scene = m_world->current();
         //         m_render_context.current_scene(*m_current_scene);
         //     }
@@ -334,15 +348,15 @@ export namespace atlas {
         void post_destroy() {
             m_render_context.destruct();
 
-            for(auto& command : m_command_buffers) {
+            for (auto& command : m_command_buffers) {
                 command.destruct();
             }
 
-            for(auto& color_image : m_images) {
+            for (auto& color_image : m_images) {
                 color_image.destruct();
             }
 
-            for(auto& depth_image : m_depth_images) {
+            for (auto& depth_image : m_depth_images) {
                 depth_image.destruct();
             }
             m_window->destruct();
@@ -354,31 +368,30 @@ export namespace atlas {
         }
 
     private:
-        uint32_t m_next_image_frame_idx=0;
+        uint32_t m_next_image_frame_idx = 0;
         VkFormat m_color_format;
         VkFormat m_depth_format;
         std::shared_ptr<graphics_context> m_context;
-        std::shared_ptr<window> m_window=nullptr;
+        std::shared_ptr<window> m_window = nullptr;
         event::bus* m_bus = nullptr;
-        glm::mat4 m_view=glm::mat4(1.f);
-        glm::mat4 m_projection=glm::mat4(1.f);
+        glm::mat4 m_view = glm::mat4(1.f);
+        glm::mat4 m_projection = glm::mat4(1.f);
 
         render_context m_render_context;
 
         std::shared_ptr<world> m_world;
 
         // std::shared_ptr<imgui_context> m_imgui_context;
-        std::shared_ptr<scene> m_current_scene=nullptr;
+        std::shared_ptr<scene> m_current_scene = nullptr;
 
         // vulkan-cpp specific handles
         vk::instance m_instance;
         std::optional<vk::physical_device> m_physical;
         std::shared_ptr<vk::device> m_device;
-        vk::image_extent m_extent{};
         std::vector<vk::sample_image> m_images;
         std::vector<vk::sample_image> m_depth_images;
         std::vector<vk::command_buffer> m_command_buffers;
-        float m_delta_time=0.f;
+        float m_delta_time = 0.f;
         static application* s_instance;
     };
 
