@@ -32,7 +32,8 @@ export namespace atlas {
     class window {
     public:
         window() = default;
-        window(/*NOLINT*/ std::shared_ptr<graphics_context> p_context, const window_params& p_params)
+        window(/*NOLINT*/ std::shared_ptr<graphics_context> p_context,
+               const window_params& p_params)
           : m_device(p_context->logical_device()) {
             m_instance = p_context->instance_handle();
 
@@ -42,7 +43,7 @@ export namespace atlas {
                 .width = p_params.width,
                 .height = p_params.height,
             };
-            
+
             m_window = glfwCreateWindow(static_cast<int>(p_params.width),
                                         static_cast<int>(p_params.height),
                                         p_params.name.c_str(),
@@ -50,11 +51,9 @@ export namespace atlas {
                                         nullptr);
 
             glfwMakeContextCurrent(m_window);
-            std::println("Constructing atlas::window");
 
-            m_surface = std::make_shared<vk::surface>(p_context->instance_handle(), m_window);
-            
-            center_window();
+            m_surface = std::make_shared<vk::surface>(
+              p_context->instance_handle(), m_window);
 
             vk::swapchain_params swapchain_params = {
                 .width = static_cast<uint32_t>(m_params.width),
@@ -62,20 +61,23 @@ export namespace atlas {
                 .present_index = 0,
             };
 
-            const VkSurfaceKHR surface = *m_surface;
-            m_surface_properties = p_context->physical_device().request_surface(surface);
-            m_swapchain = std::make_shared<vk::swapchain>(*p_context->logical_device(), surface, swapchain_params, p_context->physical_device().request_surface(surface));
+            m_surface_properties =
+              p_context->physical_device().request_surface(*m_surface);
 
+            m_swapchain =
+              std::make_shared<vk::swapchain>(*p_context->logical_device(),
+                                              *m_surface,
+                                              swapchain_params,
+                                              m_surface_properties);
+
+            center_window();
+            
             vk::queue_params present_params = {
                 .family = 0,
                 .index = 0,
             };
-            m_present_queue = vk::device_present_queue(*p_context->logical_device(), *m_swapchain, present_params);
-
-            // graphics_context::submit_resource_free([this](){
-            //     std::println("atlas::window submit resource free");
-            //     // m_swapchain.destruct();
-            // });
+            m_present_queue = vk::device_present_queue(
+              *p_context->logical_device(), *m_swapchain, present_params);
         }
 
         ~window() {
@@ -89,9 +91,6 @@ export namespace atlas {
         [[nodiscard]] std::span<const VkImage> request_images() const {
             return m_swapchain->get_images();
         }
-
-        [[nodiscard]] vk::surface_params surface_properties() const { return m_surface_properties; }
-
 
         [[nodiscard]] uint32_t acquire_next_frame() {
             return m_present_queue.acquire_next_image();
@@ -107,13 +106,16 @@ export namespace atlas {
 
         [[nodiscard]] GLFWwindow* glfw_window() const { return m_window; }
 
-        std::shared_ptr<vk::swapchain> swapchain_handle() { return m_swapchain; }
+        std::shared_ptr<vk::swapchain> swapchain_handle() {
+            return m_swapchain;
+        }
 
-        [[nodiscard]] vk::device_present_queue present_queue() const { return m_present_queue; }
+        [[nodiscard]] vk::device_present_queue present_queue() const {
+            return m_present_queue;
+        }
 
-
-        float aspect_ratio() {
-            return static_cast<float>(m_params.width / m_params.height);
+        [[nodiscard]] vk::surface_params surface_properties() const {
+            return m_surface_properties;
         }
 
         void center_window() {
@@ -121,9 +123,8 @@ export namespace atlas {
             const GLFWvidmode* mode = glfwGetVideoMode(monitor);
             uint32_t width = (mode->width / 2) - (m_params.width / 2);
             uint32_t height = (mode->height / 2) - (m_params.height / 2);
-            glfwSetWindowPos(m_window,
-                             static_cast<int>(width),
-                             static_cast<int>(height));
+            glfwSetWindowPos(
+              m_window, static_cast<int>(width), static_cast<int>(height));
         }
 
         void submit(std::span<const VkCommandBuffer> p_commands) {
@@ -142,7 +143,7 @@ export namespace atlas {
 
     private:
         vk::instance m_instance;
-        std::shared_ptr<vk::device> m_device=nullptr;
+        std::shared_ptr<vk::device> m_device = nullptr;
         std::shared_ptr<vk::surface> m_surface;
         std::shared_ptr<vk::swapchain> m_swapchain;
         vk::surface_params m_surface_properties;

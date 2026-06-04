@@ -381,7 +381,7 @@ export namespace atlas {
             // TODO: Use Vulkan Indirect Command Draw call for this to reduce draw calls
             flecs::query<> all_meshes = m_world->query_builder<mesh_source>().build();
             all_meshes.each([this](flecs::entity p_entity) {
-                auto& mesh = m_meshes[p_entity.id()];
+                const auto& mesh = m_meshes[p_entity.id()];
                 const VkBuffer vertex = mesh.vertex;
                 uint64_t offset = 0;
                 m_current_command->bind_vertex_buffers(std::span<const VkBuffer>(&vertex, 1), std::span<const uint64_t>(&offset, 1));

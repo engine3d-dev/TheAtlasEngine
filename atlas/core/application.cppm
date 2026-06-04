@@ -59,7 +59,6 @@ export namespace atlas {
             m_device = p_context->logical_device();
 
             // Constructing the application
-            std::println("Constructing application");
             window_params params = {
                 .width = p_params.width,
                 .height = p_params.height,
@@ -70,6 +69,7 @@ export namespace atlas {
             // m_context->instance_handle(), params);
             m_window = std::make_shared<window>(p_context, params);
 
+            m_aspect_ratio = static_cast<float>(params.width / params.height);
             event::set_window_size(m_window->glfw_window());
 
             m_bus->create_listener<atlas::event::collision_enter>();
@@ -175,10 +175,9 @@ export namespace atlas {
               ->system<flecs::pair<tag::editor, projection_view>,
                        transform,
                        perspective_camera>()
-              .each([&](flecs::pair<tag::editor, projection_view> p_pair,
+              .each([this](flecs::pair<tag::editor, projection_view> p_pair,
                         transform& p_transform,
                         perspective_camera& p_camera) {
-                  float aspect_ratio = m_window->aspect_ratio();
                   if (!p_camera.is_active) {
                       return;
                   }
@@ -187,7 +186,7 @@ export namespace atlas {
 
                   p_pair->projection =
                     glm::perspective(glm::radians(p_camera.field_of_view),
-                                     aspect_ratio,
+                                     m_aspect_ratio,
                                      p_camera.plane.x,
                                      p_camera.plane.y);
                   p_pair->projection[1][1] *= -1;
@@ -368,6 +367,7 @@ export namespace atlas {
         }
 
     private:
+        float m_aspect_ratio=0.f;
         uint32_t m_next_image_frame_idx = 0;
         VkFormat m_color_format;
         VkFormat m_depth_format;
