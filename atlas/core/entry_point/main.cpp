@@ -1,6 +1,7 @@
 // For glfwInit call
 #include <GLFW/glfw3.h>
 #include <memory_resource>
+#include <memory>
 #include <print>
 #include <vector>
 #include <expected>
