@@ -303,7 +303,6 @@ export namespace atlas {
         }
 
         void begin(vk::rendering_begin_parameters p_begin_params, const window_params& p_extent, const glm::mat4& p_proj, const glm::mat4& p_view) {
-            m_proj_view = p_proj * p_view;
             vk::viewport_params viewport = {
                 .x = 0.0f,
                 .y = 0.0f,
@@ -422,7 +421,6 @@ export namespace atlas {
     
     private:
         uint32_t m_format;
-        glm::mat4 m_proj_view=glm::mat4(1.f); // Combination of the projection * view matrix result
         std::optional<vk::physical_device> m_physical;
         std::shared_ptr<vk::device> m_device;
         vk::command_buffer* m_current_command=nullptr;
@@ -438,7 +436,6 @@ export namespace atlas {
          * 3.) Material Uniforms (diffuse/specular/etc...)
         */
         vk::dyn::buffer m_scene_uniforms;
-
         // uniform buffer to write all of our objects mat4 model matrices in
         vk::dyn::buffer m_object_model_uniforms;
 
@@ -456,15 +453,10 @@ export namespace atlas {
 
 
         // material lookups
-
         // <entity_id, gpu_material> is to search for specific indices that correspond to various material surfaces
         // indices to search inside of vector<vk::texture>
         std::unordered_map<uint64_t, gpu_material> m_material_table;
         std::vector<vk::texture> m_gpu_textures;
-
-        // GPU sampled images
-        // <slot_index, gpu_sample_texture_image>
-        std::unordered_map<uint64_t, gpu_image> m_gpu_storage_images;
         std::vector<vk::write_image> m_gpu_images;
         vk::shader_stage m_stage;
 
