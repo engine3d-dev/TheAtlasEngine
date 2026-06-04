@@ -155,6 +155,8 @@ export namespace atlas {
 
             std::println("images.size() = {}", images.size());
 
+            m_window->center_window();
+
             // m_bus->trigger<event::scene_transition>(this,
             // &application::on_scene_transition);
         }
@@ -300,11 +302,7 @@ export namespace atlas {
                 };
 
                 vk::rendering_begin_parameters begin_params = {
-                    .render_area = { { 0, 0 },
-                                    {
-                                    m_window->extent().width,
-                                    m_window->extent().height,
-                                    }, },
+                    .render_area = { { 0, 0 }, { m_window->extent().width, m_window->extent().height }, },
                     .layer_count = 1,
                     .color_attachments = std::span<const vk::rendering_attachment>(
                     &color_render_attachment, 1),
