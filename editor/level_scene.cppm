@@ -138,13 +138,6 @@ public:
             t->position -= right * velocity;
         }
 
-        if (atlas::event::is_key_pressed(key_q)) {
-            t->rotation.y += rotation_velocity;
-        }
-        if (atlas::event::is_key_pressed(key_e)) {
-            t->rotation.y -= rotation_velocity;
-        }
-
         glm::vec2 current_cursor_pos = atlas::event::cursor_position();
         if(atlas::event::is_key_pressed(key_left_shift)) {
             glm::vec2 cursor_dt = current_cursor_pos - m_last_cursor_pos;
@@ -153,11 +146,11 @@ public:
             // Update Euler angles
 
             if(atlas::event::is_mouse_pressed(mouse_button_left)) {
-                t->rotation.y -= (cursor_dt.x * mouse_sensitivity) * dt;
+                t->rotation.y -= (cursor_dt.x * mouse_sensitivity) * rotation_velocity;
             }
 
             if(atlas::event::is_mouse_pressed(mouse_button_right)) {
-                t->rotation.x -= (cursor_dt.y * mouse_sensitivity) * dt;
+                t->rotation.x -= (cursor_dt.y * mouse_sensitivity) * rotation_velocity;
             }
 
             // Clamp pitch to prevent the camera from flipping completely upside down (optional but recommended)
