@@ -150,7 +150,7 @@ public:
             }
 
             if(atlas::event::is_mouse_pressed(mouse_button_right)) {
-                t->rotation.x -= (cursor_dt.y * mouse_sensitivity) * rotation_velocity;
+                t->rotation.x += (cursor_dt.y * mouse_sensitivity) * rotation_velocity;
             }
 
             // Clamp pitch to prevent the camera from flipping completely upside down (optional but recommended)
