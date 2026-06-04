@@ -38,6 +38,10 @@ export namespace atlas {
 
             glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
             glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+            m_params = {
+                .width = p_params.width,
+                .height = p_params.height,
+            };
             
             m_window = glfwCreateWindow(static_cast<int>(p_params.width),
                                         static_cast<int>(p_params.height),
@@ -52,11 +56,6 @@ export namespace atlas {
             
             center_window();
 
-            m_params = {
-                .width = p_params.width,
-                .height = p_params.height,
-            };
-            
             vk::swapchain_params swapchain_params = {
                 .width = static_cast<uint32_t>(m_params.width),
                 .height = static_cast<uint32_t>(m_params.height),
