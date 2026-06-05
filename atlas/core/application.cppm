@@ -277,20 +277,48 @@ export namespace atlas {
                  * 
                  * These swapchain images will be used as soon the 3D scene is rendered to the imgui viewport images.
                 */
-                m_images[m_next_image_frame_idx].memory_barrier(
+
+                // m_images[m_next_image_frame_idx].memory_barrier(
+                m_imgui_context->image_memory_barrier(
                   current,
                   m_window->surface_properties().format.format,
-                  VK_IMAGE_LAYOUT_UNDEFINED,
-                  VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+                  VK_IMAGE_LAYOUT_UNDEFINED, 
+                  VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 
+                  VK_IMAGE_ASPECT_COLOR_BIT);
 
-                m_depth_images[m_next_image_frame_idx].memory_barrier(
+                // m_depth_images[m_next_image_frame_idx].memory_barrier(
+                m_imgui_context->depth_image_memory_barrier(
                   current,
                   m_depth_format,
                   VK_IMAGE_LAYOUT_UNDEFINED,
                   VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
-                  VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT);
+                  VK_IMAGE_ASPECT_DEPTH_BIT);
 
-                vk::rendering_attachment color_render_attachment = {
+                vk::rendering_attachment ui_color_render_attachment = {
+                    // .image_view = m_images[m_next_image_frame_idx].image_view(),
+                    .image_view = m_imgui_context->color_image_view(),
+                    .layout = vk::image_layout::color_optimal,
+                    .resolve_mode = vk::resolved_mode_flags::none,
+                    .resolve_image_view = nullptr,
+                    .resolve_image_layout = vk::image_layout::undefined,
+                    .load = vk::attachment_load::clear,
+                    .store = vk::attachment_store::store,
+                    .clear_values = clear_color
+                };
+
+                vk::rendering_attachment ui_depth_stencil_attachment = {
+                    .image_view = m_imgui_context->depth_image_view(),
+                    .layout = vk::image_layout::depth_stencil_optimal,
+                    .resolve_mode = vk::resolved_mode_flags::none,
+                    .resolve_image_view = nullptr,
+                    .resolve_image_layout = vk::image_layout::undefined,
+                    .load = vk::attachment_load::clear,
+                    .store = vk::attachment_store::store,
+                    .depth_values = depth_value
+                };
+
+                // presenting rendering attachments
+                vk::rendering_attachment present_color_render_attachment = {
                     .image_view = m_images[m_next_image_frame_idx].image_view(),
                     .layout = vk::image_layout::color_optimal,
                     .resolve_mode = vk::resolved_mode_flags::none,
@@ -301,7 +329,7 @@ export namespace atlas {
                     .clear_values = clear_color
                 };
 
-                vk::rendering_attachment depth_stencil_attachment = {
+                vk::rendering_attachment present_depth_stencil_attachment = {
                     .image_view =
                       m_depth_images[m_next_image_frame_idx].image_view(),
                     .layout = vk::image_layout::depth_stencil_optimal,
@@ -313,13 +341,13 @@ export namespace atlas {
                     .depth_values = depth_value
                 };
 
-                vk::rendering_begin_parameters begin_params = {
+                vk::rendering_begin_parameters ui_begin_params = {
                     .render_area = { { 0, 0 }, { m_window->extent().width, m_window->extent().height }, },
                     .layer_count = 1,
                     .color_attachments = std::span<const vk::rendering_attachment>(
-                    &color_render_attachment, 1),
-                    .depth_attachment = depth_stencil_attachment,
-                    .stencil_attachment = depth_stencil_attachment,
+                    &ui_color_render_attachment, 1),
+                    .depth_attachment = ui_depth_stencil_attachment,
+                    .stencil_attachment = ui_depth_stencil_attachment,
                 };
 
                 vk::viewport_params viewport = {
@@ -338,25 +366,57 @@ export namespace atlas {
                 };
                 current.set_scissor(0, 1, std::span<const vk::scissor_params>(&scissor, 1));
 
-                current.begin_rendering(begin_params);
+                current.begin_rendering(ui_begin_params);
 
-                m_render_context.begin(
-                  begin_params, m_window->extent(), m_projection, m_view);
+                m_render_context.begin(m_projection, m_view);
                 
                 m_render_context.end();
                 current.end_rendering();
 
-                // Performing UI Context Rendering
+                m_imgui_context->image_memory_barrier(
+                    current,
+                    VK_FORMAT_B8G8R8A8_UNORM, 
+                    VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, 
+                    VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 
+                    VK_IMAGE_ASPECT_COLOR_BIT
+                );
 
+                // Performing Present Context Rendering
+
+                m_images[m_next_image_frame_idx].memory_barrier(
+                  current,
+                  m_window->surface_properties().format.format,
+                  VK_IMAGE_LAYOUT_UNDEFINED,
+                  VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+
+                m_depth_images[m_next_image_frame_idx].memory_barrier(
+                  current,
+                  m_depth_format,
+                  VK_IMAGE_LAYOUT_UNDEFINED,
+                  VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+                  VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT);
+
+                vk::rendering_begin_parameters begin_params = {
+                    .render_area = { { 0, 0 }, { m_window->extent().width, m_window->extent().height }, },
+                    .layer_count = 1,
+                    .color_attachments = std::span<const vk::rendering_attachment>(
+                    &present_color_render_attachment, 1),
+                    .depth_attachment = present_depth_stencil_attachment,
+                    .stencil_attachment = present_depth_stencil_attachment,
+                };
+                current.begin_rendering(begin_params);
                 m_imgui_context->begin();
                 invoke_ui_update(m_current_scene.get());
                 m_imgui_context->end();
 
+                current.end_rendering();
                 m_images[m_next_image_frame_idx].memory_barrier(
                   current,
                   m_window->surface_properties().format.format,
                   VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
                   VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+
+                // m_images[m_next_image_frame_idx].memory_barrier(
                 current.end();
 
                 const VkCommandBuffer command = current;

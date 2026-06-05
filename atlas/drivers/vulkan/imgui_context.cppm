@@ -260,6 +260,25 @@ namespace atlas {
             construct(p_window, p_image_count, p_queue);
         }
 
+
+        void image_memory_barrier(const VkCommandBuffer& p_command,
+              VkFormat p_format,
+              VkImageLayout p_old,
+              VkImageLayout p_new,
+              uint32_t p_aspect_mask = VK_IMAGE_ASPECT_COLOR_BIT) {
+            
+            m_viewport_image.memory_barrier(p_command, p_format, p_old, p_new, p_aspect_mask);
+        }
+
+        void depth_image_memory_barrier(const VkCommandBuffer& p_command,
+              VkFormat p_format,
+              VkImageLayout p_old,
+              VkImageLayout p_new,
+              uint32_t p_aspect_mask = VK_IMAGE_ASPECT_COLOR_BIT) {
+            
+            m_viewport_depth_image.memory_barrier(p_command, p_format, p_old, p_new, p_aspect_mask);
+        }
+
         void construct(GLFWwindow* p_window,
                        uint32_t p_image_count,
                        const vk::device_present_queue& p_queue) {
@@ -289,6 +308,15 @@ namespace atlas {
 
         void set_current_command(vk::command_buffer& p_command) {
             m_current_command = &p_command;
+        }
+
+
+        [[nodiscard]] VkImageView color_image_view() const {
+            return m_viewport_image.image_view();
+        }
+
+        [[nodiscard]] VkImageView depth_image_view() const {
+            return m_viewport_depth_image.image_view();
         }
 
         void begin() {

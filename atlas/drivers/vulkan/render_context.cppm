@@ -302,7 +302,7 @@ export namespace atlas {
 
         }
 
-        void begin(vk::rendering_begin_parameters, const window_params&, const glm::mat4& p_proj, const glm::mat4& p_view) {
+        void begin(const glm::mat4& p_proj, const glm::mat4& p_view) {
             // vk::viewport_params viewport = {
             //     .x = 0.0f,
             //     .y = 0.0f,
