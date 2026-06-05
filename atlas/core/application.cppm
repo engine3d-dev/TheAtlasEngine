@@ -97,7 +97,8 @@ export namespace atlas {
                                 m_window->request_images().size(),
                                 m_window->present_queue(),
                                 m_color_format,
-                                m_depth_format);
+                                m_depth_format,
+                                params);
 
             // Initializing command buffers
             std::span<const VkImage> images = m_window->request_images();
@@ -269,6 +270,13 @@ export namespace atlas {
 
                 m_imgui_context->set_current_command(current);
 
+                /**
+                 * NOTE: For getting imgui_context
+                 * 
+                 * Using viewport images instead of swapchain images.
+                 * 
+                 * These swapchain images will be used as soon the 3D scene is rendered to the imgui viewport images.
+                */
                 m_images[m_next_image_frame_idx].memory_barrier(
                   current,
                   m_window->surface_properties().format.format,
@@ -314,10 +322,29 @@ export namespace atlas {
                     .stencil_attachment = depth_stencil_attachment,
                 };
 
+                vk::viewport_params viewport = {
+                    .x = 0.0f,
+                    .y = 0.0f,
+                    .width = static_cast<float>(m_window->extent().width),
+                    .height = static_cast<float>(m_window->extent().height),
+                    .min_depth = 0.0f,
+                    .max_depth = 1.0f,
+                };
+                current.set_viewport(0, 1, std::span<const vk::viewport_params>(&viewport, 1));
+
+                vk::scissor_params scissor = {
+                    .offset = { 0, 0 },
+                    .extent = {static_cast<uint32_t>(m_window->extent().width), static_cast<uint32_t>(m_window->extent().height)},
+                };
+                current.set_scissor(0, 1, std::span<const vk::scissor_params>(&scissor, 1));
+
+                current.begin_rendering(begin_params);
+
                 m_render_context.begin(
                   begin_params, m_window->extent(), m_projection, m_view);
                 
                 m_render_context.end();
+                current.end_rendering();
 
                 // Performing UI Context Rendering
 

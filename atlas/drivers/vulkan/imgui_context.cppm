@@ -77,16 +77,83 @@ namespace atlas {
         return rendering_ci;
     }
 
+    void transition_image_layout(VkDevice p_device,
+                                 vk::sample_image& p_image,
+                                 VkFormat p_format,
+                                 VkImageLayout p_old,
+                                 VkImageLayout p_new) {
+        vk::command_params copy_command_params = {
+            .levels = vk::command_levels::primary,
+            .queue_index = 0,
+            .flags = vk::command_pool_flags::reset,
+        };
+        vk::command_buffer temp_command_buffer =
+          vk::command_buffer(p_device, copy_command_params);
+
+        temp_command_buffer.begin(vk::command_usage::one_time_submit);
+
+        p_image.memory_barrier(temp_command_buffer, p_format, p_old, p_new);
+
+        temp_command_buffer.end();
+
+        VkCommandBuffer handle = temp_command_buffer;
+        VkSubmitInfo submit_info = {
+            .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+            .commandBufferCount = 1,
+            .pCommandBuffers = &handle,
+        };
+
+        uint32_t queue_family_index = 0;
+        uint32_t queue_index = 0;
+        VkQueue temp_graphics_queue;
+        vkGetDeviceQueue(
+          p_device, queue_family_index, queue_index, &temp_graphics_queue);
+
+        vkQueueSubmit(temp_graphics_queue, 1, &submit_info, nullptr);
+        vkQueueWaitIdle(temp_graphics_queue);
+
+        temp_command_buffer.destruct();
+    }
+
+    /**
+     * TODO List
+     * 0.) Initialize ImGui Context + Test ImGui Panel Undocking Beforehand
+     * 1.) Render offscreen texture
+     * 2.) Upload to imgui dockspace
+     * 3.) Retrieve viewport ID (which is a ImTextureID)
+     */
+
+
+     /**
+      * 
+      * NOTE: There are a few things to remember:
+      * 
+      * Actual TODOs that need to be done to get imgui back and working again for getting the viewport + dockspace running again:
+      * 0.) When performing off-screen rendering of the 3D screen. We are going to need to do begin_rendering/end_rendering for the viewport images.
+      *     - Rather then using the specified begin rendering in the render_context
+      *     - To get this to work we may need to strip out render_context begin_rendering/end_rendering outside of the begin/end APIs of render_context.
+      * 1.) Using imgui_contexts begin_rendering/end_rendering images.
+      * 2.) As we render those specific viewport images need to perform memory_barriers as well.
+      * 3.) Then once that is rendered. We will render the final imgui offscreen texture with the current command buffers to the swapchain for drawn to the screen.
+      * 
+      * 
+      * 
+      * 
+     */
     export class imgui_context {
     public:
         imgui_context() = delete;
         imgui_context(/*NOLINT*/ std::shared_ptr<graphics_context> p_context,
                       GLFWwindow* p_window,
-                      /*NOLINT*/ std::shared_ptr<vk::swapchain> p_swapchain,
+                      /*NOLINT*/ std::shared_ptr<vk::swapchain>,
                       uint32_t p_image_count,
                       const vk::device_present_queue& p_queue,
                       /*NOLINT*/ const VkFormat& p_color_format,
-                      /*NOLINT*/ const VkFormat& p_depth_format) {
+                      /*NOLINT*/ const VkFormat& p_depth_format,
+                      const window_params& p_params)
+          : m_color_format(p_color_format)
+          , m_depth_format(p_depth_format)
+          , m_params(p_params) {
             m_instance = p_context->instance_handle();
             m_device = p_context->logical_device();
             m_physical = p_context->physical_device();
@@ -152,15 +219,50 @@ namespace atlas {
                 *m_device, &desc_pool_create_info, nullptr, &m_descriptor_pool),
               "vkCreateDescriptorPool");
 
-            construct(p_window, /*NOLINT*/ p_swapchain, p_image_count, p_queue, p_color_format, p_depth_format);
+            // Creating viewport image
+            vk::image_params viewport_params = {
+                .extent = { .width = m_params.width,
+                            .height = m_params.height },
+                // .format = VK_FORMAT_B8G8R8A8_UNORM,
+                .format = m_color_format,
+                // .property = vk::memory_property::device_local_bit,
+                .memory_mask = m_physical->memory_properties(
+                  vk::memory_property::device_local_bit |
+                  vk::memory_property::host_visible_bit),
+                .aspect = vk::image_aspect_flags::color_bit,
+                .usage = vk::image_usage::color_attachment_bit |
+                         vk::image_usage::transfer_dst_bit |
+                         vk::image_usage::sampled_bit,
+                .address_mode_u = vk::sampler_address_mode::clamp_to_edge,
+                .addrses_mode_v = vk::sampler_address_mode::clamp_to_edge,
+                .addrses_mode_w = vk::sampler_address_mode::clamp_to_edge,
+            };
+
+            m_viewport_image = vk::sample_image(*m_device, viewport_params);
+
+            transition_image_layout(*m_device,
+                                    m_viewport_image,
+                                    m_color_format,
+                                    VK_IMAGE_LAYOUT_UNDEFINED,
+                                    VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+            // Perform additional configurations for specific handles
+            vk::image_params viewport_depth_params = {
+                .extent = { .width = m_params.width,
+                            .height = m_params.height },
+                .format = m_depth_format,
+                .memory_mask = m_physical->memory_properties(vk::memory_property::device_local_bit | vk::memory_property::host_visible_bit),
+                .aspect = vk::image_aspect_flags::depth_bit,
+                .usage = vk::image_usage::depth_stencil_bit,
+            };
+            m_viewport_depth_image = vk::sample_image(*m_device, viewport_depth_params);
+
+            construct(p_window, p_image_count, p_queue);
         }
 
         void construct(GLFWwindow* p_window,
-                       /*NOLINT*/ std::shared_ptr<vk::swapchain> p_swapchain,
                        uint32_t p_image_count,
-                       const vk::device_present_queue& p_queue,
-                       /*NOLINT*/ const VkFormat& p_color_format,
-                       /*NOLINT*/ const VkFormat& p_depth_format) {
+                       const vk::device_present_queue& p_queue) {
 
             ImGui_ImplGlfw_InitForVulkan(p_window, true);
             ImGui_ImplVulkan_InitInfo init_info = {};
@@ -176,8 +278,8 @@ namespace atlas {
             init_info.UseDynamicRendering = true;
             init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
 
-            const uint32_t color_format = static_cast<uint32_t>(p_color_format);
-            const uint32_t depth_format = static_cast<uint32_t>(p_depth_format);
+            const uint32_t color_format = static_cast<uint32_t>(m_color_format);
+            const uint32_t depth_format = static_cast<uint32_t>(m_depth_format);
             init_info.PipelineRenderingCreateInfo = pipeline_rendering_info(
               std::span<const uint32_t>(&color_format, 1),
               depth_format,
@@ -202,7 +304,7 @@ namespace atlas {
             ImGui_ImplVulkan_RenderDrawData(draw_data, *m_current_command);
 
             ImGuiIO& io = ImGui::GetIO();
-            if(io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+            if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
                 ImGui::UpdatePlatformWindows();
                 ImGui::RenderPlatformWindowsDefault();
             }
@@ -212,16 +314,24 @@ namespace atlas {
             ImGui_ImplVulkan_Shutdown();
             vkDestroyDescriptorPool(*m_device, m_descriptor_pool, nullptr);
 
+            m_viewport_image.destruct();
+            m_viewport_depth_image.destruct();
+
             ImGui_ImplGlfw_Shutdown();
             ImGui::DestroyContext();
         }
 
     private:
+        VkFormat m_color_format;
+        VkFormat m_depth_format;
         VkDescriptorPool m_descriptor_pool = nullptr;
         vk::command_buffer* m_current_command;
         std::optional<vk::instance> m_instance;
         std::optional<vk::physical_device> m_physical;
         std::shared_ptr<vk::device> m_device = nullptr;
         vk::surface_params m_surface_properties;
+        vk::sample_image m_viewport_image;
+        vk::sample_image m_viewport_depth_image;
+        window_params m_params;
     };
 };

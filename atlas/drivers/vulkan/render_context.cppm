@@ -302,24 +302,24 @@ export namespace atlas {
 
         }
 
-        void begin(vk::rendering_begin_parameters p_begin_params, const window_params& p_extent, const glm::mat4& p_proj, const glm::mat4& p_view) {
-            vk::viewport_params viewport = {
-                .x = 0.0f,
-                .y = 0.0f,
-                .width = static_cast<float>(p_extent.width),
-                .height = static_cast<float>(p_extent.height),
-                .min_depth = 0.0f,
-                .max_depth = 1.0f,
-            };
-            m_current_command->set_viewport(0, 1, std::span<const vk::viewport_params>(&viewport, 1));
+        void begin(vk::rendering_begin_parameters, const window_params&, const glm::mat4& p_proj, const glm::mat4& p_view) {
+            // vk::viewport_params viewport = {
+            //     .x = 0.0f,
+            //     .y = 0.0f,
+            //     .width = static_cast<float>(p_extent.width),
+            //     .height = static_cast<float>(p_extent.height),
+            //     .min_depth = 0.0f,
+            //     .max_depth = 1.0f,
+            // };
+            // m_current_command->set_viewport(0, 1, std::span<const vk::viewport_params>(&viewport, 1));
 
-            vk::scissor_params scissor = {
-                .offset = { 0, 0 },
-                .extent = {static_cast<uint32_t>(p_extent.width), static_cast<uint32_t>(p_extent.height)},
-            };
-            m_current_command->set_scissor(0, 1, std::span<const vk::scissor_params>(&scissor, 1));
+            // vk::scissor_params scissor = {
+            //     .offset = { 0, 0 },
+            //     .extent = {static_cast<uint32_t>(p_extent.width), static_cast<uint32_t>(p_extent.height)},
+            // };
+            // m_current_command->set_scissor(0, 1, std::span<const vk::scissor_params>(&scissor, 1));
 
-            m_current_command->begin_rendering(p_begin_params);
+            // m_current_command->begin_rendering(p_begin_params);
 
             m_main_pipeline.bind(*m_current_command);
 
@@ -389,7 +389,7 @@ export namespace atlas {
                     vkCmdDraw(*m_current_command, mesh.vertices_size, 1, 0, 0);
                 }
             });
-            m_current_command->end_rendering();
+            // m_current_command->end_rendering();
         }
 
         void set_command(vk::command_buffer& p_command) {
