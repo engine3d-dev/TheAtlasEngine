@@ -140,6 +140,7 @@ namespace atlas {
       * 
       * 
      */
+    export ImTextureID g_viewport_image_id = nullptr;
     export class imgui_context {
     public:
         imgui_context() = delete;
@@ -163,6 +164,7 @@ namespace atlas {
             // Common setup for imgui
             IMGUI_CHECKVERSION();
             ImGui::CreateContext();
+            std::println("After ImGui::CreateContext");
             ImGuiIO& io = ImGui::GetIO();
 
             io.ConfigFlags |=
@@ -177,6 +179,7 @@ namespace atlas {
             // Additional configurations
             imgui_layout_color_modification();
 
+            std::println("After setting imgui_layout_color_modification");
             ImGuiStyle& style = ImGui::GetStyle();
             if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
                 style.WindowRounding = 0.0f;
@@ -203,6 +206,7 @@ namespace atlas {
                 VkDescriptorPoolSize{ VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 100 }
             };
 
+            std::println("Before creating VkDescriptorPool");
             VkDescriptorPoolCreateInfo desc_pool_create_info = {
                 .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
                 .pNext = nullptr,
@@ -219,6 +223,7 @@ namespace atlas {
                 *m_device, &desc_pool_create_info, nullptr, &m_descriptor_pool),
               "vkCreateDescriptorPool");
 
+            std::println("After vkCrateDescriptorPool");
             // Creating viewport image
             vk::image_params viewport_params = {
                 .extent = { .width = m_params.width,
@@ -227,8 +232,7 @@ namespace atlas {
                 .format = m_color_format,
                 // .property = vk::memory_property::device_local_bit,
                 .memory_mask = m_physical->memory_properties(
-                  vk::memory_property::device_local_bit |
-                  vk::memory_property::host_visible_bit),
+                  vk::memory_property::device_local_bit),
                 .aspect = vk::image_aspect_flags::color_bit,
                 .usage = vk::image_usage::color_attachment_bit |
                          vk::image_usage::transfer_dst_bit |
@@ -240,11 +244,14 @@ namespace atlas {
 
             m_viewport_image = vk::sample_image(*m_device, viewport_params);
 
+            std::println("before transition image layout");
             transition_image_layout(*m_device,
                                     m_viewport_image,
                                     m_color_format,
                                     VK_IMAGE_LAYOUT_UNDEFINED,
                                     VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+            
+            std::println("after transition image layout");
 
             // Perform additional configurations for specific handles
             vk::image_params viewport_depth_params = {
@@ -256,7 +263,15 @@ namespace atlas {
                 .usage = vk::image_usage::depth_stencil_bit,
             };
             m_viewport_depth_image = vk::sample_image(*m_device, viewport_depth_params);
+            std::println("After initializing m_viewport_depth_image");
 
+            if(m_viewport_image.sampler() == nullptr) {
+                std::println("sampler() = nullprt");
+            }
+
+            if(m_viewport_image.image_view() == nullptr) {
+                std::println("image_view() = nullprt");
+            }
             construct(p_window, p_image_count, p_queue);
         }
 
@@ -304,6 +319,16 @@ namespace atlas {
               depth_format,
               depth_format);
             ImGui_ImplVulkan_Init(&init_info);
+
+            std::println("g_viewport_image_id constructed");
+            // Offscreen texture to retrieve
+            g_viewport_image_id =
+              static_cast<ImTextureID>(ImGui_ImplVulkan_AddTexture(
+                m_viewport_image.sampler(),
+                m_viewport_image.image_view(),
+                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
+
+            std::println("After g_viewport_image_id constructed");
         }
 
         void set_current_command(vk::command_buffer& p_command) {
@@ -342,6 +367,12 @@ namespace atlas {
             ImGui_ImplVulkan_Shutdown();
             vkDestroyDescriptorPool(*m_device, m_descriptor_pool, nullptr);
 
+            if(g_viewport_image_id != nullptr) {
+                VkDescriptorSet old_descriptor_set = reinterpret_cast<VkDescriptorSet>(g_viewport_image_id);
+                ImGui_ImplVulkan_RemoveTexture(old_descriptor_set);
+                g_viewport_image_id = nullptr;
+            }
+            
             m_viewport_image.destruct();
             m_viewport_depth_image.destruct();
 
