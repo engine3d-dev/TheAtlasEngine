@@ -114,13 +114,15 @@ main() {
 
     std::array<float, 1> priorities = { 0.f };
 #if defined(__APPLE__)
-    std::array<const char*, 2> extensions = {
+    std::array<const char*, 3> extensions = {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME,
         "VK_KHR_portability_subset",
+        "VK_KHR_dynamic_rendering",
     };
 #else
-    std::array<const char*, 1> extensions = {
+    std::array<const char*, 2> extensions = {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+        "VK_KHR_dynamic_rendering",
     };
 #endif
 
