@@ -116,36 +116,12 @@ namespace atlas {
     }
 
     /**
-     * TODO List
-     * 0.) Initialize ImGui Context + Test ImGui Panel Undocking Beforehand
-     * 1.) Render offscreen texture
-     * 2.) Upload to imgui dockspace
-     * 3.) Retrieve viewport ID (which is a ImTextureID)
+     * @brief Represents the context for rendering the UI-specific properties
+     *
+     * This context is responsible to perform any configurations and rerouting
+     * of the underlying UI logic.
      */
-
-    /**
-     *
-     * NOTE: There are a few things to remember:
-     *
-     * Actual TODOs that need to be done to get imgui back and working again for
-     * getting the viewport + dockspace running again: 0.) When performing
-     * off-screen rendering of the 3D screen. We are going to need to do
-     * begin_rendering/end_rendering for the viewport images.
-     *     - Rather then using the specified begin rendering in the
-     * render_context
-     *     - To get this to work we may need to strip out render_context
-     * begin_rendering/end_rendering outside of the begin/end APIs of
-     * render_context. 1.) Using imgui_contexts begin_rendering/end_rendering
-     * images. 2.) As we render those specific viewport images need to perform
-     * memory_barriers as well. 3.) Then once that is rendered. We will render
-     * the final imgui offscreen texture with the current command buffers to the
-     * swapchain for drawn to the screen.
-     *
-     *
-     *
-     *
-     */
-    export ImTextureID g_viewport_image_id = nullptr;
+    export VkDescriptorSet g_viewport_image_id = nullptr;
     export class imgui_context {
     public:
         imgui_context() = delete;
@@ -277,13 +253,11 @@ namespace atlas {
 
             construct(p_window, p_image_count, p_queue);
 
-            
             // Offscreen texture to retrieve
-            g_viewport_image_id =
-              static_cast<ImTextureID>(ImGui_ImplVulkan_AddTexture(
-                m_viewport_image.sampler(),
-                m_viewport_image.image_view(),
-                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
+            g_viewport_image_id = ImGui_ImplVulkan_AddTexture(
+              m_viewport_image.sampler(),
+              m_viewport_image.image_view(),
+              VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
         }
 
         void image_memory_barrier(
@@ -324,13 +298,8 @@ namespace atlas {
             init_info.UseDynamicRendering = true;
             init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
 
-            // const uint32_t color_format =
-            //   static_cast<uint32_t>(VK_FORMAT_B8G8R8A8_UNORM);
             const uint32_t color_format = static_cast<uint32_t>(m_color_format);
             const uint32_t depth_format = static_cast<uint32_t>(m_depth_format);
-
-            std::span<const uint32_t> formats =
-              std::span<const uint32_t>(&color_format, 1);
 
             init_info.PipelineRenderingCreateInfo = pipeline_rendering_info(
               std::span<const uint32_t>(&color_format, 1),
@@ -362,19 +331,23 @@ namespace atlas {
 
             ImDrawData* draw_data = ImGui::GetDrawData();
             ImGui_ImplVulkan_RenderDrawData(draw_data, *m_current_command);
+        }
 
+        void update_platforms() {
             ImGuiIO& io = ImGui::GetIO();
             if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+
                 ImGui::UpdatePlatformWindows();
                 ImGui::RenderPlatformWindowsDefault();
+
+                vkDeviceWaitIdle(*m_device);
             }
         }
 
         void destruct() {
             if (g_viewport_image_id != nullptr) {
-                VkDescriptorSet old_descriptor_set =
-                  reinterpret_cast<VkDescriptorSet>(g_viewport_image_id);
-                ImGui_ImplVulkan_RemoveTexture(old_descriptor_set);
+                VkDescriptorSet old_descriptor = g_viewport_image_id;
+                ImGui_ImplVulkan_RemoveTexture(old_descriptor);
                 g_viewport_image_id = nullptr;
             }
 

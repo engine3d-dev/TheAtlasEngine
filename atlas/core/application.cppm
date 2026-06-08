@@ -268,13 +268,9 @@ export namespace atlas {
 
                 m_render_context.set_command(current);
 
-                m_imgui_context->set_current_command(current);
-
                 m_imgui_context->image_memory_barrier(
                   current,
-                //   VK_IMAGE_LAYOUT_UNDEFINED,
                 VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-                //   VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
                 VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
                 m_imgui_context->depth_image_memory_barrier(
@@ -338,10 +334,6 @@ export namespace atlas {
 
                 current.end_rendering();
 
-                // m_imgui_context->image_memory_barrier(
-                //   current,
-                //   VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-                //   VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
                 m_imgui_context->image_memory_barrier(
                   current,
                   VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
@@ -411,12 +403,14 @@ export namespace atlas {
                   VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
                   VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 
-                // Performing Present Context Rendering
                 current.end();
 
                 const VkCommandBuffer command = current;
                 m_window->submit(std::span<const VkCommandBuffer>(&command, 1));
                 m_window->present(m_next_image_frame_idx);
+
+                // Update platform window afterwards
+                m_imgui_context->update_platforms();
             }
         }
 
