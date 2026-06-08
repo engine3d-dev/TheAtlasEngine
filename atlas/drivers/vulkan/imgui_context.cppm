@@ -123,22 +123,27 @@ namespace atlas {
      * 3.) Retrieve viewport ID (which is a ImTextureID)
      */
 
-
-     /**
-      * 
-      * NOTE: There are a few things to remember:
-      * 
-      * Actual TODOs that need to be done to get imgui back and working again for getting the viewport + dockspace running again:
-      * 0.) When performing off-screen rendering of the 3D screen. We are going to need to do begin_rendering/end_rendering for the viewport images.
-      *     - Rather then using the specified begin rendering in the render_context
-      *     - To get this to work we may need to strip out render_context begin_rendering/end_rendering outside of the begin/end APIs of render_context.
-      * 1.) Using imgui_contexts begin_rendering/end_rendering images.
-      * 2.) As we render those specific viewport images need to perform memory_barriers as well.
-      * 3.) Then once that is rendered. We will render the final imgui offscreen texture with the current command buffers to the swapchain for drawn to the screen.
-      * 
-      * 
-      * 
-      * 
+    /**
+     *
+     * NOTE: There are a few things to remember:
+     *
+     * Actual TODOs that need to be done to get imgui back and working again for
+     * getting the viewport + dockspace running again: 0.) When performing
+     * off-screen rendering of the 3D screen. We are going to need to do
+     * begin_rendering/end_rendering for the viewport images.
+     *     - Rather then using the specified begin rendering in the
+     * render_context
+     *     - To get this to work we may need to strip out render_context
+     * begin_rendering/end_rendering outside of the begin/end APIs of
+     * render_context. 1.) Using imgui_contexts begin_rendering/end_rendering
+     * images. 2.) As we render those specific viewport images need to perform
+     * memory_barriers as well. 3.) Then once that is rendered. We will render
+     * the final imgui offscreen texture with the current command buffers to the
+     * swapchain for drawn to the screen.
+     *
+     *
+     *
+     *
      */
     export ImTextureID g_viewport_image_id = nullptr;
     export class imgui_context {
@@ -152,19 +157,18 @@ namespace atlas {
                       /*NOLINT*/ const VkFormat& p_color_format,
                       /*NOLINT*/ const VkFormat& p_depth_format,
                       const window_params& p_params)
-          : m_color_format(p_color_format)
-          , m_depth_format(p_depth_format)
-          , m_params(p_params) {
+          : m_params(p_params) {
             m_instance = p_context->instance_handle();
             m_device = p_context->logical_device();
             m_physical = p_context->physical_device();
-
             std::println("Constructing imgui_context");
+
+            m_color_format = p_color_format;
+            m_depth_format = p_depth_format;
 
             // Common setup for imgui
             IMGUI_CHECKVERSION();
             ImGui::CreateContext();
-            std::println("After ImGui::CreateContext");
             ImGuiIO& io = ImGui::GetIO();
 
             io.ConfigFlags |=
@@ -179,7 +183,6 @@ namespace atlas {
             // Additional configurations
             imgui_layout_color_modification();
 
-            std::println("After setting imgui_layout_color_modification");
             ImGuiStyle& style = ImGui::GetStyle();
             if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
                 style.WindowRounding = 0.0f;
@@ -206,7 +209,6 @@ namespace atlas {
                 VkDescriptorPoolSize{ VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 100 }
             };
 
-            std::println("Before creating VkDescriptorPool");
             VkDescriptorPoolCreateInfo desc_pool_create_info = {
                 .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
                 .pNext = nullptr,
@@ -223,7 +225,6 @@ namespace atlas {
                 *m_device, &desc_pool_create_info, nullptr, &m_descriptor_pool),
               "vkCreateDescriptorPool");
 
-            std::println("After vkCrateDescriptorPool");
             // Creating viewport image
             vk::image_params viewport_params = {
                 .extent = { .width = m_params.width,
@@ -250,7 +251,7 @@ namespace atlas {
                                     m_color_format,
                                     VK_IMAGE_LAYOUT_UNDEFINED,
                                     VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-            
+
             std::println("after transition image layout");
 
             // Perform additional configurations for specific handles
@@ -258,40 +259,51 @@ namespace atlas {
                 .extent = { .width = m_params.width,
                             .height = m_params.height },
                 .format = m_depth_format,
-                .memory_mask = m_physical->memory_properties(vk::memory_property::device_local_bit | vk::memory_property::host_visible_bit),
+                .memory_mask = m_physical->memory_properties(
+                  vk::memory_property::device_local_bit |
+                  vk::memory_property::host_visible_bit),
                 .aspect = vk::image_aspect_flags::depth_bit,
                 .usage = vk::image_usage::depth_stencil_bit,
             };
-            m_viewport_depth_image = vk::sample_image(*m_device, viewport_depth_params);
-            std::println("After initializing m_viewport_depth_image");
+            m_viewport_depth_image =
+              vk::sample_image(*m_device, viewport_depth_params);
 
-            if(m_viewport_image.sampler() == nullptr) {
-                std::println("sampler() = nullprt");
-            }
+            transition_image_layout(
+              *m_device,
+              m_viewport_depth_image,
+              m_depth_format,
+              VK_IMAGE_LAYOUT_UNDEFINED,
+              VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 
-            if(m_viewport_image.image_view() == nullptr) {
-                std::println("image_view() = nullprt");
-            }
             construct(p_window, p_image_count, p_queue);
+
+            
+            // Offscreen texture to retrieve
+            g_viewport_image_id =
+              static_cast<ImTextureID>(ImGui_ImplVulkan_AddTexture(
+                m_viewport_image.sampler(),
+                m_viewport_image.image_view(),
+                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
         }
 
+        void image_memory_barrier(
+          const VkCommandBuffer& p_command,
+          VkImageLayout p_old,
+          VkImageLayout p_new,
+          uint32_t p_aspect_mask = VK_IMAGE_ASPECT_COLOR_BIT) {
 
-        void image_memory_barrier(const VkCommandBuffer& p_command,
-              VkFormat p_format,
-              VkImageLayout p_old,
-              VkImageLayout p_new,
-              uint32_t p_aspect_mask = VK_IMAGE_ASPECT_COLOR_BIT) {
-            
-            m_viewport_image.memory_barrier(p_command, p_format, p_old, p_new, p_aspect_mask);
+            m_viewport_image.memory_barrier(
+              p_command, m_color_format, p_old, p_new, p_aspect_mask);
         }
 
-        void depth_image_memory_barrier(const VkCommandBuffer& p_command,
-              VkFormat p_format,
-              VkImageLayout p_old,
-              VkImageLayout p_new,
-              uint32_t p_aspect_mask = VK_IMAGE_ASPECT_COLOR_BIT) {
-            
-            m_viewport_depth_image.memory_barrier(p_command, p_format, p_old, p_new, p_aspect_mask);
+        void depth_image_memory_barrier(
+          const VkCommandBuffer& p_command,
+          VkImageLayout p_old,
+          VkImageLayout p_new,
+          uint32_t p_aspect_mask = VK_IMAGE_ASPECT_COLOR_BIT) {
+
+            m_viewport_depth_image.memory_barrier(
+              p_command, m_depth_format, p_old, p_new, p_aspect_mask);
         }
 
         void construct(GLFWwindow* p_window,
@@ -312,29 +324,24 @@ namespace atlas {
             init_info.UseDynamicRendering = true;
             init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
 
+            // const uint32_t color_format =
+            //   static_cast<uint32_t>(VK_FORMAT_B8G8R8A8_UNORM);
             const uint32_t color_format = static_cast<uint32_t>(m_color_format);
             const uint32_t depth_format = static_cast<uint32_t>(m_depth_format);
+
+            std::span<const uint32_t> formats =
+              std::span<const uint32_t>(&color_format, 1);
+
             init_info.PipelineRenderingCreateInfo = pipeline_rendering_info(
               std::span<const uint32_t>(&color_format, 1),
               depth_format,
               depth_format);
             ImGui_ImplVulkan_Init(&init_info);
-
-            std::println("g_viewport_image_id constructed");
-            // Offscreen texture to retrieve
-            g_viewport_image_id =
-              static_cast<ImTextureID>(ImGui_ImplVulkan_AddTexture(
-                m_viewport_image.sampler(),
-                m_viewport_image.image_view(),
-                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
-
-            std::println("After g_viewport_image_id constructed");
         }
 
         void set_current_command(vk::command_buffer& p_command) {
             m_current_command = &p_command;
         }
-
 
         [[nodiscard]] VkImageView color_image_view() const {
             return m_viewport_image.image_view();
@@ -364,15 +371,16 @@ namespace atlas {
         }
 
         void destruct() {
-            ImGui_ImplVulkan_Shutdown();
-            vkDestroyDescriptorPool(*m_device, m_descriptor_pool, nullptr);
-
-            if(g_viewport_image_id != nullptr) {
-                VkDescriptorSet old_descriptor_set = reinterpret_cast<VkDescriptorSet>(g_viewport_image_id);
+            if (g_viewport_image_id != nullptr) {
+                VkDescriptorSet old_descriptor_set =
+                  reinterpret_cast<VkDescriptorSet>(g_viewport_image_id);
                 ImGui_ImplVulkan_RemoveTexture(old_descriptor_set);
                 g_viewport_image_id = nullptr;
             }
-            
+
+            ImGui_ImplVulkan_Shutdown();
+            vkDestroyDescriptorPool(*m_device, m_descriptor_pool, nullptr);
+
             m_viewport_image.destruct();
             m_viewport_depth_image.destruct();
 

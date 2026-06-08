@@ -46,9 +46,9 @@ export namespace atlas {
             m_scenes.emplace(
               p_name,
               std::allocate_shared<UScene>(
-                std::pmr::polymorphic_allocator<UScene>(m_allocator.resource()),
+                m_allocator,
                 p_name,
-                p_bus));
+                p_bus)) ;
         }
 
         // Experimental: This was just for testing. Will come back to later.
