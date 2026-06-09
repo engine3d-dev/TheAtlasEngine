@@ -1,7 +1,5 @@
 module;
 
-// #include <core/core.hpp>
-// #include <core/scene/scene.hpp>
 #include <string>
 #include <filesystem>
 #include <flecs.h>
@@ -9,6 +7,7 @@ module;
 #include <sstream>
 #include <glm/glm.hpp>
 #include <fstream>
+#include <print>
 
 export module atlas.core.serialize;
 
@@ -177,8 +176,8 @@ namespace atlas {
          * @param p_scene_ctx is the current scene to perform
          * serialization/deserialization to
          */
-        serializer(const ref<scene>& p_scene_ctx)
-          : m_current_scene_ctx(p_scene_ctx) {}
+        serializer(ref<scene> p_scene)
+          : m_current_scene_ctx(/*NOLINT*/p_scene) {}
 
         /**
          * @param p_filepath is the specified path to save the file
@@ -208,8 +207,9 @@ namespace atlas {
                                  .without<tag::editor>()
                                  .build();
 
-            q.each([&output](flecs::entity p_entity_id) {
-                serialize_entity(output, p_entity_id);
+            q.each([&output](flecs::entity p_entity) {
+                std::println("Serialize Entity: {}", p_entity.name().c_str());
+                serialize_entity(output, p_entity);
             });
 
             std::ofstream output_file(p_filepath.string());
@@ -235,16 +235,16 @@ namespace atlas {
                 return false;
             }
 
-            console_log_info("Before loading environment mappings!");
-            std::string environment_map_data = "";
-            if (data["Environment"]) {
-                environment_map_data = data["Environment"].as<std::string>();
+            // console_log_info("Before loading environment mappings!");
+            // std::string environment_map_data = "";
+            // if (data["Environment"]) {
+            //     environment_map_data = data["Environment"].as<std::string>();
 
-                console_log_info("Environment Map Loaded Path (from yaml): {}",
-                                 environment_map_data);
-            }
+            //     console_log_info("Environment Map Loaded Path (from yaml): {}",
+            //                      environment_map_data);
+            // }
 
-            p_registry.set<environment>({ .filepath = environment_map_data });
+            // p_registry.set<environment>({ .filepath = environment_map_data });
 
             YAML::Node entity_objects = data["Entities"];
 
