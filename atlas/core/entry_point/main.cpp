@@ -108,8 +108,13 @@ main() {
 
     // 1. Setting up vk instance
     vk::instance api_instance(config, debug_callback_info);
+#if defined(__APPLE__)
     std::expected<vk::physical_device, VkResult> physical_device_expected =
       api_instance.enumerate_physical_device(vk::physical_gpu::integrated);
+#else
+    std::expected<vk::physical_device, VkResult> physical_device_expected =
+      api_instance.enumerate_physical_device(vk::physical_gpu::discrete);
+#endif
     vk::physical_device physical_device = physical_device_expected.value();
 
     std::array<float, 1> priorities = { 0.f };
