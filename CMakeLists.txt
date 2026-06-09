@@ -207,7 +207,6 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas/drivers/vulkan/stb_image.cppm
 
     atlas/drivers/vulkan/hash.cppm
-    # atlas/drivers/vulkan/mesh.cppm
     atlas/drivers/vulkan/shader_resource_group.cppm
     atlas/drivers/vulkan/render_system.cppm
     atlas/drivers/vulkan/uniforms.cppm
