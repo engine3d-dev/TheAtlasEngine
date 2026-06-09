@@ -40,7 +40,7 @@ class AtlasRecipe(ConanFile):
         self.requires("yaml-cpp/0.8.0")
 
         # Vulkan-related headers and includes packages
-        self.requires("vulkan-cpp/6.1")
+        self.requires("vulkan-cpp/6.2")
         self.requires("tinyobjloader/2.0.0-rc10")
         self.requires("stb/cci.20230920")
 
