@@ -14,7 +14,7 @@ target_sources(editor PUBLIC
     level_scene2.cppm
     # content_browser_panel.cppm
     icon.cppm
-    # utilities.cppm
+    utilities.cppm
 )
 
 find_package(glfw3 REQUIRED)

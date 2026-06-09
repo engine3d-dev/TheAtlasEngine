@@ -212,6 +212,7 @@ export namespace atlas {
             m_render_context.current_scene(*m_current_scene);
 
             auto start_time = std::chrono::high_resolution_clock::now();
+            invoke_start(m_world.get());
             invoke_start(m_current_scene.get());
 
             // Querying editor cameras specific objects
@@ -244,8 +245,10 @@ export namespace atlas {
                 vk::command_buffer current =
                   m_command_buffers[m_next_image_frame_idx];
 
+                invoke_physics_update(m_world.get());
                 invoke_physics_update(m_current_scene.get());
 
+                invoke_on_update(m_world.get(), m_delta_time);
                 invoke_on_update(m_current_scene.get(), m_delta_time);
 
                 // We want this to be called after late update
