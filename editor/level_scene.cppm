@@ -56,16 +56,29 @@ public:
         viking_room.set<atlas::mesh_source>({
           .model_path = "assets/models/viking_room.obj",
           .diffuse = "assets/models/viking_room.png",
-        //   .model_path = "assets/models/cube.obj",
-        //   .diffuse = "assets/models/container_diffuse.png",
-        //   .diffuse = "assets/models/container_specular.png",
+        });
+
+        atlas::game_object platform = entity("Platform");
+
+        platform.set<atlas::transform>({
+          .scale = { 15.f, 0.30f, 10.0f },
+        });
+        platform.set<atlas::mesh_source>({
+          .model_path = "assets/models/cube.obj",
+          .diffuse = "assets/models/wood.png",
+        });
+        platform.set<atlas::physics_body>({
+          .body_movement_type = atlas::fixed,
+        });
+        platform.set<atlas::box_collider>({
+          .half_extent = { 15.f, 0.30f, 10.0f },
         });
 
 
         // const size_t grid_width = 5; 
         // const float spacing = 5;
 
-        // for(size_t i = 0; i < 100; i++) {
+        // for(size_t i = 0; i < 50; i++) {
         //     atlas::game_object obj = entity(std::format("Object #{}", i));
 
         //     size_t col = i % grid_width;
@@ -73,8 +86,9 @@ public:
 
         //     glm::vec3 pos = {
         //         float(static_cast<float>(col) * spacing),
-        //         0.0f,
-        //         float(static_cast<float>(row) * -spacing) 
+        //         // 0.0f,
+        //         float(static_cast<float>(row) * -spacing),
+        //         0.f,
         //     };
 
         //     obj.set<atlas::transform>({
@@ -84,6 +98,13 @@ public:
         //     obj.set<atlas::mesh_source>({
         //         .model_path = "assets/models/Ball OBJ.obj",
         //         .diffuse = "assets/models/clear.png",
+        //     });
+
+        //     obj.set<atlas::physics_body>({
+        //         .body_movement_type = atlas::body_type::dynamic,
+        //     });
+        //     obj.set<atlas::sphere_collider>({
+        //         .radius = 1.f,
         //     });
         // }
 
@@ -180,6 +201,8 @@ public:
 
     void ui_update() {
     }
+
+    
 private:
     std::optional<atlas::game_object> m_editor_camera;
     float m_movement_speed = 10.f;

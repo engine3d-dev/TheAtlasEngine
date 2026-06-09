@@ -24,7 +24,7 @@ import atlas.core.scene.uuid;
 import atlas.core.level_streamer;
 import atlas.core.scene;
 import atlas.core.ui.widgets;
-
+import atlas.physics.engine;
 import atlas.core.ui.widgets.imgui_stdlib;
 
 import :level_scene;
@@ -34,6 +34,8 @@ import :utilities;
 
 import atlas.core.editor.dockspace;
 import atlas.core.editor.menu_item;
+import atlas.core.serialize;
+import atlas.physics.engine;
 import vk;
 
 enum scene_runtime : uint8_t { edit, play };
@@ -47,7 +49,7 @@ public:
                  const std::string& p_tag,
                  atlas::event::bus& p_bus,
                  atlas::level_streamer& p_level_streamer)
-      : atlas::world(p_tag, p_level_streamer) {
+      : atlas::world(p_tag, p_level_streamer), m_bus(&p_bus) {
         m_device = p_context->logical_device();
         // Create defualt scene to level streamer
         // Does polymorphic allocations for these customized scenes
@@ -64,8 +66,6 @@ public:
 
         m_editor_dockspace.fullscreen(false);
         m_editor_dockspace.dockspace_open(true);
-
-        std::println("Before loading play and stop icons!");
 
         m_host_bit = p_context->physical_device().memory_properties(
                                    vk::memory_property::host_visible_bit |
@@ -91,10 +91,28 @@ public:
             std::println("m_stop_icon not loaded!");
         }
 
+        atlas::register_start(this, &editor_world::preload_assets);
+        atlas::register_update(this, &editor_world::update);
+        atlas::register_physics(this, &editor_world::physics_update);
         atlas::register_ui(this, &editor_world::ui_update);
     }
 
     ~editor_world() override = default;
+
+
+    void preload_assets() {
+        // m_deserializer_test = atlas::serializer();
+
+        // if (!m_deserializer_test.load("LevelScene-small", *m_current_scene)) {
+        //     console_log_error("Could not load yaml file LevelScene!!!");
+        // }
+
+        m_physics_engine = atlas::physics::engine(*m_current_scene, *m_bus);
+    }
+
+    void update(float p_delta_time) {
+        m_delta_time = p_delta_time;
+    }
 
     void ui_update() {
         // setting up the dockspace UI widgets at the window toolbar
@@ -148,7 +166,8 @@ public:
 
     void scene_heirarchy_panel() {
         if (ImGui::Begin("Scene Heirarchy")) {
-
+            m_current_scene->defer_begin();
+            
             auto query_all_transforms = m_current_scene->query_builder<atlas::transform>().build();
 
             query_all_transforms.each([&](flecs::entity p_entity, atlas::transform&){
@@ -211,6 +230,9 @@ public:
                     ImGui::TreePop();
                 }
             });
+
+
+            m_current_scene->defer_end();
 
             ImGui::End();
         }
@@ -304,12 +326,10 @@ public:
                           "Kinematic",
                           "Dynamic",
                       };
-                      std::string combo_preview =
-                        items[p_body->body_movement_type];
 
                       // Begin the combo box
                       if (ImGui::BeginCombo("Body Type",
-                                            combo_preview.data())) {
+                                            items[p_body->body_movement_type].data())) {
                           for (int n = 0; n < 3; n++) {
                               // Check if the current item is selected
                               const bool is_selected =
@@ -434,11 +454,11 @@ public:
                                 ImVec2(1, 1))) {
                 if (m_scene_state == scene_runtime::edit) {
                     m_scene_state = scene_runtime::play;
-                    // m_physics_engine.start();
+                    m_physics_engine.start();
                 }
                 else if (m_scene_state == scene_runtime::play) {
                     m_scene_state = scene_runtime::edit;
-                    // m_physics_engine.stop();
+                    m_physics_engine.stop();
                     // reset_objects();
                 }
             }
@@ -449,6 +469,12 @@ public:
         }
     }
 
+    void physics_update() {
+        if (m_scene_state == scene_runtime::play) {
+            m_physics_engine.update(m_delta_time);
+        }
+    }
+
 
     void destruct() {
         m_play_icon.destroy();
@@ -456,6 +482,10 @@ public:
     }
 
 private:
+    atlas::event::bus* m_bus=nullptr;
+    float m_delta_time;
+    atlas::physics::engine m_physics_engine;
+    atlas::serializer m_deserializer_test;
     // Bit for setting vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit
     uint32_t m_host_bit = 0;
     float m_movement_speed = 10.f;
