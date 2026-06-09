@@ -1,5 +1,6 @@
 module;
 
+#include <memory>
 #include <string>
 #include <filesystem>
 #include <imgui.h>
@@ -9,58 +10,28 @@ module;
 export module editor:content_browser;
 
 import atlas.logger;
-import atlas.drivers.vulkan.imgui_context;
+import atlas.drivers.vulkan;
 import atlas.drivers.vulkan.stb_image;
 import vk;
+import :icon;
 
 export class content_browser_panel {
 public:
     content_browser_panel() = default;
 
     content_browser_panel(
-      const VkDevice& p_device,
+      std::shared_ptr<vk::device> p_device,
       uint32_t p_memory_properties) {
-        vk::texture_params config_texture = {
-            .memory_mask = p_memory_properties,
-        };
+        /*NOLINT*/m_device = p_device;
 
-        atlas::vulkan::stb_image play_button("assets/icons/FileIcon.png", config_texture);
-        m_file_icon = vk::texture(p_device, &play_button, config_texture);
-        // if (!m_file_icon.loaded()) {
-        //     console_log_info("Play Button Could not be loaded!!");
-        // }
-        config_texture = {
-            .memory_mask = p_memory_properties,
-        };
+        m_directory_icon = ui::experimental::icon(m_device, p_memory_properties,
+                                 "assets/icons/DirectoryIcon.png");
 
-        atlas::vulkan::stb_image file_icon("assets/icons/FileIcon.png", config_texture);
-        m_directory_icon = vk::texture(p_device, &file_icon, config_texture);
-        // if (!m_directory_icon.loaded()) {
-        //     console_log_info("Stop Button Could not be loaded!!");
-        // }
-        config_texture = {
-            .memory_mask = p_memory_properties,
-        };
+        m_file_icon = ui::experimental::icon(m_device, p_memory_properties,
+                                 "assets/icons/FileIcon.png");
 
-        atlas::vulkan::stb_image back_icon("assets/icons/Back.png", config_texture);
-        m_back_icon = vk::texture(p_device, &back_icon, config_texture);
-        // if (!back_icon.loaded()) {
-        //     console_log_info("Stop Button Could not be loaded!!");
-        // }
-
-        m_file_icon_id = static_cast<ImTextureID>(ImGui_ImplVulkan_AddTexture(
-          m_file_icon.image().sampler(),
-          m_file_icon.image().image_view(),
-          VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
-        m_directory_icon_id =
-          static_cast<ImTextureID>(ImGui_ImplVulkan_AddTexture(
-            m_directory_icon.image().sampler(),
-            m_directory_icon.image().image_view(),
-            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
-        m_back_icon_id = static_cast<ImTextureID>(ImGui_ImplVulkan_AddTexture(
-          m_back_icon.image().sampler(),
-          m_back_icon.image().image_view(),
-          VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
+        m_back_icon = ui::experimental::icon(m_device, p_memory_properties,
+                                 "assets/icons/Back.png");
     }
 
     void run() {
@@ -70,7 +41,7 @@ public:
                 //     m_current_directory = m_current_directory.parent_path();
                 // }
                 if (ImGui::ImageButton(
-                      "##BackButton", m_back_icon_id, ImVec2(10, 10))) {
+                      "##BackButton", m_back_icon.texture_id(), ImVec2(10, 10))) {
                     m_current_directory = m_current_directory.parent_path();
                 }
             }
@@ -80,13 +51,13 @@ public:
             float thumbnail_size = 86.96f; // originally 128.f
             float cell_size = thumbnail_size + padding;
 
-            float panelWidth = ImGui::GetContentRegionAvail().x;
-            int columnCount = (int)(panelWidth / cell_size);
+            float panel_width = ImGui::GetContentRegionAvail().x;
+            int column_count = static_cast<int>(panel_width / cell_size);
 
-            if (columnCount < 1)
-                columnCount = 1;
+            if (column_count < 1)
+                column_count = 1;
 
-            ImGui::Columns(columnCount, 0, false);
+            ImGui::Columns(column_count, nullptr, false);
 
             // @note First, list all files in directory
             //
@@ -105,16 +76,11 @@ public:
                 std::string filename = relative_path.filename().string();
 
                 ImGui::PushID(filename.c_str());
-                // Ref<Texture2D> icon = dir_entry.is_directory() ?
-                // _directoryIcon : _fileIcon;
-                ImTextureID icon = dir_entry.is_directory()
-                                     ? m_directory_icon_id
-                                     : m_file_icon_id;
+                VkDescriptorSet icon = dir_entry.is_directory()
+                                     ? m_directory_icon.texture_id()
+                                     : m_file_icon.texture_id();
                 ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
 
-                // ImGui::ImageButton(reinterpret_cast<void
-                // *>(icon->getRendererID()), {thumbnail_size, thumbnail_size},
-                // { 0, 1 }, { 1, 0});
                 ImGui::ImageButton("##Button",
                                    icon,
                                    ImVec2(thumbnail_size, thumbnail_size),
@@ -122,11 +88,11 @@ public:
                                    { 0, 1 });
 
                 if (ImGui::BeginDragDropSource()) {
-                    std::string itemPath = relative_path.string();
-                    // @note keep in mind sizeof(itemPath) is in bytes
+                    std::string item_path = relative_path.string();
+                    // @note keep in mind sizeof(item_path) is in bytes
                     ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM",
-                                              itemPath.c_str(),
-                                              itemPath.size());
+                                              item_path.c_str(),
+                                              item_path.size());
                     ImGui::EndDragDropSource();
                 }
 
@@ -145,27 +111,21 @@ public:
                 ImGui::PopID();
             }
 
-            // ImGui::Columns(1);
-            // ImGui::SliderFloat("Thumnail Size", &thumbnail_size, 16, 512);
-            // ImGui::SliderFloat("Padding", &padding, 0, 32);
-
             ImGui::End();
         }
     }
 
     void destroy() {
-        m_file_icon.destruct();
-        m_directory_icon.destruct();
-        m_back_icon.destruct();
+        m_file_icon.destroy();
+        m_directory_icon.destroy();
+        m_back_icon.destroy();
     }
 
 private:
-    vk::texture m_file_icon;
-    vk::texture m_directory_icon;
-    vk::texture m_back_icon;
-    ImTextureID m_file_icon_id;
-    ImTextureID m_directory_icon_id;
-    ImTextureID m_back_icon_id;
+    std::shared_ptr<vk::device> m_device;
+    ui::experimental::icon m_back_icon;
+    ui::experimental::icon m_directory_icon;
+    ui::experimental::icon m_file_icon;
     std::filesystem::path m_asset_path =
       std::filesystem::current_path() / "assets";
     std::filesystem::path m_current_directory = m_asset_path;

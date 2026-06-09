@@ -30,6 +30,7 @@ import atlas.core.ui.widgets.imgui_stdlib;
 import :level_scene;
 import :icon;
 import :utilities;
+import :content_browser;
 // import :level_scene2;
 
 import atlas.core.editor.dockspace;
@@ -90,6 +91,9 @@ public:
         if(!m_stop_icon.loaded()) {
             std::println("m_stop_icon not loaded!");
         }
+
+
+        m_content_browser = content_browser_panel(m_device, m_host_bit);
 
         atlas::register_start(this, &editor_world::preload_assets);
         atlas::register_update(this, &editor_world::update);
@@ -156,7 +160,7 @@ public:
 
             materials_editor_panel();
 
-            content_browser_panel();
+            m_content_browser.run();
 
             ui_toolbar();
 
@@ -404,12 +408,6 @@ public:
         }
     }
 
-    void content_browser_panel() {
-        if (ImGui::Begin("Content Browser")) {
-            ImGui::End();
-        }
-    }
-
     void ui_toolbar() {
         ImGui::PushStyleVar(
           ImGuiStyleVar_WindowPadding,
@@ -497,4 +495,8 @@ private:
     atlas::ui::menu_item m_editor_menu;
     ui::experimental::icon m_play_icon;
     ui::experimental::icon m_stop_icon;
+    // content_browser_panel(
+    //   std::shared_ptr<vk::device> p_device,
+    //   uint32_t p_memory_properties) {
+    content_browser_panel m_content_browser;
 };
