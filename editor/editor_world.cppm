@@ -50,7 +50,8 @@ public:
                  const std::string& p_tag,
                  atlas::event::bus& p_bus,
                  atlas::level_streamer& p_level_streamer)
-      : atlas::world(p_tag, p_level_streamer), m_bus(&p_bus) {
+      : atlas::world(p_tag, p_level_streamer)
+      , m_bus(&p_bus) {
         m_device = p_context->logical_device();
         // Create defualt scene to level streamer
         // Does polymorphic allocations for these customized scenes
@@ -69,14 +70,13 @@ public:
         m_editor_dockspace.dockspace_open(true);
 
         m_host_bit = p_context->physical_device().memory_properties(
-                                   vk::memory_property::host_visible_bit |
-                                   vk::memory_property::host_cached_bit);
+          vk::memory_property::host_visible_bit |
+          vk::memory_property::host_coherent_bit);
         // Initializing icon.
-        m_play_icon =
-          ui::experimental::icon(m_device, m_host_bit,
-                                 "assets/icons/PlayButton.png");
+        m_play_icon = ui::experimental::icon(
+          m_device, m_host_bit, "assets/icons/PlayButton.png");
 
-        if(!m_play_icon.loaded()) {
+        if (!m_play_icon.loaded()) {
             std::println("m_play_icon not loaded!");
         }
 
@@ -84,14 +84,12 @@ public:
           ui::experimental::icon(m_device,
                                  p_context->physical_device().memory_properties(
                                    vk::memory_property::host_visible_bit |
-                                   vk::memory_property::host_cached_bit),
+                                   vk::memory_property::host_coherent_bit),
                                  "assets/icons/StopButton.png");
 
-
-        if(!m_stop_icon.loaded()) {
+        if (!m_stop_icon.loaded()) {
             std::println("m_stop_icon not loaded!");
         }
-
 
         m_content_browser = content_browser_panel(m_device, m_host_bit);
 
@@ -103,20 +101,18 @@ public:
 
     ~editor_world() override = default;
 
-
     void preload_assets() {
         // m_deserializer_test = atlas::serializer();
 
-        // if (!m_deserializer_test.load("LevelScene-small", *m_current_scene)) {
+        // if (!m_deserializer_test.load("LevelScene-small", *m_current_scene))
+        // {
         //     console_log_error("Could not load yaml file LevelScene!!!");
         // }
 
         m_physics_engine = atlas::physics::engine(*m_current_scene, *m_bus);
     }
 
-    void update(float p_delta_time) {
-        m_delta_time = p_delta_time;
-    }
+    void update(float p_delta_time) { m_delta_time = p_delta_time; }
 
     void ui_update() {
         // setting up the dockspace UI widgets at the window toolbar
@@ -171,10 +167,12 @@ public:
     void scene_heirarchy_panel() {
         if (ImGui::Begin("Scene Heirarchy")) {
             m_current_scene->defer_begin();
-            
-            auto query_all_transforms = m_current_scene->query_builder<atlas::transform>().build();
 
-            query_all_transforms.each([&](flecs::entity p_entity, atlas::transform&){
+            auto query_all_transforms =
+              m_current_scene->query_builder<atlas::transform>().build();
+
+            query_all_transforms.each([&](flecs::entity p_entity,
+                                          atlas::transform&) {
                 // We set the imgui flags for our scene heirarchy panel
                 // TODO -- Make the scene heirarchy panel a separate class that
                 // is used for specify the layout and other UI elements here
@@ -186,7 +184,7 @@ public:
                 flags |= ImGuiWindowFlags_Popup;
                 flags |= ImGuiTreeNodeFlags_AllowItemOverlap;
 
-                 bool opened = ImGui::TreeNodeEx(p_entity.name().c_str(), flags);
+                bool opened = ImGui::TreeNodeEx(p_entity.name().c_str(), flags);
 
                 if (ImGui::IsItemClicked()) {
                     m_selected_entity = p_entity;
@@ -235,7 +233,6 @@ public:
                 }
             });
 
-
             m_current_scene->defer_end();
 
             ImGui::End();
@@ -270,33 +267,35 @@ public:
                   "atlas::mesh_source",
                   m_selected_entity,
                   [](atlas::mesh_source* p_source) {
-                    //   if (ImGui::InputText(
-                    //         "Input Label",
-                    //         &p_source->model_path,
-                    //         ImGuiInputTextFlags_EnterReturnsTrue)) {
-                    //       console_log_info("mesh_src = {}",
-                    //                        p_source->model_path);
-                    //     //   atlas::event::mesh_reload reload_request = {
-                    //     //       .entity_id = m_selected_entity.id(),
-                    //     //       .filename = p_source->model_path,
-                    //     //   };
+                      //   if (ImGui::InputText(
+                      //         "Input Label",
+                      //         &p_source->model_path,
+                      //         ImGuiInputTextFlags_EnterReturnsTrue)) {
+                      //       console_log_info("mesh_src = {}",
+                      //                        p_source->model_path);
+                      //     //   atlas::event::mesh_reload reload_request = {
+                      //     //       .entity_id = m_selected_entity.id(),
+                      //     //       .filename = p_source->model_path,
+                      //     //   };
 
-                    //     //   if (std::filesystem::exists(p_source->model_path)) {
-                    //     //       signal(reload_request);
-                    //     //   }
-                    //   }
+                      //     //   if
+                      //     (std::filesystem::exists(p_source->model_path)) {
+                      //     //       signal(reload_request);
+                      //     //   }
+                      //   }
                       atlas::ui::draw_vec4("Color", p_source->color);
 
-                    //   if (ImGui::Button("Reload Material")) {
-                    //       atlas::event::material_reload
-                    //         // reload_material_request = {
-                    //         //     .entity_id = m_selected_entity.id(),
-                    //         //     .diffuse = "assets/models/viking_room.png",
-                    //         //     .specular = "",
-                    //         // };
+                      //   if (ImGui::Button("Reload Material")) {
+                      //       atlas::event::material_reload
+                      //         // reload_material_request = {
+                      //         //     .entity_id = m_selected_entity.id(),
+                      //         //     .diffuse =
+                      //         "assets/models/viking_room.png",
+                      //         //     .specular = "",
+                      //         // };
 
-                    //     //   signal(reload_material_request);
-                    //   }
+                      //     //   signal(reload_material_request);
+                      //   }
                   });
 
                 atlas::ui::draw_component<atlas::point_light>(
@@ -332,8 +331,9 @@ public:
                       };
 
                       // Begin the combo box
-                      if (ImGui::BeginCombo("Body Type",
-                                            items[p_body->body_movement_type].data())) {
+                      if (ImGui::BeginCombo(
+                            "Body Type",
+                            items[p_body->body_movement_type].data())) {
                           for (int n = 0; n < 3; n++) {
                               // Check if the current item is selected
                               const bool is_selected =
@@ -430,26 +430,26 @@ public:
         //     ImGui::End();
         // }
 
-        if(ImGui::Begin("##toolbox")) {
+        if (ImGui::Begin("##toolbox")) {
             VkDescriptorSet button_id = (m_scene_state == scene_runtime::edit)
-                                        ? m_play_icon.texture_id()
-                                        : m_stop_icon.texture_id();
+                                          ? m_play_icon.texture_id()
+                                          : m_stop_icon.texture_id();
 
             /**
-            * @note GetWindowContentRegionMax().x is how much space is there for
-            * content (widgets)
-            * @note 0.5f is the offset for padding.
-            * @note takes button size and halves it and makes the offset the center
-            * of that tab. (centering  buttons)
-            */
+             * @note GetWindowContentRegionMax().x is how much space is there
+             * for content (widgets)
+             * @note 0.5f is the offset for padding.
+             * @note takes button size and halves it and makes the offset the
+             * center of that tab. (centering  buttons)
+             */
             ImGui::SameLine((ImGui::GetWindowContentRegionMax().x * 0.5f) -
                             (button_size * 0.5f));
 
             if (ImGui::ImageButton("##Button",
-                                button_id,
-                                ImVec2{ button_size, button_size },
-                                ImVec2(0, 0),
-                                ImVec2(1, 1))) {
+                                   button_id,
+                                   ImVec2{ button_size, button_size },
+                                   ImVec2(0, 0),
+                                   ImVec2(1, 1))) {
                 if (m_scene_state == scene_runtime::edit) {
                     m_scene_state = scene_runtime::play;
                     m_physics_engine.start();
@@ -473,18 +473,16 @@ public:
         }
     }
 
-
     void destruct() {
         m_play_icon.destroy();
         m_stop_icon.destroy();
     }
 
 private:
-    atlas::event::bus* m_bus=nullptr;
+    atlas::event::bus* m_bus = nullptr;
     float m_delta_time;
     atlas::physics::engine m_physics_engine;
     atlas::serializer m_deserializer_test;
-    // Bit for setting vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit
     uint32_t m_host_bit = 0;
     float m_movement_speed = 10.f;
     flecs::entity m_selected_entity;
