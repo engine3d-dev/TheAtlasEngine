@@ -24,6 +24,8 @@ import atlas.core.scene.components;
 import atlas.core.utilities;
 import atlas.core.math;
 
+import atlas.drivers.vulkan;
+
 export class level_scene final : public atlas::scene {
 public:
     level_scene(const std::string& p_name, atlas::event::bus& p_bus)
@@ -88,6 +90,7 @@ public:
         atlas::register_start(this, &level_scene::start);
         atlas::register_physics(this, &level_scene::physics_update);
         atlas::register_update(this, &level_scene::on_update);
+        atlas::register_ui(this, &level_scene::ui_update);
     }
 
     ~level_scene() override = default;
@@ -175,6 +178,8 @@ public:
     // fixed-update framerate
     void physics_update() {}
 
+    void ui_update() {
+    }
 private:
     std::optional<atlas::game_object> m_editor_camera;
     float m_movement_speed = 10.f;

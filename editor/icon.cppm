@@ -10,9 +10,8 @@ module;
 export module editor:icon;
 
 import atlas.core.utilities;
-import atlas.drivers.vulkan.physical_device;
-import atlas.drivers.vulkan.stb_image;
 import vk;
+import atlas.drivers.vulkan.stb_image;
 
 export namespace ui::experimental {
     /**
@@ -25,13 +24,10 @@ export namespace ui::experimental {
     class icon {
     public:
         icon() = default;
-        icon(const VkDevice& p_device,
+        icon(/*NOLINT*/std::shared_ptr<vk::device> p_device,
              uint32_t p_memory_properties,
              const std::filesystem::path& p_filename) {
-            // vk::texture_info config_texture = {
-            //     .phsyical_memory_properties = p_memory_properties,
-            //     .filepath = p_filename
-            // };
+            /*NOLINT*/m_device = p_device;
             vk::texture_params config_texture = {
                 // .memory_mask = physical_device.memory_properties(
                 // vk::memory_property::host_visible_bit |
@@ -39,48 +35,49 @@ export namespace ui::experimental {
                 .memory_mask = p_memory_properties,
             };
 
-            atlas::vulkan::stb_image image(p_filename.string(), config_texture);
-            m_icon_image = vk::texture(p_device, &image, config_texture);
-            if (!m_icon_image.loaded()) {
-                console_log_info("Play Button Could not be loaded!!");
-            }
+            atlas::stb_image image(p_filename.string(), config_texture);
+            m_icon_image = vk::texture(*m_device, &image, config_texture);
 
             m_extent = image.extent();
             m_icon_image_id =
-              static_cast<ImTextureID>(ImGui_ImplVulkan_AddTexture(
+              ImGui_ImplVulkan_AddTexture(
                 m_icon_image.image().sampler(),
                 m_icon_image.image().image_view(),
-                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
+                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
         }
 
-        icon(const VkDevice& p_device,
+        icon(/*NOLINT*/std::shared_ptr<vk::device> p_device,
              uint32_t p_memory_properties,
              const vk::image_extent& p_extent, std::span<const uint8_t> p_data) {
+            /*NOLINT*/ m_device = p_device;
             m_extent = p_extent;
-            m_icon_image = vk::texture(p_device, p_extent, p_data, p_memory_properties);
+            m_icon_image = vk::texture(*m_device, p_extent, p_data, p_memory_properties);
             m_icon_image_id =
-              static_cast<ImTextureID>(ImGui_ImplVulkan_AddTexture(
+              ImGui_ImplVulkan_AddTexture(
                 m_icon_image.image().sampler(),
                 m_icon_image.image().image_view(),
-                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
+                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
         }
 
-        ~icon() {
-            // implicitly destroy
-            // destroy();
+        ~icon() = default;
+
+
+        [[nodiscard]] bool loaded() const {
+            return m_icon_image.loaded();
         }
 
         [[nodiscard]] uint32_t width() const { return m_extent.width; }
 
         [[nodiscard]] uint32_t height() const { return m_extent.height; }
 
-        [[nodiscard]] ImTextureID texture_id() const { return m_icon_image_id; }
+        [[nodiscard]] VkDescriptorSet texture_id() const { return m_icon_image_id; }
 
         void destroy() { m_icon_image.destruct(); }
 
     private:
+        std::shared_ptr<vk::device> m_device;
         vk::image_extent m_extent{};
         vk::texture m_icon_image;
-        ImTextureID m_icon_image_id;
+        VkDescriptorSet m_icon_image_id;
     };
 };

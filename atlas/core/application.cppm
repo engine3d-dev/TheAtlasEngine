@@ -392,6 +392,8 @@ export namespace atlas {
                 current.begin_rendering(present_begin_params);
                 m_imgui_context->begin();
                 m_imgui_context->set_current_command(current);
+
+                invoke_ui_update(m_world.get());
                 invoke_ui_update(m_current_scene.get());
                 m_imgui_context->end();
                 current.end_rendering();

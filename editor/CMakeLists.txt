@@ -13,7 +13,7 @@ target_sources(editor PUBLIC
     level_scene.cppm
     level_scene2.cppm
     # content_browser_panel.cppm
-    # icon.cppm
+    icon.cppm
     # utilities.cppm
 )
 
