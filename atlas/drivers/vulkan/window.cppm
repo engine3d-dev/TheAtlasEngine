@@ -64,7 +64,7 @@ export namespace atlas {
             };
 
             m_surface_properties =
-              p_context->physical_device().request_surface(*m_surface);
+              p_context->physical_device().request_surface(*m_surface, VK_FORMAT_B8G8R8A8_UNORM);
 
             m_swapchain =
               std::make_shared<vk::swapchain>(*p_context->logical_device(),
