@@ -330,7 +330,6 @@ export namespace atlas {
                 .view = p_view,
                 .proj = p_proj,
             };
-            scene_ubo.proj[1][1] *= -1;
 
             m_scene_uniforms.transfer<scene_uniforms>(std::span<scene_uniforms>(&scene_ubo, 1));
 
