@@ -120,15 +120,12 @@ public:
         atlas::transform* t = m_editor_camera->get_mut<atlas::transform>();
         float dt = p_delta_time;
 
-        // current default movement speed that does not applied modified speed
-        float default_speed = 10.f;
-        float rotation_speed = 1.f;
+        // movement speed -- higher the faster camera moves
+        float default_speed = 50.f;
         float velocity = default_speed * dt;
         if (atlas::event::is_mouse_pressed(mouse_button_middle)) {
             velocity = m_movement_speed * dt;
         }
-
-        float rotation_velocity = rotation_speed * dt;
 
         glm::quat to_quaternion = atlas::to_quat(t->quaternion);
 
@@ -161,22 +158,28 @@ public:
         }
 
         glm::vec2 current_cursor_pos = atlas::event::cursor_position();
+        if (m_is_first_frame) {
+            m_last_cursor_pos = current_cursor_pos;
+            m_is_first_frame = false;
+        }
+
         if(atlas::event::is_key_pressed(key_left_shift)) {
+            
+            // sensitivity is how fast the cursor rotates
+            float mouse_sensitivity = 0.01;
             glm::vec2 cursor_dt = current_cursor_pos - m_last_cursor_pos;
-            float mouse_sensitivity = 0.1;
+            m_last_cursor_pos = current_cursor_pos; // Store for next frame
 
-            // Update Euler angles
+            m_yaw -= (cursor_dt.x * mouse_sensitivity);
+            m_pitch -= (cursor_dt.y * mouse_sensitivity);
 
-            if(atlas::event::is_mouse_pressed(mouse_button_left)) {
-                t->rotation.y -= (cursor_dt.x * mouse_sensitivity) * rotation_velocity;
-            }
+            t->set_rotation(glm::vec3(m_pitch, m_yaw, 0.0f));
+        }
 
-            if(atlas::event::is_mouse_pressed(mouse_button_right)) {
-                t->rotation.x += (cursor_dt.y * mouse_sensitivity) * rotation_velocity;
-            }
-
-            // Clamp pitch to prevent the camera from flipping completely upside down (optional but recommended)
-            t->rotation.x = glm::clamp(t->rotation.x, -89.0f, 89.0f);
+        // The first frame when presseing left shift is to
+        // continue rotating the camera from where the original position left off
+        if(atlas::event::is_key_released(key_left_shift)) {
+            m_is_first_frame = true;
         }
 
         // Signal to trigger this kind of scene transition
@@ -188,13 +191,8 @@ public:
         //     };
         //     signal<atlas::event::scene_transition>(scene_transition);
         // }
-        t->set_rotation(t->rotation);
-
-        m_last_cursor_pos = current_cursor_pos;
     }
 
-    // TODO: Have this physics_update be executed during the physics
-    // fixed-update framerate
     void physics_update() {}
 
     void ui_update() {
@@ -205,4 +203,7 @@ private:
     std::optional<atlas::game_object> m_editor_camera;
     float m_movement_speed = 10.f;
     glm::vec2 m_last_cursor_pos{};
+    float m_yaw=0.f;
+    float m_pitch=0.f;
+    bool m_is_first_frame=true;
 };
