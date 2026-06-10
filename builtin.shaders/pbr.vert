@@ -24,10 +24,12 @@ layout(location = 0) out vec3 fragColor;
 layout(location = 1) out vec2 fragTexCoords;
 layout(location = 2) out vec3 fragNormals;
 layout(location = 3) out flat int fragDiffuseIdx;
+layout(location = 4) out flat int fragEnvironmentIdx;
 
 layout(buffer_reference, scalar) buffer readonly SceneUniforms {
     mat4 view;
     mat4 proj;
+    mat4 skybox_proj_view;
 };
 
 layout(buffer_reference, scalar) buffer ObjectsTable {
@@ -53,4 +55,5 @@ void main() {
     fragTexCoords = inTexCoords;
     fragNormals = inNormals;
     fragDiffuseIdx = push_const.diffuse_idx;
+    fragEnvironmentIdx = 0;
 }

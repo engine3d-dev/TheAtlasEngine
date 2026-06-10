@@ -24,6 +24,7 @@ import atlas.drivers.vulkan.stb_image;
 import atlas.core.utilities;
 
 import :graphics_context;
+import :environment_map;
 import vk;
 
 export namespace atlas {
@@ -84,6 +85,8 @@ export namespace atlas {
         render_context(/*NOLINT*/std::shared_ptr<graphics_context> p_context, VkFormat p_color_format, VkFormat p_depth_format) {
             m_physical = p_context->physical_device();
             m_device = p_context->logical_device();
+            m_color_format = p_color_format;
+            m_depth_format = p_depth_format;
 
             // Vertex Attributes Parameters
             std::array<vk::vertex_attribute_entry, 4> attribute_entries = {
@@ -138,7 +141,7 @@ export namespace atlas {
             // Configuring Descriptor Set 0 -- specify to vk::pipeline
             // Descriptor Set 0
             uint32_t max_descriptors = 1000;
-            std::array<vk::descriptor_entry, 1> entries_set1 = {
+            std::array<vk::descriptor_entry, 2> entries_set1 = {
                 vk::descriptor_entry{
                     // layout (set = 0, binding = 1) uniform sampler2D textures[];
                     .type = vk::descriptor_type::combined_image_sampler,
@@ -148,7 +151,17 @@ export namespace atlas {
                     },
                     .descriptor_count = max_descriptors,
                     .flags = vk::descriptor_bind_flags::partially_bound_bit |
-                            vk::descriptor_bind_flags::variable_descriptor_count_bit |
+                            vk::descriptor_bind_flags::update_after_bind,
+                },
+                vk::descriptor_entry{
+                    // layout (set = 0, binding = 2) uniform sampler2D environment_maps[];
+                    .type = vk::descriptor_type::combined_image_sampler,
+                    .binding_point = {
+                        .binding = 2,
+                        .stage = vk::shader_stage::fragment,
+                    },
+                    .descriptor_count = 100,
+                    .flags = vk::descriptor_bind_flags::partially_bound_bit |
                             vk::descriptor_bind_flags::update_after_bind,
                 }
             };
@@ -291,10 +304,25 @@ export namespace atlas {
             }
 
 
-            std::array<vk::write_image_descriptor, 1> set0_samples = {
+            // Loading environment maps
+            m_environment_map = environment_map(m_device, m_physical.value(), "assets/skybox/mirrored_hall_8k.hdr", m_color_format, m_depth_format);
+
+            vk::write_image environment_image = {
+                .sampler = m_environment_map.sampler(),
+                .view = m_environment_map.image_view(),
+                .layout = vk::image_layout::shader_read_only_optimal,
+            };
+            std::array<vk::write_image_descriptor, 2> set0_samples = {
+                // layout(set = 0, binding = 1) sampler2D[]
                 vk::write_image_descriptor{
                     .dst_binding = 1,
                     .sample_images = m_gpu_images,
+                },
+
+                // layout(set = 0, binding = 2) samplerCube[]
+                vk::write_image_descriptor{
+                    .dst_binding = 2,
+                    .sample_images = std::span<const vk::write_image>(&environment_image, 1),
                 }
             };
 
@@ -303,23 +331,10 @@ export namespace atlas {
         }
 
         void begin(const glm::mat4& p_proj, const glm::mat4& p_view) {
-            // vk::viewport_params viewport = {
-            //     .x = 0.0f,
-            //     .y = 0.0f,
-            //     .width = static_cast<float>(p_extent.width),
-            //     .height = static_cast<float>(p_extent.height),
-            //     .min_depth = 0.0f,
-            //     .max_depth = 1.0f,
-            // };
-            // m_current_command->set_viewport(0, 1, std::span<const vk::viewport_params>(&viewport, 1));
-
-            // vk::scissor_params scissor = {
-            //     .offset = { 0, 0 },
-            //     .extent = {static_cast<uint32_t>(p_extent.width), static_cast<uint32_t>(p_extent.height)},
-            // };
-            // m_current_command->set_scissor(0, 1, std::span<const vk::scissor_params>(&scissor, 1));
-
-            // m_current_command->begin_rendering(p_begin_params);
+            // Calculating skybox projection and view
+            // m_skybox_proj_view = p_proj * glm::mat4(glm::mat3(p_view));
+            m_projection = p_proj;
+            m_view = p_view;
 
             m_main_pipeline.bind(*m_current_command);
 
@@ -388,11 +403,18 @@ export namespace atlas {
                     vkCmdDraw(*m_current_command, mesh.vertices_size, 1, 0, 0);
                 }
             });
-            // m_current_command->end_rendering();
+
+
+
+            // Draw Environments
+            m_environment_map.begin(m_projection, m_view);
+
+            m_environment_map.end();
         }
 
         void set_command(vk::command_buffer& p_command) {
             m_current_command = &p_command;
+            m_environment_map.set_current_command(*m_current_command);
         }
 
         void current_scene(flecs::world& p_world) {
@@ -402,6 +424,8 @@ export namespace atlas {
         void destruct() {
             m_scene_uniforms.reset();
             m_object_model_uniforms.reset();
+
+            m_environment_map.destruct();
 
             // destroying vector<vk::texture>
             for(auto& image : m_gpu_textures) {
@@ -419,7 +443,11 @@ export namespace atlas {
         }
     
     private:
+        glm::mat4 m_projection;
+        glm::mat4 m_view;
         uint32_t m_format;
+        VkFormat m_color_format;
+        VkFormat m_depth_format;
         std::optional<vk::physical_device> m_physical;
         std::shared_ptr<vk::device> m_device;
         vk::command_buffer* m_current_command=nullptr;
@@ -460,5 +488,8 @@ export namespace atlas {
         vk::shader_stage m_stage;
 
         flecs::world* m_world=nullptr;
+
+        glm::mat4 m_skybox_proj_view;
+        environment_map m_environment_map;
     };
 };
