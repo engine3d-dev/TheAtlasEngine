@@ -163,7 +163,7 @@ public:
             m_is_first_frame = false;
         }
 
-        if(atlas::event::is_key_pressed(key_left_shift)) {
+        if(atlas::event::is_mouse_pressed(mouse_button_middle)) {
             
             // sensitivity is how fast the cursor rotates
             float mouse_sensitivity = 0.01;
@@ -178,7 +178,7 @@ public:
 
         // The first frame when presseing left shift is to
         // continue rotating the camera from where the original position left off
-        if(atlas::event::is_key_released(key_left_shift)) {
+        if(atlas::event::is_mouse_released(mouse_button_middle)) {
             m_is_first_frame = true;
         }
 
