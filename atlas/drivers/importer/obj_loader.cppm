@@ -36,7 +36,7 @@ namespace std {
 export namespace atlas {
     class obj_importer {
     public:
-        obj_importer(const std::string& p_path) {
+        obj_importer(const std::string& p_path, bool p_flip) : m_flip(p_flip) {
             m_load = load(p_path);
         }
 
@@ -84,11 +84,31 @@ export namespace atlas {
                         };
                     }
 
-                    if (index.texcoord_index >= 0) {
-                        vertex.uv = {
-                            attrib.texcoords[2 * index.texcoord_index + 0],
-                            1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
+                    if (!attrib.texcoords.empty()) {
+                        glm::vec2 flipped_uv = {
+                            attrib.texcoords[static_cast<long long>(
+                                               index.texcoord_index) *
+                                             2],
+                            1.0f - attrib.texcoords[static_cast<long long>(
+                                                      index.texcoord_index) *
+                                                      2 +
+                                                    1],
                         };
+
+                        glm::vec2 original_uv = {
+                            attrib.texcoords[static_cast<long long>(
+                                               index.texcoord_index) *
+                                             2],
+                            attrib.texcoords[static_cast<long long>(
+                                               index.texcoord_index) *
+                                               2 +
+                                             1],
+                        };
+
+                        vertex.uv = m_flip ? flipped_uv : original_uv;
+                    }
+                    else {
+                        vertex.uv = glm::vec2(0.f, 0.f);
                     }
 
                     if (!unique_vertices.contains(vertex)) {
@@ -121,6 +141,7 @@ export namespace atlas {
     private:
         std::vector<vk::vertex_input> m_vertices;
         std::vector<uint32_t> m_indices;
+        bool m_flip=false;
         bool m_load=false;
     };
 };

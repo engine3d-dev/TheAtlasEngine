@@ -46,7 +46,8 @@ export namespace atlas {
         uint64_t scene_address=0;
         uint64_t model_mat_array_address=0;
         uint32_t model_idx=0;
-        uint32_t material_address=0;
+        uint32_t diffuse_idx=0;
+        uint32_t specular_idx=0;
     };
 
     struct scene_uniforms {
@@ -60,6 +61,7 @@ export namespace atlas {
 
     struct gpu_material {
         uint64_t diffuse_idx=0;
+        uint64_t specular_idx=0;
     };
 
 
@@ -256,7 +258,7 @@ export namespace atlas {
                 };
 
                 // importing .obj 3d models here
-                obj_importer importer(src->model_path);
+                obj_importer importer(src->model_path, src->flip);
                 gpu_mesh_data gpu_mesh{};
                 gpu_mesh.vertex = vk::vertex_buffer(*m_device, importer.vertices(), vertex_params);
                 gpu_mesh.index = vk::index_buffer(*m_device, importer.indices(), index_params);
@@ -280,18 +282,18 @@ export namespace atlas {
                     m_gpu_textures.emplace_back(*m_device, &diffuse_img, config_texture);
                 }
 
-                m_material_table.emplace(p_entity.id(), material);
-                /*
+                
                 if(!src->specular.empty()) {
                     std::println("Loading specular: {}", src->specular);
-                    gpu_image specular_store_image {
-                        .slot = m_texture_slot_index++,
-                        .texture_data = vk::texture(*m_device, &specular_img, config_texture),
-                    };
-
-                    m_gpu_storage_images.emplace(p_entity.id(), specular_store_image);
+                    // gpu_image specular_store_image {
+                    //     .slot = m_texture_slot_index++,
+                    //     .texture_data = vk::texture(*m_device, &specular_img, config_texture),
+                    // };
+                    material.specular_idx = m_texture_slot_index++;
+                    m_gpu_textures.emplace_back(*m_device, &specular_img, config_texture);
                 }
-                */
+
+                m_material_table.emplace(p_entity.id(), material);
             });
 
             // Preparing the texture data before we update descriptor set 0
@@ -397,7 +399,8 @@ export namespace atlas {
                     .scene_address = scene_ubo_address,
                     .model_mat_array_address = objects_ubo_address,
                     .model_idx = static_cast<uint32_t>(m_model_matrices_lookup[p_entity.id()]),
-                    .material_address = static_cast<uint32_t>(m_material_table[p_entity.id()].diffuse_idx),
+                    .diffuse_idx = static_cast<uint32_t>(m_material_table[p_entity.id()].diffuse_idx),
+                    .specular_idx = static_cast<uint32_t>(m_material_table[p_entity.id()].specular_idx),
                 };
 
                 m_main_pipeline.push_constant<push_constant_data>(*m_current_command, push, m_stage, 0);

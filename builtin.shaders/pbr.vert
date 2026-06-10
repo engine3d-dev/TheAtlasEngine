@@ -24,6 +24,16 @@ layout(location = 0) out vec3 fragColor;
 layout(location = 1) out vec2 fragTexCoords;
 layout(location = 2) out vec3 fragNormals;
 layout(location = 3) out flat int fragDiffuseIdx;
+layout(location = 4) out flat int fragSpecularIdx;
+
+// struct material {
+//     int diffuse_idx;
+//     int specular_idx;
+// };
+
+// layout(bufer_reference, scalar) buffer readonly MaterialUniforms {
+//     material materials[];
+// };
 
 layout(buffer_reference, scalar) buffer readonly SceneUniforms {
     mat4 view;
@@ -39,6 +49,7 @@ layout(push_constant) uniform Constants {
     ObjectsTable objects;
     int model_matrix_idx;
     int diffuse_idx;
+    int specular_idx;
 } push_const;
 
 
@@ -53,4 +64,5 @@ void main() {
     fragTexCoords = inTexCoords;
     fragNormals = inNormals;
     fragDiffuseIdx = push_const.diffuse_idx;
+    fragSpecularIdx = push_const.specular_idx;
 }

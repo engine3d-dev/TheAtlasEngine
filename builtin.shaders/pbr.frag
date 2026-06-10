@@ -6,7 +6,7 @@ layout(location = 0) in vec3 fragColor;
 layout(location = 1) in vec2 fragTexCoords;
 layout(location = 2) in vec3 fragNormals;
 layout(location = 3) in flat int fragDiffuseIdx;
-// layout(location = 4) in flat int fragSpecularIdx;
+layout(location = 4) in flat int fragSpecularIdx;
 
 layout(location = 0) out vec4 outColor;
 
@@ -25,7 +25,7 @@ vec2 SampleEquirectangular(vec3 v) {
 void main() {
     vec3 color = fragColor;
     vec4 diffuse = texture(textures[nonuniformEXT(fragDiffuseIdx)], fragTexCoords);
-    // vec4 specular = texture(textures[nonuniformEXT(fragSpecularIdx)], fragTexCoords);
+    vec4 specular = texture(textures[nonuniformEXT(fragSpecularIdx)], fragTexCoords);
 
     vec3 albedo = diffuse.rgb;
     // Map the surface normal direction to the HDR map to get diffuse ambient light
