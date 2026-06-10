@@ -243,6 +243,8 @@ export namespace atlas {
             all_meshes.each([this](flecs::entity p_entity){
                 const mesh_source* src = p_entity.get<mesh_source>();
 
+                std::println("ID {}: prebake(): {}",p_entity.id(), src->model_path);
+                
                 vk::buffer_parameters vertex_params = {
                     .memory_mask = m_physical->memory_properties(vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit),
                     .usage = vk::buffer_usage::transfer_dst_bit | vk::buffer_usage::vertex_buffer_bit,
@@ -304,8 +306,16 @@ export namespace atlas {
             }
 
 
-            // Loading environment maps
-            m_environment_map = environment_map(m_device, m_physical.value(), "assets/skybox/mirrored_hall_8k.hdr", m_color_format, m_depth_format);
+            // Ensure that we load the environment
+            // We should never load an invalid environment
+            if(m_world->has<environment>()) {
+                const environment* environment_data = m_world->get<environment>();
+                m_environment_map = environment_map(m_device, m_physical.value(), environment_data->filepath, m_color_format, m_depth_format);
+            }
+            else {
+                std::array<float, 4> black_color = {0.f, 0.f, 0.f, 0.f};
+                m_environment_map = environment_map(m_device, m_physical.value(), black_color, vk::image_extent{.width=1, .height=1}, m_color_format, m_depth_format);
+            }
 
             vk::write_image environment_image = {
                 .sampler = m_environment_map.sampler(),

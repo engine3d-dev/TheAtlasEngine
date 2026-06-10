@@ -92,13 +92,15 @@ namespace atlas {
 
         // Deserialize atlas::material component
         if (p_entity_value["Mesh Source"]) {
-            auto perspective_camera_data = p_entity_value["Mesh Source"];
-            p_deserialize_to_object.set<mesh_source>({
-              .model_path =
-                perspective_camera_data["Model Path"].as<std::string>(),
-              .diffuse = perspective_camera_data["Diffuse"].as<std::string>(),
-              .specular = perspective_camera_data["Specular"].as<std::string>(),
-            });
+            auto mesh = p_entity_value["Mesh Source"];
+            if(!mesh["Model Path"].as<std::string>().empty()) {
+                p_deserialize_to_object.set<mesh_source>({
+                    .model_path =
+                        mesh["Model Path"].as<std::string>(),
+                    .diffuse = mesh["Diffuse"].as<std::string>(),
+                    .specular = mesh["Specular"].as<std::string>(),
+                });
+            }
         }
 
         if (p_entity_value["Point Light"]) {
@@ -236,15 +238,17 @@ namespace atlas {
             }
 
             // console_log_info("Before loading environment mappings!");
-            // std::string environment_map_data = "";
-            // if (data["Environment"]) {
-            //     environment_map_data = data["Environment"].as<std::string>();
+            std::string environment_map_data = "";
+            if (data["Environment"]) {
+                environment_map_data = data["Environment"].as<std::string>();
 
-            //     console_log_info("Environment Map Loaded Path (from yaml): {}",
-            //                      environment_map_data);
-            // }
+                console_log_info("Environment Map Loaded Path (from yaml): {}",
+                                 environment_map_data);
+            }
 
-            // p_registry.set<environment>({ .filepath = environment_map_data });
+            if(!environment_map_data.empty()) {
+                p_registry.set<environment>({ .filepath = environment_map_data });
+            }
 
             YAML::Node entity_objects = data["Entities"];
 

@@ -54,6 +54,16 @@ public:
         construct(p_filename);
     }
 
+    environment_map(std::shared_ptr<vk::device> p_device,
+                    vk::physical_device& p_physical,
+                    std::span<const float> p_color, const vk::image_extent& p_extent, /*NOLINT*/VkFormat p_color_format, VkFormat p_depth_format) : m_color_format(p_color_format), m_depth_format(p_depth_format) {
+        /*NOLINT*/ m_device = p_device;
+        m_physical = p_physical;
+        m_memory_mask = m_physical->memory_properties(vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit);
+
+        construct(p_color, p_extent);
+    }
+
     void construct(const std::string& p_filename) {
         bool res = create_hdr(p_filename);
 
@@ -63,6 +73,19 @@ public:
 
         if (res) {
             std::println("Loaded succesfully: {}", p_filename);
+        }
+        create_pipelines();
+    }
+
+    void construct(std::span<const float> p_color, const vk::image_extent& p_extent) {
+        bool res = create_hdr(p_color, p_extent);
+
+        if (!res) {
+            std::println("Cannot load environment");
+        }
+
+        if (res) {
+            std::println("Loaded succesfully raw pixels successfully");
         }
         create_pipelines();
     }
@@ -164,6 +187,93 @@ public:
         upload_cmd.destruct();
         staging_buffer.destruct();
         stbi_set_flip_vertically_on_load(false);
+
+        return true;
+    }
+
+    bool create_hdr(std::span<const float> p_colors, const vk::image_extent& p_extent) {
+
+        VkFormat texture_format = VK_FORMAT_R32G32B32A32_SFLOAT;
+        const uint64_t bytes_per_pixel_channel = 16; // float are 4 bytes
+        const uint64_t total_size_bytes =
+          static_cast<uint64_t>(static_cast<uint64_t>(p_extent.width) * p_extent.height * bytes_per_pixel_channel);
+        const uint64_t image_size = total_size_bytes;
+
+        vk::buffer_parameters staging_params = {
+            .memory_mask = m_memory_mask,
+            .usage = vk::buffer_usage::transfer_src_bit,
+        };
+
+        vk::buffer staging_buffer =
+          vk::buffer(*m_device, image_size, staging_params);
+
+        // Creating image handle to storing the HDR
+        vk::image_params skybox_params = {
+            .extent = { .width = static_cast<uint32_t>(p_extent.width), .height = static_cast<uint32_t>(p_extent.height), },
+            .format = texture_format,
+            .memory_mask = m_memory_mask,
+            // .property = vk::memory_property::device_local_bit,
+            .aspect = vk::image_aspect_flags::color_bit,
+            .usage = vk::image_usage::transfer_dst_bit |
+                        vk::image_usage::sampled_bit,
+            // .view_type = VK_IMAGE_VIEW_TYPE_CUBE,
+        };
+        m_skybox_image = vk::sample_image(*m_device, skybox_params);
+
+        // Transferring data from the CPU
+        std::span<const uint8_t> pixels_data(
+          reinterpret_cast<const uint8_t*>(p_colors.data()), image_size);
+        staging_buffer.transfer(pixels_data);
+
+
+        // 6. Record and Execute Upload
+        vk::command_params upload_params = {
+            .levels = vk::command_levels::primary,
+            .queue_index = 0, // Graphics Queue
+            .flags = vk::command_pool_flags::reset,
+        };
+        vk::command_buffer upload_cmd(*m_device, upload_params);
+
+        upload_cmd.begin(vk::command_usage::one_time_submit);
+
+        // Begin Memory Barrier: Undefined to TRANSFER_DST
+        m_skybox_image.memory_barrier(upload_cmd,
+                                      texture_format,
+                                      VK_IMAGE_LAYOUT_UNDEFINED,
+                                      VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+
+        vk::buffer_image_copy image_copy{
+            .image_offset = { .width = 0, .height = 0, .depth = 0, },
+            .image_extent = skybox_params.extent,
+        };
+        staging_buffer.copy_to_image(
+          upload_cmd,
+          m_skybox_image,
+          std::span<const vk::buffer_image_copy>(&image_copy, 1));
+
+        // Begin Memory Barrier: TRANSFER_DST to SHADER_READ_ONLY
+        m_skybox_image.memory_barrier(upload_cmd,
+                                      texture_format,
+                                      VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                                      VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+        upload_cmd.end();
+
+        VkQueue graphics_queue;
+        vkGetDeviceQueue(*m_device, 0, 0, &graphics_queue);
+
+        VkCommandBuffer raw_cmd = upload_cmd;
+        VkSubmitInfo submit_info = {
+            .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+            .commandBufferCount = 1,
+            .pCommandBuffers = &raw_cmd,
+        };
+
+        vkQueueSubmit(graphics_queue, 1, &submit_info, nullptr);
+        vkQueueWaitIdle(graphics_queue);
+
+        upload_cmd.destruct();
+        staging_buffer.destruct();
 
         return true;
     }

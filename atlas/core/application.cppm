@@ -207,13 +207,13 @@ export namespace atlas {
                   p_pair->view = glm::inverse(p_pair->view);
               });
 
-            // Setting the current scene for the renderer to start rendering the
-            // objects
-            m_render_context.current_scene(*m_current_scene);
-
             auto start_time = std::chrono::high_resolution_clock::now();
             invoke_start(m_world.get());
             invoke_start(m_current_scene.get());
+
+            // Setting the current scene for the renderer to start rendering the
+            // objects
+            m_render_context.current_scene(*m_current_scene);
 
             // Querying editor cameras specific objects
             // Then using this to execute specific main cameras.

@@ -102,12 +102,12 @@ public:
     ~editor_world() override = default;
 
     void preload_assets() {
-        // m_deserializer_test = atlas::serializer();
+        m_deserializer_test = atlas::serializer();
 
-        // if (!m_deserializer_test.load("LevelScene-small", *m_current_scene))
-        // {
-        //     console_log_error("Could not load yaml file LevelScene!!!");
-        // }
+        if (!m_deserializer_test.load("LevelScene", *m_current_scene))
+        {
+            console_log_error("Could not load yaml file LevelScene!!!");
+        }
 
         m_physics_engine = atlas::physics::engine(*m_current_scene, *m_bus);
     }
@@ -457,7 +457,10 @@ public:
                 else if (m_scene_state == scene_runtime::play) {
                     m_scene_state = scene_runtime::edit;
                     m_physics_engine.stop();
-                    // reset_objects();
+
+                    if (!m_deserializer_test.load("LevelScene", *m_current_scene)) {
+                        console_log_error("Could not load yaml file LevelScene!!!");
+                    }
                 }
             }
 
