@@ -491,7 +491,6 @@ export namespace atlas {
 
         flecs::world* m_world=nullptr;
 
-        glm::mat4 m_skybox_proj_view;
         environment_map m_environment_map;
     };
 };
