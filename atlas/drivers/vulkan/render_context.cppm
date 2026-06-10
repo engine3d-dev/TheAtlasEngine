@@ -154,13 +154,13 @@ export namespace atlas {
                             vk::descriptor_bind_flags::update_after_bind,
                 },
                 vk::descriptor_entry{
-                    // layout (set = 0, binding = 2) uniform sampler2D environment_maps[];
+                    // layout (set = 0, binding = 2) uniform sampler2D environment_map;
                     .type = vk::descriptor_type::combined_image_sampler,
                     .binding_point = {
                         .binding = 2,
                         .stage = vk::shader_stage::fragment,
                     },
-                    .descriptor_count = 100,
+                    .descriptor_count = 1,
                     .flags = vk::descriptor_bind_flags::partially_bound_bit |
                             vk::descriptor_bind_flags::update_after_bind,
                 }
@@ -318,13 +318,15 @@ export namespace atlas {
                     .dst_binding = 1,
                     .sample_images = m_gpu_images,
                 },
-
-                // layout(set = 0, binding = 2) samplerCube[]
+                // layout(set = 0, binding = 2) sampler2D environment;
                 vk::write_image_descriptor{
                     .dst_binding = 2,
                     .sample_images = std::span<const vk::write_image>(&environment_image, 1),
                 }
             };
+
+
+            
 
             m_set0_resource.update({}, set0_samples);
 
