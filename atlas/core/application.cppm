@@ -59,7 +59,7 @@ export namespace atlas {
             m_device = p_context->logical_device();
 
             // Constructing the application
-            window_params params = {
+            m_window_params = {
                 .width = p_params.width,
                 .height = p_params.height,
                 .name = p_params.name,
@@ -67,9 +67,9 @@ export namespace atlas {
             
             // m_window = std::allocate_shared<window>(,
             // m_context->instance_handle(), params);
-            m_window = std::make_shared<window>(p_context, params);
+            m_window = std::make_shared<window>(p_context, m_window_params);
 
-            m_aspect_ratio = static_cast<float>(params.width) / static_cast<float>(params.height);
+            m_aspect_ratio = static_cast<float>(m_window_params.width) / static_cast<float>(m_window_params.height);
             event::set_window_size(m_window->glfw_window());
 
             m_bus->create_listener<atlas::event::collision_enter>();
@@ -155,7 +155,7 @@ export namespace atlas {
                                 // VK_FORMAT_B8G8R8A8_UNORM,
                                 m_color_format,
                                 m_depth_format,
-                                params);
+                                m_window_params);
             std::println("images.size() = {}", images.size());
 
             m_window->center_window();
@@ -306,7 +306,7 @@ export namespace atlas {
                 };
 
                 vk::rendering_begin_parameters ui_begin_params = {
-                    .render_area = { { 0, 0 }, { m_window->extent().width, m_window->extent().height }, },
+                    .render_area = { { 0, 0 }, { m_window_params.width, m_window_params.height }, },
                     .layer_count = 1,
                     .color_attachments = std::span<const vk::rendering_attachment>(
                     &ui_color_render_attachment, 1),
@@ -317,8 +317,8 @@ export namespace atlas {
                 vk::viewport_params viewport = {
                     .x = 0.0f,
                     .y = 0.0f,
-                    .width = static_cast<float>(m_window->extent().width),
-                    .height = static_cast<float>(m_window->extent().height),
+                    .width = static_cast<float>(m_window_params.width),
+                    .height = static_cast<float>(m_window_params.height),
                     .min_depth = 0.0f,
                     .max_depth = 1.0f,
                 };
@@ -326,7 +326,7 @@ export namespace atlas {
 
                 vk::scissor_params scissor = {
                     .offset = { 0, 0 },
-                    .extent = {static_cast<uint32_t>(m_window->extent().width), static_cast<uint32_t>(m_window->extent().height)},
+                    .extent = {static_cast<uint32_t>(m_window_params.width), static_cast<uint32_t>(m_window_params.height)},
                 };
                 current.set_scissor(0, 1, std::span<const vk::scissor_params>(&scissor, 1));
 
@@ -482,6 +482,7 @@ export namespace atlas {
         std::vector<vk::sample_image> m_depth_images;
         std::vector<vk::command_buffer> m_command_buffers;
         float m_delta_time = 0.f;
+        window_params m_window_params{};
         static application* s_instance;
     };
 
