@@ -9,8 +9,6 @@ module;
 #include <glm/gtx/hash.hpp>
 #include <tiny_obj_loader.h>
 
-#include <print>
-
 export module atlas.drivers.importer:obj_loader;
 
 import vk;
@@ -38,18 +36,18 @@ namespace std {
 export namespace atlas {
     class obj_importer {
     public:
-        obj_importer(std::string_view p_path) {
+        obj_importer(const std::string& p_path) {
             m_load = load(p_path);
         }
 
-        bool load(std::string_view p_path) {
+        bool load(const std::string& p_path) {
             tinyobj::attrib_t attrib;
             std::vector<tinyobj::shape_t> shapes;
             std::vector<tinyobj::material_t> materials;
             std::string warn;
             std::string err;
 
-            if(!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, p_path.data())) {
+            if(!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, p_path.c_str())) {
                 return false;
             }
 

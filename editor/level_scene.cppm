@@ -164,11 +164,10 @@ public:
         }
 
         if(atlas::event::is_mouse_pressed(mouse_button_middle)) {
-            
+            atlas::event::set_cursor_mode(atlas::cursor_mode::disabled);
             // sensitivity is how fast the cursor rotates
             float mouse_sensitivity = 0.01;
             glm::vec2 cursor_dt = current_cursor_pos - m_last_cursor_pos;
-            m_last_cursor_pos = current_cursor_pos; // Store for next frame
 
             m_yaw -= (cursor_dt.x * mouse_sensitivity);
             m_pitch -= (cursor_dt.y * mouse_sensitivity);
@@ -180,6 +179,7 @@ public:
         // continue rotating the camera from where the original position left off
         if(atlas::event::is_mouse_released(mouse_button_middle)) {
             m_is_first_frame = true;
+            atlas::event::set_cursor_mode(atlas::cursor_mode::normal);
         }
 
         // Signal to trigger this kind of scene transition
@@ -191,6 +191,9 @@ public:
         //     };
         //     signal<atlas::event::scene_transition>(scene_transition);
         // }
+
+        // Store for next frame
+        m_last_cursor_pos = current_cursor_pos;
     }
 
     void physics_update() {}

@@ -493,8 +493,5 @@ private:
     atlas::ui::menu_item m_editor_menu;
     ui::experimental::icon m_play_icon;
     ui::experimental::icon m_stop_icon;
-    // content_browser_panel(
-    //   std::shared_ptr<vk::device> p_device,
-    //   uint32_t p_memory_properties) {
     content_browser_panel m_content_browser;
 };
