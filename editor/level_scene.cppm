@@ -47,10 +47,8 @@ public:
         atlas::game_object viking_room = entity("Viking Room");
         viking_room.set<atlas::transform>({
           .position = { 5, 5, 0.f },
-        //   .position = { 1.f, 1.f, 1.f },
           .rotation = { 2.30f, 95.90f, 91.80f },
-        //   .rotation = { 1.f, 1.f, 1.f },
-          .scale{ 1.f },
+          .scale{ 10.f },
         });
 
         viking_room.set<atlas::mesh_source>({
