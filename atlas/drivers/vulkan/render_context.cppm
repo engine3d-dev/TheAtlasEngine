@@ -47,6 +47,7 @@ export namespace atlas {
         uint32_t model_idx=0;
         uint32_t diffuse_idx=0;
         uint32_t specular_idx=0;
+        uint64_t point_light_address;
     };
 
     struct scene_uniforms {
@@ -61,6 +62,24 @@ export namespace atlas {
     struct gpu_material {
         uint64_t diffuse_idx=0;
         uint64_t specular_idx=0;
+    };
+
+    struct gpu_point_light {
+        glm::vec4 position; // this is provided by the transform
+        glm::vec4 color = { 1.f, 1.f, 1.f, 1.f };
+        float attenuation = 1.f;
+        float constant = 1.f;
+        float linear = 1.f;
+        float quadratic = 1.f;
+
+        glm::vec4 ambient = glm::vec4(1.f);
+        glm::vec4 diffuse = glm::vec4(1.f);
+        glm::vec4 specular = glm::vec4(1.f);
+    };
+
+     struct light_scene_ubo {
+        alignas(16) uint32_t num_lights=0;
+        alignas(16) std::array<gpu_point_light, 10> point_lights{};
     };
 
 
@@ -228,6 +247,10 @@ export namespace atlas {
             uint32_t max_objects = 10'000;
             m_object_model_uniforms = vk::dyn::buffer(*m_device, sizeof(objects_uniform) * max_objects, uniform_params);
 
+
+            // configuring uniforms for point lights
+            m_lighting_uniforms = vk::dyn::buffer(*m_device, sizeof(light_scene_ubo), uniform_params);
+
             // Index 0 will default to a white texture
             vk::image_extent extent = {
                 .width = 1,
@@ -342,6 +365,35 @@ export namespace atlas {
             m_projection = p_proj;
             m_view = p_view;
 
+
+            // querying for objects with point lights
+            flecs::query<point_light> all_point_lights = m_world->query_builder<point_light>().build();
+
+            int index = 0;
+            light_scene_ubo scene_point_lights{};
+            all_point_lights.each([&index, &scene_point_lights](flecs::entity p_entity, point_light& p_light){
+                const transform* t = p_entity.get<transform>();
+                p_light.position = t->position;
+
+                scene_point_lights.point_lights[index] = {
+                    .position = glm::vec4(p_light.position, 1.f),
+                    .color = p_light.color,
+                    .attenuation = p_light.attenuation,
+                    .constant = p_light.constant,
+                    .linear = p_light.linear,
+                    .quadratic = p_light.quadratic,
+                    .ambient = p_light.ambient,
+                    .diffuse = p_light.diffuse,
+                    .specular = p_light.specular,
+                };
+
+                index++;
+            });
+
+            scene_point_lights.num_lights = index;
+
+            m_lighting_uniforms.transfer<light_scene_ubo>(std::span<const light_scene_ubo>(&scene_point_lights, 1));
+
             m_main_pipeline.bind(*m_current_command);
 
             flecs::query<> all_meshes = m_world->query_builder<mesh_source>().build();
@@ -387,12 +439,14 @@ export namespace atlas {
                 // Retrieving the buffer address that can be looked up from the glsl shader
                 const uint64_t scene_ubo_address = m_scene_uniforms.get_device_address();
                 const uint64_t objects_ubo_address = m_object_model_uniforms.get_device_address();
+                const uint64_t lighting_address = m_lighting_uniforms.get_device_address();
                 push_constant_data push = {
                     .scene_address = scene_ubo_address,
                     .model_mat_array_address = objects_ubo_address,
                     .model_idx = static_cast<uint32_t>(m_model_matrices_lookup[p_entity.id()]),
                     .diffuse_idx = static_cast<uint32_t>(m_material_table[p_entity.id()].diffuse_idx),
                     .specular_idx = static_cast<uint32_t>(m_material_table[p_entity.id()].specular_idx),
+                    .point_light_address = lighting_address,
                 };
 
                 m_main_pipeline.push_constant<push_constant_data>(*m_current_command, push, m_stage, 0);
@@ -472,6 +526,7 @@ export namespace atlas {
         vk::dyn::buffer m_scene_uniforms;
         // uniform buffer to write all of our objects mat4 model matrices in
         vk::dyn::buffer m_object_model_uniforms;
+        vk::dyn::buffer m_lighting_uniforms;
 
         std::unordered_map<uint64_t, gpu_mesh_data> m_meshes;
 
