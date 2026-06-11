@@ -126,6 +126,8 @@ public:
             .aspect = vk::image_aspect_flags::color_bit,
             .usage = vk::image_usage::transfer_dst_bit |
                         vk::image_usage::sampled_bit,
+            .address_mode_u = vk::sampler_address_mode::repeat,
+            .addrses_mode_v = vk::sampler_address_mode::clamp_to_edge,
             // .view_type = VK_IMAGE_VIEW_TYPE_CUBE,
         };
         m_skybox_image = vk::sample_image(*m_device, skybox_params);
