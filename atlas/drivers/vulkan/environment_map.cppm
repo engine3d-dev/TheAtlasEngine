@@ -723,6 +723,7 @@ public:
         m_skybox_descriptor.destruct();
         m_skybox_shaders.destruct();
         m_skybox_pipeline.destruct();
+        m_skybox_uniforms.reset();
     }
 
 private:
