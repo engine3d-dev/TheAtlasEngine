@@ -53,6 +53,7 @@ export namespace atlas {
     struct scene_uniforms {
         glm::mat4 view=glm::mat4(1.f);
         glm::mat4 proj=glm::mat4(1.f);
+        glm::vec4 camera_pos=glm::vec4(1.f);
     };
 
     struct objects_uniform {
@@ -502,8 +503,13 @@ export namespace atlas {
             m_shader_resource.destruct();
             m_main_pipeline.destruct();
         }
+
+        void set_camera_pos(const glm::vec4& p_camera_pos) {
+            m_camera_pos = p_camera_pos;
+        }
     
     private:
+        glm::vec4 m_camera_pos = glm::vec4(1.f);
         glm::mat4 m_projection;
         glm::mat4 m_view;
         uint32_t m_format;

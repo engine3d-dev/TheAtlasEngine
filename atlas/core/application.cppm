@@ -256,13 +256,15 @@ export namespace atlas {
                 // TODO: Should consider changing this from
                 // using tags in flecs for specifying active cameras.
                 query_camera_objects.each(
-                  [&](flecs::entity,
+                  [&](flecs::entity p_entity,
                       flecs::pair<tag::editor, projection_view> p_pair,
                       perspective_camera& p_camera) {
                       if (!p_camera.is_active) {
                           return;
                       }
 
+                      const transform* t = p_entity.get<transform>();
+                      m_render_context.set_camera_pos(glm::vec4(t->position, 1.f));
                       m_projection = p_pair->projection;
                       m_view = p_pair->view;
                   });

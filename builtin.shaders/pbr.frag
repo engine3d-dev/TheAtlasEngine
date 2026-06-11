@@ -14,7 +14,7 @@ layout(location = 5) in vec3 FragPos;
 layout(location = 0) out vec4 outColor;
 
 layout(set = 0, binding = 1) uniform sampler2D textures[];
-layout(set = 0, binding = 2) uniform sampler2D environment_map; // used for IBL
+layout(set = 0, binding = 2) uniform samplerCube environment_map; // used for IBL
 
 struct point_light {
     vec4 position;
@@ -23,7 +23,7 @@ struct point_light {
     float constant;
     float linear;
     float quadratic;
-    
+
     vec4 ambient; // 4th channel is the intensity value
     vec4 diffuse;
     vec4 specular;
@@ -32,6 +32,7 @@ struct point_light {
 layout(buffer_reference, scalar) buffer readonly SceneUniforms {
     mat4 view;
     mat4 proj;
+    vec4 camera_pos;
 };
 
 const int max_point_lights = 1000;
@@ -95,12 +96,12 @@ vec3 calc_point_light(point_light light, vec3 normal, vec3 fragPos, vec3 view_di
 }
 
 void main() {
-    vec3 color = fragColor;
     vec4 diffuse = texture(textures[nonuniformEXT(fragDiffuseIdx)], fragTexCoords);
     vec4 specular = texture(textures[nonuniformEXT(fragSpecularIdx)], fragTexCoords);
-    // vec3 default_ambience = (vec3(texture(diffuse_texture, fragTexCoords)) * fragColor.rgb) * 0.1;
-    vec3 default_ambience = (vec3(texture(textures[nonuniformEXT(fragDiffuseIdx)], fragTexCoords)) * fragColor.rgb) * 0.1;
-    vec3 final_color = default_ambience;
+
+    vec3 albedo = diffuse.rgb;
+    // vec3 albedo = fragColor.rgb;
+    vec3 final_color = (albedo * fragColor.rgb) * 0.1;
 
     PointLightsUniforms lights = push_const.lights;
 
@@ -113,20 +114,30 @@ void main() {
         final_color += calc_point_light(src, fragNormals, FragPos, dir_to_light) * (src.color.rgb * src.color.a);
     }
 
-    // Uncomment to calculate the irradiance mapping
-    // vec3 albedo = diffuse.rgb;
-    // // Map the surface normal direction to the HDR map to get diffuse ambient light
-    // vec3 N = normalize(fragNormals);
-    // vec2 envUV = SampleEquirectangular(N);
-    // // Low-frequency ambient lighting from the surrounding environment
-    // // vec3 ambientIrradiance = texture(environment_map, envUV).rgb;
-    // vec3 ambientIrradiance = textureLod(environment_map, envUV, 4.0).rgb;
+    SceneUniforms ubo = push_const.global_ubo;
 
-    // // In a full PBR equation, this would be multiplied by your diffuse term (1.0 - metallic) * albedo
-    // vec3 ambient = ambientIrradiance * albedo * 0.05; // Dim down slightly for a basic placeholder balance
+    // vec3 view_pos = vec3(inverse(ubo.view)[3]);
+    // vec3 view_dir = normalize(ubo.camera_pos.xyz - FragPos);
+    vec3 normal = normalize(fragNormals);
+    vec3 Incident = normalize(FragPos - ubo.camera_pos.xyz);
 
-    // // 4. Combine lighting components (Direct light + Ambient IBL)
-    // vec3 final_color = albedo + ambient * color;
+
+
+    // Calculating diffuse term
+    // vec2 diffuse_uv = SampleEquirectangular(normal);
+    vec3 ambient_irradiance = textureLod(environment_map, normal, 5.0).rgb;
+    vec3 ibl_diffuse = ambient_irradiance * albedo * 0.5;
+
+    // Calculating the specular term
+    vec3 reflect_dir = reflect(Incident, normal);
+    // vec2 specular_uv = SampleEquirectangular(reflect_dir);
+    vec3 ambient_radiance = textureLod(environment_map, reflect_dir, 1.5).rgb;
+
+
+    vec3 ibl_specular = ambient_radiance * specular.rgb * 0.5;
+
+    final_color += (ibl_diffuse + ibl_specular);
+
 
 
     outColor = vec4(final_color, 1.0);

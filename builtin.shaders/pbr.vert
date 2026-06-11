@@ -39,6 +39,7 @@ layout(location = 5) out vec3 FragPos;
 layout(buffer_reference, scalar) buffer readonly SceneUniforms {
     mat4 view;
     mat4 proj;
+    vec4 camera_pos;
 };
 
 struct point_light {
@@ -88,7 +89,10 @@ void main() {
     gl_Position = ubo.proj * ubo.view * position_in_world;
     fragColor = inColor;
     fragTexCoords = inTexCoords;
+    // fragNormals = mat3(object.model[push_const.model_matrix_idx]) * inNormals;
+    // mat3 normal_mat = transpose(inverse(mat3(object.model[push_const.model_matrix_idx])));
     fragNormals = inNormals;
+    // fragNormals = normal_mat * inNormals;
     fragDiffuseIdx = push_const.diffuse_idx;
     fragSpecularIdx = push_const.specular_idx;
     FragPos = position_in_world.xyz;
