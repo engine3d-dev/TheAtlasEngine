@@ -83,10 +83,12 @@ layout(push_constant) uniform Constants {
 void main() {
     SceneUniforms ubo = push_const.global_ubo;
     ObjectsTable object = push_const.objects;
-    
-    vec4 position_in_world = object.model[push_const.model_matrix_idx] * vec4(inPosition, 1.0);
+
+    // retrieve our 3D objects local position within the world
+    vec4 world_position = object.model[push_const.model_matrix_idx] * vec4(inPosition, 1.0);
+
     // gl_Position = ubo.proj * ubo.view * object.model[push_const.model_matrix_idx] * vec4(inPosition, 1.0);
-    gl_Position = ubo.proj * ubo.view * position_in_world;
+    gl_Position = ubo.proj * ubo.view * world_position;
     fragColor = inColor;
     fragTexCoords = inTexCoords;
     // fragNormals = mat3(object.model[push_const.model_matrix_idx]) * inNormals;
@@ -95,5 +97,5 @@ void main() {
     // fragNormals = normal_mat * inNormals;
     fragDiffuseIdx = push_const.diffuse_idx;
     fragSpecularIdx = push_const.specular_idx;
-    FragPos = position_in_world.xyz;
+    FragPos = world_position.xyz;
 }
