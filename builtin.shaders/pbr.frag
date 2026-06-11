@@ -14,7 +14,7 @@ layout(location = 5) in vec3 FragPos;
 layout(location = 0) out vec4 outColor;
 
 layout(set = 0, binding = 1) uniform sampler2D textures[];
-layout(set = 0, binding = 2) uniform samplerCube environment_map; // used for IBL
+layout(set = 0, binding = 2) uniform sampler2D environment_map; // used for IBL
 
 struct point_light {
     vec4 position;
@@ -99,8 +99,8 @@ void main() {
     vec4 diffuse = texture(textures[nonuniformEXT(fragDiffuseIdx)], fragTexCoords);
     vec4 specular = texture(textures[nonuniformEXT(fragSpecularIdx)], fragTexCoords);
 
-    vec3 albedo = diffuse.rgb;
-    // vec3 albedo = fragColor.rgb;
+    // vec3 albedo = diffuse.rgb;
+    vec3 albedo = fragColor.rgb;
     vec3 final_color = (albedo * fragColor.rgb) * 0.1;
 
     PointLightsUniforms lights = push_const.lights;
@@ -124,21 +124,21 @@ void main() {
 
 
     // Calculating diffuse term
-    // vec2 diffuse_uv = SampleEquirectangular(normal);
-    vec3 ambient_irradiance = textureLod(environment_map, normal, 5.0).rgb;
+    vec2 diffuse_uv = SampleEquirectangular(normal);
+    // vec3 ambient_irradiance = textureLod(environment_map, normal, 5.0).rgb;
+    vec3 ambient_irradiance = textureLod(environment_map, diffuse_uv, 5.0).rgb;
     vec3 ibl_diffuse = ambient_irradiance * albedo * 0.5;
 
     // Calculating the specular term
     vec3 reflect_dir = reflect(Incident, normal);
-    // vec2 specular_uv = SampleEquirectangular(reflect_dir);
-    vec3 ambient_radiance = textureLod(environment_map, reflect_dir, 1.5).rgb;
+    vec2 specular_uv = SampleEquirectangular(reflect_dir);
+    // vec3 ambient_radiance = textureLod(environment_map, reflect_dir, 1.5).rgb;
+    vec3 ambient_radiance = textureLod(environment_map, specular_uv, 1.5).rgb;
 
 
     vec3 ibl_specular = ambient_radiance * specular.rgb * 0.5;
 
     final_color += (ibl_diffuse + ibl_specular);
-
-
 
     outColor = vec4(final_color, 1.0);
 }

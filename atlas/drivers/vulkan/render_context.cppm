@@ -403,6 +403,7 @@ export namespace atlas {
             scene_uniforms scene_ubo = {
                 .view = p_view,
                 .proj = p_proj,
+                .camera_pos = m_camera_pos,
             };
 
             m_scene_uniforms.transfer<scene_uniforms>(std::span<scene_uniforms>(&scene_ubo, 1));
@@ -412,6 +413,9 @@ export namespace atlas {
                 const transform* t = p_entity.get<transform>();
                 glm::mat4 model = glm::mat4(1.f);
                 model = glm::translate(model, t->position);
+
+                glm::mat4 rotation_mat = glm::mat4(glm::quat(t->rotation));
+                model *= rotation_mat;
                 model = glm::scale(model, t->scale);
 
                 if(m_model_matrices_lookup.contains(p_entity.id())) {
