@@ -428,9 +428,6 @@ public:
           ImVec4(button_active.x, button_active.y, button_active.z, 0.5f));
 
         float button_size = 20.0f;
-        // if(ImGui::Begin("##toolbox")) {
-        //     ImGui::End();
-        // }
 
         if (ImGui::Begin("##toolbox")) {
             VkDescriptorSet button_id = (m_scene_state == scene_runtime::edit)
