@@ -72,6 +72,20 @@ public:
           .half_extent = { 15.f, 0.30f, 10.0f },
         });
 
+        atlas::game_object backpack = entity("Backpack");
+
+        backpack.set<atlas::transform>({
+          .position = { 0.f, 2.10f, -7.30f },
+          .scale = { 0.9f, 0.9f, 0.9f },
+        });
+
+        backpack.set<atlas::mesh_source>({
+          .color = { 1.f, 1.f, 1.f, 1.f },
+          .model_path = "assets/backpack/backpack.obj",
+          .diffuse = "assets/backpack/diffuse.jpg",
+          .specular = "assets/backpack/specular.jpg"
+        });
+
 
         // const size_t grid_width = 5; 
         // const float spacing = 5;

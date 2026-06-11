@@ -71,7 +71,10 @@ export namespace ui::experimental {
             return m_icon_image_id;
         }
 
-        void destroy() { m_icon_image.destruct(); }
+        void destroy() {
+            m_icon_image.destruct();
+            ImGui_ImplVulkan_RemoveTexture(m_icon_image_id);
+        }
 
     private:
         std::shared_ptr<vk::device> m_device;

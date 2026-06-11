@@ -95,6 +95,7 @@ namespace atlas {
             auto mesh = p_entity_value["Mesh Source"];
             if(!mesh["Model Path"].as<std::string>().empty()) {
                 p_deserialize_to_object.set<mesh_source>({
+                    .flip = static_cast<bool>(mesh["Flip"].as<int>()),
                     .model_path =
                         mesh["Model Path"].as<std::string>(),
                     .diffuse = mesh["Diffuse"].as<std::string>(),

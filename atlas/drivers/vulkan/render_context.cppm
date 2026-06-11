@@ -1,7 +1,6 @@
 module;
 
 #include <memory>
-#include <print>
 #include <array>
 #include <span>
 #include <unordered_map>
@@ -244,8 +243,6 @@ export namespace atlas {
 
             all_meshes.each([this](flecs::entity p_entity){
                 const mesh_source* src = p_entity.get<mesh_source>();
-
-                std::println("ID {}: prebake(): {}",p_entity.id(), src->model_path);
                 
                 vk::buffer_parameters vertex_params = {
                     .memory_mask = m_physical->memory_properties(vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit),
@@ -284,11 +281,6 @@ export namespace atlas {
 
                 
                 if(!src->specular.empty()) {
-                    std::println("Loading specular: {}", src->specular);
-                    // gpu_image specular_store_image {
-                    //     .slot = m_texture_slot_index++,
-                    //     .texture_data = vk::texture(*m_device, &specular_img, config_texture),
-                    // };
                     material.specular_idx = m_texture_slot_index++;
                     m_gpu_textures.emplace_back(*m_device, &specular_img, config_texture);
                 }

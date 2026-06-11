@@ -1,5 +1,7 @@
 module;
 
+#include <thread>
+#include <atomic>
 #include <string>
 #include <print>
 
@@ -97,6 +99,7 @@ public:
         atlas::register_update(this, &editor_world::update);
         atlas::register_physics(this, &editor_world::physics_update);
         atlas::register_ui(this, &editor_world::ui_update);
+        atlas::register_post(this, &editor_world::unload_assets);
     }
 
     ~editor_world() override = default;
@@ -104,8 +107,7 @@ public:
     void preload_assets() {
         m_deserializer_test = atlas::serializer();
 
-        if (!m_deserializer_test.load("LevelScene", *m_current_scene))
-        {
+        if (!m_deserializer_test.load("LevelScene", *m_current_scene)) {
             console_log_error("Could not load yaml file LevelScene!!!");
         }
 
@@ -476,9 +478,12 @@ public:
         }
     }
 
-    void destruct() {
+    void unload_assets() {
+        // console_log_info("Unloading Assets");
+
         m_play_icon.destroy();
         m_stop_icon.destroy();
+        m_content_browser.destroy();
     }
 
 private:

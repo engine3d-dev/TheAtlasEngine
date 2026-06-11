@@ -401,7 +401,6 @@ export namespace atlas {
                 m_imgui_context->end();
                 current.end_rendering();
 
-
                 m_images[m_next_image_frame_idx].memory_barrier(
                   current,
                   m_window->surface_properties().format.format,
@@ -417,6 +416,9 @@ export namespace atlas {
                 // Update platform window afterwards
                 m_imgui_context->update_platforms();
             }
+            
+            invoke_post_update(m_current_scene.get());
+            invoke_post_update(m_world.get());
         }
 
         // Experimental: Will look into later once we dive into scene

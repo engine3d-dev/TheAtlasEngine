@@ -404,6 +404,8 @@ export namespace atlas {
         p_output << YAML::Key << "Mesh Source";
 
         p_output << YAML::BeginMap;
+        p_output << YAML::Key << "Flip" << YAML::Value
+                 << p_material->flip;
         p_output << YAML::Key << "Model Path" << YAML::Value
                  << p_material->model_path;
         p_output << YAML::Key << "Diffuse" << YAML::Value
