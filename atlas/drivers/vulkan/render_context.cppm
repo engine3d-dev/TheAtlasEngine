@@ -490,6 +490,7 @@ export namespace atlas {
         void destruct() {
             m_scene_uniforms.reset();
             m_object_model_uniforms.reset();
+            m_lighting_uniforms.reset();
 
             m_environment_map.destruct();
 
