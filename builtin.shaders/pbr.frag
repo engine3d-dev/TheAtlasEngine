@@ -148,7 +148,7 @@ void main() {
 
     float roughness = 0.2;
     float metallic = 0.2;
-    float ao = 0.2;
+    float ao = 0.5;
 
     vec3 F0 = vec3(0.04);
     F0 = mix(F0, albedo, metallic);
@@ -180,7 +180,7 @@ void main() {
         float dist = length(src.position.xyz - FragPos);
         // float attenuation = 1.0 / (dist * dist);
         float attenuation = src.attenuation / (src.constant + src.linear * dist + src.quadratic * pow(dist, 2));
-        vec3 radiance = src.color.rgb * attenuation;
+        vec3 radiance = src.color.rgb * src.color.a * attenuation;
 
         // cook-torrance brdf
         float NDF = DistributionGGX(normal, H, roughness);
@@ -189,7 +189,7 @@ void main() {
 
         vec3 numerator = NDF * G * F;
         float denominator = 4.0 * max(dot(normal, view_dir), 0.0) * max(dot(normal, dir_to_light), 0.0) + 0.0001;
-        vec3 specular = numerator / denominator;
+        vec3 specular = numerator / denominator * specular_texture.rgb;
 
         vec3 kS = F;
         vec3 kD = vec3(1.0) - kS;
@@ -202,13 +202,13 @@ void main() {
         Lo += (kD * albedo / PI + specular) * radiance * NdotL;
     }
 
-
+    float max_texture_mip_levels = 0.0;
     vec3 kS = fresnelSchlick(max(dot(normal, view_dir), 0.0), F0);
     vec3 kD = 1.0 - kS;
     kD *= 1.0 - metallic;
     vec2 environment_uv = SampleEquirectangular(normal);
     // vec3 irradiance = texture(environment_map, environment_uv).rgb;
-    vec3 irradiance = textureLod(environment_map, environment_uv, 0.0).rgb;
+    vec3 irradiance = textureLod(environment_map, environment_uv, max_texture_mip_levels).rgb;
     vec3 diffuse = irradiance * albedo;
     vec3 ambient = (kD * diffuse.rgb) * ao;
     vec3 color = ambient + Lo;
@@ -216,26 +216,5 @@ void main() {
     color = color / (color + vec3(1.0));
     color = pow(color, vec3(1.0/2.2));
 
-
-
-    // Calculating diffuse term
-    // vec2 diffuse_uv = SampleEquirectangular(normal);
-    // // vec3 ambient_irradiance = textureLod(environment_map, normal, 5.0).rgb;
-    // vec3 ambient_irradiance = textureLod(environment_map, diffuse_uv, 5.0).rgb;
-    // vec3 ibl_diffuse = ambient_irradiance * albedo * 0.5;
-
-    // // Calculating the specular term
-    // vec3 reflect_dir = reflect(view_dir, normal);
-    // vec2 specular_uv = SampleEquirectangular(reflect_dir);
-    // // vec3 ambient_radiance = textureLod(environment_map, reflect_dir, 1.5).rgb;
-
-    // vec3 ambient_radiance = textureLod(environment_map, specular_uv, 1.5).rgb;
-
-
-    // vec3 ibl_specular = ambient_radiance * specular_texture.rgb * 0.5;
-
-    // final_color += (ibl_diffuse + ibl_specular);
-
-    // outColor = vec4(final_color, 1.0);
     outColor = vec4(color, 1.0);
 }
