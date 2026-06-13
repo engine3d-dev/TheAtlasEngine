@@ -205,6 +205,7 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas/drivers/vulkan/utilities.cppm
     atlas/drivers/vulkan/environment_map.cppm
     atlas/drivers/vulkan/stb_image.cppm
+    atlas/drivers/vulkan/gpu_uniforms.cppm
 
     atlas/drivers/vulkan/hash.cppm
     atlas/drivers/vulkan/shader_resource_group.cppm
