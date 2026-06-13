@@ -36,7 +36,7 @@ export namespace atlas {
             m_instance = p_context->instance_handle();
 
             glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-            glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+            glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
             m_window = glfwCreateWindow(static_cast<int>(p_params.width),
                                         static_cast<int>(p_params.height),
