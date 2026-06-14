@@ -39,9 +39,7 @@ export namespace atlas {
      * @brief application properties settings for the window
      */
     struct application_settings {
-        std::string name = "Undefined";
-        uint32_t width = 0;
-        uint32_t height = 0;
+        window_params extent{};
         glm::vec4 background_color = { 1.f, 0.5f, 0.5f, 1.f };
     };
 
@@ -57,16 +55,11 @@ export namespace atlas {
             m_physical = p_context->physical_device();
             m_device = p_context->logical_device();
 
-            // Constructing the application
-            m_window_params = {
-                .width = p_params.width,
-                .height = p_params.height,
-                .name = p_params.name,
-            };
+            m_window_params = p_params.extent;
             
             // m_window = std::allocate_shared<window>(,
             // m_context->instance_handle(), params);
-            m_window = std::make_shared<window>(p_context, m_window_params);
+            m_window = std::make_shared<window>(p_context, p_params.extent);
 
             m_aspect_ratio = static_cast<float>(m_window_params.width) / static_cast<float>(m_window_params.height);
             event::set_window_size(m_window->glfw_window());

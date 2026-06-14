@@ -174,7 +174,5 @@ main() {
     logical_device->wait();
 
     app->post_destroy();
-
-    context->post_cleanup();
     return 0;
 }

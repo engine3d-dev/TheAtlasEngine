@@ -30,9 +30,11 @@ import vk;
 export namespace atlas {
 
     /**
-     * @brief Core render context to schedule images and barriers for coordinating rendering operations
      * 
-     * Manages multiple render contexts
+     * @brief Context that translates the ECS rendering-specific components to GPU-visible resources
+     * 
+     * Manages the dispatching of task workloads to performing data transfers and draw calls.
+     * 
     */
     class render_context {
     public:

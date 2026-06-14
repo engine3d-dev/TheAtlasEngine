@@ -41,6 +41,11 @@ struct environment_push_constant {
     uint64_t scene_environment_address=0;
 };
 
+/**
+ * 
+ * @brief Vulkan-specific implementation for loading GPU resources associated to loading environent maps.
+ * 
+*/
 export class environment_map {
 public:
     environment_map() = default;
@@ -64,6 +69,9 @@ public:
         construct(p_color, p_extent);
     }
 
+    /**
+     * @brief loads in a new HDRI environment map
+    */
     void construct(const std::string& p_filename) {
         bool res = create_hdr(p_filename);
 
@@ -77,6 +85,9 @@ public:
         create_pipelines();
     }
 
+    /**
+     * @brief loads in raw pixels and texture dimensions to receive in raw pixels data if no HDRI is provided.
+    */
     void construct(std::span<const float> p_color, const vk::image_extent& p_extent) {
         bool res = create_hdr(p_color, p_extent);
 
@@ -90,6 +101,9 @@ public:
         create_pipelines();
     }
 
+    /**
+     * @brief performs the loading operation to read in the pixel float data of the actual HDRI metadata.
+    */
     bool create_hdr(const std::string& p_filename) {
         stbi_set_flip_vertically_on_load(true);
         int w, h, channels;
@@ -117,7 +131,7 @@ public:
         vk::buffer staging_buffer =
           vk::buffer(*m_device, image_size, staging_params);
 
-        // Creating image handle to storing the HDR
+        // Creating GPU image resource
         vk::image_params skybox_params = {
             .extent = { .width = static_cast<uint32_t>(width), .height = static_cast<uint32_t>(height), },
             .format = texture_format,
@@ -132,7 +146,7 @@ public:
         };
         m_skybox_image = vk::sample_image(*m_device, skybox_params);
 
-        // Transferring data from the CPU
+        // Transferring CPU data to GPU-visible data
         std::span<const uint8_t> pixels_data(
           reinterpret_cast<const uint8_t*>(pixels), image_size);
         staging_buffer.transfer(pixels_data);
@@ -150,6 +164,7 @@ public:
 
         upload_cmd.begin(vk::command_usage::one_time_submit);
 
+        // Performing image layout transitions to ensure we do not lose any data transferring over to the GPU.
         // Begin Memory Barrier: Undefined to TRANSFER_DST
         m_skybox_image.memory_barrier(upload_cmd,
                                       texture_format,

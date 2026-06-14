@@ -16,11 +16,18 @@ export module atlas.drivers.vulkan:stb_image;
 import vk;
 
 export namespace atlas {
+
+    /**
+     * @brief Implementing image loading that utilizes stb_image to decode disk-based images into uncompressed streams of bytes.
+     * 
+     * Provides size extents of uncompressed of the total image size.
+     * 
+    */
     class stb_image : public vk::image {
     public:
         stb_image() = default;
 
-        stb_image(std::string_view p_path, vk::texture_params p_params) {
+        stb_image(std::string_view p_path, const vk::texture_params& p_params) {
             image_load(p_path, p_params);
         }
 
@@ -56,16 +63,6 @@ export namespace atlas {
 
             // Retrieving total image size to the count of the image layers
             uint32_t size = size_bytes * p_params.layer_count;
-
-            // vk::image_params image_options = {
-            //     .extent = m_extent,
-            //     .format = texture_format,
-            //     .memory_mask = p_params.memory_mask,
-            //     .usage =
-            //     vk::image_usage::transfer_dst_bit |
-            //     vk::image_usage::sampled_bit, .mip_levels =
-            //     p_params.mip_levels, .layer_count = p_params.layer_count,
-            // };
 
             m_bytes.reserve(size);
             std::span<uint8_t> bytes_view =

@@ -36,9 +36,11 @@ private:
 atlas::ref<atlas::application>
 initialize_application(/*NOLINT*/std::shared_ptr<atlas::graphics_context> p_context, atlas::event::bus& p_bus) {
     atlas::application_settings settings = {
-        .name = "Editor",
-        .width = 1510,
-        .height = 877,
+        .extent = {
+            .width = 1510,
+            .height = 877,
+            .name = "Editor",
+        },
         .background_color = { 0.f, 0.f, 0.f, 0.f },
     };
     return create_ref<editor_application>(p_context, settings, p_bus);

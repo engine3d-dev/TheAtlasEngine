@@ -133,8 +133,6 @@ target_sources(${PROJECT_NAME} PUBLIC
     TYPE CXX_MODULES
     FILES
     atlas/core/common.cppm
-    atlas/core/utilities/types.cppm
-    atlas/core/utilities/utilities.cppm
     atlas/core/core.cppm
     atlas/core/logger.cppm
     atlas/core/application.cppm
@@ -151,6 +149,7 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas/core/scene/level_streamer.cppm
     atlas/core/scene/uuid.cppm
 
+    atlas/core/utilities/utilities.cppm
     atlas/core/utilities/state.cppm
     atlas/core/utilities/poll_state.cppm
 
@@ -164,6 +163,7 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas/core/event/types.cppm
 
     # editor
+    atlas/core/editor/editor.cppm
     atlas/core/editor/dockspace.cppm
     atlas/core/editor/menu_item.cppm
     atlas/core/ui/ui.cppm
@@ -207,8 +207,6 @@ target_sources(${PROJECT_NAME} PUBLIC
 
     atlas/drivers/vulkan/hash.cppm
     atlas/drivers/vulkan/shader_resource_group.cppm
-    atlas/drivers/vulkan/render_system.cppm
-    atlas/drivers/vulkan/uniforms.cppm
 
 
     # 3D Model Importers
