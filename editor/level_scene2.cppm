@@ -24,9 +24,9 @@ public:
     level_scene2(const std::string& p_name, atlas::event::bus& p_bus)
       : atlas::scene(p_name, p_bus) {
 
-
         m_editor_camera = entity("Editor Camera");
-        m_editor_camera->add<flecs::pair<atlas::tag::editor, atlas::projection_view>>();
+        m_editor_camera
+          ->add<flecs::pair<atlas::tag::editor, atlas::projection_view>>();
         m_editor_camera->set<atlas::transform>({
           .position = { 3.50f, 4.90f, 36.40f },
           .scale{ 1.f },
@@ -45,8 +45,8 @@ public:
         });
 
         cube.set<atlas::mesh_source>({
-            .model_path = "assets/models/cube.obj",
-            .diffuse = "assets/models/container_diffuse.png",
+          .model_path = "assets/models/cube.obj",
+          .diffuse = "assets/models/container_diffuse.png",
         });
 
         atlas::register_start(this, &level_scene2::start);
@@ -56,8 +56,7 @@ public:
 
     ~level_scene2() override = default;
 
-    void start() {
-    }
+    void start() {}
 
     void on_update(float p_delta_time) {
         atlas::transform* t = m_editor_camera->get_mut<atlas::transform>();
@@ -109,7 +108,7 @@ public:
         }
 
         // Signal to trigger this kind of scene transition
-        if(atlas::event::is_key_pressed(key_n)) {
+        if (atlas::event::is_key_pressed(key_n)) {
             std::println("Signaling to transition to level scene");
             atlas::event::scene_transition scene_transition = {
                 .next_scene = "Level Scene",
@@ -120,9 +119,9 @@ public:
         t->set_rotation(t->rotation);
     }
 
-    // TODO: Have this physics_update be executed during the physics fixed-update framerate
-    void physics_update() {
-    }
+    // TODO: Have this physics_update be executed during the physics
+    // fixed-update framerate
+    void physics_update() {}
 
     // void on_signal(atlas::event::scene_transition& p_transition) {
     //     p_transition.next_scene = "Level Scene 2";

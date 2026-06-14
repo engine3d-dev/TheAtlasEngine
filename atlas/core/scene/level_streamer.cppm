@@ -33,7 +33,7 @@ export namespace atlas {
          * @return the currently active scene to retrieve
          */
         ref<scene> current_scene(const std::string& p_name) {
-            if(!m_scenes.contains(p_name)) {
+            if (!m_scenes.contains(p_name)) {
                 return nullptr;
             }
 
@@ -43,11 +43,7 @@ export namespace atlas {
         template<typename UScene>
         void default_scene(const std::string& p_name, event::bus& p_bus) {
             m_scenes.emplace(
-              p_name,
-              std::allocate_shared<UScene>(
-                m_allocator,
-                p_name,
-                p_bus)) ;
+              p_name, std::allocate_shared<UScene>(m_allocator, p_name, p_bus));
         }
 
         // Experimental: This was just for testing. Will come back to later.

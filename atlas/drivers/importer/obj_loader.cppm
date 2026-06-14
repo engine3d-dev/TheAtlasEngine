@@ -36,7 +36,8 @@ namespace std {
 export namespace atlas {
     class obj_importer {
     public:
-        obj_importer(const std::string& p_path, bool p_flip) : m_flip(p_flip) {
+        obj_importer(const std::string& p_path, bool p_flip)
+          : m_flip(p_flip) {
             m_load = load(p_path);
         }
 
@@ -47,22 +48,24 @@ export namespace atlas {
             std::string warn;
             std::string err;
 
-            if(!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, p_path.c_str())) {
+            if (!tinyobj::LoadObj(
+                  &attrib, &shapes, &materials, &warn, &err, p_path.c_str())) {
                 return false;
             }
 
             std::unordered_map<vk::vertex_input, uint32_t> unique_vertices{};
 
-            for(const auto& shape_face : shapes) {
-                for(const auto& index : shape_face.mesh.indices) {
+            for (const auto& shape_face : shapes) {
+                for (const auto& index : shape_face.mesh.indices) {
                     vk::vertex_input vertex{};
 
-                    if(!unique_vertices.contains(vertex)) {
-                        unique_vertices[vertex] = static_cast<uint32_t>(m_vertices.size());
+                    if (!unique_vertices.contains(vertex)) {
+                        unique_vertices[vertex] =
+                          static_cast<uint32_t>(m_vertices.size());
                         m_vertices.push_back(vertex);
                     }
 
-                    if(index.vertex_index >= 0) {
+                    if (index.vertex_index >= 0) {
                         vertex.position = {
                             attrib.vertices[3 * index.vertex_index + 0],
                             attrib.vertices[3 * index.vertex_index + 1],
@@ -113,7 +116,7 @@ export namespace atlas {
 
                     if (!unique_vertices.contains(vertex)) {
                         unique_vertices[vertex] =
-                        static_cast<uint32_t>(m_vertices.size());
+                          static_cast<uint32_t>(m_vertices.size());
                         m_vertices.push_back(vertex);
                     }
 
@@ -124,24 +127,18 @@ export namespace atlas {
             return true;
         }
 
-        [[nodiscard]] bool is_load() const {
-            return m_load;
-        }
+        [[nodiscard]] bool is_load() const { return m_load; }
 
         //! @return the geometry vertices
-        std::span<vk::vertex_input> vertices() {
-            return m_vertices;
-        }
+        std::span<vk::vertex_input> vertices() { return m_vertices; }
 
         //! @return the geometry indices
-        std::span<uint32_t> indices() {
-            return m_indices;
-        }
+        std::span<uint32_t> indices() { return m_indices; }
 
     private:
         std::vector<vk::vertex_input> m_vertices;
         std::vector<uint32_t> m_indices;
-        bool m_flip=false;
-        bool m_load=false;
+        bool m_flip = false;
+        bool m_load = false;
     };
 };

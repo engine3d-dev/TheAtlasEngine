@@ -148,14 +148,15 @@ namespace atlas {
             ImGui::CreateContext();
             ImGuiIO& io = ImGui::GetIO();
             io.IniFilename = nullptr;
-            
-            std::filesystem::path path = std::filesystem::current_path() / "imgui.ini";
 
-            std::string data_source="";
-            if(std::filesystem::exists(path)) {
+            std::filesystem::path path =
+              std::filesystem::current_path() / "imgui.ini";
+
+            std::string data_source = "";
+            if (std::filesystem::exists(path)) {
                 std::ifstream file(path.string());
 
-                if(!file) {
+                if (!file) {
                     std::println("Cannot load {}", path.string());
                 }
 
@@ -164,7 +165,8 @@ namespace atlas {
                 data_source = ss.str();
             }
 
-            ImGui::LoadIniSettingsFromMemory(data_source.c_str(), data_source.size());
+            ImGui::LoadIniSettingsFromMemory(data_source.c_str(),
+                                             data_source.size());
 
             io.ConfigFlags |=
               ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls

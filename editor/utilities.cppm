@@ -5,7 +5,6 @@ module;
 #include <imgui/backends/imgui_impl_vulkan.h>
 #include <string>
 
-
 export module editor:utilities;
 import atlas.core.ui;
 import atlas.core.scene;

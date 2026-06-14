@@ -75,15 +75,13 @@ public:
           .scale = { 0.9f, 0.9f, 0.9f },
         });
 
-        backpack.set<atlas::mesh_source>({
-          .color = { 1.f, 1.f, 1.f, 1.f },
-          .model_path = "assets/backpack/backpack.obj",
-          .diffuse = "assets/backpack/diffuse.jpg",
-          .specular = "assets/backpack/specular.jpg"
-        });
+        backpack.set<atlas::mesh_source>(
+          { .color = { 1.f, 1.f, 1.f, 1.f },
+            .model_path = "assets/backpack/backpack.obj",
+            .diffuse = "assets/backpack/diffuse.jpg",
+            .specular = "assets/backpack/specular.jpg" });
 
-
-        // const size_t grid_width = 5; 
+        // const size_t grid_width = 5;
         // const float spacing = 5;
 
         // for(size_t i = 0; i < 50; i++) {
@@ -173,7 +171,7 @@ public:
             m_is_first_frame = false;
         }
 
-        if(atlas::event::is_mouse_pressed(mouse_button_middle)) {
+        if (atlas::event::is_mouse_pressed(mouse_button_middle)) {
             atlas::event::set_cursor_mode(atlas::cursor_mode::disabled);
             // sensitivity is how fast the cursor rotates
             float mouse_sensitivity = 0.01;
@@ -186,8 +184,9 @@ public:
         }
 
         // The first frame when presseing left shift is to
-        // continue rotating the camera from where the original position left off
-        if(atlas::event::is_mouse_released(mouse_button_middle)) {
+        // continue rotating the camera from where the original position left
+        // off
+        if (atlas::event::is_mouse_released(mouse_button_middle)) {
             m_is_first_frame = true;
             atlas::event::set_cursor_mode(atlas::cursor_mode::normal);
         }
@@ -208,15 +207,13 @@ public:
 
     void physics_update() {}
 
-    void ui_update() {
-    }
+    void ui_update() {}
 
-    
 private:
     std::optional<atlas::game_object> m_editor_camera;
     float m_movement_speed = 10.f;
     glm::vec2 m_last_cursor_pos{};
-    float m_yaw=0.f;
-    float m_pitch=0.f;
-    bool m_is_first_frame=true;
+    float m_yaw = 0.f;
+    float m_pitch = 0.f;
+    bool m_is_first_frame = true;
 };

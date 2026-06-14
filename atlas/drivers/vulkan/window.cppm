@@ -48,16 +48,20 @@ export namespace atlas {
             m_surface = std::make_shared<vk::surface>(
               p_context->instance_handle(), m_window);
 
-            int framebuffer_width=0;
-            int framebuffer_height=0;
-            glfwGetFramebufferSize(m_window, &framebuffer_width, &framebuffer_height);
+            int framebuffer_width = 0;
+            int framebuffer_height = 0;
+            glfwGetFramebufferSize(
+              m_window, &framebuffer_width, &framebuffer_height);
 
-            // Weird issue where the frame buffer size is different then the window size.
-            // Causing majority of the portion of the window to render pink pixels, indicating an error.
+            // Weird issue where the frame buffer size is different then the
+            // window size. Causing majority of the portion of the window to
+            // render pink pixels, indicating an error.
             m_params.width = static_cast<uint32_t>(framebuffer_width);
             m_params.height = static_cast<uint32_t>(framebuffer_height);
 
-            std::println("Window created with extent: {}x{}", m_params.width, m_params.height);
+            std::println("Window created with extent: {}x{}",
+                         m_params.width,
+                         m_params.height);
 
             vk::swapchain_params swapchain_params = {
                 .width = static_cast<uint32_t>(m_params.width),
@@ -65,15 +69,15 @@ export namespace atlas {
                 .present_index = 0,
             };
 
-            m_surface_properties =
-              p_context->physical_device().request_surface(*m_surface, VK_FORMAT_B8G8R8A8_UNORM);
+            m_surface_properties = p_context->physical_device().request_surface(
+              *m_surface, VK_FORMAT_B8G8R8A8_UNORM);
 
             m_swapchain =
               std::make_shared<vk::swapchain>(*p_context->logical_device(),
                                               *m_surface,
                                               swapchain_params,
                                               m_surface_properties);
-            
+
             center_window();
             vk::queue_params present_params = {
                 .family = 0,
@@ -122,15 +126,14 @@ export namespace atlas {
         }
 
         void center_window() {
-            int window_width=0;
-            int window_height=0;
+            int window_width = 0;
+            int window_height = 0;
             glfwGetWindowSize(m_window, &window_width, &window_height);
             GLFWmonitor* monitor = glfwGetPrimaryMonitor();
             const GLFWvidmode* mode = glfwGetVideoMode(monitor);
             int width = (mode->width / 2) - (window_width / 2);
             int height = (mode->height / 2) - (window_height / 2);
-            glfwSetWindowPos(
-              m_window, width, height);
+            glfwSetWindowPos(m_window, width, height);
         }
 
         void submit(std::span<const VkCommandBuffer> p_commands) {
@@ -145,9 +148,7 @@ export namespace atlas {
             return !glfwWindowShouldClose(m_window);
         }
 
-        [[nodiscard]] window_params extent() const {
-            return m_params;
-        }
+        [[nodiscard]] window_params extent() const { return m_params; }
 
     private:
         vk::instance m_instance;

@@ -18,11 +18,12 @@ import vk;
 export namespace atlas {
 
     /**
-     * @brief Implementing image loading that utilizes stb_image to decode disk-based images into uncompressed streams of bytes.
-     * 
+     * @brief Implementing image loading that utilizes stb_image to decode
+     * disk-based images into uncompressed streams of bytes.
+     *
      * Provides size extents of uncompressed of the total image size.
-     * 
-    */
+     *
+     */
     class stb_image : public vk::image {
     public:
         stb_image() = default;

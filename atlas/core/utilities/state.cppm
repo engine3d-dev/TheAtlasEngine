@@ -170,7 +170,6 @@ export namespace atlas {
         });
     }
 
-
     template<typename UObject, typename UCallback>
     void register_post(UObject* p_instance, const UCallback& p_callable) {
         static_assert(std::is_member_pointer_v<UCallback>,

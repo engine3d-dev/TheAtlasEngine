@@ -38,40 +38,54 @@ struct environment_uniforms {
 };
 
 struct environment_push_constant {
-    uint64_t scene_environment_address=0;
+    uint64_t scene_environment_address = 0;
 };
 
 /**
- * 
- * @brief Vulkan-specific implementation for loading GPU resources associated to loading environent maps.
- * 
-*/
+ *
+ * @brief Vulkan-specific implementation for loading GPU resources associated to
+ * loading environent maps.
+ *
+ */
 export class environment_map {
 public:
     environment_map() = default;
     environment_map(std::shared_ptr<vk::device> p_device,
                     vk::physical_device& p_physical,
-                    const std::string& p_filename, /*NOLINT*/VkFormat p_color_format, VkFormat p_depth_format) : m_color_format(p_color_format), m_depth_format(p_depth_format) {
+                    const std::string& p_filename,
+                    /*NOLINT*/ VkFormat p_color_format,
+                    VkFormat p_depth_format)
+      : m_color_format(p_color_format)
+      , m_depth_format(p_depth_format) {
         /*NOLINT*/ m_device = p_device;
         m_physical = p_physical;
-        m_memory_mask = m_physical->memory_properties(vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit);
+        m_memory_mask =
+          m_physical->memory_properties(vk::memory_property::host_visible_bit |
+                                        vk::memory_property::host_cached_bit);
 
         construct(p_filename);
     }
 
     environment_map(std::shared_ptr<vk::device> p_device,
                     vk::physical_device& p_physical,
-                    std::span<const float> p_color, const vk::image_extent& p_extent, /*NOLINT*/VkFormat p_color_format, VkFormat p_depth_format) : m_color_format(p_color_format), m_depth_format(p_depth_format) {
+                    std::span<const float> p_color,
+                    const vk::image_extent& p_extent,
+                    /*NOLINT*/ VkFormat p_color_format,
+                    VkFormat p_depth_format)
+      : m_color_format(p_color_format)
+      , m_depth_format(p_depth_format) {
         /*NOLINT*/ m_device = p_device;
         m_physical = p_physical;
-        m_memory_mask = m_physical->memory_properties(vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit);
+        m_memory_mask =
+          m_physical->memory_properties(vk::memory_property::host_visible_bit |
+                                        vk::memory_property::host_cached_bit);
 
         construct(p_color, p_extent);
     }
 
     /**
      * @brief loads in a new HDRI environment map
-    */
+     */
     void construct(const std::string& p_filename) {
         bool res = create_hdr(p_filename);
 
@@ -86,9 +100,11 @@ public:
     }
 
     /**
-     * @brief loads in raw pixels and texture dimensions to receive in raw pixels data if no HDRI is provided.
-    */
-    void construct(std::span<const float> p_color, const vk::image_extent& p_extent) {
+     * @brief loads in raw pixels and texture dimensions to receive in raw
+     * pixels data if no HDRI is provided.
+     */
+    void construct(std::span<const float> p_color,
+                   const vk::image_extent& p_extent) {
         bool res = create_hdr(p_color, p_extent);
 
         if (!res) {
@@ -102,8 +118,9 @@ public:
     }
 
     /**
-     * @brief performs the loading operation to read in the pixel float data of the actual HDRI metadata.
-    */
+     * @brief performs the loading operation to read in the pixel float data of
+     * the actual HDRI metadata.
+     */
     bool create_hdr(const std::string& p_filename) {
         stbi_set_flip_vertically_on_load(true);
         int w, h, channels;
@@ -164,8 +181,9 @@ public:
 
         upload_cmd.begin(vk::command_usage::one_time_submit);
 
-        // Performing image layout transitions to ensure we do not lose any data transferring over to the GPU.
-        // Begin Memory Barrier: Undefined to TRANSFER_DST
+        // Performing image layout transitions to ensure we do not lose any data
+        // transferring over to the GPU. Begin Memory Barrier: Undefined to
+        // TRANSFER_DST
         m_skybox_image.memory_barrier(upload_cmd,
                                       texture_format,
                                       VK_IMAGE_LAYOUT_UNDEFINED,
@@ -208,12 +226,14 @@ public:
         return true;
     }
 
-    bool create_hdr(std::span<const float> p_colors, const vk::image_extent& p_extent) {
+    bool create_hdr(std::span<const float> p_colors,
+                    const vk::image_extent& p_extent) {
 
         VkFormat texture_format = VK_FORMAT_R32G32B32A32_SFLOAT;
         const uint64_t bytes_per_pixel_channel = 16; // float are 4 bytes
         const uint64_t total_size_bytes =
-          static_cast<uint64_t>(static_cast<uint64_t>(p_extent.width) * p_extent.height * bytes_per_pixel_channel);
+          static_cast<uint64_t>(static_cast<uint64_t>(p_extent.width) *
+                                p_extent.height * bytes_per_pixel_channel);
         const uint64_t image_size = total_size_bytes;
 
         vk::buffer_parameters staging_params = {
@@ -241,7 +261,6 @@ public:
         std::span<const uint8_t> pixels_data(
           reinterpret_cast<const uint8_t*>(p_colors.data()), image_size);
         staging_buffer.transfer(pixels_data);
-
 
         // 6. Record and Execute Upload
         vk::command_params upload_params = {
@@ -540,49 +559,48 @@ public:
         m_skybox_vbo = vk::vertex_buffer(*m_device, vertices, vertex_params);
     }
 
-
     void create_pipelines() {
         create_buffers();
         std::array<vk::vertex_attribute_entry, 4> attribute_entries = {
             vk::vertex_attribute_entry{
-                .location = 0,
-                .format = vk::format::rgb32_sfloat,
-                .stride = offsetof(vk::vertex_input, position),
+              .location = 0,
+              .format = vk::format::rgb32_sfloat,
+              .stride = offsetof(vk::vertex_input, position),
             },
             vk::vertex_attribute_entry{
-                .location = 1,
-                .format = vk::format::rgb32_sfloat,
-                .stride = offsetof(vk::vertex_input, color),
+              .location = 1,
+              .format = vk::format::rgb32_sfloat,
+              .stride = offsetof(vk::vertex_input, color),
             },
             vk::vertex_attribute_entry{
-                .location = 2,
-                .format = vk::format::rgb32_sfloat,
-                .stride = offsetof(vk::vertex_input, normals),
+              .location = 2,
+              .format = vk::format::rgb32_sfloat,
+              .stride = offsetof(vk::vertex_input, normals),
             },
             vk::vertex_attribute_entry{
-                .location = 3,
-                .format = vk::format::rg32_sfloat,
-                .stride = offsetof(vk::vertex_input, uv),
+              .location = 3,
+              .format = vk::format::rg32_sfloat,
+              .stride = offsetof(vk::vertex_input, uv),
             }
         };
         std::array<vk::vertex_attribute, 1> attribute = {
             vk::vertex_attribute{
-                // layout (set = 0, binding = 0)
-                .binding = 0,
-                .entries = attribute_entries,
-                .stride = sizeof(vk::vertex_input),
-                .input_rate = vk::input_rate::vertex,
+              // layout (set = 0, binding = 0)
+              .binding = 0,
+              .entries = attribute_entries,
+              .stride = sizeof(vk::vertex_input),
+              .input_rate = vk::input_rate::vertex,
             },
         };
 
         const std::array<vk::shader_source, 2> sources = {
             vk::shader_source{
-                .filename = "builtin.shaders/skybox/skybox.vert.spv",
-                .stage = vk::shader_stage::vertex,
+              .filename = "builtin.shaders/skybox/skybox.vert.spv",
+              .stage = vk::shader_stage::vertex,
             },
             vk::shader_source{
-                .filename = "builtin.shaders/skybox/skybox.frag.spv",
-                .stage = vk::shader_stage::fragment,
+              .filename = "builtin.shaders/skybox/skybox.frag.spv",
+              .stage = vk::shader_stage::fragment,
             },
         };
 
@@ -591,7 +609,6 @@ public:
         };
         m_skybox_shaders = vk::shader_resource(*m_device, shader_info);
         m_skybox_shaders.vertex_attributes(attribute);
-
 
         // Specifying descriptors
 
@@ -609,7 +626,6 @@ public:
             },
         };
 
-
         // layout(set = 0, ...)
         uint32_t max_descriptors = 1;
         vk::descriptor_layout set0_layout = {
@@ -618,20 +634,25 @@ public:
             .entries = entries, // descriptor layout entries description
             .descriptor_counts = std::span<const uint32_t>(&max_descriptors, 1),
         };
-        m_skybox_descriptor = vk::descriptor_resource(*m_device, set0_layout, vk::descriptor_layout_flags::update_after_bind_pool);
-
+        m_skybox_descriptor = vk::descriptor_resource(
+          *m_device,
+          set0_layout,
+          vk::descriptor_layout_flags::update_after_bind_pool);
 
         // specifying push constant for pipelines
-        std::array<vk::color_blend_attachment_state, 1> color_blend_attachments = {
-            vk::color_blend_attachment_state{},
-        };
+        std::array<vk::color_blend_attachment_state, 1>
+          color_blend_attachments = {
+              vk::color_blend_attachment_state{},
+          };
 
         std::array<vk::dynamic_state, 2> dynamic_states = {
-            vk::dynamic_state::viewport, vk::dynamic_state::scissor,
+            vk::dynamic_state::viewport,
+            vk::dynamic_state::scissor,
         };
 
         uint32_t vertex_mask = static_cast<uint32_t>(vk::shader_stage::vertex);
-        uint32_t fragment_mask = static_cast<uint32_t>(vk::shader_stage::fragment);
+        uint32_t fragment_mask =
+          static_cast<uint32_t>(vk::shader_stage::fragment);
         uint32_t stage_mask = vertex_mask | fragment_mask;
         m_stage = static_cast<vk::shader_stage>(stage_mask);
         vk::push_constant_range range = {
@@ -669,12 +690,16 @@ public:
         m_skybox_pipeline = vk::pipeline(*m_device, skybox_pipeline_params);
 
         vk::buffer_parameters uniform_params = {
-            .memory_mask = m_physical->memory_properties(vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit),
-            .usage = vk::buffer_usage::uniform_buffer_bit | vk::buffer_usage::shader_device_address_bit,
+            .memory_mask = m_physical->memory_properties(
+              vk::memory_property::host_visible_bit |
+              vk::memory_property::host_cached_bit),
+            .usage = vk::buffer_usage::uniform_buffer_bit |
+                     vk::buffer_usage::shader_device_address_bit,
             .allocate_flags = vk::memory_allocate_flags::device_address_bit_khr,
         };
 
-        m_skybox_uniforms = vk::dyn::buffer(*m_device, sizeof(environment_uniforms), uniform_params);
+        m_skybox_uniforms = vk::dyn::buffer(
+          *m_device, sizeof(environment_uniforms), uniform_params);
 
         vk::write_image environment_image = {
             .sampler = m_skybox_image.sampler(),
@@ -684,8 +709,9 @@ public:
         std::array<vk::write_image_descriptor, 1> write_descriptors = {
             // layout(set = 0, binding = 1) sampler2D environment;
             vk::write_image_descriptor{
-                .dst_binding = 1,
-                .sample_images = std::span<const vk::write_image>(&environment_image, 1),
+              .dst_binding = 1,
+              .sample_images =
+                std::span<const vk::write_image>(&environment_image, 1),
             },
         };
 
@@ -696,7 +722,6 @@ public:
         m_current_command = &p_current;
     }
 
-
     void begin(const glm::mat4& p_proj, const glm::mat4& p_view) {
         m_proj_view = p_proj * glm::mat4(glm::mat3(p_view));
 
@@ -705,25 +730,33 @@ public:
             .proj_view = m_proj_view,
         };
 
-        m_skybox_uniforms.transfer<environment_uniforms>(std::span<environment_uniforms>(&scene_ubo, 1));
+        m_skybox_uniforms.transfer<environment_uniforms>(
+          std::span<environment_uniforms>(&scene_ubo, 1));
 
         const VkDescriptorSet skybox_descriptor = m_skybox_descriptor;
-        m_current_command->bind_descriptors(m_skybox_pipeline.layout(), VK_PIPELINE_BIND_POINT_GRAPHICS, std::span<const VkDescriptorSet>(&skybox_descriptor, 1));
+        m_current_command->bind_descriptors(
+          m_skybox_pipeline.layout(),
+          VK_PIPELINE_BIND_POINT_GRAPHICS,
+          std::span<const VkDescriptorSet>(&skybox_descriptor, 1));
     }
 
     void end() {
-        const uint64_t scene_environment = m_skybox_uniforms.get_device_address();
+        const uint64_t scene_environment =
+          m_skybox_uniforms.get_device_address();
 
         environment_push_constant environment_push_const = {
             .scene_environment_address = scene_environment,
         };
 
-        m_skybox_pipeline.push_constant<environment_push_constant>(*m_current_command, environment_push_const, m_stage, 0);
+        m_skybox_pipeline.push_constant<environment_push_constant>(
+          *m_current_command, environment_push_const, m_stage, 0);
 
         // Binding our vertex buffers here
         const VkBuffer& skybox_vertex = m_skybox_vbo;
         uint64_t offset = 0;
-        m_current_command->bind_vertex_buffers(std::span<const VkBuffer>(&skybox_vertex, 1), std::span<const uint64_t>(&offset, 1));
+        m_current_command->bind_vertex_buffers(
+          std::span<const VkBuffer>(&skybox_vertex, 1),
+          std::span<const uint64_t>(&offset, 1));
 
         vkCmdDraw(*m_current_command, m_vertices_size, 1, 0, 0);
     }
@@ -746,7 +779,7 @@ public:
 private:
     glm::mat4 m_proj_view;
     vk::command_buffer* m_current_command;
-    uint64_t m_vertices_size=0;
+    uint64_t m_vertices_size = 0;
     std::shared_ptr<vk::device> m_device;
     std::optional<vk::physical_device> m_physical;
     vk::vertex_buffer m_skybox_vbo;

@@ -97,11 +97,9 @@ main() {
         // specify to using vulkan 1.4
         .version = vk::api_version::vk_1_4,
         // .validation takes in a std::span<const char*>
-        .validations =
-          validation_layers,
+        .validations = validation_layers,
         // .extensions also takes in std::span<const char*>
-        .extensions =
-          global_extensions
+        .extensions = global_extensions
     };
 
     // 1. Setting up vk instance

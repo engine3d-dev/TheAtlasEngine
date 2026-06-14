@@ -11,17 +11,17 @@ import editor;
 
 class editor_application : public atlas::application {
 public:
-    editor_application(/*NOLINT*/std::shared_ptr<atlas::graphics_context> p_context,
-                       const atlas::application_settings& p_settings,
-                       atlas::event::bus& p_bus)
+    editor_application(
+      /*NOLINT*/ std::shared_ptr<atlas::graphics_context> p_context,
+      const atlas::application_settings& p_settings,
+      atlas::event::bus& p_bus)
       : atlas::application(p_context, p_settings, p_bus) {
 
-        m_world =
-          std::make_shared<editor_world>(p_context, "Editor World", p_bus, m_stream);
+        m_world = std::make_shared<editor_world>(
+          p_context, "Editor World", p_bus, m_stream);
 
         current_world(m_world);
     }
-
 
     // ~editor_application() {
     //     m_world->destruct();
@@ -34,7 +34,9 @@ private:
 };
 
 atlas::ref<atlas::application>
-initialize_application(/*NOLINT*/std::shared_ptr<atlas::graphics_context> p_context, atlas::event::bus& p_bus) {
+initialize_application(
+  /*NOLINT*/ std::shared_ptr<atlas::graphics_context> p_context,
+  atlas::event::bus& p_bus) {
     atlas::application_settings settings = {
         .extent = {
             .width = 1510,

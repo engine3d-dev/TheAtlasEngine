@@ -5,5 +5,4 @@ module;
 
 export module atlas.renderer;
 
-export namespace atlas {
-};
+export namespace atlas {};

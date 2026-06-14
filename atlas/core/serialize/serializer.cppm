@@ -91,13 +91,12 @@ namespace atlas {
         // Deserialize atlas::material component
         if (p_entity_value["Mesh Source"]) {
             auto mesh = p_entity_value["Mesh Source"];
-            if(!mesh["Model Path"].as<std::string>().empty()) {
+            if (!mesh["Model Path"].as<std::string>().empty()) {
                 p_deserialize_to_object.set<mesh_source>({
-                    .flip = static_cast<bool>(mesh["Flip"].as<int>()),
-                    .model_path =
-                        mesh["Model Path"].as<std::string>(),
-                    .diffuse = mesh["Diffuse"].as<std::string>(),
-                    .specular = mesh["Specular"].as<std::string>(),
+                  .flip = static_cast<bool>(mesh["Flip"].as<int>()),
+                  .model_path = mesh["Model Path"].as<std::string>(),
+                  .diffuse = mesh["Diffuse"].as<std::string>(),
+                  .specular = mesh["Specular"].as<std::string>(),
                 });
             }
         }
@@ -178,7 +177,7 @@ namespace atlas {
          * serialization/deserialization to
          */
         serializer(ref<scene> p_scene)
-          : m_current_scene_ctx(/*NOLINT*/p_scene) {}
+          : m_current_scene_ctx(/*NOLINT*/ p_scene) {}
 
         /**
          * @param p_filepath is the specified path to save the file
@@ -245,8 +244,9 @@ namespace atlas {
                                  environment_map_data);
             }
 
-            if(!environment_map_data.empty()) {
-                p_registry.set<environment>({ .filepath = environment_map_data });
+            if (!environment_map_data.empty()) {
+                p_registry.set<environment>(
+                  { .filepath = environment_map_data });
             }
 
             YAML::Node entity_objects = data["Entities"];

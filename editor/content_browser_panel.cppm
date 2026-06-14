@@ -17,19 +17,18 @@ export class content_browser_panel {
 public:
     content_browser_panel() = default;
 
-    content_browser_panel(
-      std::shared_ptr<vk::device> p_device,
-      uint32_t p_memory_properties) {
-        /*NOLINT*/m_device = p_device;
+    content_browser_panel(std::shared_ptr<vk::device> p_device,
+                          uint32_t p_memory_properties) {
+        /*NOLINT*/ m_device = p_device;
 
-        m_directory_icon = ui::experimental::icon(m_device, p_memory_properties,
-                                 "assets/icons/DirectoryIcon.png");
+        m_directory_icon = ui::experimental::icon(
+          m_device, p_memory_properties, "assets/icons/DirectoryIcon.png");
 
-        m_file_icon = ui::experimental::icon(m_device, p_memory_properties,
-                                 "assets/icons/FileIcon.png");
+        m_file_icon = ui::experimental::icon(
+          m_device, p_memory_properties, "assets/icons/FileIcon.png");
 
-        m_back_icon = ui::experimental::icon(m_device, p_memory_properties,
-                                 "assets/icons/Back.png");
+        m_back_icon = ui::experimental::icon(
+          m_device, p_memory_properties, "assets/icons/Back.png");
     }
 
     void run() {
@@ -38,8 +37,9 @@ public:
                 // if(ImGui::Button("<-")){
                 //     m_current_directory = m_current_directory.parent_path();
                 // }
-                if (ImGui::ImageButton(
-                      "##BackButton", m_back_icon.texture_id(), ImVec2(10, 10))) {
+                if (ImGui::ImageButton("##BackButton",
+                                       m_back_icon.texture_id(),
+                                       ImVec2(10, 10))) {
                     m_current_directory = m_current_directory.parent_path();
                 }
             }
@@ -75,8 +75,8 @@ public:
 
                 ImGui::PushID(filename.c_str());
                 VkDescriptorSet icon = dir_entry.is_directory()
-                                     ? m_directory_icon.texture_id()
-                                     : m_file_icon.texture_id();
+                                         ? m_directory_icon.texture_id()
+                                         : m_file_icon.texture_id();
                 ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
 
                 ImGui::ImageButton("##Button",

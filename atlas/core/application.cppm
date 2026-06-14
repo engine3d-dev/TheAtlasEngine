@@ -56,12 +56,13 @@ export namespace atlas {
             m_device = p_context->logical_device();
 
             m_window_params = p_params.extent;
-            
+
             // m_window = std::allocate_shared<window>(,
             // m_context->instance_handle(), params);
             m_window = std::make_shared<window>(p_context, p_params.extent);
 
-            m_aspect_ratio = static_cast<float>(m_window_params.width) / static_cast<float>(m_window_params.height);
+            m_aspect_ratio = static_cast<float>(m_window_params.width) /
+                             static_cast<float>(m_window_params.height);
             event::set_window_size(m_window->glfw_window());
 
             m_bus->create_listener<atlas::event::collision_enter>();
@@ -139,15 +140,16 @@ export namespace atlas {
             m_render_context =
               render_context(m_context, m_color_format, m_depth_format);
 
-            m_imgui_context = std::make_shared<imgui_context>(p_context,
-                                m_window->glfw_window(),
-                                m_window->swapchain_handle(),
-                                m_window->request_images().size(),
-                                m_window->present_queue(),
-                                // VK_FORMAT_B8G8R8A8_UNORM,
-                                m_color_format,
-                                m_depth_format,
-                                m_window_params);
+            m_imgui_context =
+              std::make_shared<imgui_context>(p_context,
+                                              m_window->glfw_window(),
+                                              m_window->swapchain_handle(),
+                                              m_window->request_images().size(),
+                                              m_window->present_queue(),
+                                              // VK_FORMAT_B8G8R8A8_UNORM,
+                                              m_color_format,
+                                              m_depth_format,
+                                              m_window_params);
             std::println("images.size() = {}", images.size());
 
             m_window->center_window();
@@ -173,8 +175,8 @@ export namespace atlas {
                        transform,
                        perspective_camera>()
               .each([this](flecs::pair<tag::editor, projection_view> p_pair,
-                        transform& p_transform,
-                        perspective_camera& p_camera) {
+                           transform& p_transform,
+                           perspective_camera& p_camera) {
                   if (!p_camera.is_active) {
                       return;
                   }
@@ -256,7 +258,8 @@ export namespace atlas {
                       }
 
                       const transform* t = p_entity.get<transform>();
-                      m_render_context.set_camera_pos(glm::vec4(t->position, 1.f));
+                      m_render_context.set_camera_pos(
+                        glm::vec4(t->position, 1.f));
                       m_projection = p_pair->projection;
                       m_view = p_pair->view;
                   });
@@ -267,8 +270,8 @@ export namespace atlas {
 
                 m_imgui_context->image_memory_barrier(
                   current,
-                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-                VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+                  VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                  VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
                 m_imgui_context->depth_image_memory_barrier(
                   current,
@@ -316,13 +319,16 @@ export namespace atlas {
                     .min_depth = 0.0f,
                     .max_depth = 1.0f,
                 };
-                current.set_viewport(0, 1, std::span<const vk::viewport_params>(&viewport, 1));
+                current.set_viewport(
+                  0, 1, std::span<const vk::viewport_params>(&viewport, 1));
 
                 vk::scissor_params scissor = {
                     .offset = { 0, 0 },
-                    .extent = {static_cast<uint32_t>(m_window_params.width), static_cast<uint32_t>(m_window_params.height)},
+                    .extent = { static_cast<uint32_t>(m_window_params.width),
+                                static_cast<uint32_t>(m_window_params.height) },
                 };
-                current.set_scissor(0, 1, std::span<const vk::scissor_params>(&scissor, 1));
+                current.set_scissor(
+                  0, 1, std::span<const vk::scissor_params>(&scissor, 1));
 
                 current.begin_rendering(ui_begin_params);
 
@@ -338,7 +344,7 @@ export namespace atlas {
 
                 /**
                  * Presenting to Swapchain Memory Barriers
-                */
+                 */
 
                 vk::rendering_attachment present_color_render_attachment = {
                     .image_view = m_images[m_next_image_frame_idx].image_view(),
@@ -374,7 +380,7 @@ export namespace atlas {
 
                 m_images[m_next_image_frame_idx].memory_barrier(
                   current,
-                m_color_format,
+                  m_color_format,
                   VK_IMAGE_LAYOUT_UNDEFINED,
                   VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
@@ -385,7 +391,6 @@ export namespace atlas {
                   VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
                   VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT);
 
-                
                 current.begin_rendering(present_begin_params);
                 m_imgui_context->begin();
                 m_imgui_context->set_current_command(current);
@@ -410,7 +415,7 @@ export namespace atlas {
                 // Update platform window afterwards
                 m_imgui_context->update_platforms();
             }
-            
+
             invoke_post_update(m_current_scene.get());
             invoke_post_update(m_world.get());
         }
@@ -453,7 +458,7 @@ export namespace atlas {
         }
 
     private:
-        float m_aspect_ratio=0.f;
+        float m_aspect_ratio = 0.f;
         uint32_t m_next_image_frame_idx = 0;
         VkFormat m_color_format;
         VkFormat m_depth_format;

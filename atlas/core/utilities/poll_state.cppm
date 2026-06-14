@@ -45,7 +45,8 @@ export namespace atlas {
         s_start[p_address].emplace_back(p_callback);
     }
 
-    void post_update_poll(void* p_address, const std::function<void()>& p_callback) {
+    void post_update_poll(void* p_address,
+                          const std::function<void()>& p_callback) {
         s_post[p_address].emplace_back(p_callback);
     }
 

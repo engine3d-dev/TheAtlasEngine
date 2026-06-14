@@ -451,8 +451,10 @@ public:
                     m_scene_state = scene_runtime::edit;
                     m_physics_engine.stop();
 
-                    if (!m_deserializer_test.load("LevelScene", *m_current_scene)) {
-                        console_log_error("Could not load yaml file LevelScene!!!");
+                    if (!m_deserializer_test.load("LevelScene",
+                                                  *m_current_scene)) {
+                        console_log_error(
+                          "Could not load yaml file LevelScene!!!");
                     }
                 }
             }

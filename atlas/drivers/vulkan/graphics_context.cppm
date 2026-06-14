@@ -26,8 +26,9 @@ import vk;
 export namespace atlas {
 
     /**
-     * @brief graphics context to manage core resources that is used as the primary resource access to the core Vulkan handles.
-    */
+     * @brief graphics context to manage core resources that is used as the
+     * primary resource access to the core Vulkan handles.
+     */
     class graphics_context {
     public:
         graphics_context() = default;
@@ -36,7 +37,7 @@ export namespace atlas {
                          std::shared_ptr<vk::device> p_device)
           : m_api_instance(p_api_instance)
           , m_physical(&p_physical)
-          , m_device(/*NOLINT*/p_device) {
+          , m_device(/*NOLINT*/ p_device) {
             // Constructing the graphics context
         }
 
