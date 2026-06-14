@@ -15,7 +15,7 @@ import atlas.common;
 import atlas.core.scene;
 import atlas.core.serialize.types;
 import atlas.core.scene.components;
-import atlas.logger;
+import atlas.core.utilities;
 
 namespace atlas {
     // used to serialize entities

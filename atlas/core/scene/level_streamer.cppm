@@ -8,7 +8,7 @@ module;
 
 export module atlas.core.level_streamer;
 
-import atlas.logger;
+import atlas.core.utilities;
 import atlas.core.scene;
 import atlas.core.scene.uuid;
 import atlas.core.event;

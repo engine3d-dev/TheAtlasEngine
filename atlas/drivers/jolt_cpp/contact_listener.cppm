@@ -33,7 +33,8 @@ module;
 #include <Jolt/Math/Quat.h>
 
 export module atlas.drivers.jolt_cpp.contact_listener;
-import atlas.logger;
+// import atlas.logger;
+import atlas.core.utilities;
 // import atlas.core.event.types;
 import atlas.core.event;
 

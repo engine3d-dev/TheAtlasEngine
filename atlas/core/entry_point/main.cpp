@@ -20,7 +20,7 @@
 
 import atlas.application;
 import atlas.common;
-import atlas.logger;
+import atlas.core.utilities;
 import atlas.graphics_api;
 import atlas.drivers.vulkan;
 import atlas.core.event;

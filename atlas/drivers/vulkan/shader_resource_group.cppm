@@ -8,7 +8,8 @@ module;
 
 export module atlas.drivers.vulkan.shader_resource_group;
 
-import atlas.logger;
+// import atlas.logger;
+import atlas.core.utilities;
 import vk;
 
 namespace atlas::vulkan {

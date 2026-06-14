@@ -9,7 +9,7 @@ module;
 
 export module editor:content_browser;
 
-import atlas.logger;
+import atlas.core.utilities;
 import atlas.drivers.vulkan;
 import atlas.drivers.vulkan.stb_image;
 import vk;
