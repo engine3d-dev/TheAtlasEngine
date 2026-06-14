@@ -7,7 +7,7 @@ module;
 
 
 export module editor:utilities;
-import atlas.core.ui.widgets;
+import atlas.core.ui;
 import atlas.core.scene.components;
 
 export void

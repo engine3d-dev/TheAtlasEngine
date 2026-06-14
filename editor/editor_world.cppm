@@ -25,9 +25,8 @@ import atlas.drivers.renderer_system;
 import atlas.core.scene.uuid;
 import atlas.core.level_streamer;
 import atlas.core.scene;
-import atlas.core.ui.widgets;
+import atlas.core.ui;
 import atlas.physics.engine;
-import atlas.core.ui.widgets.imgui_stdlib;
 
 import :level_scene;
 import :icon;
