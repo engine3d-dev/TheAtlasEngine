@@ -22,7 +22,6 @@ import atlas.core.utilities;
 import atlas.core.scene;
 import atlas.core.scene.world;
 import atlas.core.event;
-import atlas.drivers.renderer_system;
 import atlas.core.level_streamer;
 import atlas.core.ui;
 import atlas.physics.engine;

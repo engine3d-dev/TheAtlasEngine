@@ -11,7 +11,7 @@ export module editor:icon;
 
 import atlas.core.utilities;
 import vk;
-import atlas.drivers.vulkan.stb_image;
+import atlas.drivers.vulkan;
 
 export namespace ui::experimental {
     /**

@@ -11,7 +11,7 @@ module;
 #include <stb_image.h>
 #endif
 
-export module atlas.drivers.vulkan.stb_image;
+export module atlas.drivers.vulkan:stb_image;
 
 import vk;
 

@@ -22,8 +22,6 @@ import atlas.core.scene;
 import atlas.core.utilities;
 import atlas.core.math;
 
-import atlas.drivers.vulkan;
-
 export class level_scene final : public atlas::scene {
 public:
     level_scene(const std::string& p_name, atlas::event::bus& p_bus)

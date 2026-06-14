@@ -15,16 +15,16 @@ module;
 #include <glm/gtx/hash.hpp>
 
 export module atlas.drivers.vulkan:render_context;
-import atlas.core.scene;
 
-import atlas.drivers.importer;
-import atlas.core.scene;
-import atlas.drivers.vulkan.stb_image;
-import atlas.core.utilities;
-
+import :stb_image;
 import :graphics_context;
 import :environment_map;
 import :gpu_uniforms;
+
+import atlas.core.scene;
+import atlas.drivers.importer;
+import atlas.core.utilities;
+
 import vk;
 
 export namespace atlas {
