@@ -11,7 +11,7 @@ module;
 #include <print>
 
 export module atlas.core.utilities:logger;
-export import :common;
+import :common;
 
 export namespace atlas {
     /**

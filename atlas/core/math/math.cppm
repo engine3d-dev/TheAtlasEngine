@@ -4,6 +4,7 @@ module;
 #include <glm/gtx/quaternion.hpp>
 
 export module atlas.core.math;
+export import :types;
 
 export namespace atlas {
 

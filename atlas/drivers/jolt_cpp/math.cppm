@@ -10,7 +10,7 @@ module;
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 export module atlas.drivers.jolt_cpp:math;
-import atlas.core.math.types;
+import atlas.core.math;
 
 export namespace atlas {
     template<>
