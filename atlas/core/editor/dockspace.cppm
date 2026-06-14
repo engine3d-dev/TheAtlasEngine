@@ -6,7 +6,7 @@ module;
 
 #include <GLFW/glfw3.h>
 
-export module atlas.core.editor.dockspace;
+export module atlas.core.editor:dockspace;
 
 export namespace atlas::ui {
     /**

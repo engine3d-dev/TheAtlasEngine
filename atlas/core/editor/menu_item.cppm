@@ -6,7 +6,7 @@ module;
 #include <imgui/backends/imgui_impl_glfw.h>
 #include <imgui/backends/imgui_impl_vulkan.h>
 
-export module atlas.core.editor.menu_item;
+export module atlas.core.editor:menu_item;
 
 export namespace atlas::ui {
     struct block {

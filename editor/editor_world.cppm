@@ -33,8 +33,7 @@ import :utilities;
 import :content_browser;
 // import :level_scene2;
 
-import atlas.core.editor.dockspace;
-import atlas.core.editor.menu_item;
+import atlas.core.editor;
 import atlas.core.serialize;
 import atlas.physics.engine;
 import vk;
