@@ -132,10 +132,6 @@ target_sources(${PROJECT_NAME} PUBLIC
     FILE_SET CXX_MODULES
     TYPE CXX_MODULES
     FILES
-
-    # core
-    # atlas/atlas.cppm
-    atlas/core/api.cppm
     atlas/core/common.cppm
     atlas/core/utilities/types.cppm
     atlas/core/utilities/utilities.cppm
@@ -170,6 +166,7 @@ target_sources(${PROJECT_NAME} PUBLIC
     # editor
     atlas/core/editor/dockspace.cppm
     atlas/core/editor/menu_item.cppm
+    atlas/core/ui/ui.cppm
     atlas/core/ui/widgets.cppm
     atlas/core/filesystem/file_dialog.cppm
 
@@ -192,6 +189,7 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas/physics/physics_engine.cppm
     
     # jolt_cpp
+    atlas/drivers/jolt_cpp/jolt_cpp.cppm
     atlas/drivers/jolt_cpp/math.cppm
     atlas/drivers/jolt_cpp/broad_phase.cppm
     atlas/drivers/jolt_cpp/contact_listener.cppm
