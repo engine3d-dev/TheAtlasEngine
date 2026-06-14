@@ -9,7 +9,7 @@ import atlas.core.utilities;
 import atlas.core.scene;
 import atlas.core.event;
 import atlas.drivers.physics_context;
-import atlas.drivers.jolt_cpp.context;
+import atlas.drivers.jolt_cpp;
 
 namespace atlas::physics {
 

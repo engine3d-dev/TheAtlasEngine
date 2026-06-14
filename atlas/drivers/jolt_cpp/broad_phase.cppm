@@ -32,7 +32,7 @@ module;
 #include <Jolt/Math/Real.h>
 #include <Jolt/Math/Quat.h>
 
-export module atlas.drivers.jolt_cpp.broad_phase;
+export module atlas.drivers.jolt_cpp:broad_phase;
 
 import atlas.core.utilities;
 
