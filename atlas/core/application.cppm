@@ -24,7 +24,6 @@ module;
 export module atlas.application;
 
 import atlas.core.utilities;
-import atlas.core.utilities.poll_state;
 import atlas.core.event;
 import vk;
 import atlas.drivers.vulkan;

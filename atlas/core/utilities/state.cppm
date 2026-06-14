@@ -3,9 +3,9 @@ module;
 #include <type_traits>
 #include <cstring>
 
-export module atlas.core.utilities.state;
+export module atlas.core.utilities:state;
 
-import atlas.core.utilities.poll_state;
+import :poll_state;
 
 export namespace atlas {
     /**

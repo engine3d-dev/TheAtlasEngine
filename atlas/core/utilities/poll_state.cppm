@@ -5,7 +5,7 @@ module;
 #include <functional>
 #include <vector>
 
-export module atlas.core.utilities.poll_state;
+export module atlas.core.utilities:poll_state;
 
 export namespace atlas {
     inline std::unordered_map<void*, std::vector<std::function<void(float)>>>
