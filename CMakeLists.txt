@@ -180,7 +180,6 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas/drivers/renderer_system.cppm
 
     # imgui/UI
-    atlas/drivers/vulkan/imgui_context.cppm
     atlas/core/ui/imgui_stdlib.cppm
 
     # physics
@@ -200,13 +199,13 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas/drivers/vulkan/graphics_context.cppm
     atlas/drivers/vulkan/window.cppm
     atlas/drivers/vulkan/render_context.cppm
+    atlas/drivers/vulkan/imgui_context.cppm
     atlas/drivers/vulkan/utilities.cppm
     atlas/drivers/vulkan/environment_map.cppm
     atlas/drivers/vulkan/stb_image.cppm
     atlas/drivers/vulkan/gpu_uniforms.cppm
 
     atlas/drivers/vulkan/hash.cppm
-    atlas/drivers/vulkan/shader_resource_group.cppm
 
 
     # 3D Model Importers
