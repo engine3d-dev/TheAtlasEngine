@@ -1,3 +1,5 @@
+module;
+
 export module editor;
 
 export import :world;
