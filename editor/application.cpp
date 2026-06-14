@@ -3,7 +3,7 @@
 #include <memory>
 
 import atlas.application;
-import atlas.common;
+import atlas.core.utilities;
 import atlas.core.level_streamer;
 import atlas.core.event;
 import editor;

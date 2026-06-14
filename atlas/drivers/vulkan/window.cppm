@@ -20,7 +20,6 @@ module;
 
 export module atlas.drivers.vulkan:window;
 
-import atlas.common;
 import atlas.core.utilities;
 import vk;
 import :graphics_context;

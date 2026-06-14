@@ -19,7 +19,6 @@
 #endif
 
 import atlas.application;
-import atlas.common;
 import atlas.core.utilities;
 import atlas.graphics_api;
 import atlas.drivers.vulkan;

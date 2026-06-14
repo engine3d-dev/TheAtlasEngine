@@ -11,7 +11,6 @@ module;
 
 export module atlas.core.serialize;
 
-import atlas.common;
 import atlas.core.scene;
 import atlas.core.serialize.types;
 import atlas.core.scene.components;

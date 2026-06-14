@@ -5,7 +5,7 @@ module;
 
 export module atlas.drivers.physics_context;
 
-import atlas.common;
+import atlas.core.utilities;
 import atlas.core.scene.components;
 import atlas.core.event;
 

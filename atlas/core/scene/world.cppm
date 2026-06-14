@@ -6,7 +6,7 @@ module;
 
 export module atlas.core.scene.world;
 
-import atlas.common;
+import atlas.core.utilities;
 import atlas.core.scene;
 import atlas.core.level_streamer;
 import atlas.core.event;

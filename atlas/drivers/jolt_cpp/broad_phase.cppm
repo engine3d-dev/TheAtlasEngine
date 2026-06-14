@@ -34,7 +34,7 @@ module;
 
 export module atlas.drivers.jolt_cpp.broad_phase;
 
-import atlas.common;
+import atlas.core.utilities;
 
 export namespace atlas::physics {
 

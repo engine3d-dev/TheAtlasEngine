@@ -19,7 +19,7 @@ export module atlas.drivers.vulkan:imgui_context;
 
 import :graphics_context;
 
-import atlas.common;
+import atlas.core.utilities;
 import vk;
 
 import atlas.core.utilities;
