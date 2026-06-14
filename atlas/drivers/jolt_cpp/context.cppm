@@ -39,7 +39,7 @@ export module atlas.drivers.jolt_cpp.context;
 
 import atlas.core.utilities;
 import atlas.core.event;
-import atlas.core.scene.components;
+import atlas.core.scene;
 
 import atlas.drivers.jolt_cpp.broad_phase;
 import atlas.drivers.jolt_cpp.contact_listener;

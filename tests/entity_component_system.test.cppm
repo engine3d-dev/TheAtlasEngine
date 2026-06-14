@@ -8,7 +8,6 @@ module;
 export module atlas.tests:entity_component_system;
 
 import atlas.core.scene;
-import atlas.core.scene.game_object;
 import atlas.core.math.types;
 import atlas.core.event;
 import atlas.drivers.jolt_cpp.types;

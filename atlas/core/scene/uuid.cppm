@@ -2,7 +2,7 @@ module;
 #include <random>
 #include <limits>
 
-export module atlas.core.scene.uuid;
+export module atlas.core.scene:uuid;
 
 export namespace atlas {
 

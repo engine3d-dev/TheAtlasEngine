@@ -30,7 +30,7 @@ import atlas.drivers.vulkan;
 
 import atlas.core.scene;
 import atlas.core.scene.world;
-import atlas.core.scene.components;
+import atlas.core.scene;
 import atlas.core.math;
 
 export namespace atlas {

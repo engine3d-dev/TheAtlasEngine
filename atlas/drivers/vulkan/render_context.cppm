@@ -19,7 +19,6 @@ import atlas.core.scene;
 
 import atlas.drivers.importer;
 import atlas.core.scene;
-import atlas.core.scene.components;
 import atlas.drivers.vulkan.stb_image;
 import atlas.core.utilities;
 

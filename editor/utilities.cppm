@@ -8,7 +8,7 @@ module;
 
 export module editor:utilities;
 import atlas.core.ui;
-import atlas.core.scene.components;
+import atlas.core.scene;
 
 export void
 ui_component_list(flecs::entity& p_selected_entity) {

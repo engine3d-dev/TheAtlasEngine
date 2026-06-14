@@ -15,8 +15,6 @@ export module editor:level_scene2;
 import atlas.application;
 import atlas.core.event;
 import atlas.core.scene;
-import atlas.core.scene.game_object;
-import atlas.core.scene.components;
 import atlas.core.utilities;
 import atlas.core.math;
 

@@ -7,9 +7,9 @@ export module atlas.core.scene;
 
 import atlas.core.utilities;
 import atlas.core.event;
-import atlas.core.scene.game_object;
-import atlas.core.scene.uuid;
-import atlas.core.scene.components;
+export import :game_object;
+export import :uuid;
+export import :components;
 
 export namespace atlas {
     /**

@@ -4,7 +4,7 @@ module;
 #include <yaml-cpp/yaml.h>
 
 export module atlas.core.serialize.types;
-import atlas.core.scene.components;
+import atlas.core.scene;
 
 namespace YAML {
     /**

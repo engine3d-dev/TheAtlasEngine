@@ -3,8 +3,6 @@ module;
 export module atlas.tests:scene;
 
 import atlas.core.scene;
-import atlas.core.scene.game_object;
-import atlas.core.scene.components;
 import atlas.core.event;
 
 export void

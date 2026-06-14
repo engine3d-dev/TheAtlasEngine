@@ -13,7 +13,6 @@ export module atlas.core.serialize;
 
 import atlas.core.scene;
 import atlas.core.serialize.types;
-import atlas.core.scene.components;
 import atlas.core.utilities;
 
 namespace atlas {
