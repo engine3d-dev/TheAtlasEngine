@@ -417,7 +417,8 @@ export namespace atlas {
             invoke_post_update(m_current_scene.get());
             invoke_post_update(m_world.get());
 
-            m_next_image_frame_idx = (m_next_image_frame_idx + 1) % m_frames_in_flight;
+            m_next_image_frame_idx =
+              (m_next_image_frame_idx + 1) % m_frames_in_flight;
         }
 
         // Experimental: Will look into later once we dive into scene
@@ -482,7 +483,7 @@ export namespace atlas {
         std::vector<vk::command_buffer> m_command_buffers;
         float m_delta_time = 0.f;
         window_params m_window_params{};
-        uint32_t m_frames_in_flight=2;
+        uint32_t m_frames_in_flight = 2;
         static application* s_instance;
     };
 

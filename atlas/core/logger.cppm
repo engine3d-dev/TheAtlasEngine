@@ -29,7 +29,8 @@ export namespace atlas {
             m_loggers.insert({ "atlas", spdlog::stdout_color_mt("atlas") });
             m_loggers.insert({ "physics", spdlog::stdout_color_mt("physics") });
             m_loggers.insert({ "vulkan", spdlog::stdout_color_mt("vulkan") });
-            m_loggers.insert({ "vk::validation", spdlog::stdout_color_mt("vk::validation") });
+            m_loggers.insert(
+              { "vk::validation", spdlog::stdout_color_mt("vk::validation") });
             m_loggers.insert(
               { "assert", spdlog::stdout_color_mt("core assertion") });
 

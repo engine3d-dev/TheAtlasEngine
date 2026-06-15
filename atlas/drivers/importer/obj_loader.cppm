@@ -89,8 +89,13 @@ export namespace atlas {
 
                     if (!attrib.texcoords.empty()) {
                         glm::vec2 flipped_uv = {
-                            attrib.texcoords[static_cast<long long>(index.texcoord_index) * 2],
-                            1.0f - attrib.texcoords[static_cast<long long>(index.texcoord_index) * 2 + 1],
+                            attrib.texcoords[static_cast<long long>(
+                                               index.texcoord_index) *
+                                             2],
+                            1.0f - attrib.texcoords[static_cast<long long>(
+                                                      index.texcoord_index) *
+                                                      2 +
+                                                    1],
                         };
 
                         glm::vec2 original_uv = {

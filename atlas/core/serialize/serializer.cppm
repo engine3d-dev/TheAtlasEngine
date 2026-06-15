@@ -207,7 +207,8 @@ namespace atlas {
                                  .build();
 
             q.each([&output](flecs::entity p_entity) {
-                console_log_error("Serialize Entity: {}", p_entity.name().c_str());
+                console_log_error("Serialize Entity: {}",
+                                  p_entity.name().c_str());
                 serialize_entity(output, p_entity);
             });
 
