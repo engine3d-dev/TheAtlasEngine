@@ -1,6 +1,7 @@
 module;
 
 #include <string>
+#include <format>
 
 #include <glm/glm.hpp>
 
@@ -32,7 +33,7 @@ namespace atlas {
 
             size_t base_color_uv_index = 0;
 
-            // 1. Create the Parser configuration (enable SIMD parsing if
+            // Create the Parser configuration (enable SIMD parsing if
             // available)
             fastgltf::Parser parser(fastgltf::Extensions::None);
 
