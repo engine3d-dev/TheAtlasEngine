@@ -5,6 +5,7 @@ module;
 #include <span>
 #include <unordered_map>
 #include <optional>
+#include <filesystem>
 
 #include <vulkan/vulkan.h>
 #include <flecs.h>
@@ -223,6 +224,7 @@ export namespace atlas {
         }
 
         void prebake() {
+
             flecs::query<> all_meshes =
               m_world->query_builder<mesh_source>().build();
 
@@ -245,18 +247,33 @@ export namespace atlas {
                 };
 
                 // importing .obj 3d models here
-                obj_importer importer(src->model_path, src->flip);
-                gpu_mesh_data gpu_mesh{};
-                gpu_mesh.vertex = vk::vertex_buffer(
-                  *m_device, importer.vertices(), vertex_params);
-                gpu_mesh.index =
-                  vk::index_buffer(*m_device, importer.indices(), index_params);
-                gpu_mesh.has_indices_buffer =
-                  (importer.indices().size() >= 0) ? true : false;
-                gpu_mesh.vertices_size = importer.vertices().size();
-                gpu_mesh.indices_size = importer.indices().size();
-
-                m_meshes.emplace(p_entity.id(), gpu_mesh);
+                if(std::filesystem::path(src->model_path).extension() == ".obj") {
+                    gpu_mesh_data gpu_mesh{};
+                    console_log_warn("Loading OBJ Path: {}", src->model_path);
+                    obj_importer importer(src->model_path, src->flip);
+                    gpu_mesh.vertex = vk::vertex_buffer(
+                    *m_device, importer.vertices(), vertex_params);
+                    gpu_mesh.index =
+                    vk::index_buffer(*m_device, importer.indices(), index_params);
+                    gpu_mesh.has_indices_buffer = (importer.indices().size() >= 0) ? true : false;
+                    gpu_mesh.vertices_size = importer.vertices().size();
+                    gpu_mesh.indices_size = importer.indices().size();
+                    m_meshes.emplace(p_entity.id(), gpu_mesh);
+                }
+                else if (std::filesystem::path(src->model_path).extension() == ".gltf" || std::filesystem::path(src->model_path).extension() == ".glb") {
+                    gpu_mesh_data gpu_mesh{};
+                    console_log_warn("Loading GLTF Path: {}", src->model_path);
+                    gltf_importer importer(src->model_path, src->flip);
+                    console_log_info("vertices.size() = {}", importer.vertices().size());
+                    console_log_info("vertices.size() = {}", importer.indices().size());
+                    gpu_mesh.vertex = vk::vertex_buffer(*m_device, importer.vertices(), vertex_params);
+                    gpu_mesh.index = vk::index_buffer(*m_device, importer.indices(), index_params);
+                    gpu_mesh.has_indices_buffer = (importer.indices().size() >= 0) ? true : false;
+                    gpu_mesh.vertices_size = importer.vertices().size();
+                    gpu_mesh.indices_size = importer.indices().size();
+                    
+                    m_meshes.emplace(p_entity.id(), gpu_mesh);
+                }
 
                 vk::texture_params config_texture = {
                     .memory_mask = m_physical->memory_properties(

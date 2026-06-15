@@ -89,13 +89,8 @@ export namespace atlas {
 
                     if (!attrib.texcoords.empty()) {
                         glm::vec2 flipped_uv = {
-                            attrib.texcoords[static_cast<long long>(
-                                               index.texcoord_index) *
-                                             2],
-                            1.0f - attrib.texcoords[static_cast<long long>(
-                                                      index.texcoord_index) *
-                                                      2 +
-                                                    1],
+                            attrib.texcoords[static_cast<long long>(index.texcoord_index) * 2],
+                            1.0f - attrib.texcoords[static_cast<long long>(index.texcoord_index) * 2 + 1],
                         };
 
                         glm::vec2 original_uv = {
@@ -127,7 +122,7 @@ export namespace atlas {
             return true;
         }
 
-        [[nodiscard]] bool is_load() const { return m_load; }
+        [[nodiscard]] bool load() const { return m_load; }
 
         //! @return the geometry vertices
         std::span<vk::vertex_input> vertices() { return m_vertices; }

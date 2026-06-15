@@ -42,7 +42,8 @@ class AtlasRecipe(ConanFile):
         # Vulkan-related headers and includes packages
         self.requires("vulkan-cpp/6.2")
         self.requires("tinyobjloader/2.0.0-rc10")
-        self.requires("stb/cci.20230920")
+        self.requires("fastgltf/0.9.0")
+        self.requires("stb/cci.20240531")
 
         self.requires("nfd/3.0")
         self.requires("watcher/0.12.0")

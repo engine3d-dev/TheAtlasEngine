@@ -91,6 +91,7 @@ set_packages(
     flecs
 
     tinyobjloader
+    fastgltf
     ${SHADERC_PACKAGE}
     watcher
     vulkan-cpp
@@ -108,6 +109,7 @@ set_packages(
     stb::stb
     flecs::flecs_static
     tinyobjloader::tinyobjloader
+    fastgltf::fastgltf
     ${SHADERC_LINK_PACKAGE}
     watcher::watcher
     vulkan-cpp
@@ -208,9 +210,10 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas/drivers/vulkan/hash.cppm
 
 
-    # 3D Model Importers
+    # 3D Model File Format Importers
     atlas/drivers/importer/importer.cppm
     atlas/drivers/importer/obj_loader.cppm
+    atlas/drivers/importer/gltf_importer.cppm
 )
 
 target_sources(${PROJECT_NAME} PUBLIC
