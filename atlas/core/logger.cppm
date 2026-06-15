@@ -29,6 +29,7 @@ export namespace atlas {
             m_loggers.insert({ "atlas", spdlog::stdout_color_mt("atlas") });
             m_loggers.insert({ "physics", spdlog::stdout_color_mt("physics") });
             m_loggers.insert({ "vulkan", spdlog::stdout_color_mt("vulkan") });
+            m_loggers.insert({ "vk::validation", spdlog::stdout_color_mt("vk::validation") });
             m_loggers.insert(
               { "assert", spdlog::stdout_color_mt("core assertion") });
 
@@ -43,6 +44,9 @@ export namespace atlas {
 
             m_loggers["assert"]->set_level(spdlog::level::trace);
             m_loggers["assert"]->set_pattern(p_pattern);
+
+            m_loggers["vk::validation"]->set_level(spdlog::level::trace);
+            m_loggers["vk::validation"]->set_pattern(p_pattern);
             s_instance = this;
         }
 

@@ -33,7 +33,7 @@ debug_callback(VkDebugUtilsMessageSeverityFlagBitsEXT,
                VkDebugUtilsMessageTypeFlagsEXT,
                const VkDebugUtilsMessengerCallbackDataEXT* p_callback_data,
                void*) {
-    console_log_info("{}", p_callback_data->pMessage);
+    console_log_info_tagged("vk::validation", "{}", p_callback_data->pMessage);
     return false;
 }
 
