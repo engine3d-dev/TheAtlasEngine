@@ -2,7 +2,6 @@ module;
 
 #include <cstdint>
 #include <string>
-#include <print>
 #include <chrono>
 #include <utility>
 
@@ -150,7 +149,6 @@ export namespace atlas {
                                               m_color_format,
                                               m_depth_format,
                                               m_window_params);
-            std::println("images.size() = {}", images.size());
 
             m_window->center_window();
 
@@ -418,14 +416,15 @@ export namespace atlas {
 
             invoke_post_update(m_current_scene.get());
             invoke_post_update(m_world.get());
+
+            m_next_image_frame_idx =
+              (m_next_image_frame_idx + 1) % m_frames_in_flight;
         }
 
         // Experimental: Will look into later once we dive into scene
         // transitioning void on_scene_transition(event::scene_transition&
         // p_scene_transition) {
         //     m_world->current(p_scene_transition.next_scene);
-        //     std::println("Attempting to switch to the scene: {}",
-        //     p_scene_transition.next_scene);
 
         //     // We only want to set the current scene if that specific scene
         //     is valid if(m_world->current() != nullptr) {
@@ -484,6 +483,7 @@ export namespace atlas {
         std::vector<vk::command_buffer> m_command_buffers;
         float m_delta_time = 0.f;
         window_params m_window_params{};
+        uint32_t m_frames_in_flight = 2;
         static application* s_instance;
     };
 

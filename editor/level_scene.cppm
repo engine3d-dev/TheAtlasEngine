@@ -194,7 +194,6 @@ public:
         // Signal to trigger this kind of scene transition
         // Experimental: This was used for testing.
         // if(atlas::event::is_key_pressed(key_n)) {
-        //     std::println("Signaling to transition to next_scene");
         //     atlas::event::scene_transition scene_transition = {
         //         .next_scene = "Level Scene 2",
         //     };

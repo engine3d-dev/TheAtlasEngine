@@ -59,10 +59,6 @@ export namespace atlas {
             m_params.width = static_cast<uint32_t>(framebuffer_width);
             m_params.height = static_cast<uint32_t>(framebuffer_height);
 
-            std::println("Window created with extent: {}x{}",
-                         m_params.width,
-                         m_params.height);
-
             vk::swapchain_params swapchain_params = {
                 .width = static_cast<uint32_t>(m_params.width),
                 .height = static_cast<uint32_t>(m_params.height),

@@ -127,7 +127,7 @@ export namespace atlas {
             return true;
         }
 
-        [[nodiscard]] bool is_load() const { return m_load; }
+        [[nodiscard]] bool load() const { return m_load; }
 
         //! @return the geometry vertices
         std::span<vk::vertex_input> vertices() { return m_vertices; }

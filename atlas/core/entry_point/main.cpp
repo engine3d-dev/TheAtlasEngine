@@ -2,7 +2,6 @@
 #include <GLFW/glfw3.h>
 #include <memory_resource>
 #include <memory>
-#include <print>
 #include <vector>
 #include <expected>
 
@@ -30,12 +29,11 @@ import vk;
   atlas::event::bus& p_bus);
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL
-debug_callback(
-  [[maybe_unused]] VkDebugUtilsMessageSeverityFlagBitsEXT p_message_severity,
-  [[maybe_unused]] VkDebugUtilsMessageTypeFlagsEXT p_message_type,
-  const VkDebugUtilsMessengerCallbackDataEXT* p_callback_data,
-  [[maybe_unused]] void* p_user_data) {
-    std::print("validation layer:\t\t{}\n\n", p_callback_data->pMessage);
+debug_callback(VkDebugUtilsMessageSeverityFlagBitsEXT,
+               VkDebugUtilsMessageTypeFlagsEXT,
+               const VkDebugUtilsMessengerCallbackDataEXT* p_callback_data,
+               void*) {
+    console_log_info_tagged("vk::validation", "{}", p_callback_data->pMessage);
     return false;
 }
 
@@ -47,7 +45,7 @@ get_instance_extensions() {
       glfwGetRequiredInstanceExtensions(&extension_count);
 
     for (uint32_t i = 0; i < extension_count; i++) {
-        std::println("Required Extension = {}", required_extensions[i]);
+        console_log_info("Required Extension = {}", required_extensions[i]);
         extension_names.emplace_back(required_extensions[i]);
     }
 
@@ -73,7 +71,7 @@ main() {
     }
 
     if (!glfwVulkanSupported()) {
-        std::println("GLFW: Vulkan is not supported!");
+        console_log_error("GLFW: Vulkan is not supported!");
         return -1;
     }
 
@@ -114,6 +112,9 @@ main() {
     vk::physical_device physical_device = physical_device_expected.value();
 
     std::array<float, 1> priorities = { 0.f };
+
+    // VK_KHR_dynamic_rendering is required to be explicitly specified in the
+    // extensions to prevent imgui from crashing.
 #if defined(__APPLE__)
     std::array<const char*, 3> extensions = {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME,
