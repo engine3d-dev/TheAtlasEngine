@@ -15,6 +15,10 @@ module;
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
 
+#include <mutex>
+#include <future>
+#include <deque>
+
 export module atlas.drivers.vulkan:render_context;
 
 import :stb_image;
@@ -29,7 +33,18 @@ import atlas.core.utilities;
 import vk;
 
 export namespace atlas {
+    struct request_payload {
+        uint64_t entity_id=0;
+        // gpu_mesh_data mesh{};
+        std::optional<obj_importer> obj;
+        std::optional<gltf_importer> gltf;
+    };
 
+    struct request_material_payload {
+        uint64_t entity_id=0;
+        std::optional<stb_image> diffuse;
+        std::optional<stb_image> specular;
+    };
     /**
      *
      * @brief Context that translates the ECS rendering-specific components to
@@ -204,6 +219,21 @@ export namespace atlas {
             m_object_model_uniforms = vk::dyn::buffer(
               *m_device, sizeof(objects_uniform) * max_objects, uniform_params);
 
+            vk::buffer_parameters indirect_buffer_params = {
+                .memory_mask = m_physical->memory_properties(
+                  vk::memory_property::host_visible_bit |
+                  vk::memory_property::host_cached_bit),
+                .usage = vk::buffer_usage::storage_buffer_bit |
+                         vk::buffer_usage::indirect_buffer_bit |
+                         vk::buffer_usage::shader_device_address_bit,
+                .allocate_flags =
+                  vk::memory_allocate_flags::device_address_bit_khr,
+            };
+            m_indirect_buffer =
+              vk::dyn::buffer(*m_device,
+                              sizeof(VkDrawIndirectCommand) * max_objects,
+                              indirect_buffer_params);
+
             // configuring uniforms for point lights
             m_lighting_uniforms = vk::dyn::buffer(
               *m_device, sizeof(light_scene_ubo), uniform_params);
@@ -224,12 +254,18 @@ export namespace atlas {
         }
 
         void prebake() {
-
             flecs::query<> all_meshes =
               m_world->query_builder<mesh_source>().build();
 
             all_meshes.each([this](flecs::entity p_entity) {
                 const mesh_source* src = p_entity.get<mesh_source>();
+                async_request_load(p_entity.id(), src->model_path, src->flip);
+            });
+
+            while(!m_async_queue.empty()) {
+                std::future<request_payload> future = std::move(m_async_queue.front());
+                request_payload payload = future.get();
+                m_async_queue.pop_front();
 
                 vk::buffer_parameters vertex_params = {
                     .memory_mask = m_physical->memory_properties(
@@ -246,38 +282,44 @@ export namespace atlas {
                     .usage = vk::buffer_usage::index_buffer_bit,
                 };
 
-                // importing .obj 3d models here
-                if (std::filesystem::path(src->model_path).extension() ==
-                    ".obj") {
+                if(payload.obj.has_value()) {
+                    obj_importer importer = payload.obj.value();
                     gpu_mesh_data gpu_mesh{};
-                    obj_importer importer(src->model_path, src->flip);
                     gpu_mesh.vertex = vk::vertex_buffer(
-                      *m_device, importer.vertices(), vertex_params);
+                    *m_device, importer.vertices(), vertex_params);
                     gpu_mesh.index = vk::index_buffer(
-                      *m_device, importer.indices(), index_params);
-                    gpu_mesh.has_indices_buffer =
-                      (importer.indices().size() >= 0) ? true : false;
+                    *m_device, importer.indices(), index_params);
+                    gpu_mesh.has_indices_buffer = (importer.indices().size() >= 0) ? true : false;
                     gpu_mesh.vertices_size = importer.vertices().size();
                     gpu_mesh.indices_size = importer.indices().size();
-                    m_meshes.emplace(p_entity.id(), gpu_mesh);
+                    m_meshes.emplace(payload.entity_id, gpu_mesh);
                 }
-                else if (std::filesystem::path(src->model_path).extension() ==
-                           ".gltf" ||
-                         std::filesystem::path(src->model_path).extension() ==
-                           ".glb") {
-                    gpu_mesh_data gpu_mesh{};
-                    gltf_importer importer(src->model_path, src->flip);
-                    gpu_mesh.vertex = vk::vertex_buffer(
-                      *m_device, importer.vertices(), vertex_params);
-                    gpu_mesh.index = vk::index_buffer(
-                      *m_device, importer.indices(), index_params);
-                    gpu_mesh.has_indices_buffer =
-                      (importer.indices().size() >= 0) ? true : false;
-                    gpu_mesh.vertices_size = importer.vertices().size();
-                    gpu_mesh.indices_size = importer.indices().size();
 
-                    m_meshes.emplace(p_entity.id(), gpu_mesh);
+                if(payload.gltf.has_value()) {
+                    gltf_importer importer = payload.gltf.value();
+                    gpu_mesh_data gpu_mesh{};
+                    gpu_mesh.vertex = vk::vertex_buffer(
+                    *m_device, importer.vertices(), vertex_params);
+                    gpu_mesh.index = vk::index_buffer(
+                    *m_device, importer.indices(), index_params);
+                    gpu_mesh.has_indices_buffer =
+                    (importer.indices().size() >= 0) ? true : false;
+                    gpu_mesh.vertices_size = importer.vertices().size();
+                    gpu_mesh.indices_size = importer.indices().size();
+                    m_meshes.emplace(payload.entity_id, gpu_mesh);
                 }
+            }
+
+            all_meshes.each([this](flecs::entity p_entity) {
+                const mesh_source* src = p_entity.get<mesh_source>();
+                async_request_material(p_entity.id(), src);
+            });
+
+
+            while(!m_async_materials_queue.empty()) {
+                std::future<request_material_payload> future = std::move(m_async_materials_queue.front());
+                request_material_payload payload = future.get();
+                m_async_materials_queue.pop_front();
 
                 vk::texture_params config_texture = {
                     .memory_mask = m_physical->memory_properties(
@@ -285,26 +327,110 @@ export namespace atlas {
                       vk::memory_property::host_cached_bit),
                 };
                 // Loading texture and setting up VkSampler and VkImageView
-                stb_image diffuse_img = stb_image(src->diffuse, config_texture);
-                stb_image specular_img =
-                  stb_image(src->specular, config_texture);
 
                 // Reminder: Use diffuse_idx
                 gpu_material material = {};
-                if (!src->diffuse.empty()) {
+                if (payload.diffuse.has_value()) {
+                    auto diffuse = payload.diffuse.value();
                     material.diffuse_idx = m_texture_slot_index++;
-                    m_gpu_textures.emplace_back(
-                      *m_device, &diffuse_img, config_texture);
+                    m_gpu_textures.emplace_back(*m_device, &diffuse, config_texture);
                 }
 
-                if (!src->specular.empty()) {
+                if (payload.specular.has_value()) {
+                    auto specular = payload.specular.value();
                     material.specular_idx = m_texture_slot_index++;
                     m_gpu_textures.emplace_back(
-                      *m_device, &specular_img, config_texture);
+                      *m_device, &specular, config_texture);
                 }
 
-                m_material_table.emplace(p_entity.id(), material);
-            });
+                m_material_table.emplace(payload.entity_id, material);
+            }
+
+            // all_meshes.each([this](flecs::entity p_entity) {
+            //     const mesh_source* src = p_entity.get<mesh_source>();
+
+            //     /*
+            //     vk::buffer_parameters vertex_params = {
+            //         .memory_mask = m_physical->memory_properties(
+            //           vk::memory_property::host_visible_bit |
+            //           vk::memory_property::host_cached_bit),
+            //         .usage = vk::buffer_usage::transfer_dst_bit |
+            //                  vk::buffer_usage::vertex_buffer_bit,
+            //     };
+
+            //     vk::buffer_parameters index_params = {
+            //         .memory_mask = m_physical->memory_properties(
+            //           vk::memory_property::host_visible_bit |
+            //           vk::memory_property::host_cached_bit),
+            //         .usage = vk::buffer_usage::index_buffer_bit,
+            //     };
+
+            //     // importing .obj 3d models here
+            //     if (std::filesystem::path(src->model_path).extension() ==
+            //         ".obj") {
+            //         gpu_mesh_data gpu_mesh{};
+            //         obj_importer importer(src->model_path, src->flip);
+            //         gpu_mesh.vertex = vk::vertex_buffer(
+            //           *m_device, importer.vertices(), vertex_params);
+            //         gpu_mesh.index = vk::index_buffer(
+            //           *m_device, importer.indices(), index_params);
+            //         gpu_mesh.has_indices_buffer =
+            //           (importer.indices().size() >= 0) ? true : false;
+            //         gpu_mesh.vertices_size = importer.vertices().size();
+            //         gpu_mesh.indices_size = importer.indices().size();
+            //         m_meshes.emplace(p_entity.id(), gpu_mesh);
+            //     }
+            //     else if (std::filesystem::path(src->model_path).extension() ==
+            //                ".gltf" ||
+            //              std::filesystem::path(src->model_path).extension() ==
+            //                ".glb") {
+            //         gpu_mesh_data gpu_mesh{};
+            //         gltf_importer importer(src->model_path, src->flip);
+            //         gpu_mesh.vertex = vk::vertex_buffer(
+            //           *m_device, importer.vertices(), vertex_params);
+            //         gpu_mesh.index = vk::index_buffer(
+            //           *m_device, importer.indices(), index_params);
+            //         gpu_mesh.has_indices_buffer =
+            //           (importer.indices().size() >= 0) ? true : false;
+            //         gpu_mesh.vertices_size = importer.vertices().size();
+            //         gpu_mesh.indices_size = importer.indices().size();
+
+            //         m_meshes.emplace(p_entity.id(), gpu_mesh);
+            //     }
+            //     */
+
+
+
+
+                // vk::texture_params config_texture = {
+                //     .memory_mask = m_physical->memory_properties(
+                //       vk::memory_property::host_visible_bit |
+                //       vk::memory_property::host_cached_bit),
+                // };
+                // // Loading texture and setting up VkSampler and VkImageView
+                // stb_image diffuse_img = stb_image(src->diffuse, config_texture);
+                // stb_image specular_img =
+                //   stb_image(src->specular, config_texture);
+
+                // // Reminder: Use diffuse_idx
+                // gpu_material material = {};
+                // if (!src->diffuse.empty()) {
+                //     material.diffuse_idx = m_texture_slot_index++;
+                //     m_gpu_textures.emplace_back(
+                //       *m_device, &diffuse_img, config_texture);
+                // }
+
+                // if (!src->specular.empty()) {
+                //     material.specular_idx = m_texture_slot_index++;
+                //     m_gpu_textures.emplace_back(
+                //       *m_device, &specular_img, config_texture);
+                // }
+
+
+                
+
+            //     m_material_table.emplace(p_entity.id(), material);
+            // });
 
             // Preparing the texture data before we update descriptor set 0
             // Storing all of our texture via one contiguous array of textures
@@ -516,6 +642,7 @@ export namespace atlas {
             m_scene_uniforms.reset();
             m_object_model_uniforms.reset();
             m_lighting_uniforms.reset();
+            m_indirect_buffer.reset();
 
             m_environment_map.destruct();
 
@@ -538,6 +665,49 @@ export namespace atlas {
             m_camera_pos = p_camera_pos;
         }
 
+
+    private:
+        void async_request_load(uint64_t p_entity_id, const std::string& p_path, bool p_flip) {
+            std::future<request_payload> task = std::async(std::launch::async, [p_entity_id, p_path, p_flip](){
+                request_payload payload{};
+                payload.entity_id = p_entity_id;
+                
+                if (std::filesystem::path(p_path).extension() == ".obj") {
+                    obj_importer importer(p_path, p_flip);
+                    payload.obj = importer;
+                }
+                else if (std::filesystem::path(p_path).extension() ==
+                            ".gltf" ||
+                            std::filesystem::path(p_path).extension() ==
+                            ".glb") {
+                    gltf_importer importer(p_path, p_flip);
+                    payload.gltf = importer;
+                }
+                return payload;
+            });
+
+            m_async_queue.push_back(std::move(task));
+        }
+
+        void async_request_material(uint64_t p_id, const mesh_source* p_src) {
+            std::future<request_material_payload> task = std::async(std::launch::async, [this, p_id, p_src](){
+                request_material_payload payload{};
+                vk::texture_params config_texture = {
+                    .memory_mask = m_physical->memory_properties(
+                      vk::memory_property::host_visible_bit |
+                      vk::memory_property::host_cached_bit),
+                };
+
+                payload.entity_id = p_id;
+                stb_image diffuse_img = stb_image(p_src->diffuse, config_texture);
+                stb_image specular_img = stb_image(p_src->specular, config_texture);
+
+                return payload;
+            });
+
+            m_async_materials_queue.push_back(std::move(task));
+        }
+
     private:
         glm::vec4 m_camera_pos = glm::vec4(1.f);
         glm::mat4 m_projection;
@@ -550,7 +720,10 @@ export namespace atlas {
         vk::command_buffer* m_current_command = nullptr;
         vk::shader_resource m_shader_resource;
         vk::pipeline m_main_pipeline;
-        std::vector<VkDrawIndexedIndirectCommand> m_indirect_commands;
+
+        std::vector<VkDrawIndirectCommand> m_indirect_commands;
+        vk::dyn::buffer m_indirect_buffer;
+
         vk::descriptor_resource m_set0_resource;
 
         /**
@@ -590,5 +763,9 @@ export namespace atlas {
         flecs::world* m_world = nullptr;
 
         environment_map m_environment_map;
+
+        // std::mutex m_mutex;
+        std::deque<std::future<request_payload>> m_async_queue;
+        std::deque<std::future<request_material_payload>> m_async_materials_queue;
     };
 };
