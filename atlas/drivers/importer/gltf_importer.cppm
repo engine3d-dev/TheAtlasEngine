@@ -8,7 +8,6 @@ module;
 #include <fastgltf/math.hpp>
 #include <fastgltf/tools.hpp>
 #include <fastgltf/types.hpp>
-#include <fastgltf/dxmath_element_traits.hpp>
 #include <fastgltf/glm_element_traits.hpp>
 
 export module atlas.drivers.importer:gltf_importer;
