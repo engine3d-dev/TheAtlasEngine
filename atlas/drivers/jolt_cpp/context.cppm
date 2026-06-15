@@ -35,20 +35,16 @@ module;
 #include <glm/glm.hpp>
 #include <map>
 
-export module atlas.drivers.jolt_cpp.context;
+export module atlas.drivers.jolt_cpp:context;
 
-// import atlas.logger;
-// import atlas.common;
+import :broad_phase;
+import :contact_listener;
+import :math;
+
 import atlas.core.utilities;
 import atlas.core.event;
-import atlas.core.scene.components;
-
-import atlas.drivers.jolt_cpp.broad_phase;
-import atlas.drivers.jolt_cpp.contact_listener;
-
-import atlas.drivers.jolt_cpp.types;
+import atlas.core.scene;
 import atlas.drivers.physics_context;
-import atlas.drivers.jolt_cpp.types;
 
 namespace atlas::physics {
 
@@ -99,7 +95,7 @@ namespace atlas::physics {
         uint32_t max_contact_constraints = 8192;
     };
 
-    static void trace_impl(const char* p_in_fmt, ...) {
+    void trace_impl(const char* p_in_fmt, ...) {
         va_list list;
         va_start(list, p_in_fmt);
         char buffer[1024];

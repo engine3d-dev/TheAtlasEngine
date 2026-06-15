@@ -3,8 +3,8 @@ module;
 #include <flecs.h>
 #include <optional>
 
-export module atlas.core.scene.game_object;
-import atlas.core.scene.components;
+export module atlas.core.scene:game_object;
+import :components;
 
 export namespace atlas {
     /**

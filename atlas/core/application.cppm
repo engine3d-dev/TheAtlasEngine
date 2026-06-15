@@ -1,38 +1,37 @@
 module;
 
 #include <cstdint>
-#include <glm/ext.hpp>
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/quaternion.hpp>
-#include <vulkan/vulkan.h>
 #include <string>
 #include <print>
 #include <chrono>
 #include <utility>
+
+#include <array>
+#include <memory>
+#include <memory_resource>
+#include <optional>
+#include <span>
+
+#include <glm/ext.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/quaternion.hpp>
+
 #include <flecs.h>
 #include <GLFW/glfw3.h>
 #include <imgui.h>
+#include <vulkan/vulkan.h>
 
 export module atlas.application;
 
 import atlas.core.utilities;
-import atlas.core.utilities.poll_state;
-import atlas.window;
-import atlas.drivers;
-import atlas.renderer.context_loader;
 import atlas.core.event;
-import atlas.drivers.renderer_system;
-import atlas.renderer;
-import atlas.drivers.vulkan.instance_context;
+import vk;
+import atlas.drivers.vulkan;
+
 import atlas.core.scene;
 import atlas.core.scene.world;
-import atlas.core.event;
-import atlas.core.scene.components;
-
+import atlas.core.scene;
 import atlas.core.math;
-import atlas.drivers.vulkan.imgui_context;
-import vk;
-import atlas.drivers.graphics_context;
 
 export namespace atlas {
 
@@ -40,123 +39,144 @@ export namespace atlas {
      * @brief application properties settings for the window
      */
     struct application_settings {
-        std::string name = "Undefined";
-        uint32_t width = 0;
-        uint32_t height = 0;
+        window_params extent{};
         glm::vec4 background_color = { 1.f, 0.5f, 0.5f, 1.f };
     };
 
-    /**
-     * @brief represents a single application that gets created by the engine
-     * internally
-     *
-     * There is only ever going to be one application tied to the engine's
-     * runtime. As the application is given responsibilities of preloading,
-     * pre-initialization any sort of utilities required by the engine, and any
-     * form of post-cleanup when the user requests the application to close.
-     *
-     */
     class application {
     public:
-        /**
-         * @brief constructs a new application
-         * @param p_settings is the specific application settings to configure
-         * how the application may be setup
-         */
-        application(/*NOLINT*/ ref<graphics_context> p_context,
+        application() = default;
+        application(/*NOLINT*/ std::shared_ptr<graphics_context> p_context,
                     const application_settings& p_params,
                     event::bus& p_bus)
-          : m_bus(&p_bus) {
-            console_log_info(
-              "application(const application_settings&) initialized!!!");
+          : m_context(p_context)
+          , m_bus(&p_bus) {
+            m_instance = p_context->instance_handle();
+            m_physical = p_context->physical_device();
+            m_device = p_context->logical_device();
 
-            window_params params = {
-                .width = p_params.width,
-                .height = p_params.height,
-                .name = p_params.name,
-            };
-            m_window =
-              initialize_window(p_context, params, graphics_api::vulkan);
-            m_initial_window_params = m_window->data();
-            event::set_window_size(static_cast<GLFWwindow*>(*m_window));
+            m_window_params = p_params.extent;
 
-            m_renderer =
-              initialize_renderer(p_context,
-                                  graphics_api::vulkan,
-                                  params,
-                                  m_window->current_swapchain().image_size(),
-                                  "Renderer");
-            m_renderer->set_background_color(p_params.background_color);
+            // m_window = std::allocate_shared<window>(,
+            // m_context->instance_handle(), params);
+            m_window = std::make_shared<window>(p_context, p_params.extent);
 
-            m_ui_context = vulkan::imgui_context(
-              p_context->handle(), m_window->current_swapchain(), *m_window);
+            m_aspect_ratio = static_cast<float>(m_window_params.width) /
+                             static_cast<float>(m_window_params.height);
+            event::set_window_size(m_window->glfw_window());
 
-            p_context->submit_resource_free(
-              [this]() { m_ui_context.destroy(); });
-
-            s_instance = this;
-
-            // Setting internal-level listeners for specific events
             m_bus->create_listener<atlas::event::collision_enter>();
             m_bus->create_listener<atlas::event::collision_persisted>();
             m_bus->create_listener<atlas::event::collision_exit>();
-            m_bus->create_immediate_listener<atlas::event::mesh_reload>();
-            m_bus->create_immediate_listener<atlas::event::material_reload>();
+            // m_bus->create_immediate_listener<atlas::event::scene_transition>();
+            // m_bus->create_immediate_listener<atlas::event::mesh_reload>();
+            // m_bus->create_immediate_listener<atlas::event::material_reload>();
 
-            m_bus->trigger<event::mesh_reload>(this, &application::reload_mesh);
-            m_bus->trigger<event::material_reload>(
-              this, &application::reload_material);
+            // Requesting depth format
+            std::array<vk::format, 3> format_support = {
+                vk::format::d32_sfloat,
+                vk::format::d32_sfloat_s8_uint,
+                vk::format::d24_unorm_s8_uint
+            };
+
+            m_color_format = m_window->surface_properties().format.format;
+            // We provide a selection of format support that we want to check is
+            // supported on current hardware device.
+            m_depth_format = m_physical->request_depth_format(format_support);
+
+            // Initializing command buffers
+            std::span<const VkImage> images = m_window->request_images();
+
+            m_images.resize(images.size());
+            m_depth_images.resize(images.size());
+
+            for (uint32_t i = 0; i < m_images.size(); i++) {
+                vk::image_params color_img_params = {
+                    .extent = {
+                        .width = m_window->extent().width,
+                        .height = m_window->extent().height,
+                    },
+                    .format = m_window->surface_properties().format.format,
+                    .memory_mask = m_physical->memory_properties(
+                    vk::memory_property::device_local_bit),
+                    .aspect = vk::image_aspect_flags::color_bit,
+                    .usage = vk::image_usage::color_attachment_bit,
+                    .mip_levels = 1,
+                    .layer_count = 1,
+                };
+                m_images[i] =
+                  vk::sample_image(*m_device, images[i], color_img_params);
+
+                vk::image_params depth_img_params = {
+                    .extent = {
+                        .width = m_window->extent().width,
+                        .height = m_window->extent().height,
+                    },
+                    .format = m_depth_format,
+                    .memory_mask = m_physical->memory_properties(
+                    vk::memory_property::device_local_bit),
+                    .aspect = vk::image_aspect_flags::depth_bit,
+                    .usage = vk::image_usage::depth_stencil_bit,
+                    .mip_levels = 1,
+                    .layer_count = 1,
+                };
+
+                m_depth_images[i] =
+                  vk::sample_image(*m_device, depth_img_params);
+            }
+
+            m_command_buffers.resize(images.size());
+
+            for (uint32_t i = 0; i < m_command_buffers.size(); i++) {
+                vk::command_params command_params = {
+                    .levels = vk::command_levels::primary,
+                    .queue_index = 0,
+                    .flags = vk::command_pool_flags::reset,
+                };
+                m_command_buffers[i] =
+                  vk::command_buffer(*m_device, command_params);
+            }
+
+            m_render_context =
+              render_context(m_context, m_color_format, m_depth_format);
+
+            m_imgui_context =
+              std::make_shared<imgui_context>(p_context,
+                                              m_window->glfw_window(),
+                                              m_window->swapchain_handle(),
+                                              m_window->request_images().size(),
+                                              m_window->present_queue(),
+                                              // VK_FORMAT_B8G8R8A8_UNORM,
+                                              m_color_format,
+                                              m_depth_format,
+                                              m_window_params);
+            std::println("images.size() = {}", images.size());
+
+            m_window->center_window();
+
+            // m_bus->trigger<event::scene_transition>(this,
+            // &application::on_scene_transition);
         }
 
-        ~application() { m_window->close(); }
-
-        /**
-         * @return the delta time as a float for giving you the timestep every
-         * frame
-         */
-        static float delta_time() { return s_instance->m_delta_time; }
-
-        /**
-         * @brief Explicitly is used to execute the application's mainloop
-         */
         void execute() {
-            console_log_info("Executing game mainloop!!!");
+            VkClearValue clear_color = {
+                { { 0.f, 0.5f, 0.5f, 1.f } },
+            };
 
-            auto start_time = std::chrono::high_resolution_clock::now();
+            VkClearValue depth_value = {
+                .depthStencil = { .depth = 1.f, .stencil = 0 },
+            };
 
-            ref<scene> current_scene = m_current_world->current();
+            m_current_scene = m_world->current();
 
-            invoke_start(current_scene.get());
-
-            m_renderer->current_scene_context(current_scene);
-
-            // Bug-prone API.
-            //  Due to requiring there to be a valid m_current_scene specified.
-            // TODO: SHOULD have this API be invoked whenever a
-            // `current_scene_context` sets a new scene (for invalidation)
-            m_renderer->preload(
-              m_window->current_swapchain().swapchain_renderpass());
-
-            /*
-                - flecs::system is how your able to schedule changes for given
-                portions of data in this case the projection/view matrices are
-            only being changed when flecs::world::progress(g_delta_time) is
-            being invoked within the mainloop
-                current_world_scope.system<projection_view, transform,
-                perspective_camera>()
-
-                - When users do object->add<flecs::pair<tag::editor,
-                projection_view>>(), this automatically gets invoked by the
-            .system<...> that gets invoked by the mainloop.
-            */
-            current_scene
+            // Handling camera system execution
+            m_current_scene
               ->system<flecs::pair<tag::editor, projection_view>,
                        transform,
                        perspective_camera>()
-              .each([&](flecs::pair<tag::editor, projection_view> p_pair,
-                        transform& p_transform,
-                        perspective_camera& p_camera) {
-                  float aspect_ratio = m_window->aspect_ratio();
+              .each([this](flecs::pair<tag::editor, projection_view> p_pair,
+                           transform& p_transform,
+                           perspective_camera& p_camera) {
                   if (!p_camera.is_active) {
                       return;
                   }
@@ -165,7 +185,7 @@ export namespace atlas {
 
                   p_pair->projection =
                     glm::perspective(glm::radians(p_camera.field_of_view),
-                                     aspect_ratio,
+                                     m_aspect_ratio,
                                      p_camera.plane.x,
                                      p_camera.plane.y);
                   p_pair->projection[1][1] *= -1;
@@ -181,19 +201,23 @@ export namespace atlas {
                   p_pair->view = glm::inverse(p_pair->view);
               });
 
-            /*
-                - Currently how this works is we query with anything that has a
-            flecs::pair<tag::editor, projection_view>
-                - This tells the ecs flecs what to do query for in regards to
-            specific objects that are a camera
-                - in the tag:: namespace, this is to imply components that are
-            empty and just represent tags, to specify their uses.
-            */
+            auto start_time = std::chrono::high_resolution_clock::now();
+            invoke_start(m_world.get());
+            invoke_start(m_current_scene.get());
+
+            // Setting the current scene for the renderer to start rendering the
+            // objects
+            m_render_context.current_scene(*m_current_scene);
+
+            // Querying editor cameras specific objects
+            // Then using this to execute specific main cameras.
             auto query_camera_objects =
-              current_scene
+              m_current_scene
                 ->query_builder<flecs::pair<tag::editor, projection_view>,
                                 perspective_camera>()
                 .build();
+
+            m_render_context.prebake();
 
             while (m_window->available()) {
                 auto current_time = std::chrono::high_resolution_clock::now();
@@ -201,179 +225,265 @@ export namespace atlas {
                   std::chrono::duration<float, std::chrono::seconds::period>(
                     current_time - start_time)
                     .count();
-                start_time = current_time;
 
+                start_time = current_time;
                 event::flush_events();
 
                 // Progresses the flecs::world by one tick (or replaced with
                 // using the delta time) This also invokes the following
                 // system<T...> call  before the mainloop
-                current_scene->progress(m_delta_time);
+                m_current_scene->progress(m_delta_time);
 
-                m_current_frame_index = m_window->acquired_next_frame();
+                m_next_image_frame_idx = m_window->acquire_next_frame();
 
-                // Current commands that are going to be iterated through
-                // Use the acquired swapchain image index for the command buffer
-                // and swapchain framebuffer so we record and present the same
-                // image.
-                ::vk::command_buffer currently_active =
-                  m_window->active_command(m_current_frame_index);
+                vk::command_buffer current =
+                  m_command_buffers[m_next_image_frame_idx];
 
-                invoke_physics_update(current_scene.get());
+                invoke_physics_update(m_world.get());
+                invoke_physics_update(m_current_scene.get());
 
-                invoke_on_update(current_scene.get(), m_delta_time);
+                invoke_on_update(m_world.get(), m_delta_time);
+                invoke_on_update(m_current_scene.get(), m_delta_time);
 
-                invoke_defer_update(current_scene.get());
                 // We want this to be called after late update
-                // This queries all camera objects within the camera system
-                // Update -- going to be removing camera system in replacement
-                // of just simply using flecs::system to keep it simple for the
-                // time
+                // This queries all camera objects within the camera sytsem
+                // TODO: Should consider changing this from
+                // using tags in flecs for specifying active cameras.
                 query_camera_objects.each(
-                  [&](flecs::entity,
+                  [&](flecs::entity p_entity,
                       flecs::pair<tag::editor, projection_view> p_pair,
                       perspective_camera& p_camera) {
                       if (!p_camera.is_active) {
                           return;
                       }
 
-                      //   m_proj_view = p_pair->projection * p_pair->view;
+                      const transform* t = p_entity.get<transform>();
+                      m_render_context.set_camera_pos(
+                        glm::vec4(t->position, 1.f));
                       m_projection = p_pair->projection;
                       m_view = p_pair->view;
                   });
 
-                // invalidate imgui context
-                if (m_initial_window_params.width != m_window->data().width and
-                    m_initial_window_params.height != m_window->data().height) {
-                    m_ui_context.invalidate(m_window->current_swapchain());
-                    // once we have invalidated the current width/height, we set
-                    // that to its new width/height value post-resizing
-                    // TODO: Make this into a event::window_resize event that
-                    // can be handled!
-                    m_initial_window_params = m_window->data();
+                current.begin(vk::command_usage::simulatneous_use_bit);
 
-                    // Make sure to update the imgui window size
-                    ImGui::SetNextWindowSize(ImVec2(
-                      static_cast<float>(m_initial_window_params.width),
-                      static_cast<float>(m_initial_window_params.height)));
-                }
+                m_render_context.set_command(current);
 
-                // Prevents things like stalling so the CPU doesnt have to wait
-                // for the GPU to fully complete before starting on the next
-                // frame Command buffer uses this to track the frames to process
-                // its commands. current_frame = (acquired_next_frame + 1) %
-                // frames_in_flight; auto current_frame = (m_current_frame_index
-                // + 1) % 2;
+                m_imgui_context->image_memory_barrier(
+                  current,
+                  VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                  VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
-                // viewport renderpass to render the 3D screen to the offscreen
-                // texture
-                auto viewport_framebuffer =
-                  m_ui_context.active_framebuffer(m_current_frame_index % 2u);
-                m_renderer->begin_frame(
-                  currently_active,
-                  m_window->current_swapchain().settings(),
-                  m_ui_context.viewport_renderpass(),
-                  viewport_framebuffer,
-                  m_projection,
-                  m_view,
-                  m_current_frame_index);
+                m_imgui_context->depth_image_memory_barrier(
+                  current,
+                  VK_IMAGE_LAYOUT_UNDEFINED,
+                  VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+                  VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT);
 
-                m_renderer->end_frame();
-
-                m_ui_context.begin(currently_active, m_current_frame_index);
-
-                invoke_ui_update(current_scene.get());
-
-                // final renderpass for rendering the offscreen information to
-                // the final renderpass
-                window_params swapchain_extent =
-                  m_window->current_swapchain().settings();
-                std::array<float, 4> color = { 0.1f, 0.105f, 0.11f, 1.0f };
-                vk::renderpass_begin_params begin_renderpass = {
-                    .current_command = currently_active,
-                    .extent = { swapchain_extent.width,
-                                swapchain_extent.height },
-                    .current_framebuffer =
-                      m_window->current_swapchain().active_framebuffer(
-                        m_current_frame_index),
-                    .color = color,
-                    .subpass = vk::subpass_contents::inline_bit
+                // presenting rendering attachments
+                vk::rendering_attachment ui_color_render_attachment = {
+                    .image_view = m_imgui_context->color_image_view(),
+                    .layout = vk::image_layout::color_optimal,
+                    .resolve_mode = vk::resolved_mode_flags::none,
+                    .resolve_image_view = nullptr,
+                    .resolve_image_layout = vk::image_layout::undefined,
+                    .load = vk::attachment_load::clear,
+                    .store = vk::attachment_store::store,
+                    .clear_values = clear_color
                 };
-                m_window->current_swapchain().swapchain_renderpass().begin(
-                  begin_renderpass);
-                m_ui_context.end();
-                m_window->current_swapchain().swapchain_renderpass().end(
-                  currently_active);
-                currently_active.end();
 
-                std::array<const VkCommandBuffer, 1> commands = {
-                    currently_active,
+                vk::rendering_attachment ui_depth_stencil_attachment = {
+                    .image_view = m_imgui_context->depth_image_view(),
+                    .layout = vk::image_layout::depth_stencil_optimal,
+                    .resolve_mode = vk::resolved_mode_flags::none,
+                    .resolve_image_view = nullptr,
+                    .resolve_image_layout = vk::image_layout::undefined,
+                    .load = vk::attachment_load::clear,
+                    .store = vk::attachment_store::store,
+                    .depth_values = depth_value
                 };
-                m_window->current_swapchain().submit(commands);
 
-                m_window->present(m_current_frame_index);
+                vk::rendering_begin_parameters ui_begin_params = {
+                    .render_area = { { 0, 0 }, { m_window_params.width, m_window_params.height }, },
+                    .layer_count = 1,
+                    .color_attachments = std::span<const vk::rendering_attachment>(
+                    &ui_color_render_attachment, 1),
+                    .depth_attachment = ui_depth_stencil_attachment,
+                    .stencil_attachment = ui_depth_stencil_attachment,
+                };
+
+                vk::viewport_params viewport = {
+                    .x = 0.0f,
+                    .y = 0.0f,
+                    .width = static_cast<float>(m_window_params.width),
+                    .height = static_cast<float>(m_window_params.height),
+                    .min_depth = 0.0f,
+                    .max_depth = 1.0f,
+                };
+                current.set_viewport(
+                  0, 1, std::span<const vk::viewport_params>(&viewport, 1));
+
+                vk::scissor_params scissor = {
+                    .offset = { 0, 0 },
+                    .extent = { static_cast<uint32_t>(m_window_params.width),
+                                static_cast<uint32_t>(m_window_params.height) },
+                };
+                current.set_scissor(
+                  0, 1, std::span<const vk::scissor_params>(&scissor, 1));
+
+                current.begin_rendering(ui_begin_params);
+
+                m_render_context.begin(m_projection, m_view);
+                m_render_context.end();
+
+                current.end_rendering();
+
+                m_imgui_context->image_memory_barrier(
+                  current,
+                  VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+                  VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+                /**
+                 * Presenting to Swapchain Memory Barriers
+                 */
+
+                vk::rendering_attachment present_color_render_attachment = {
+                    .image_view = m_images[m_next_image_frame_idx].image_view(),
+                    .layout = vk::image_layout::color_optimal,
+                    .resolve_mode = vk::resolved_mode_flags::none,
+                    .resolve_image_view = nullptr,
+                    .resolve_image_layout = vk::image_layout::undefined,
+                    .load = vk::attachment_load::clear,
+                    .store = vk::attachment_store::store,
+                    .clear_values = clear_color
+                };
+
+                vk::rendering_attachment present_depth_stencil_attachment = {
+                    .image_view =
+                      m_depth_images[m_next_image_frame_idx].image_view(),
+                    .layout = vk::image_layout::depth_stencil_optimal,
+                    .resolve_mode = vk::resolved_mode_flags::none,
+                    .resolve_image_view = nullptr,
+                    .resolve_image_layout = vk::image_layout::undefined,
+                    .load = vk::attachment_load::clear,
+                    .store = vk::attachment_store::store,
+                    .depth_values = depth_value
+                };
+
+                vk::rendering_begin_parameters present_begin_params = {
+                    .render_area = { { 0, 0 }, { m_window->extent().width, m_window->extent().height }, },
+                    .layer_count = 1,
+                    .color_attachments = std::span<const vk::rendering_attachment>(
+                    &present_color_render_attachment, 1),
+                    .depth_attachment = present_depth_stencil_attachment,
+                    .stencil_attachment = present_depth_stencil_attachment,
+                };
+
+                m_images[m_next_image_frame_idx].memory_barrier(
+                  current,
+                  m_color_format,
+                  VK_IMAGE_LAYOUT_UNDEFINED,
+                  VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+
+                m_depth_images[m_next_image_frame_idx].memory_barrier(
+                  current,
+                  m_depth_format,
+                  VK_IMAGE_LAYOUT_UNDEFINED,
+                  VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+                  VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT);
+
+                current.begin_rendering(present_begin_params);
+                m_imgui_context->begin();
+                m_imgui_context->set_current_command(current);
+
+                invoke_ui_update(m_world.get());
+                invoke_ui_update(m_current_scene.get());
+                m_imgui_context->end();
+                current.end_rendering();
+
+                m_images[m_next_image_frame_idx].memory_barrier(
+                  current,
+                  m_window->surface_properties().format.format,
+                  VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+                  VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+
+                current.end();
+
+                const VkCommandBuffer command = current;
+                m_window->submit(std::span<const VkCommandBuffer>(&command, 1));
+                m_window->present(m_next_image_frame_idx);
+
+                // Update platform window afterwards
+                m_imgui_context->update_platforms();
             }
+
+            invoke_post_update(m_current_scene.get());
+            invoke_post_update(m_world.get());
         }
 
-        /**
-         * @brief Performs any post cleanup when user requests the application
-         * to close
-         */
-        void post_destroy() { console_log_info("Executing post cleanup!!!"); }
+        // Experimental: Will look into later once we dive into scene
+        // transitioning void on_scene_transition(event::scene_transition&
+        // p_scene_transition) {
+        //     m_world->current(p_scene_transition.next_scene);
+        //     std::println("Attempting to switch to the scene: {}",
+        //     p_scene_transition.next_scene);
 
-        /**
-         * @brief we only ever have one window
-         *
-         * This static function was a means to getting access to the window to
-         * perform any operations or request any data the window may have to
-         * provide
-         */
-        // static window& get_window() { return *s_instance->m_window; }
+        //     // We only want to set the current scene if that specific scene
+        //     is valid if(m_world->current() != nullptr) {
+        //         m_current_scene = m_world->current();
+        //         m_render_context.current_scene(*m_current_scene);
+        //     }
+        // }
 
-        /* Retrieves the current selected graphics API */
-        /**
-         * @return the currently specified API.
-         */
-        static graphics_api current_api() { return graphics_api::vulkan; }
+        void post_destroy() {
+            m_imgui_context->destruct();
+            m_render_context.destruct();
 
-        /* Returns the currently selected swapchain */
-        /**
-         * @brief gives you the current swapchain handle
-         *
-         * TODO: This is not actually needed, and should be removed
-         */
-        VkSwapchainKHR get_current_swapchain() {
-            return m_window->current_swapchain();
+            for (auto& command : m_command_buffers) {
+                command.destruct();
+            }
+
+            for (auto& color_image : m_images) {
+                color_image.destruct();
+            }
+
+            for (auto& depth_image : m_depth_images) {
+                depth_image.destruct();
+            }
+            m_window->destruct();
+            m_device->destruct();
         }
 
-        void current_world(ref<world> p_world) { m_current_world = p_world; }
-
-        void reload_mesh(event::mesh_reload&) {
-            console_log_info(
-              "application::trigger<UEvent> invoked from core/application!");
-        }
-
-        void reload_material(event::material_reload&) {
-            console_log_info(
-              "application::trigger<material> invoked from core/application!");
-        }
-
-    protected:
-        [[nodiscard]] ref<renderer_system> renderer_instance() const {
-            return m_renderer;
+        void current_world(std::shared_ptr<world> p_world) {
+            m_world = std::move(p_world);
         }
 
     private:
-        float m_delta_time = 0.f;
-        ref<world> m_current_world;
-        ref<window> m_window;
-        window_params m_initial_window_params;
-        ref<renderer_system> m_renderer = nullptr;
-        glm::mat4 m_projection;
-        glm::mat4 m_view;
-        uint32_t m_current_frame_index = -1;
-        vulkan::imgui_context m_ui_context;
+        float m_aspect_ratio = 0.f;
+        uint32_t m_next_image_frame_idx = 0;
+        VkFormat m_color_format;
+        VkFormat m_depth_format;
+        std::shared_ptr<graphics_context> m_context;
+        std::shared_ptr<window> m_window = nullptr;
         event::bus* m_bus = nullptr;
+        glm::mat4 m_view = glm::mat4(1.f);
+        glm::mat4 m_projection = glm::mat4(1.f);
+
+        render_context m_render_context;
+
+        std::shared_ptr<world> m_world;
+
+        std::shared_ptr<imgui_context> m_imgui_context;
+        std::shared_ptr<scene> m_current_scene = nullptr;
+
+        // vulkan-cpp specific handles
+        vk::instance m_instance;
+        std::optional<vk::physical_device> m_physical;
+        std::shared_ptr<vk::device> m_device;
+        std::vector<vk::sample_image> m_images;
+        std::vector<vk::sample_image> m_depth_images;
+        std::vector<vk::command_buffer> m_command_buffers;
+        float m_delta_time = 0.f;
+        window_params m_window_params{};
         static application* s_instance;
     };
 

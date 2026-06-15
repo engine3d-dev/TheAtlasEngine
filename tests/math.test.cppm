@@ -5,8 +5,8 @@ module;
 #include <boost/ut.hpp>
 export module atlas.tests:math;
 
-import atlas.core.math.types;
-import atlas.drivers.jolt_cpp.types;
+import atlas.core.math;
+import atlas.drivers.jolt_cpp;
 
 /**
  * @name MockTestTransform

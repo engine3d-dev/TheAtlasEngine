@@ -7,8 +7,6 @@ module;
 
 export module atlas.drivers.renderer_system;
 
-// import atlas.core.utilities.types;
-// import atlas.common;
 import atlas.core.utilities;
 import atlas.core.scene;
 import vk;

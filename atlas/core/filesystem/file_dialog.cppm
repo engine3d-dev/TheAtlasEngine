@@ -6,7 +6,7 @@ module;
 
 export module atlas.core.filesystem.file_dialog;
 
-import atlas.logger;
+import atlas.core.utilities;
 
 export namespace atlas::filesystem {
     std::string load_from_file_dialog(

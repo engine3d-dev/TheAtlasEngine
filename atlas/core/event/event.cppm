@@ -26,6 +26,13 @@ namespace atlas {
      */
     enum input_state { None, Idle, Pressed, Released };
 
+    export enum cursor_mode : uint32_t {
+        normal = 0x00034001,
+        hidden = 0x00034002,
+        disabled = 0x00034003,
+        captured = 0x00034004,
+    };
+
     struct joystick_button {
         int ID = -1;
         std::string Name = "";
@@ -141,6 +148,11 @@ namespace atlas {
 
         void set_window_size(GLFWwindow* p_window) {
             s_window_address = p_window;
+        }
+
+        void set_cursor_mode(cursor_mode p_mode) {
+            glfwSetInputMode(
+              s_window_address, GLFW_CURSOR, static_cast<int>(p_mode));
         }
 
         // specfying listening for events

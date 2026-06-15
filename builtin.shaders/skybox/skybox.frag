@@ -1,6 +1,6 @@
 #version 450
 
-layout (location=0) in vec3 TexCoords; // Direction vector from vertex shader
+layout (location=0) in vec3 fragDirectionCoords; // Direction vector from vertex shader
 
 layout (location=0) out vec4 out_Color;
 
@@ -29,7 +29,7 @@ vec2 SampleEquirectangular(vec3 v) {
 
 void main() {
     // Get the 2D UV coordinate from the 3D direction
-    vec2 uv = SampleEquirectangular(TexCoords);
+    vec2 uv = SampleEquirectangular(fragDirectionCoords);
     
     // Sample the HDR map
     vec3 color = texture(cubeSampler, uv).rgb;

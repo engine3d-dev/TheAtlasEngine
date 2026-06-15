@@ -8,10 +8,10 @@ module;
 #include <type_traits>
 #include <typeinfo>
 
-export module atlas.core.ui.widgets;
+export module atlas.core.ui:widgets;
 
 import atlas.core.filesystem.file_dialog;
-import atlas.core.scene.components;
+import atlas.core.scene;
 
 export namespace atlas::ui {
     using ::ImGui::InputText;

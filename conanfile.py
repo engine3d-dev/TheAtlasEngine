@@ -32,7 +32,7 @@ class AtlasRecipe(ConanFile):
         self.requires("joltphysics/5.2.0")
         if self.options.enable_shaderc:
             self.requires("shaderc/2025.3")
-        self.requires("imguidocking/3.0")
+        self.requires("imguidocking/4.0")
         self.requires("flecs/4.0.4")
         self.requires("glfw/3.4")
         self.requires("spdlog/1.16.0")
@@ -40,7 +40,7 @@ class AtlasRecipe(ConanFile):
         self.requires("yaml-cpp/0.8.0")
 
         # Vulkan-related headers and includes packages
-        self.requires("vulkan-cpp/5.0")
+        self.requires("vulkan-cpp/6.2")
         self.requires("tinyobjloader/2.0.0-rc10")
         self.requires("stb/cci.20230920")
 

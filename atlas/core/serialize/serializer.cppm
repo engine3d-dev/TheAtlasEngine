@@ -1,7 +1,5 @@
 module;
 
-// #include <core/core.hpp>
-// #include <core/scene/scene.hpp>
 #include <string>
 #include <filesystem>
 #include <flecs.h>
@@ -9,14 +7,13 @@ module;
 #include <sstream>
 #include <glm/glm.hpp>
 #include <fstream>
+#include <print>
 
 export module atlas.core.serialize;
 
-import atlas.common;
 import atlas.core.scene;
 import atlas.core.serialize.types;
-import atlas.core.scene.components;
-import atlas.logger;
+import atlas.core.utilities;
 
 namespace atlas {
     // used to serialize entities
@@ -93,13 +90,15 @@ namespace atlas {
 
         // Deserialize atlas::material component
         if (p_entity_value["Mesh Source"]) {
-            auto perspective_camera_data = p_entity_value["Mesh Source"];
-            p_deserialize_to_object.set<mesh_source>({
-              .model_path =
-                perspective_camera_data["Model Path"].as<std::string>(),
-              .diffuse = perspective_camera_data["Diffuse"].as<std::string>(),
-              .specular = perspective_camera_data["Specular"].as<std::string>(),
-            });
+            auto mesh = p_entity_value["Mesh Source"];
+            if (!mesh["Model Path"].as<std::string>().empty()) {
+                p_deserialize_to_object.set<mesh_source>({
+                  .flip = static_cast<bool>(mesh["Flip"].as<int>()),
+                  .model_path = mesh["Model Path"].as<std::string>(),
+                  .diffuse = mesh["Diffuse"].as<std::string>(),
+                  .specular = mesh["Specular"].as<std::string>(),
+                });
+            }
         }
 
         if (p_entity_value["Point Light"]) {
@@ -177,8 +176,8 @@ namespace atlas {
          * @param p_scene_ctx is the current scene to perform
          * serialization/deserialization to
          */
-        serializer(const ref<scene>& p_scene_ctx)
-          : m_current_scene_ctx(p_scene_ctx) {}
+        serializer(ref<scene> p_scene)
+          : m_current_scene_ctx(/*NOLINT*/ p_scene) {}
 
         /**
          * @param p_filepath is the specified path to save the file
@@ -208,8 +207,9 @@ namespace atlas {
                                  .without<tag::editor>()
                                  .build();
 
-            q.each([&output](flecs::entity p_entity_id) {
-                serialize_entity(output, p_entity_id);
+            q.each([&output](flecs::entity p_entity) {
+                std::println("Serialize Entity: {}", p_entity.name().c_str());
+                serialize_entity(output, p_entity);
             });
 
             std::ofstream output_file(p_filepath.string());
@@ -235,7 +235,7 @@ namespace atlas {
                 return false;
             }
 
-            console_log_info("Before loading environment mappings!");
+            // console_log_info("Before loading environment mappings!");
             std::string environment_map_data = "";
             if (data["Environment"]) {
                 environment_map_data = data["Environment"].as<std::string>();
@@ -244,7 +244,10 @@ namespace atlas {
                                  environment_map_data);
             }
 
-            p_registry.set<environment>({ .filepath = environment_map_data });
+            if (!environment_map_data.empty()) {
+                p_registry.set<environment>(
+                  { .filepath = environment_map_data });
+            }
 
             YAML::Node entity_objects = data["Entities"];
 

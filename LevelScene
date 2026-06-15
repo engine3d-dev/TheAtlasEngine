@@ -8,6 +8,7 @@ Entities:
       Rotation: [0, 0, 0]
       Quaternion: [0, 0, 0, 1]
     Mesh Source:
+      Flip: 0
       Model Path: ""
       Diffuse: ""
       Specular: ""
@@ -24,6 +25,7 @@ Entities:
       Rotation: [2.29999995, 95.9000015, 91.8000031]
       Quaternion: [0, 0, 0, 1]
     Mesh Source:
+      Flip: 1
       Model Path: assets/models/viking_room.obj
       Diffuse: assets/models/viking_room.png
       Specular: ""
@@ -56,6 +58,7 @@ Entities:
       Rotation: [2.9000001, 16.5, 0.600000024]
       Quaternion: [-1.5550123e-08, -1.33205403e-05, -1.63867355e-08, 1]
     Mesh Source:
+      Flip: 0
       Model Path: assets/models/cube.obj
       Diffuse: assets/models/container_diffuse.png
       Specular: assets/models/wallace_gromit_image.jpg

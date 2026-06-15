@@ -3,7 +3,7 @@ module;
 #include <imgui.h>
 #include <string>
 
-export module atlas.core.ui.widgets.imgui_stdlib;
+export module atlas.core.ui:imgui_stdlib;
 
 struct InputTextCallback_UserData {
     std::string* Str;

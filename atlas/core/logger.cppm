@@ -10,8 +10,8 @@ module;
 #include <memory>
 #include <print>
 
-export module atlas.logger;
-export import atlas.common;
+export module atlas.core.utilities:logger;
+import :common;
 
 export namespace atlas {
     /**

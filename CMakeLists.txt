@@ -132,17 +132,10 @@ target_sources(${PROJECT_NAME} PUBLIC
     FILE_SET CXX_MODULES
     TYPE CXX_MODULES
     FILES
-
-    # core
-    # atlas/atlas.cppm
-    atlas/core/api.cppm
     atlas/core/common.cppm
-    atlas/core/utilities/types.cppm
-    atlas/core/utilities/utilities.cppm
     atlas/core/core.cppm
     atlas/core/logger.cppm
     atlas/core/application.cppm
-    atlas/core/window.cppm
 
     # math
     atlas/core/math/types.cppm
@@ -156,6 +149,7 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas/core/scene/level_streamer.cppm
     atlas/core/scene/uuid.cppm
 
+    atlas/core/utilities/utilities.cppm
     atlas/core/utilities/state.cppm
     atlas/core/utilities/poll_state.cppm
 
@@ -169,8 +163,10 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas/core/event/types.cppm
 
     # editor
+    atlas/core/editor/editor.cppm
     atlas/core/editor/dockspace.cppm
     atlas/core/editor/menu_item.cppm
+    atlas/core/ui/ui.cppm
     atlas/core/ui/widgets.cppm
     atlas/core/filesystem/file_dialog.cppm
 
@@ -179,23 +175,11 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas/core/serialize/serializer.cppm
 
     # renderer
-    atlas/renderer/context_loader.cppm
     atlas/renderer/renderer.cppm
     
-    atlas/drivers/drivers.cppm
-    atlas/drivers/graphics_context.cppm
-
     atlas/drivers/renderer_system.cppm
 
-
-    atlas/drivers/vulkan/hash.cppm
-    atlas/drivers/vulkan/mesh.cppm
-    atlas/drivers/vulkan/shader_resource_group.cppm
-    atlas/drivers/vulkan/render_system.cppm
-    atlas/drivers/vulkan/uniforms.cppm
-
     # imgui/UI
-    atlas/drivers/vulkan/imgui_context.cppm
     atlas/core/ui/imgui_stdlib.cppm
 
     # physics
@@ -204,19 +188,29 @@ target_sources(${PROJECT_NAME} PUBLIC
     atlas/physics/physics_engine.cppm
     
     # jolt_cpp
+    atlas/drivers/jolt_cpp/jolt_cpp.cppm
     atlas/drivers/jolt_cpp/math.cppm
     atlas/drivers/jolt_cpp/broad_phase.cppm
     atlas/drivers/jolt_cpp/contact_listener.cppm
     atlas/drivers/jolt_cpp/context.cppm
 
-    # drivers
+    # drivers/vulkan
+    atlas/drivers/vulkan/vulkan.cppm
+    atlas/drivers/vulkan/graphics_context.cppm
+    atlas/drivers/vulkan/window.cppm
+    atlas/drivers/vulkan/render_context.cppm
+    atlas/drivers/vulkan/imgui_context.cppm
     atlas/drivers/vulkan/utilities.cppm
-    atlas/drivers/vulkan/instance_context.cppm
-    atlas/drivers/vulkan/window_context.cppm
-    atlas/drivers/vulkan/physical_device.cppm
-    atlas/drivers/vulkan/device.cppm
-    atlas/drivers/vulkan/swapchain.cppm
     atlas/drivers/vulkan/environment_map.cppm
+    atlas/drivers/vulkan/stb_image.cppm
+    atlas/drivers/vulkan/gpu_uniforms.cppm
+
+    atlas/drivers/vulkan/hash.cppm
+
+
+    # 3D Model Importers
+    atlas/drivers/importer/importer.cppm
+    atlas/drivers/importer/obj_loader.cppm
 )
 
 target_sources(${PROJECT_NAME} PUBLIC

@@ -1,10 +1,11 @@
 module;
 
+#include <print>
 #include <unordered_map>
 #include <functional>
 #include <vector>
 
-export module atlas.core.utilities.poll_state;
+export module atlas.core.utilities:poll_state;
 
 export namespace atlas {
     inline std::unordered_map<void*, std::vector<std::function<void(float)>>>
@@ -17,6 +18,8 @@ export namespace atlas {
       s_physica_update{};
     inline std::unordered_map<void*, std::vector<std::function<void()>>>
       s_start{};
+    inline std::unordered_map<void*, std::vector<std::function<void()>>>
+      s_post{};
 
     void poll_update(void* p_address,
                      const std::function<void(float)>& p_callback) {
@@ -42,26 +45,9 @@ export namespace atlas {
         s_start[p_address].emplace_back(p_callback);
     }
 
-    // TEMP: This is a temporary solution, should look into doing this
-    // differently
-    void remove_update(void* p_address) {
-        s_update.erase(p_address);
-    }
-
-    void remove_defer_update(void* p_address) {
-        s_defer_update.erase(p_address);
-    }
-
-    void remove_physics_update(void* p_address) {
-        s_physica_update.erase(p_address);
-    }
-
-    void remove_ui_update(void* p_address) {
-        s_ui_update.erase(p_address);
-    }
-
-    void remove_start(void* p_address) {
-        s_start.erase(p_address);
+    void post_update_poll(void* p_address,
+                          const std::function<void()>& p_callback) {
+        s_post[p_address].emplace_back(p_callback);
     }
 
     /**
@@ -82,10 +68,6 @@ export namespace atlas {
      *
      */
     void invoke_on_update(void* p_scene, float p_delta_time) {
-        // for (auto& [address, on_update] : s_update) {
-        //     on_update(p_delta_time);
-        // }
-
         for (auto& on_update : s_update[p_scene]) {
             on_update(p_delta_time);
         }
@@ -112,6 +94,12 @@ export namespace atlas {
     void invoke_start(void* p_scene) {
         for (auto& on_update : s_start[p_scene]) {
             on_update();
+        }
+    }
+
+    void invoke_post_update(void* p_scene) {
+        for (auto& post_update : s_post[p_scene]) {
+            post_update();
         }
     }
 };

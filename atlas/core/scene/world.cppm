@@ -6,7 +6,7 @@ module;
 
 export module atlas.core.scene.world;
 
-import atlas.common;
+import atlas.core.utilities;
 import atlas.core.scene;
 import atlas.core.level_streamer;
 import atlas.core.event;
@@ -63,6 +63,11 @@ export namespace atlas {
         void current(const std::string& p_name) {
             m_current = m_level_streamer->current_scene(p_name);
         }
+
+        // template<typename UScene>
+        // void create_scene(const std::string& p_name, event::bus& p_bus) {
+        //     m_level_streamer->create_scene<UScene>(p_name, p_bus);
+        // }
 
     private:
         ref<scene> m_current;

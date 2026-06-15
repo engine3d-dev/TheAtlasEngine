@@ -3,7 +3,7 @@ module;
 #include <glm/glm.hpp>
 #include <initializer_list>
 
-export module atlas.core.math.types;
+export module atlas.core.math:types;
 
 export namespace atlas {
 

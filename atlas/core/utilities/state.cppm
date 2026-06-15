@@ -3,9 +3,9 @@ module;
 #include <type_traits>
 #include <cstring>
 
-export module atlas.core.utilities.state;
+export module atlas.core.utilities:state;
 
-import atlas.core.utilities.poll_state;
+import :poll_state;
 
 export namespace atlas {
     /**
@@ -166,6 +166,16 @@ export namespace atlas {
                       "Cannot register a function that is not a member "
                       "function of a class object");
         poll_ui_update(p_instance, [p_instance, p_callable]() {
+            (p_instance->*p_callable)();
+        });
+    }
+
+    template<typename UObject, typename UCallback>
+    void register_post(UObject* p_instance, const UCallback& p_callable) {
+        static_assert(std::is_member_pointer_v<UCallback>,
+                      "Cannot register a function that is not a member "
+                      "function of a class object");
+        post_update_poll(p_instance, [p_instance, p_callable]() {
             (p_instance->*p_callable)();
         });
     }

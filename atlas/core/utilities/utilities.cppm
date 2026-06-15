@@ -1,7 +1,19 @@
+module;
+
+#include <cstdint>
+#include <string>
+
 export module atlas.core.utilities;
 
-export import atlas.logger;
-export import atlas.common;
-export import atlas.graphics_api;
-export import atlas.core.utilities.types;
-export import atlas.core.utilities.state;
+export import :logger;
+export import :common;
+export import :poll_state;
+export import :state;
+
+namespace atlas {
+    export struct window_params {
+        uint32_t width;
+        uint32_t height;
+        std::string name = "";
+    };
+};

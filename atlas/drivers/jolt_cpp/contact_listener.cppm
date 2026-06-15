@@ -32,9 +32,8 @@ module;
 #include <Jolt/Math/Real.h>
 #include <Jolt/Math/Quat.h>
 
-export module atlas.drivers.jolt_cpp.contact_listener;
-import atlas.logger;
-// import atlas.core.event.types;
+export module atlas.drivers.jolt_cpp:contact_listener;
+import atlas.core.utilities;
 import atlas.core.event;
 
 export namespace atlas::physics {

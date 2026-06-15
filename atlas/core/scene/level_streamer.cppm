@@ -8,9 +8,8 @@ module;
 
 export module atlas.core.level_streamer;
 
-import atlas.logger;
+import atlas.core.utilities;
 import atlas.core.scene;
-import atlas.core.scene.uuid;
 import atlas.core.event;
 
 export namespace atlas {
@@ -34,18 +33,29 @@ export namespace atlas {
          * @return the currently active scene to retrieve
          */
         ref<scene> current_scene(const std::string& p_name) {
+            if (!m_scenes.contains(p_name)) {
+                return nullptr;
+            }
+
             return m_scenes[p_name];
         }
 
         template<typename UScene>
         void default_scene(const std::string& p_name, event::bus& p_bus) {
             m_scenes.emplace(
-              p_name,
-              std::allocate_shared<UScene>(
-                std::pmr::polymorphic_allocator<UScene>(m_allocator.resource()),
-                p_name,
-                p_bus));
+              p_name, std::allocate_shared<UScene>(m_allocator, p_name, p_bus));
         }
+
+        // Experimental: This was just for testing. Will come back to later.
+        // template<typename UScene>
+        // void create_scene(const std::string& p_name, event::bus& p_bus) {
+        //     m_scenes.emplace(
+        //       p_name,
+        //       std::allocate_shared<UScene>(
+        //         std::pmr::polymorphic_allocator<UScene>(m_allocator.resource()),
+        //         p_name,
+        //         p_bus));
+        // }
 
         /**
          * @brief used to iterate through over the scenes created
