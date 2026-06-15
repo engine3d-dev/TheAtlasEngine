@@ -1,7 +1,6 @@
 module;
 
 #include <string>
-#include <print>
 #include <flecs.h>
 #include <optional>
 
@@ -109,7 +108,7 @@ public:
 
         // Signal to trigger this kind of scene transition
         if (atlas::event::is_key_pressed(key_n)) {
-            std::println("Signaling to transition to level scene");
+            console_log_error("Signaling to transition to level scene");
             atlas::event::scene_transition scene_transition = {
                 .next_scene = "Level Scene",
             };

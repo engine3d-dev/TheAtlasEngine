@@ -7,7 +7,6 @@ module;
 #include <vector>
 #include <span>
 #include <string>
-#include <print>
 
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
@@ -31,6 +30,7 @@ module;
 
 export module atlas.drivers.vulkan:environment_map;
 
+import atlas.core.utilities;
 import vk;
 
 struct environment_uniforms {
@@ -90,12 +90,9 @@ public:
         bool res = create_hdr(p_filename);
 
         if (!res) {
-            std::println("Cannot load environment: {}", p_filename);
+            console_log_error("Cannot load environment: {}", p_filename);
         }
 
-        if (res) {
-            std::println("Loaded succesfully: {}", p_filename);
-        }
         create_pipelines();
     }
 
@@ -108,11 +105,7 @@ public:
         bool res = create_hdr(p_color, p_extent);
 
         if (!res) {
-            std::println("Cannot load environment");
-        }
-
-        if (res) {
-            std::println("Loaded succesfully raw pixels successfully");
+            console_log_error("Cannot load environment");
         }
         create_pipelines();
     }

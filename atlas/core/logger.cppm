@@ -8,7 +8,6 @@ module;
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <memory>
-#include <print>
 
 export module atlas.core.utilities:logger;
 import :common;
@@ -24,7 +23,6 @@ export namespace atlas {
     public:
         console_log_manager(
           const std::string& p_pattern = "%^[%n] [%T]: %v%$") {
-            std::println("Constructing console_log_manager!");
 
             //! @note Setting up logs for different log stdout's
             //! @note Logs for p_tag is logs specific to the game.

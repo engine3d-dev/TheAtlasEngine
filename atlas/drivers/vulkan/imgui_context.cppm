@@ -9,7 +9,6 @@ module;
 #include <imgui/backends/imgui_impl_vulkan.h>
 #include <array>
 #include <GLFW/glfw3.h>
-#include <print>
 #include <memory>
 #include <optional>
 #include <span>
@@ -138,7 +137,6 @@ namespace atlas {
             m_instance = p_context->instance_handle();
             m_device = p_context->logical_device();
             m_physical = p_context->physical_device();
-            std::println("Constructing imgui_context");
 
             m_color_format = p_color_format;
             m_depth_format = p_depth_format;
@@ -157,7 +155,7 @@ namespace atlas {
                 std::ifstream file(path.string());
 
                 if (!file) {
-                    std::println("Cannot load {}", path.string());
+                    console_log_error("Cannot load {}", path.string());
                 }
 
                 std::stringstream ss;
@@ -242,14 +240,11 @@ namespace atlas {
 
             m_viewport_image = vk::sample_image(*m_device, viewport_params);
 
-            std::println("before transition image layout");
             transition_image_layout(*m_device,
                                     m_viewport_image,
                                     m_color_format,
                                     VK_IMAGE_LAYOUT_UNDEFINED,
                                     VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-
-            std::println("after transition image layout");
 
             // Perform additional configurations for specific handles
             vk::image_params viewport_depth_params = {

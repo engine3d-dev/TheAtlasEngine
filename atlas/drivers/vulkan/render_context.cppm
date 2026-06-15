@@ -249,7 +249,6 @@ export namespace atlas {
                 // importing .obj 3d models here
                 if(std::filesystem::path(src->model_path).extension() == ".obj") {
                     gpu_mesh_data gpu_mesh{};
-                    console_log_warn("Loading OBJ Path: {}", src->model_path);
                     obj_importer importer(src->model_path, src->flip);
                     gpu_mesh.vertex = vk::vertex_buffer(
                     *m_device, importer.vertices(), vertex_params);
@@ -262,10 +261,7 @@ export namespace atlas {
                 }
                 else if (std::filesystem::path(src->model_path).extension() == ".gltf" || std::filesystem::path(src->model_path).extension() == ".glb") {
                     gpu_mesh_data gpu_mesh{};
-                    console_log_warn("Loading GLTF Path: {}", src->model_path);
                     gltf_importer importer(src->model_path, src->flip);
-                    console_log_info("vertices.size() = {}", importer.vertices().size());
-                    console_log_info("vertices.size() = {}", importer.indices().size());
                     gpu_mesh.vertex = vk::vertex_buffer(*m_device, importer.vertices(), vertex_params);
                     gpu_mesh.index = vk::index_buffer(*m_device, importer.indices(), index_params);
                     gpu_mesh.has_indices_buffer = (importer.indices().size() >= 0) ? true : false;

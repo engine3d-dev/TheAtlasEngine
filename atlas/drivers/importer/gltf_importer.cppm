@@ -4,30 +4,12 @@ module;
 
 #include <glm/glm.hpp>
 
-// #define STB_IMAGE_WRITE_IMPLEMENTATION
-// #define TINYGLTF_IMPLEMENTATION
-// #include <tiny_gltf.h>
-// #include "fastgltf/base64.hpp"
-// #include "fastgltf/core.hpp"
-// #include "fastgltf/dxmath_element_traits.hpp"
-// #include "fastgltf/glm_element_traits.hpp"
-// #include "fastgltf/math.hpp"
-// #include "fastgltf/tools.hpp"
-// #include "fastgltf/types.hpp"
-// #include "fastgltf/util.hpp"
-// #include <fastgltf/core.hpp>
-// #include <fastgltf/types.hpp>
-// #include <fastgltf/tools.hpp>
-// #include <fastgltf/core.hpp>
-// #include <fastgltf/types.hpp>
-#include "fastgltf/base64.hpp"
-#include "fastgltf/core.hpp"
-#include "fastgltf/dxmath_element_traits.hpp"
-#include "fastgltf/glm_element_traits.hpp"
-#include "fastgltf/math.hpp"
-#include "fastgltf/tools.hpp"
-#include "fastgltf/types.hpp"
-#include "fastgltf/util.hpp"
+#include <fastgltf/core.hpp>
+#include <fastgltf/math.hpp>
+#include <fastgltf/tools.hpp>
+#include <fastgltf/types.hpp>
+#include <fastgltf/dxmath_element_traits.hpp>
+#include <fastgltf/glm_element_traits.hpp>
 
 export module atlas.drivers.importer:gltf_importer;
 
@@ -55,12 +37,8 @@ namespace atlas {
             // 2. Map buffers directly without copying them into memory prematurely
             constexpr auto gltf_options = fastgltf::Options::DontRequireValidAssetMember 
                                         | fastgltf::Options::LoadExternalBuffers;
-            // constexpr auto gltf_options =
-            // fastgltf::Options::DontRequireValidAssetMember |
-			// fastgltf::Options::GenerateMeshIndices;
-            
+
             std::filesystem::path filepath = std::filesystem::path(p_path);
-            console_log_info("FILE PATH: {}", filepath.string());
 
             auto data = fastgltf::GltfDataBuffer::FromPath(filepath);
             if (data.error() != fastgltf::Error::None) {
@@ -153,15 +131,12 @@ namespace atlas {
 
                         if (has_uv) {
                             const auto& uv_accessor = model.accessors[uv_attribute->accessorIndex];
-                            
-                            // Extract 2D texture coordinate element matching the current vertex index
+
+                            // Extract 2D texture coordinate element matching based from the current primitive index
                             glm::vec2 uv = fastgltf::getAccessorElement<glm::vec2>(model, uv_accessor, index);
                             
-                            // Vulkan texture coordinate space has (0,0) at the top-left.
-                            // glTF uses OpenGL space with (0,0) at the bottom-left.
-                            // Flip the V coordinate if your sampler/shader expects Vulkan-native coordinates.
-                            // vertex.uv = {uv.x, 1.0f - uv.y};
-                            vertex.uv = uv;
+                            glm::vec2 flipped_uv = {uv.x, 1.0f - uv.y};
+                            vertex.uv = m_flip ? flipped_uv : uv;
                         }
 
                         m_vertices.push_back(vertex);

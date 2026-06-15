@@ -73,7 +73,7 @@ public:
           m_device, m_host_bit, "assets/icons/PlayButton.png");
 
         if (!m_play_icon.loaded()) {
-            std::println("m_play_icon not loaded!");
+            console_log_error("m_play_icon not loaded!");
         }
 
         m_stop_icon =
@@ -84,7 +84,7 @@ public:
                                  "assets/icons/StopButton.png");
 
         if (!m_stop_icon.loaded()) {
-            std::println("m_stop_icon not loaded!");
+            console_log_error("m_stop_icon not loaded!");
         }
 
         m_content_browser = content_browser_panel(m_device, m_host_bit);
