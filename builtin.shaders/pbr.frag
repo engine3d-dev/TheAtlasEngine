@@ -173,10 +173,11 @@ void main() {
     vec3 Lo = vec3(0.0);
     for(int i = 0; i < num_point_lights; i++) {
         point_light src = lights.point_lights[i];
+        vec3 light_view_dir = normalize(src.position.xyz - FragPos);
 
         // L
         vec3 dir_to_light = normalize(src.position.xyz - FragPos);
-        vec3 H = normalize(dir_to_light + view_dir);
+        vec3 H = normalize(dir_to_light + light_view_dir);
         float dist = length(src.position.xyz - FragPos);
         // float attenuation = 1.0 / (dist * dist);
         float attenuation = src.attenuation / (src.constant + src.linear * dist + src.quadratic * pow(dist, 2));
@@ -184,11 +185,11 @@ void main() {
 
         // cook-torrance brdf
         float NDF = DistributionGGX(normal, H, roughness);
-        float G = GeometrySmith(normal, view_dir, dir_to_light, roughness);
-        vec3 F = fresnelSchlick(max(dot(H, view_dir) , 0.0), F0);
+        float G = GeometrySmith(normal, light_view_dir, dir_to_light, roughness);
+        vec3 F = fresnelSchlick(max(dot(H, light_view_dir) , 0.0), F0);
 
         vec3 numerator = NDF * G * F;
-        float denominator = 4.0 * max(dot(normal, view_dir), 0.0) * max(dot(normal, dir_to_light), 0.0) + 0.0001;
+        float denominator = 4.0 * max(dot(normal, light_view_dir), 0.0) * max(dot(normal, dir_to_light), 0.0) + 0.0001;
         vec3 specular = numerator / denominator * specular_texture.rgb;
 
         vec3 kS = F;
