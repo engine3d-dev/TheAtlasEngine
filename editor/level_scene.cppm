@@ -75,11 +75,23 @@ public:
           .scale = { 0.9f, 0.9f, 0.9f },
         });
 
-        backpack.set<atlas::mesh_source>(
-          { .color = { 1.f, 1.f, 1.f, 1.f },
-            .model_path = "assets/backpack/backpack.obj",
-            .diffuse = "assets/backpack/diffuse.jpg",
-            .specular = "assets/backpack/specular.jpg" });
+        backpack.set<atlas::mesh_source>({
+          .color = { 1.f, 1.f, 1.f, 1.f },
+          .model_path = "assets/backpack/backpack.obj",
+          .diffuse = "assets/backpack/diffuse.jpg",
+          .specular = "assets/backpack/specular.jpg",
+        });
+
+        atlas::game_object city = entity("City");
+
+        city.set<atlas::transform>({
+            .position = {1.f, 1.f, 1.f},
+            .scale = {0.03, 0.03, 0.03},
+        });
+        city.set<atlas::mesh_source>({
+            .model_path = "assets/medieval_modular_city_realistic.glb",
+        });
+
 
         // const size_t grid_width = 5;
         // const float spacing = 5;
