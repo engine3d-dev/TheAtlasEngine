@@ -92,6 +92,7 @@ set_packages(
 
     tinyobjloader
     fastgltf
+    Taskflow
     ${SHADERC_PACKAGE}
     watcher
     vulkan-cpp
@@ -110,6 +111,7 @@ set_packages(
     flecs::flecs_static
     tinyobjloader::tinyobjloader
     fastgltf::fastgltf
+    Taskflow::Taskflow
     ${SHADERC_LINK_PACKAGE}
     watcher::watcher
     vulkan-cpp
