@@ -297,18 +297,6 @@ export namespace atlas {
 
                 mesh_task* task = &group_tasks.back();
 
-                gpu_draw_call gpu_mesh{};
-
-
-                vk::buffer_parameters vertex_params = {
-                    .memory_mask = m_physical->memory_properties(vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit),
-                    .usage = vk::buffer_usage::transfer_dst_bit | vk::buffer_usage::vertex_buffer_bit,
-                };
-                vk::buffer_parameters index_params = {
-                    .memory_mask = m_physical->memory_properties(vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit),
-                    .usage = vk::buffer_usage::index_buffer_bit,
-                };
-
                 tf::Task processing_task = taskflow.emplace([task, ext]() mutable{
                     if(ext == ".obj") {
                         task->obj.emplace(task->path, task->flip);
@@ -318,10 +306,36 @@ export namespace atlas {
                         task->gltf.emplace(task->path, task->flip);
                     }
                 });
+            });
 
+            m_executor->run(taskflow).wait();
 
-                tf::Task loading_task = taskflow.emplace([gpu_mesh, task, this, vertex_params, index_params]() mutable {
-                    bool successful = false;
+            auto current_time = std::chrono::high_resolution_clock::now();
+
+            uint64_t elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count();
+            uint64_t elapsed_sec = std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time).count();
+            console_log_info("Elapsed Seconds: {}", elapsed_sec);
+            console_log_info("Elapsed Microseconds: {}", elapsed_ms);
+
+            // execution processes
+
+            vk::buffer_parameters vertex_params = {
+                .memory_mask = m_physical->memory_properties(vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit),
+                .usage = vk::buffer_usage::transfer_dst_bit | vk::buffer_usage::vertex_buffer_bit,
+            };
+            vk::buffer_parameters index_params = {
+                .memory_mask = m_physical->memory_properties(vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit),
+                .usage = vk::buffer_usage::index_buffer_bit,
+            };
+            
+            start_time = std::chrono::high_resolution_clock::now();
+            tf::Task loading_task = taskflow.emplace([this, group_tasks, vertex_params, index_params]() mutable {
+                gpu_draw_call gpu_mesh{};
+                bool successful = false;
+
+                for(auto& t : group_tasks) {
+                    mesh_task* task = &t;
+
                     if (task->obj.has_value()) {
                         auto& importer = task->obj.value();
                         if (!importer.vertices().empty()) {
@@ -348,22 +362,17 @@ export namespace atlas {
                     }
 
                     if(successful) {
-                        // std::lock_guard<std::mutex> guard(mutex);
                         m_meshes.emplace(task->entity_id, gpu_mesh);
                     }
-                });
-
-
-                processing_task.precede(loading_task);
+                }
             });
 
-            tf::Future<void> future = m_executor->run(taskflow);
-            future.wait();
+            m_executor->run(taskflow).wait();
 
-            auto current_time = std::chrono::high_resolution_clock::now();
+            current_time = std::chrono::high_resolution_clock::now();
 
-            uint64_t elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count();
-            uint64_t elapsed_sec = std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time).count();
+            elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count();
+            elapsed_sec = std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time).count();
             console_log_info("Elapsed Seconds: {}", elapsed_sec);
             console_log_info("Elapsed Microseconds: {}", elapsed_ms);
 
