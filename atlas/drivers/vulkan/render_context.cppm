@@ -19,6 +19,11 @@ module;
 #include <future>
 #include <deque>
 
+#include <chrono>
+
+#include <taskflow/taskflow.hpp>
+#include <taskflow/algorithm/for_each.hpp>
+
 export module atlas.drivers.vulkan:render_context;
 
 import :stb_image;
@@ -33,11 +38,26 @@ import atlas.core.utilities;
 import vk;
 
 export namespace atlas {
+    enum class material_type : uint8_t {
+        none,
+        diffuse,
+        specular
+    };
     struct request_payload {
         uint64_t entity_id=0;
         // gpu_mesh_data mesh{};
         std::optional<obj_importer> obj;
         std::optional<gltf_importer> gltf;
+    };
+
+    struct mesh_task {
+        uint64_t entity_id=0;
+        std::string path;
+        std::optional<obj_importer> obj;
+        std::optional<gltf_importer> gltf;
+        bool duplicate=false;
+        bool flip=false;
+
     };
 
     struct request_material_payload {
@@ -251,105 +271,27 @@ export namespace atlas {
               m_physical->memory_properties(
                 vk::memory_property::host_visible_bit |
                 vk::memory_property::host_cached_bit));
+
+
+            m_executor = std::make_shared<tf::Executor>();
         }
 
         void prebake() {
             flecs::query<> all_meshes =
               m_world->query_builder<mesh_source>().build();
 
-            all_meshes.each([this](flecs::entity p_entity) {
-                const mesh_source* src = p_entity.get<mesh_source>();
-                async_request_load(p_entity.id(), src->model_path, src->flip);
-            });
-
-            while(!m_async_queue.empty()) {
-                std::future<request_payload> future = std::move(m_async_queue.front());
-                request_payload payload = future.get();
-                m_async_queue.pop_front();
-
-                vk::buffer_parameters vertex_params = {
-                    .memory_mask = m_physical->memory_properties(
-                      vk::memory_property::host_visible_bit |
-                      vk::memory_property::host_cached_bit),
-                    .usage = vk::buffer_usage::transfer_dst_bit |
-                             vk::buffer_usage::vertex_buffer_bit,
-                };
-
-                vk::buffer_parameters index_params = {
-                    .memory_mask = m_physical->memory_properties(
-                      vk::memory_property::host_visible_bit |
-                      vk::memory_property::host_cached_bit),
-                    .usage = vk::buffer_usage::index_buffer_bit,
-                };
-
-                if(payload.obj.has_value()) {
-                    obj_importer importer = payload.obj.value();
-                    gpu_mesh_data gpu_mesh{};
-                    gpu_mesh.vertex = vk::vertex_buffer(
-                    *m_device, importer.vertices(), vertex_params);
-                    gpu_mesh.index = vk::index_buffer(
-                    *m_device, importer.indices(), index_params);
-                    gpu_mesh.has_indices_buffer = (importer.indices().size() >= 0) ? true : false;
-                    gpu_mesh.vertices_size = importer.vertices().size();
-                    gpu_mesh.indices_size = importer.indices().size();
-                    m_meshes.emplace(payload.entity_id, gpu_mesh);
-                }
-
-                if(payload.gltf.has_value()) {
-                    gltf_importer importer = payload.gltf.value();
-                    gpu_mesh_data gpu_mesh{};
-                    gpu_mesh.vertex = vk::vertex_buffer(
-                    *m_device, importer.vertices(), vertex_params);
-                    gpu_mesh.index = vk::index_buffer(
-                    *m_device, importer.indices(), index_params);
-                    gpu_mesh.has_indices_buffer =
-                    (importer.indices().size() >= 0) ? true : false;
-                    gpu_mesh.vertices_size = importer.vertices().size();
-                    gpu_mesh.indices_size = importer.indices().size();
-                    m_meshes.emplace(payload.entity_id, gpu_mesh);
-                }
-            }
-
-            all_meshes.each([this](flecs::entity p_entity) {
-                const mesh_source* src = p_entity.get<mesh_source>();
-                async_request_material(p_entity.id(), src);
-            });
-
-
-            while(!m_async_materials_queue.empty()) {
-                std::future<request_material_payload> future = std::move(m_async_materials_queue.front());
-                request_material_payload payload = future.get();
-                m_async_materials_queue.pop_front();
-
-                vk::texture_params config_texture = {
-                    .memory_mask = m_physical->memory_properties(
-                      vk::memory_property::host_visible_bit |
-                      vk::memory_property::host_cached_bit),
-                };
-                // Loading texture and setting up VkSampler and VkImageView
-
-                // Reminder: Use diffuse_idx
-                gpu_material material = {};
-                if (payload.diffuse.has_value()) {
-                    auto diffuse = payload.diffuse.value();
-                    material.diffuse_idx = m_texture_slot_index++;
-                    m_gpu_textures.emplace_back(*m_device, &diffuse, config_texture);
-                }
-
-                if (payload.specular.has_value()) {
-                    auto specular = payload.specular.value();
-                    material.specular_idx = m_texture_slot_index++;
-                    m_gpu_textures.emplace_back(
-                      *m_device, &specular, config_texture);
-                }
-
-                m_material_table.emplace(payload.entity_id, material);
-            }
+            // auto start_time = std::chrono::high_resolution_clock::now();
 
             // all_meshes.each([this](flecs::entity p_entity) {
             //     const mesh_source* src = p_entity.get<mesh_source>();
+            //     async_request_load(p_entity.id(), src->model_path, src->flip);
+            // });
 
-            //     /*
+            // while(!m_async_queue.empty()) {
+            //     std::future<request_payload> future = std::move(m_async_queue.front());
+            //     request_payload payload = future.get();
+            //     m_async_queue.pop_front();
+
             //     vk::buffer_parameters vertex_params = {
             //         .memory_mask = m_physical->memory_properties(
             //           vk::memory_property::host_visible_bit |
@@ -365,43 +307,167 @@ export namespace atlas {
             //         .usage = vk::buffer_usage::index_buffer_bit,
             //     };
 
-            //     // importing .obj 3d models here
-            //     if (std::filesystem::path(src->model_path).extension() ==
-            //         ".obj") {
+            //     if(payload.obj.has_value()) {
+            //         obj_importer importer = payload.obj.value();
             //         gpu_mesh_data gpu_mesh{};
-            //         obj_importer importer(src->model_path, src->flip);
             //         gpu_mesh.vertex = vk::vertex_buffer(
-            //           *m_device, importer.vertices(), vertex_params);
+            //         *m_device, importer.vertices(), vertex_params);
             //         gpu_mesh.index = vk::index_buffer(
-            //           *m_device, importer.indices(), index_params);
-            //         gpu_mesh.has_indices_buffer =
-            //           (importer.indices().size() >= 0) ? true : false;
+            //         *m_device, importer.indices(), index_params);
+            //         gpu_mesh.has_indices_buffer = (importer.indices().size() >= 0) ? true : false;
             //         gpu_mesh.vertices_size = importer.vertices().size();
             //         gpu_mesh.indices_size = importer.indices().size();
-            //         m_meshes.emplace(p_entity.id(), gpu_mesh);
+            //         m_meshes.emplace(payload.entity_id, gpu_mesh);
             //     }
-            //     else if (std::filesystem::path(src->model_path).extension() ==
-            //                ".gltf" ||
-            //              std::filesystem::path(src->model_path).extension() ==
-            //                ".glb") {
+
+            //     if(payload.gltf.has_value()) {
+            //         gltf_importer importer = payload.gltf.value();
             //         gpu_mesh_data gpu_mesh{};
-            //         gltf_importer importer(src->model_path, src->flip);
             //         gpu_mesh.vertex = vk::vertex_buffer(
-            //           *m_device, importer.vertices(), vertex_params);
+            //         *m_device, importer.vertices(), vertex_params);
             //         gpu_mesh.index = vk::index_buffer(
-            //           *m_device, importer.indices(), index_params);
+            //         *m_device, importer.indices(), index_params);
             //         gpu_mesh.has_indices_buffer =
-            //           (importer.indices().size() >= 0) ? true : false;
+            //         (importer.indices().size() >= 0) ? true : false;
             //         gpu_mesh.vertices_size = importer.vertices().size();
             //         gpu_mesh.indices_size = importer.indices().size();
-
-            //         m_meshes.emplace(p_entity.id(), gpu_mesh);
+            //         m_meshes.emplace(payload.entity_id, gpu_mesh);
             //     }
-            //     */
+            // }
+
+            // auto current_time = std::chrono::high_resolution_clock::now();
+
+            // uint64_t elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count();
+            // uint64_t elapsed_sec = std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time).count();
+
+            // console_log_info("Elapsed Seconds: {}", elapsed_sec);
+            // console_log_info("Elapsed Microseconds: {}", elapsed_ms);
+
+            auto start_time = std::chrono::high_resolution_clock::now();
+            std::vector<mesh_task> tasks;
+
+            // all_meshes.each([&tasks](flecs::entity p_entity){
+            //     const mesh_source* src = p_entity.get<mesh_source>();
+
+            //     if(src->model_path.empty()) {
+            //         return;
+            //     }
+
+            //     mesh_task task = {};
+            //     task.entity_id = p_entity.id();
+            //     task.path = src->model_path;
+            //     task.flip = src->flip;
+
+            //     tasks.emplace_back(task);
+            // });
+            std::unordered_map<std::string, uint64_t> batch_path_to_owner;
+
+            all_meshes.each([this, &tasks, &batch_path_to_owner](flecs::entity p_entity) {
+                const mesh_source* src = p_entity.get<mesh_source>();
+                if (src->model_path.empty()) return;
+
+                mesh_task task = {};
+                task.entity_id = p_entity.id();
+                task.path = src->model_path;
+                task.flip = src->flip;
+
+                // Cache lookup: Skip loading if it exists globally or within this batch
+                if (m_cached_meshes_task.contains(src->model_path)) {
+                    task.duplicate = true;
+                } 
+                else if (batch_path_to_owner.contains(src->model_path)) {
+                    task.duplicate = true;
+                } 
+                else {
+                    batch_path_to_owner[src->model_path] = p_entity.id();
+                }
+
+                tasks.emplace_back(task);
+            });
+
+            // 2. Compute file extensions on the main thread to eliminate allocations inside threads
+            std::vector<std::string> extensions(tasks.size());
+            for (size_t i = 0; i < tasks.size(); ++i) {
+                if (!tasks[i].duplicate) {
+                    extensions[i] = std::filesystem::path(tasks[i].path).extension().string();
+                }
+            }
+
+            // 3. Parallel Execution via Taskflow
+            tf::Taskflow taskflow;
+            taskflow.for_each_index(size_t(0), tasks.size(), size_t(1), [&tasks, &extensions](size_t idx) {
+                mesh_task& p_task = tasks[idx];
+                if (p_task.duplicate) return; // Immediate exit—Zero disk overhead
+
+                const std::string& ext = extensions[idx];
+
+                if (ext == ".obj") {
+                    // Ensure your constructors use std::move internally to minimize heap overhead
+                    p_task.obj.emplace(p_task.path, p_task.flip);
+                }
+                else if (ext == ".gltf" || ext == ".glb") {
+                    p_task.gltf.emplace(p_task.path, p_task.flip);
+                }
+            });
+
+            m_executor->run(taskflow).get();
+
+            auto current_time = std::chrono::high_resolution_clock::now();
+
+            uint64_t elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count();
+            uint64_t elapsed_sec = std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time).count();
+            console_log_info("Elapsed Seconds: {}", elapsed_sec);
+            console_log_info("Elapsed Microseconds: {}", elapsed_ms);
+            vk::buffer_parameters vertex_params = {
+                .memory_mask = m_physical->memory_properties(vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit),
+                .usage = vk::buffer_usage::transfer_dst_bit | vk::buffer_usage::vertex_buffer_bit,
+            };
+            vk::buffer_parameters index_params = {
+                .memory_mask = m_physical->memory_properties(vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit),
+                .usage = vk::buffer_usage::index_buffer_bit,
+            };
 
 
+            for(auto& task : tasks) {
+                if(task.duplicate) {
+                    continue;
+                }
 
+                gpu_draw_call gpu_mesh{};
 
+                bool successful=false;
+                if (task.obj.has_value()) {
+                    auto& importer = task.obj.value();
+                    if (!importer.vertices().empty()) {
+                        gpu_mesh.has_indices_buffer = !importer.indices().empty();
+                        gpu_mesh.vertices_size = importer.vertices().size();
+                        gpu_mesh.indices_size = importer.indices().size();
+                        m_cached_vertexes.emplace(task.entity_id, vk::vertex_buffer(*m_device, importer.vertices(), vertex_params));
+                        m_cacched_index_buffers.emplace(task.entity_id, vk::index_buffer(*m_device, importer.indices(), index_params));
+                        successful = true;
+                    }
+                }
+                if (task.gltf.has_value()) {
+                    auto& importer = task.gltf.value();
+                    if (!importer.vertices().empty()) {
+                        gpu_mesh.has_indices_buffer = !importer.indices().empty();
+                        gpu_mesh.vertices_size = importer.vertices().size();
+                        gpu_mesh.indices_size = importer.indices().size();
+
+                        m_cached_vertexes.emplace(task.entity_id, vk::vertex_buffer(*m_device, importer.vertices(), vertex_params));
+                        m_cacched_index_buffers.emplace(task.entity_id, vk::index_buffer(*m_device, importer.indices(), index_params));
+                        successful = true;
+                    }
+                }
+
+                if (successful) {
+                    m_meshes.emplace(task.entity_id, gpu_mesh);
+                    m_cached_meshes_task.emplace(task.path, task.entity_id);
+                    successful = false;
+                }
+            }
+
+            all_meshes.each([this](flecs::entity p_entity) {
                 // vk::texture_params config_texture = {
                 //     .memory_mask = m_physical->memory_properties(
                 //       vk::memory_property::host_visible_bit |
@@ -413,7 +479,7 @@ export namespace atlas {
                 //   stb_image(src->specular, config_texture);
 
                 // // Reminder: Use diffuse_idx
-                // gpu_material material = {};
+                gpu_material material = {};
                 // if (!src->diffuse.empty()) {
                 //     material.diffuse_idx = m_texture_slot_index++;
                 //     m_gpu_textures.emplace_back(
@@ -429,8 +495,15 @@ export namespace atlas {
 
                 
 
-            //     m_material_table.emplace(p_entity.id(), material);
-            // });
+                m_material_table.emplace(p_entity.id(), material);
+            });
+
+            // auto current_time = std::chrono::high_resolution_clock::now();
+            // uint64_t elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count();
+            // uint64_t elapsed_sec = std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time).count();
+
+            // console_log_info("Elapsed Seconds: {}", elapsed_sec);
+            // console_log_info("Elapsed Microseconds: {}", elapsed_ms);
 
             // Preparing the texture data before we update descriptor set 0
             // Storing all of our texture via one contiguous array of textures
@@ -584,6 +657,7 @@ export namespace atlas {
             flecs::query<> all_meshes =
               m_world->query_builder<mesh_source>().build();
             all_meshes.each([this](flecs::entity p_entity) {
+                // const mesh_source* src = p_entity.get<mesh_source>();
                 // Retrieving the buffer address that can be looked up from the
                 // glsl shader
                 const uint64_t scene_ubo_address =
@@ -610,18 +684,21 @@ export namespace atlas {
                 // TODO: Use Vulkan Indirect Command Draw call for this to
                 // reduce draw calls
                 const auto& mesh = m_meshes[p_entity.id()];
-                const VkBuffer vertex = mesh.vertex;
+                const VkBuffer vertex = m_cached_vertexes[p_entity.id()];
                 uint64_t offset = 0;
-                m_current_command->bind_vertex_buffers(
-                  std::span<const VkBuffer>(&vertex, 1),
-                  std::span<const uint64_t>(&offset, 1));
-                if (mesh.has_indices_buffer) {
-                    m_current_command->bind_index_buffers32(mesh.index);
-                    vkCmdDrawIndexed(
-                      *m_current_command, mesh.indices_size, 1, 0, 0, 0);
-                }
-                else {
-                    vkCmdDraw(*m_current_command, mesh.vertices_size, 1, 0, 0);
+
+                if(vertex != nullptr) {
+                    m_current_command->bind_vertex_buffers(
+                    std::span<const VkBuffer>(&vertex, 1),
+                    std::span<const uint64_t>(&offset, 1));
+                    if (mesh.has_indices_buffer and m_cacched_index_buffers[p_entity.id()] != nullptr) {
+                        m_current_command->bind_index_buffers32(m_cacched_index_buffers[p_entity.id()]);
+                        vkCmdDrawIndexed(
+                        *m_current_command, mesh.indices_size, 1, 0, 0, 0);
+                    }
+                    else {
+                        vkCmdDraw(*m_current_command, mesh.vertices_size, 1, 0, 0);
+                    }
                 }
             });
 
@@ -651,9 +728,12 @@ export namespace atlas {
                 image.destruct();
             }
 
-            for (auto& [id, mesh] : m_meshes) {
-                mesh.vertex.destruct();
-                mesh.index.destruct();
+            for(auto&[id, vertex] : m_cached_vertexes) {
+                vertex.destruct();
+            }
+
+            for(auto&[id, index] : m_cacched_index_buffers) {
+                index.destruct();
             }
 
             m_set0_resource.destruct();
@@ -686,11 +766,13 @@ export namespace atlas {
                 return payload;
             });
 
-            m_async_queue.push_back(std::move(task));
+            m_async_queue.emplace_back(std::move(task));
         }
 
         void async_request_material(uint64_t p_id, const mesh_source* p_src) {
             std::future<request_material_payload> task = std::async(std::launch::async, [this, p_id, p_src](){
+                std::string diffuse = p_src->diffuse;
+                std::string specular = p_src->specular;
                 request_material_payload payload{};
                 vk::texture_params config_texture = {
                     .memory_mask = m_physical->memory_properties(
@@ -699,13 +781,15 @@ export namespace atlas {
                 };
 
                 payload.entity_id = p_id;
-                stb_image diffuse_img = stb_image(p_src->diffuse, config_texture);
-                stb_image specular_img = stb_image(p_src->specular, config_texture);
+                // stb_image diffuse = stb_image(diffuse, config_texture);
+                payload.diffuse = stb_image(diffuse, config_texture);
+
+                payload.specular = stb_image(specular, config_texture);
 
                 return payload;
             });
 
-            m_async_materials_queue.push_back(std::move(task));
+            m_async_materials_queue.emplace_back(std::move(task));
         }
 
     private:
@@ -738,7 +822,7 @@ export namespace atlas {
         vk::dyn::buffer m_object_model_uniforms;
         vk::dyn::buffer m_lighting_uniforms;
 
-        std::unordered_map<uint64_t, gpu_mesh_data> m_meshes;
+        std::unordered_map<uint64_t, gpu_draw_call> m_meshes;
 
         uint64_t m_texture_slot_index = 1;
 
@@ -749,6 +833,17 @@ export namespace atlas {
 
         // <entity_id, model_matrix_arr_index>
         std::unordered_map<uint64_t, uint64_t> m_model_matrices_lookup;
+
+        std::shared_ptr<tf::Executor> m_executor;
+
+        // Caching already loaded
+        // <filepath, mesh_task>
+        // This can be used to cache in meshes and since the lookup uses entity ID
+        // We can reuse the mesh from that specific entity mesh ID that uses that filepath
+        std::unordered_map<std::string, mesh_task> m_cached_meshes_task;
+        std::unordered_map<std::string, std::string> m_texture_filepath;
+        std::unordered_map<uint64_t, vk::vertex_buffer> m_cached_vertexes;
+        std::unordered_map<uint64_t, vk::index_buffer> m_cacched_index_buffers;
         std::vector<glm::mat4> m_model_matrices;
 
         // material lookups

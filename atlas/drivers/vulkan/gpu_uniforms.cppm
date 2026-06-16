@@ -13,9 +13,8 @@ export module atlas.drivers.vulkan:gpu_uniforms;
 import vk;
 
 export namespace atlas {
-    struct gpu_mesh_data {
-        vk::vertex_buffer vertex;
-        vk::index_buffer index;
+
+    struct gpu_draw_call {
         uint32_t index_count = 0;
         uint32_t instance = 1;
         uint32_t first_index = 0;
