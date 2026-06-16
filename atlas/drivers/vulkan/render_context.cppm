@@ -282,8 +282,6 @@ export namespace atlas {
 
             auto start_time = std::chrono::high_resolution_clock::now();
             tf::Taskflow taskflow;
-            std::mutex mutex;
-
             std::vector<mesh_task> group_tasks;
             group_tasks.reserve(all_meshes.count());
 
@@ -311,24 +309,18 @@ export namespace atlas {
                     .usage = vk::buffer_usage::index_buffer_bit,
                 };
 
-                console_log_trace("Processing: {} with ext = {}", task->path, ext);
-
                 tf::Task processing_task = taskflow.emplace([task, ext]() mutable{
                     if(ext == ".obj") {
                         task->obj.emplace(task->path, task->flip);
                     }
 
                     if(ext == ".gltf" or ext == ".glb") {
-                        task->obj.emplace(task->path, task->flip);
+                        task->gltf.emplace(task->path, task->flip);
                     }
                 });
 
 
-                console_log_info("task->obj.has_value() = {}", task->obj.has_value());
-                console_log_info("task->gltf.has_value() = {}", task->gltf.has_value());
-
-
-                tf::Task loading_task = taskflow.emplace([gpu_mesh, task, this, vertex_params, index_params, &mutex]() mutable {
+                tf::Task loading_task = taskflow.emplace([gpu_mesh, task, this, vertex_params, index_params]() mutable {
                     bool successful = false;
                     if (task->obj.has_value()) {
                         auto& importer = task->obj.value();
@@ -337,7 +329,6 @@ export namespace atlas {
                             gpu_mesh.vertices_size = importer.vertices().size();
                             gpu_mesh.indices_size = importer.indices().size();
 
-                            std::lock_guard<std::mutex> guard(mutex);
                             m_cached_vertexes.emplace(task->path, vk::vertex_buffer(*m_device, importer.vertices(), vertex_params));
                             m_cacched_index_buffers.emplace(task->path, vk::index_buffer(*m_device, importer.indices(), index_params));
                             successful = true;
@@ -350,7 +341,6 @@ export namespace atlas {
                             gpu_mesh.vertices_size = importer.vertices().size();
                             gpu_mesh.indices_size = importer.indices().size();
 
-                            std::lock_guard<std::mutex> guard(mutex);
                             m_cached_vertexes.emplace(task->path, vk::vertex_buffer(*m_device, importer.vertices(), vertex_params));
                             m_cacched_index_buffers.emplace(task->path, vk::index_buffer(*m_device, importer.indices(), index_params));
                             successful = true;
@@ -358,7 +348,7 @@ export namespace atlas {
                     }
 
                     if(successful) {
-                        std::lock_guard<std::mutex> guard(mutex);
+                        // std::lock_guard<std::mutex> guard(mutex);
                         m_meshes.emplace(task->entity_id, gpu_mesh);
                     }
                 });
@@ -367,128 +357,8 @@ export namespace atlas {
                 processing_task.precede(loading_task);
             });
 
-            m_executor->run(taskflow).wait();
-
-            // 2. Compute file extensions on the main thread to eliminate allocations inside threads
-            // std::vector<std::string> extensions(tasks.size());
-            // for (size_t i = 0; i < tasks.size(); ++i) {
-            //     if (!tasks[i].duplicate) {
-            //         extensions[i] = std::filesystem::path(tasks[i].path).extension().string();
-            //     }
-            // }
-
-            // vk::buffer_parameters vertex_params = {
-            //     .memory_mask = m_physical->memory_properties(vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit),
-            //     .usage = vk::buffer_usage::transfer_dst_bit | vk::buffer_usage::vertex_buffer_bit,
-            // };
-            // vk::buffer_parameters index_params = {
-            //     .memory_mask = m_physical->memory_properties(vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit),
-            //     .usage = vk::buffer_usage::index_buffer_bit,
-            // };
-
-            // // 3. Parallel Execution via Taskflow
-            // taskflow.for_each_index(size_t(0), tasks.size(), size_t(1), [&](size_t idx) {
-            //     // mesh_task& task = tasks[idx];
-            //     mesh_task task{};
-            //     // We should never have to create multiple duplicates of data
-            //     // If you have multiple objects that use the same pieces of data then use instancing
-            //     // if (task.duplicate) {
-            //     //     return; // Immediate exit—Zero disk overhead
-            //     // }
-            //     if (m_cached_meshes_task.contains(src->model_path)) {
-            //         task.duplicate = true;
-            //     } 
-            //     else if (batch_path_to_owner.contains(src->model_path)) {
-            //         task.duplicate = true;
-            //     } 
-
-            //     const std::string& ext = extensions[idx];
-
-            //     if (ext == ".obj") {
-            //         // Ensure your constructors use std::move internally to minimize heap overhead
-            //         task.obj.emplace(task.path, task.flip);
-            //     }
-            //     else if (ext == ".gltf" || ext == ".glb") {
-            //         task.gltf.emplace(task.path, task.flip);
-            //     }
-
-            //     gpu_draw_call gpu_mesh{};
-                
-            //     bool successful=false;
-            //     if (task.obj.has_value()) {
-            //         auto& importer = task.obj.value();
-            //         if (!importer.vertices().empty()) {
-            //             gpu_mesh.has_indices_buffer = !importer.indices().empty();
-            //             gpu_mesh.vertices_size = importer.vertices().size();
-            //             gpu_mesh.indices_size = importer.indices().size();
-            //             m_cached_vertexes.emplace(task.path, vk::vertex_buffer(*m_device, importer.vertices(), vertex_params));
-            //             m_cacched_index_buffers.emplace(task.path, vk::index_buffer(*m_device, importer.indices(), index_params));
-            //             successful = true;
-            //         }
-            //     }
-            //     if (task.gltf.has_value()) {
-            //         auto& importer = task.gltf.value();
-            //         if (!importer.vertices().empty()) {
-            //             gpu_mesh.has_indices_buffer = !importer.indices().empty();
-            //             gpu_mesh.vertices_size = importer.vertices().size();
-            //             gpu_mesh.indices_size = importer.indices().size();
-
-            //             m_cached_vertexes.emplace(task.path, vk::vertex_buffer(*m_device, importer.vertices(), vertex_params));
-            //             m_cacched_index_buffers.emplace(task.path, vk::index_buffer(*m_device, importer.indices(), index_params));
-            //             successful = true;
-            //         }
-            //     }
-
-            //     if (successful) {
-            //         m_meshes.emplace(task.entity_id, gpu_mesh);
-            //         m_cached_meshes_task.emplace(task.path, task.entity_id);
-            //         successful = false;
-            //     }
-            // });
-
-            // taskflow.for_each_index(size_t(0), tasks.size(), size_t(1), [&](size_t idx){});
-            // taskflow.for_each(tasks.begin(), tasks.end(), [&](mesh_task& task){
-            //     // We should never have to create multiple duplicates of data
-            //     // If you have multiple objects that use the same pieces of data then use instancing
-            //     if(task.duplicate) {
-            //         return;
-            //     }
-
-            //     gpu_draw_call gpu_mesh{};
-
-            //     bool successful=false;
-            //     if (task.obj.has_value()) {
-            //         auto& importer = task.obj.value();
-            //         if (!importer.vertices().empty()) {
-            //             gpu_mesh.has_indices_buffer = !importer.indices().empty();
-            //             gpu_mesh.vertices_size = importer.vertices().size();
-            //             gpu_mesh.indices_size = importer.indices().size();
-            //             m_cached_vertexes.emplace(task.path, vk::vertex_buffer(*m_device, importer.vertices(), vertex_params));
-            //             m_cacched_index_buffers.emplace(task.path, vk::index_buffer(*m_device, importer.indices(), index_params));
-            //             successful = true;
-            //         }
-            //     }
-            //     if (task.gltf.has_value()) {
-            //         auto& importer = task.gltf.value();
-            //         if (!importer.vertices().empty()) {
-            //             gpu_mesh.has_indices_buffer = !importer.indices().empty();
-            //             gpu_mesh.vertices_size = importer.vertices().size();
-            //             gpu_mesh.indices_size = importer.indices().size();
-
-            //             m_cached_vertexes.emplace(task.path, vk::vertex_buffer(*m_device, importer.vertices(), vertex_params));
-            //             m_cacched_index_buffers.emplace(task.path, vk::index_buffer(*m_device, importer.indices(), index_params));
-            //             successful = true;
-            //         }
-            //     }
-
-            //     if (successful) {
-            //         m_meshes.emplace(task.entity_id, gpu_mesh);
-            //         m_cached_meshes_task.emplace(task.path, task.entity_id);
-            //         successful = false;
-            //     }
-            // });
-
-            m_executor->run(taskflow).get();
+            tf::Future<void> future = m_executor->run(taskflow);
+            future.wait();
 
             auto current_time = std::chrono::high_resolution_clock::now();
 
@@ -498,58 +368,16 @@ export namespace atlas {
             console_log_info("Elapsed Microseconds: {}", elapsed_ms);
 
 
-            // for(auto& task : tasks) {
-
-            //     // We should never have to create multiple duplicates of data
-            //     // If you have multiple objects that use the same pieces of data then use instancing
-            //     if(task.duplicate) {
-            //         continue;
-            //     }
-
-            //     gpu_draw_call gpu_mesh{};
-
-            //     bool successful=false;
-            //     if (task.obj.has_value()) {
-            //         auto importer = task.obj.value();
-            //         if (!importer.vertices().empty()) {
-            //             gpu_mesh.has_indices_buffer = !importer.indices().empty();
-            //             gpu_mesh.vertices_size = importer.vertices().size();
-            //             gpu_mesh.indices_size = importer.indices().size();
-            //             m_cached_vertexes.emplace(task.path, vk::vertex_buffer(*m_device, importer.vertices(), vertex_params));
-            //             m_cacched_index_buffers.emplace(task.path, vk::index_buffer(*m_device, importer.indices(), index_params));
-            //             successful = true;
-            //         }
-            //     }
-            //     if (task.gltf.has_value()) {
-            //         auto importer = task.gltf.value();
-            //         if (!importer.vertices().empty()) {
-            //             gpu_mesh.has_indices_buffer = !importer.indices().empty();
-            //             gpu_mesh.vertices_size = importer.vertices().size();
-            //             gpu_mesh.indices_size = importer.indices().size();
-
-            //             m_cached_vertexes.emplace(task.path, vk::vertex_buffer(*m_device, importer.vertices(), vertex_params));
-            //             m_cacched_index_buffers.emplace(task.path, vk::index_buffer(*m_device, importer.indices(), index_params));
-            //             successful = true;
-            //         }
-            //     }
-
-            //     if (successful) {
-            //         m_meshes.emplace(task.entity_id, gpu_mesh);
-            //         m_cached_meshes_task.emplace(task.path, task.entity_id);
-            //         successful = false;
-            //     }
-            // }
-
             all_meshes.each([this](flecs::entity p_entity) {
+                const mesh_source* src = p_entity.get<mesh_source>();
                 // vk::texture_params config_texture = {
                 //     .memory_mask = m_physical->memory_properties(
                 //       vk::memory_property::host_visible_bit |
                 //       vk::memory_property::host_cached_bit),
                 // };
-                // // Loading texture and setting up VkSampler and VkImageView
+                // // // Loading texture and setting up VkSampler and VkImageView
                 // stb_image diffuse_img = stb_image(src->diffuse, config_texture);
-                // stb_image specular_img =
-                //   stb_image(src->specular, config_texture);
+                // stb_image specular_img = stb_image(src->specular, config_texture);
 
                 // // Reminder: Use diffuse_idx
                 gpu_material material = {};
