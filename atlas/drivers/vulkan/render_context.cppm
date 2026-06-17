@@ -307,7 +307,7 @@ export namespace atlas {
                 auto promise = std::make_shared<std::promise<mesh_task>>();
                 tasks_futures.push_back(promise->get_future());
 
-                m_executor->silent_async([&task, promise, ext]() mutable {
+                m_executor->silent_async([task, promise, ext]() mutable {
                     
                     if(ext == ".obj") {
                         task.obj.emplace(task.path, task.flip);
@@ -343,10 +343,10 @@ export namespace atlas {
             
             start_time = std::chrono::high_resolution_clock::now();
             m_taskflow.emplace([this, &tasks_futures, vertex_params, index_params]() mutable {
-                gpu_draw_call gpu_mesh{};
-                bool successful = false;
 
                 for(auto& f : tasks_futures) {
+                    gpu_draw_call gpu_mesh{};
+                    bool successful = false;
                     mesh_task task = f.get();
 
                     if (task.obj.has_value()) {
@@ -355,6 +355,9 @@ export namespace atlas {
                             gpu_mesh.has_indices_buffer = !importer.indices().empty();
                             gpu_mesh.vertices_size = importer.vertices().size();
                             gpu_mesh.indices_size = importer.indices().size();
+
+                            m_cached_vertexes.emplace(task.path, vk::vertex_buffer(*m_device, importer.vertices(), vertex_params));
+                            m_cacched_index_buffers.emplace(task.path, vk::index_buffer(*m_device, importer.indices(), index_params));
                             successful = true;
                         }
                     }
@@ -388,7 +391,7 @@ export namespace atlas {
 
 
             all_meshes.each([this](flecs::entity p_entity) {
-                const mesh_source* src = p_entity.get<mesh_source>();
+                // const mesh_source* src = p_entity.get<mesh_source>();
                 // vk::texture_params config_texture = {
                 //     .memory_mask = m_physical->memory_properties(
                 //       vk::memory_property::host_visible_bit |
