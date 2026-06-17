@@ -281,34 +281,47 @@ export namespace atlas {
               m_world->query_builder<mesh_source>().build();
 
             auto start_time = std::chrono::high_resolution_clock::now();
-            tf::Taskflow taskflow;
-            std::vector<mesh_task> group_tasks;
-            group_tasks.reserve(all_meshes.count());
+            std::vector<mesh_task> targets;
 
-            all_meshes.each([&](flecs::entity p_entity) {
+            std::vector<mesh_task> executed_tasks;
+            std::vector<std::future<mesh_task>> tasks_futures;
+
+            tasks_futures.reserve(all_meshes.count());
+            targets.reserve(all_meshes.count());
+            executed_tasks.reserve(all_meshes.count());
+
+            all_meshes.each([&targets](flecs::entity p_entity){
                 const mesh_source* src = p_entity.get<mesh_source>();
-                mesh_task spawn_task={};
-                spawn_task.entity_id = p_entity.id();
-                spawn_task.path = src->model_path;
-                spawn_task.flip = src->flip;
-                std::filesystem::path path = std::filesystem::path(src->model_path);
-                const std::string ext = path.extension().string();
-                group_tasks.emplace_back(spawn_task);
+                mesh_task task = {};
+                task.entity_id = p_entity.id();
+                task.path = src->model_path;
+                task.flip = src->flip;
 
-                mesh_task* task = &group_tasks.back();
+                targets.push_back(task);
+            });
 
-                tf::Task processing_task = taskflow.emplace([task, ext]() mutable{
+            for(auto& task : targets) {
+                std::filesystem::path p = std::filesystem::path(task.path);
+                std::string ext = p.extension().string();
+
+                auto promise = std::make_shared<std::promise<mesh_task>>();
+                tasks_futures.push_back(promise->get_future());
+
+                m_executor->silent_async([&task, promise, ext]() mutable {
+                    
                     if(ext == ".obj") {
-                        task->obj.emplace(task->path, task->flip);
+                        task.obj.emplace(task.path, task.flip);
                     }
 
                     if(ext == ".gltf" or ext == ".glb") {
-                        task->gltf.emplace(task->path, task->flip);
+                        task.gltf.emplace(task.path, task.flip);
                     }
-                });
-            });
 
-            m_executor->run(taskflow).wait();
+                    promise->set_value(task);
+                });
+            }
+
+            m_executor->run(m_taskflow).wait();
 
             auto current_time = std::chrono::high_resolution_clock::now();
 
@@ -329,45 +342,42 @@ export namespace atlas {
             };
             
             start_time = std::chrono::high_resolution_clock::now();
-            tf::Task loading_task = taskflow.emplace([this, group_tasks, vertex_params, index_params]() mutable {
+            m_taskflow.emplace([this, &tasks_futures, vertex_params, index_params]() mutable {
                 gpu_draw_call gpu_mesh{};
                 bool successful = false;
 
-                for(auto& t : group_tasks) {
-                    mesh_task* task = &t;
+                for(auto& f : tasks_futures) {
+                    mesh_task task = f.get();
 
-                    if (task->obj.has_value()) {
-                        auto& importer = task->obj.value();
+                    if (task.obj.has_value()) {
+                        auto& importer = task.obj.value();
                         if (!importer.vertices().empty()) {
                             gpu_mesh.has_indices_buffer = !importer.indices().empty();
                             gpu_mesh.vertices_size = importer.vertices().size();
                             gpu_mesh.indices_size = importer.indices().size();
-
-                            m_cached_vertexes.emplace(task->path, vk::vertex_buffer(*m_device, importer.vertices(), vertex_params));
-                            m_cacched_index_buffers.emplace(task->path, vk::index_buffer(*m_device, importer.indices(), index_params));
                             successful = true;
                         }
                     }
-                    if (task->gltf.has_value()) {
-                        auto& importer = task->gltf.value();
+                    if (task.gltf.has_value()) {
+                        auto& importer = task.gltf.value();
                         if (!importer.vertices().empty()) {
                             gpu_mesh.has_indices_buffer = !importer.indices().empty();
                             gpu_mesh.vertices_size = importer.vertices().size();
                             gpu_mesh.indices_size = importer.indices().size();
 
-                            m_cached_vertexes.emplace(task->path, vk::vertex_buffer(*m_device, importer.vertices(), vertex_params));
-                            m_cacched_index_buffers.emplace(task->path, vk::index_buffer(*m_device, importer.indices(), index_params));
+                            m_cached_vertexes.emplace(task.path, vk::vertex_buffer(*m_device, importer.vertices(), vertex_params));
+                            m_cacched_index_buffers.emplace(task.path, vk::index_buffer(*m_device, importer.indices(), index_params));
                             successful = true;
                         }
                     }
 
                     if(successful) {
-                        m_meshes.emplace(task->entity_id, gpu_mesh);
+                        m_meshes.emplace(task.entity_id, gpu_mesh);
                     }
                 }
             });
 
-            m_executor->run(taskflow).wait();
+            m_executor->run(m_taskflow).wait();
 
             current_time = std::chrono::high_resolution_clock::now();
 
@@ -735,6 +745,7 @@ export namespace atlas {
         // <entity_id, model_matrix_arr_index>
         std::unordered_map<uint64_t, uint64_t> m_model_matrices_lookup;
 
+        tf::Taskflow m_taskflow;
         std::shared_ptr<tf::Executor> m_executor;
 
         // Caching already loaded
