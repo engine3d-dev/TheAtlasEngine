@@ -50,6 +50,15 @@ export namespace atlas {
         std::optional<gltf_importer> gltf;
     };
 
+
+    struct material_task {
+        uint64_t entity_id;
+        std::string diffuse_path="";
+        std::string specular_path="";
+        std::optional<stb_image> diffuse;
+        std::optional<stb_image> specular;
+    };
+
     struct mesh_task {
         uint64_t entity_id=0;
         std::string path;
@@ -321,8 +330,6 @@ export namespace atlas {
                 });
             }
 
-            m_executor->run(m_taskflow).wait();
-
             auto current_time = std::chrono::high_resolution_clock::now();
 
             uint64_t elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count();
@@ -331,7 +338,6 @@ export namespace atlas {
             console_log_info("Elapsed Microseconds: {}", elapsed_ms);
 
             // execution processes
-
             vk::buffer_parameters vertex_params = {
                 .memory_mask = m_physical->memory_properties(vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit),
                 .usage = vk::buffer_usage::transfer_dst_bit | vk::buffer_usage::vertex_buffer_bit,
@@ -342,8 +348,8 @@ export namespace atlas {
             };
             
             start_time = std::chrono::high_resolution_clock::now();
-            m_taskflow.emplace([this, &tasks_futures, vertex_params, index_params]() mutable {
 
+            m_taskflow.emplace([this, &tasks_futures, vertex_params, index_params]() mutable {
                 for(auto& f : tasks_futures) {
                     gpu_draw_call gpu_mesh{};
                     bool successful = false;
@@ -380,7 +386,7 @@ export namespace atlas {
                 }
             });
 
-            m_executor->run(m_taskflow).wait();
+            m_executor->run(m_taskflow).get();
 
             current_time = std::chrono::high_resolution_clock::now();
 
@@ -389,34 +395,67 @@ export namespace atlas {
             console_log_info("Elapsed Seconds: {}", elapsed_sec);
             console_log_info("Elapsed Microseconds: {}", elapsed_ms);
 
+            start_time = std::chrono::high_resolution_clock::now();
+            std::vector<std::future<material_task>> material_futures;
+            std::vector<material_task> material_targets;
+            material_targets.reserve(all_meshes.count());
+            material_futures.reserve(all_meshes.count());
+            vk::texture_params config_texture = {
+                .memory_mask = m_physical->memory_properties(
+                    vk::memory_property::host_visible_bit |
+                    vk::memory_property::host_cached_bit),
+            };
 
-            all_meshes.each([this](flecs::entity p_entity) {
-                // const mesh_source* src = p_entity.get<mesh_source>();
-                // vk::texture_params config_texture = {
-                //     .memory_mask = m_physical->memory_properties(
-                //       vk::memory_property::host_visible_bit |
-                //       vk::memory_property::host_cached_bit),
-                // };
-                // // // Loading texture and setting up VkSampler and VkImageView
-                // stb_image diffuse_img = stb_image(src->diffuse, config_texture);
-                // stb_image specular_img = stb_image(src->specular, config_texture);
+            all_meshes.each([this, &material_targets](flecs::entity p_entity) {
+                const mesh_source* src = p_entity.get<mesh_source>();
+                material_task material = {};
+                material.entity_id = p_entity.id();
+                material.diffuse_path = src->diffuse;
+                material.specular_path = src->specular;
 
-                // // Reminder: Use diffuse_idx
-                gpu_material material = {};
-                // if (!src->diffuse.empty()) {
-                //     material.diffuse_idx = m_texture_slot_index++;
-                //     m_gpu_textures.emplace_back(
-                //       *m_device, &diffuse_img, config_texture);
-                // }
-
-                // if (!src->specular.empty()) {
-                //     material.specular_idx = m_texture_slot_index++;
-                //     m_gpu_textures.emplace_back(
-                //       *m_device, &specular_img, config_texture);
-                // }
-
-                m_material_table.emplace(p_entity.id(), material);
+                material_targets.push_back(material);
             });
+
+
+            for(auto& task : material_targets) {
+                auto promise = std::make_shared<std::promise<material_task>>();
+                material_futures.push_back(promise->get_future());
+
+                m_executor->silent_async([promise, &task, config_texture]() mutable {
+                    if (!task.diffuse_path.empty()) {
+                        task.diffuse = stb_image(task.diffuse_path, config_texture);
+                    }
+
+                    if (!task.specular_path.empty()) {
+                        task.specular = stb_image(task.specular_path, config_texture);
+                    }
+
+                    promise->set_value(task);
+                });
+            }
+
+            for(auto& task : material_futures) {
+                material_task mat = task.get();
+                gpu_material material = {};
+                if(mat.diffuse.has_value()) {
+                    auto diffuse = mat.diffuse.value();
+                    material.diffuse_idx = m_texture_slot_index++;
+                    m_gpu_textures.emplace_back(*m_device, &diffuse, config_texture);
+                }
+
+                if(mat.specular.has_value()) {
+                    auto specular = mat.specular.value();
+                    material.specular_idx = m_texture_slot_index++;
+                    m_gpu_textures.emplace_back(*m_device, &specular, config_texture);
+                }
+
+                m_material_table.emplace(mat.entity_id, material);
+            }
+
+            elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count();
+            elapsed_sec = std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time).count();
+            console_log_info("Elapsed Seconds: {}", elapsed_sec);
+            console_log_info("Elapsed Microseconds: {}", elapsed_ms);
 
             // Preparing the texture data before we update descriptor set 0
             // Storing all of our texture via one contiguous array of textures
