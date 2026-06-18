@@ -1,5 +1,8 @@
 module;
 
+#include <taskflow/taskflow.hpp>
+#include <taskflow/algorithm/for_each.hpp>
+
 #include <array>
 #include <cstdint>
 #include <cstring>
@@ -41,6 +44,11 @@ struct environment_push_constant {
     uint64_t scene_environment_address = 0;
 };
 
+struct environment_task_payload {
+    std::span<const uint8_t> bytes{};
+    uint64_t image_size=0;
+};
+
 /**
  *
  * @brief Vulkan-specific implementation for loading GPU resources associated to
@@ -54,8 +62,10 @@ public:
                     vk::physical_device& p_physical,
                     const std::string& p_filename,
                     /*NOLINT*/ VkFormat p_color_format,
-                    VkFormat p_depth_format)
-      : m_color_format(p_color_format)
+                    VkFormat p_depth_format,
+                    /*NOLINT*/std::shared_ptr<tf::Executor> p_executor)
+      : /*NOLINT*/ m_executor(p_executor)
+      , m_color_format(p_color_format)
       , m_depth_format(p_depth_format) {
         /*NOLINT*/ m_device = p_device;
         m_physical = p_physical;
@@ -71,8 +81,10 @@ public:
                     std::span<const float> p_color,
                     const vk::image_extent& p_extent,
                     /*NOLINT*/ VkFormat p_color_format,
-                    VkFormat p_depth_format)
-      : m_color_format(p_color_format)
+                    VkFormat p_depth_format,
+                    std::shared_ptr<tf::Executor> p_executor)
+      : /*NOLINT*/ m_executor(p_executor)
+      , m_color_format(p_color_format)
       , m_depth_format(p_depth_format) {
         /*NOLINT*/ m_device = p_device;
         m_physical = p_physical;
@@ -87,11 +99,22 @@ public:
      * @brief loads in a new HDRI environment map
      */
     void construct(const std::string& p_filename) {
-        bool res = create_hdr(p_filename);
+        // bool res = create_hdr(p_filename);
 
-        if (!res) {
-            console_log_error("Cannot load environment: {}", p_filename);
-        }
+        // if (!res) {
+        //     console_log_error("Cannot load environment: {}", p_filename);
+        // }
+
+        m_taskflow.emplace([this, p_filename](){
+            bool success = create_hdr(p_filename);
+            if (!success) {
+                // Handle error or log it (Taskflow tasks usually run on worker threads)
+                console_log_error("Cannot load environment: {}", p_filename);
+            }
+        });
+
+
+        m_executor->run(m_taskflow).wait();
 
         create_pipelines();
     }
@@ -102,11 +125,16 @@ public:
      */
     void construct(std::span<const float> p_color,
                    const vk::image_extent& p_extent) {
-        bool res = create_hdr(p_color, p_extent);
 
-        if (!res) {
-            console_log_error("Cannot load environment");
-        }
+        m_taskflow.emplace([this, p_color, p_extent](){
+            bool res = create_hdr(p_color, p_extent);
+
+            if (!res) {
+                console_log_error("Cannot load environment");
+            }
+        });
+
+        m_executor->run(m_taskflow).wait();
         create_pipelines();
     }
 
@@ -198,7 +226,10 @@ public:
                                       VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
         upload_cmd.end();
+        
+        std::mutex queue_mutex;
 
+        queue_mutex.lock();
         VkQueue graphics_queue;
         vkGetDeviceQueue(*m_device, 0, 0, &graphics_queue);
 
@@ -211,6 +242,7 @@ public:
 
         vkQueueSubmit(graphics_queue, 1, &submit_info, nullptr);
         vkQueueWaitIdle(graphics_queue);
+        queue_mutex.unlock();
 
         upload_cmd.destruct();
         staging_buffer.destruct();
@@ -779,6 +811,9 @@ private:
     vk::sample_image m_skybox_image;
     uint32_t m_memory_mask;
     vk::shader_stage m_stage;
+
+    tf::Taskflow m_taskflow;
+    std::shared_ptr<tf::Executor> m_executor;
 
     VkFormat m_color_format;
     VkFormat m_depth_format;

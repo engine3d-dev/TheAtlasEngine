@@ -43,13 +43,6 @@ export namespace atlas {
         diffuse,
         specular
     };
-    struct request_payload {
-        uint64_t entity_id=0;
-        // gpu_mesh_data mesh{};
-        std::optional<obj_importer> obj;
-        std::optional<gltf_importer> gltf;
-    };
-
 
     struct material_task {
         uint64_t entity_id;
@@ -69,11 +62,6 @@ export namespace atlas {
 
     };
 
-    struct request_material_payload {
-        uint64_t entity_id=0;
-        std::optional<stb_image> diffuse;
-        std::optional<stb_image> specular;
-    };
     /**
      *
      * @brief Context that translates the ECS rendering-specific components to
@@ -289,7 +277,6 @@ export namespace atlas {
             flecs::query<> all_meshes =
               m_world->query_builder<mesh_source>().build();
 
-            auto start_time = std::chrono::high_resolution_clock::now();
             std::vector<mesh_task> targets;
 
             std::vector<mesh_task> executed_tasks;
@@ -330,13 +317,6 @@ export namespace atlas {
                 });
             }
 
-            auto current_time = std::chrono::high_resolution_clock::now();
-
-            uint64_t elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count();
-            uint64_t elapsed_sec = std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time).count();
-            console_log_info("Elapsed Seconds: {}", elapsed_sec);
-            console_log_info("Elapsed Microseconds: {}", elapsed_ms);
-
             // execution processes
             vk::buffer_parameters vertex_params = {
                 .memory_mask = m_physical->memory_properties(vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit),
@@ -346,56 +326,43 @@ export namespace atlas {
                 .memory_mask = m_physical->memory_properties(vk::memory_property::host_visible_bit | vk::memory_property::host_cached_bit),
                 .usage = vk::buffer_usage::index_buffer_bit,
             };
-            
-            start_time = std::chrono::high_resolution_clock::now();
 
-            m_taskflow.emplace([this, &tasks_futures, vertex_params, index_params]() mutable {
-                for(auto& f : tasks_futures) {
-                    gpu_draw_call gpu_mesh{};
-                    bool successful = false;
-                    mesh_task task = f.get();
+            for(auto& f : tasks_futures) {
+                gpu_draw_call gpu_mesh{};
+                bool successful = false;
+                mesh_task task = f.get();
 
-                    if (task.obj.has_value()) {
-                        auto& importer = task.obj.value();
-                        if (!importer.vertices().empty()) {
-                            gpu_mesh.has_indices_buffer = !importer.indices().empty();
-                            gpu_mesh.vertices_size = importer.vertices().size();
-                            gpu_mesh.indices_size = importer.indices().size();
+                if (task.obj.has_value()) {
+                    auto& importer = task.obj.value();
+                    if (!importer.vertices().empty()) {
+                        gpu_mesh.has_indices_buffer = !importer.indices().empty();
+                        gpu_mesh.vertices_size = importer.vertices().size();
+                        gpu_mesh.indices_size = importer.indices().size();
 
-                            m_cached_vertexes.emplace(task.path, vk::vertex_buffer(*m_device, importer.vertices(), vertex_params));
-                            m_cacched_index_buffers.emplace(task.path, vk::index_buffer(*m_device, importer.indices(), index_params));
-                            successful = true;
-                        }
-                    }
-                    if (task.gltf.has_value()) {
-                        auto& importer = task.gltf.value();
-                        if (!importer.vertices().empty()) {
-                            gpu_mesh.has_indices_buffer = !importer.indices().empty();
-                            gpu_mesh.vertices_size = importer.vertices().size();
-                            gpu_mesh.indices_size = importer.indices().size();
-
-                            m_cached_vertexes.emplace(task.path, vk::vertex_buffer(*m_device, importer.vertices(), vertex_params));
-                            m_cacched_index_buffers.emplace(task.path, vk::index_buffer(*m_device, importer.indices(), index_params));
-                            successful = true;
-                        }
-                    }
-
-                    if(successful) {
-                        m_meshes.emplace(task.entity_id, gpu_mesh);
+                        m_cached_vertexes.emplace(task.entity_id, vk::vertex_buffer(*m_device, importer.vertices(), vertex_params));
+                        m_cacched_index_buffers.emplace(task.entity_id, vk::index_buffer(*m_device, importer.indices(), index_params));
+                        successful = true;
                     }
                 }
-            });
+                if (task.gltf.has_value()) {
+                    auto& importer = task.gltf.value();
+                    if (!importer.vertices().empty()) {
+                        gpu_mesh.has_indices_buffer = !importer.indices().empty();
+                        gpu_mesh.vertices_size = importer.vertices().size();
+                        gpu_mesh.indices_size = importer.indices().size();
 
-            m_executor->run(m_taskflow).get();
+                        m_cached_vertexes.emplace(task.entity_id, vk::vertex_buffer(*m_device, importer.vertices(), vertex_params));
+                        m_cacched_index_buffers.emplace(task.entity_id, vk::index_buffer(*m_device, importer.indices(), index_params));
+                        successful = true;
+                    }
+                }
 
-            current_time = std::chrono::high_resolution_clock::now();
+                if(successful) {
+                    m_meshes.emplace(task.entity_id, gpu_mesh);
+                }
+            }
 
-            elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count();
-            elapsed_sec = std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time).count();
-            console_log_info("Elapsed Seconds: {}", elapsed_sec);
-            console_log_info("Elapsed Microseconds: {}", elapsed_ms);
-
-            start_time = std::chrono::high_resolution_clock::now();
+            auto start_time = std::chrono::high_resolution_clock::now();
             std::vector<std::future<material_task>> material_futures;
             std::vector<material_task> material_targets;
             material_targets.reserve(all_meshes.count());
@@ -406,7 +373,7 @@ export namespace atlas {
                     vk::memory_property::host_cached_bit),
             };
 
-            all_meshes.each([this, &material_targets](flecs::entity p_entity) {
+            all_meshes.each([&material_targets](flecs::entity p_entity) {
                 const mesh_source* src = p_entity.get<mesh_source>();
                 material_task material = {};
                 material.entity_id = p_entity.id();
@@ -452,8 +419,9 @@ export namespace atlas {
                 m_material_table.emplace(mat.entity_id, material);
             }
 
-            elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count();
-            elapsed_sec = std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time).count();
+            auto current_time = std::chrono::high_resolution_clock::now();
+            auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count();
+            auto elapsed_sec = std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time).count();
             console_log_info("Elapsed Seconds: {}", elapsed_sec);
             console_log_info("Elapsed Microseconds: {}", elapsed_ms);
 
@@ -477,7 +445,8 @@ export namespace atlas {
                                                     m_physical.value(),
                                                     environment_data->filepath,
                                                     m_color_format,
-                                                    m_depth_format);
+                                                    m_depth_format,
+                                                 m_executor);
             }
             else {
                 std::array<float, 4> black_color = { 0.f, 0.f, 0.f, 0.f };
@@ -487,7 +456,8 @@ export namespace atlas {
                                   black_color,
                                   vk::image_extent{ .width = 1, .height = 1 },
                                   m_color_format,
-                                  m_depth_format);
+                                  m_depth_format,
+                                m_executor);
             }
 
             vk::write_image environment_image = {
@@ -609,7 +579,7 @@ export namespace atlas {
             flecs::query<> all_meshes =
               m_world->query_builder<mesh_source>().build();
             all_meshes.each([this](flecs::entity p_entity) {
-                const mesh_source* src = p_entity.get<mesh_source>();
+                // const mesh_source* src = p_entity.get<mesh_source>();
                 // Retrieving the buffer address that can be looked up from the
                 // glsl shader
                 const uint64_t scene_ubo_address =
@@ -637,15 +607,15 @@ export namespace atlas {
                 // reduce draw calls
                 const auto& mesh = m_meshes[p_entity.id()];
 
-                const VkBuffer vertex = m_cached_vertexes[src->model_path];
+                const VkBuffer vertex = m_cached_vertexes[p_entity.id()];
                 uint64_t offset = 0;
 
                 if(vertex != nullptr) {
                     m_current_command->bind_vertex_buffers(
                     std::span<const VkBuffer>(&vertex, 1),
                     std::span<const uint64_t>(&offset, 1));
-                    if (mesh.has_indices_buffer and m_cacched_index_buffers[src->model_path] != nullptr) {
-                        m_current_command->bind_index_buffers32(m_cacched_index_buffers[src->model_path]);
+                    if (mesh.has_indices_buffer and m_cacched_index_buffers[p_entity.id()] != nullptr) {
+                        m_current_command->bind_index_buffers32(m_cacched_index_buffers[p_entity.id()]);
                         vkCmdDrawIndexed(
                         *m_current_command, mesh.indices_size, 1, 0, 0, 0);
                     }
@@ -696,53 +666,6 @@ export namespace atlas {
 
         void set_camera_pos(const glm::vec4& p_camera_pos) {
             m_camera_pos = p_camera_pos;
-        }
-
-
-    private:
-        void async_request_load(uint64_t p_entity_id, const std::string& p_path, bool p_flip) {
-            std::future<request_payload> task = std::async(std::launch::async, [p_entity_id, p_path, p_flip](){
-                request_payload payload{};
-                payload.entity_id = p_entity_id;
-                
-                if (std::filesystem::path(p_path).extension() == ".obj") {
-                    obj_importer importer(p_path, p_flip);
-                    payload.obj = importer;
-                }
-                else if (std::filesystem::path(p_path).extension() ==
-                            ".gltf" ||
-                            std::filesystem::path(p_path).extension() ==
-                            ".glb") {
-                    gltf_importer importer(p_path, p_flip);
-                    payload.gltf = importer;
-                }
-                return payload;
-            });
-
-            m_async_queue.emplace_back(std::move(task));
-        }
-
-        void async_request_material(uint64_t p_id, const mesh_source* p_src) {
-            std::future<request_material_payload> task = std::async(std::launch::async, [this, p_id, p_src](){
-                std::string diffuse = p_src->diffuse;
-                std::string specular = p_src->specular;
-                request_material_payload payload{};
-                vk::texture_params config_texture = {
-                    .memory_mask = m_physical->memory_properties(
-                      vk::memory_property::host_visible_bit |
-                      vk::memory_property::host_cached_bit),
-                };
-
-                payload.entity_id = p_id;
-                // stb_image diffuse = stb_image(diffuse, config_texture);
-                payload.diffuse = stb_image(diffuse, config_texture);
-
-                payload.specular = stb_image(specular, config_texture);
-
-                return payload;
-            });
-
-            m_async_materials_queue.emplace_back(std::move(task));
         }
 
     private:
@@ -796,8 +719,8 @@ export namespace atlas {
         // We can reuse the mesh from that specific entity mesh ID that uses that filepath
         std::unordered_map<std::string, mesh_task> m_cached_meshes_task;
         std::unordered_map<std::string, std::string> m_texture_filepath;
-        std::unordered_map<std::string, vk::vertex_buffer> m_cached_vertexes;
-        std::unordered_map<std::string, vk::index_buffer> m_cacched_index_buffers;
+        std::unordered_map<uint64_t, vk::vertex_buffer> m_cached_vertexes;
+        std::unordered_map<uint64_t, vk::index_buffer> m_cacched_index_buffers;
         std::vector<glm::mat4> m_model_matrices;
 
         // material lookups
@@ -812,9 +735,5 @@ export namespace atlas {
         flecs::world* m_world = nullptr;
 
         environment_map m_environment_map;
-
-        // std::mutex m_mutex;
-        std::deque<std::future<request_payload>> m_async_queue;
-        std::deque<std::future<request_material_payload>> m_async_materials_queue;
     };
 };
