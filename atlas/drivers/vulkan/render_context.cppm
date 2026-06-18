@@ -59,7 +59,6 @@ export namespace atlas {
         std::optional<gltf_importer> gltf;
         bool duplicate=false;
         bool flip=false;
-
     };
 
     /**
@@ -299,6 +298,9 @@ export namespace atlas {
             for(auto& task : targets) {
                 std::filesystem::path p = std::filesystem::path(task.path);
                 std::string ext = p.extension().string();
+
+                // Shouldnt conflict because different entity IDs
+                m_cached_mesh_paths.emplace(task.entity_id, task.path);
 
                 auto promise = std::make_shared<std::promise<mesh_task>>();
                 tasks_futures.push_back(promise->get_future());
@@ -718,9 +720,14 @@ export namespace atlas {
         // This can be used to cache in meshes and since the lookup uses entity ID
         // We can reuse the mesh from that specific entity mesh ID that uses that filepath
         std::unordered_map<std::string, mesh_task> m_cached_meshes_task;
+        std::deque<mesh_task> m_mesh_tasks_queue;
         std::unordered_map<std::string, std::string> m_texture_filepath;
         std::unordered_map<uint64_t, vk::vertex_buffer> m_cached_vertexes;
         std::unordered_map<uint64_t, vk::index_buffer> m_cacched_index_buffers;
+
+        // Used to cache 3D model paths
+        // <entity_id, model_path>
+        std::unordered_map<uint64_t, std::string> m_cached_mesh_paths;
         std::vector<glm::mat4> m_model_matrices;
 
         // material lookups
