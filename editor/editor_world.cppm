@@ -99,7 +99,7 @@ public:
     ~editor_world() override = default;
 
     void preload_assets() {
-        m_deserializer_test = atlas::serializer();
+        m_deserializer_test = atlas::serializer(m_current_scene);
 
         if (!m_deserializer_test.load("LevelScene", *m_current_scene)) {
             console_log_error("Could not load yaml file LevelScene!!!");
@@ -117,14 +117,12 @@ public:
 
             if (ImGui::BeginMenu("File")) {
                 if (ImGui::MenuItem("Save")) {
-                    // m_deserializer_test.save("LevelScene");
+                    m_deserializer_test.save("LevelScene");
                 }
 
                 ImGui::Separator();
 
                 if (ImGui::MenuItem("Exit")) {
-                    // glfwSetWindowShouldClose(atlas::application::close(),
-                    // true);
                 }
 
                 ImGui::EndMenu();
@@ -135,9 +133,6 @@ public:
             ImGui::SetNextWindowDockID(dockspace_id, ImGuiCond_FirstUseEver);
             if (ImGui::Begin("Viewport")) {
                 ImVec2 viewport_size = ImGui::GetContentRegionAvail();
-                // ImGui::Image(m_viewport_image_id,
-                // {static_cast<float>(m_extent.width),
-                // static_cast<float>(m_extent.height)});
                 if (atlas::g_viewport_image_id == nullptr) {
                     console_log_error("atlas::vulkan::g_viewport_image_id is "
                                       "nullptr!!!!!!!!!!!!!!!!!!!");
@@ -163,6 +158,16 @@ public:
     void scene_heirarchy_panel() {
         if (ImGui::Begin("Scene Heirarchy")) {
             m_current_scene->defer_begin();
+
+            // @note right click on blank space
+            // @param string_id
+            // @param popup_flags - will be the mouse flag (0=right, 1=left)
+            if (atlas::ui::begin_popup_context_window(nullptr, 1, false)) {
+                if (ImGui::MenuItem("Create Empty Entity")) {
+                    m_current_entity = m_current_scene->entity("Empty Entity");
+                }
+                ImGui::EndPopup();
+            }
 
             auto query_all_transforms =
               m_current_scene->query_builder<atlas::transform>().build();
@@ -263,22 +268,13 @@ public:
                   "atlas::mesh_source",
                   m_selected_entity,
                   [](atlas::mesh_source* p_source) {
-                      //   if (ImGui::InputText(
-                      //         "Input Label",
-                      //         &p_source->model_path,
-                      //         ImGuiInputTextFlags_EnterReturnsTrue)) {
-                      //       console_log_info("mesh_src = {}",
-                      //                        p_source->model_path);
-                      //     //   atlas::event::mesh_reload reload_request = {
-                      //     //       .entity_id = m_selected_entity.id(),
-                      //     //       .filename = p_source->model_path,
-                      //     //   };
+                        if (ImGui::InputText(
+                              "Input Label",
+                              &p_source->model_path,
+                              ImGuiInputTextFlags_EnterReturnsTrue)) {
+                            console_log_info("ImGui::InputText Entered!");
+                        }
 
-                      //     //   if
-                      //     (std::filesystem::exists(p_source->model_path)) {
-                      //     //       signal(reload_request);
-                      //     //   }
-                      //   }
                       atlas::ui::draw_vec4("Color", p_source->color);
 
                       //   if (ImGui::Button("Reload Material")) {
@@ -472,14 +468,13 @@ public:
     }
 
     void unload_assets() {
-        // console_log_info("Unloading Assets");
-
         m_play_icon.destroy();
         m_stop_icon.destroy();
         m_content_browser.destroy();
     }
 
 private:
+    atlas::game_object_optional m_current_entity;
     atlas::event::bus* m_bus = nullptr;
     float m_delta_time;
     atlas::physics::engine m_physics_engine;
