@@ -161,6 +161,12 @@ export namespace atlas {
             return flecs::system_builder<Components...>(m_registry, name);
         }
 
+
+        template<typename... Components>
+        flecs::observer_builder<Components...> observer(const char* p_name=nullptr) {
+            return flecs::observer_builder<Components...>(m_registry, p_name);
+        }
+
         void progress(float p_delta_time) { m_registry.progress(p_delta_time); }
 
         /**
