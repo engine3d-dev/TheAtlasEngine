@@ -2,22 +2,23 @@ module;
 
 #include <string>
 #include <filesystem>
+#include <fstream>
+
 #include <flecs.h>
 #include <yaml-cpp/yaml.h>
-#include <sstream>
 #include <glm/glm.hpp>
-#include <fstream>
 
 export module atlas.core.serialize;
 
 import atlas.core.scene;
+import atlas.core.scene.world;
 import atlas.core.serialize.types;
 import atlas.core.utilities;
 
 namespace atlas {
     // used to serialize entities
     // TODO -- expand on this to stream_reader and stream_writer
-    static void serialize_entity(YAML::Emitter& output,
+    void serialize_entity(YAML::Emitter& output,
                                  const flecs::entity& p_entity) {
         output << YAML::BeginMap;
 
@@ -64,7 +65,7 @@ namespace atlas {
         output << YAML::EndMap;
     }
 
-    static void deserialize_entity(YAML::iterator::value_type p_entity_value,
+    void deserialize_entity(YAML::iterator::value_type p_entity_value,
                                    flecs::entity& p_deserialize_to_object) {
         if (p_entity_value["Transform"]) {
             auto transform_data = p_entity_value["Transform"];
@@ -92,7 +93,7 @@ namespace atlas {
             auto mesh = p_entity_value["Mesh Source"];
             if (!mesh["Model Path"].as<std::string>().empty()) {
                 p_deserialize_to_object.set<mesh_source>({
-                  .flip = static_cast<bool>(mesh["Flip"].as<int>()),
+                  .flip = static_cast<bool>(mesh["Flip"].as<bool>()),
                   .model_path = mesh["Model Path"].as<std::string>(),
                   .diffuse = mesh["Diffuse"].as<std::string>(),
                   .specular = mesh["Specular"].as<std::string>(),
@@ -186,6 +187,16 @@ namespace atlas {
             output << YAML::BeginMap;
             output << YAML::Key << "Scene" << YAML::Value
                    << m_current_scene_ctx->name();
+
+            flecs::world world = *m_current_scene_ctx;
+            // Serializing environment maps loaded with
+            std::string environment_path="";
+            if(world.has<environment>()) {
+                const environment* e = world.get<environment>();
+                environment_path = e->filepath;
+            }
+
+            output << YAML::Key << "Environment" << YAML::Value << environment_path;
             output << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
 
             //! @note Queries in flecs the ecs framework are how we can query
@@ -202,12 +213,11 @@ namespace atlas {
             // while specifying to not query entities that also have the
             // tag::editor specified
             flecs::query<> q = m_current_scene_ctx->query_builder()
-                                 .with<tag::serialize>()
-                                 .without<tag::editor>()
+                                 .with<transform>()
                                  .build();
 
             q.each([&output](flecs::entity p_entity) {
-                console_log_error("Serialize Entity: {}",
+                console_log_info("Serialize Entity: {}",
                                   p_entity.name().c_str());
                 serialize_entity(output, p_entity);
             });

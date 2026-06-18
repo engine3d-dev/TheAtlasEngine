@@ -99,12 +99,33 @@ namespace YAML {
     };
 
     template<>
+    struct convert<atlas::environment> {
+
+        static Node encode(const atlas::environment& rhs) {
+            Node node;
+            // Encode glm::vec3 members
+            node["Environment"] = rhs.filepath;
+            return node;
+        }
+
+        static bool decode(const Node& node, atlas::environment& rhs) {
+            if (!node.IsMap()) {
+                return false;
+            }
+
+            rhs.filepath = node["Environment"].as<std::string>();
+            return true;
+        }
+    };
+
+    template<>
     struct convert<atlas::mesh_source> {
 
         static Node encode(const atlas::mesh_source& rhs) {
             Node node;
             // Encode glm::vec3 members
             node["Model"] = rhs.model_path;
+            node["Flip"] = rhs.flip;
             node["Color"] = rhs.color;
             node["Diffuse"] = rhs.diffuse;
             node["Specular"] = rhs.specular;
