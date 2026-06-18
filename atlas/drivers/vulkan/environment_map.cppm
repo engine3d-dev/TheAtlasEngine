@@ -99,12 +99,6 @@ public:
      * @brief loads in a new HDRI environment map
      */
     void construct(const std::string& p_filename) {
-        // bool res = create_hdr(p_filename);
-
-        // if (!res) {
-        //     console_log_error("Cannot load environment: {}", p_filename);
-        // }
-
         m_taskflow.emplace([this, p_filename](){
             bool success = create_hdr(p_filename);
             if (!success) {
@@ -227,9 +221,6 @@ public:
 
         upload_cmd.end();
         
-        std::mutex queue_mutex;
-
-        queue_mutex.lock();
         VkQueue graphics_queue;
         vkGetDeviceQueue(*m_device, 0, 0, &graphics_queue);
 
@@ -242,7 +233,6 @@ public:
 
         vkQueueSubmit(graphics_queue, 1, &submit_info, nullptr);
         vkQueueWaitIdle(graphics_queue);
-        queue_mutex.unlock();
 
         upload_cmd.destruct();
         staging_buffer.destruct();
