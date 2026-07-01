@@ -549,14 +549,7 @@ export namespace atlas {
                 model *= rotation_mat;
                 model = glm::scale(model, t->scale);
 
-                if (m_model_matrices_lookup.contains(p_entity.id())) {
-                    // hash table to lookup specific index, using the entitys
-                    // main ID has a hash key This way we can use the hash value
-                    // as the location in the index to modify that model matrix.
-                    m_model_matrices[m_model_matrices_lookup[p_entity.id()]] =
-                      model;
-                }
-                else {
+                if(!m_model_matrices_lookup.contains(p_entity.id())) {
                     // Add model matrix if non existant in the array
                     m_model_matrices.push_back(model);
 
@@ -564,7 +557,15 @@ export namespace atlas {
                     // book keeping.
                     m_model_matrices_lookup.emplace(
                       p_entity.id(), m_model_matrix_index_count++);
+
+                    return;
                 }
+
+                // hash table to lookup specific index, using the entitys
+                // main ID has a hash key This way we can use the hash value
+                // as the location in the index to modify that model matrix.
+                m_model_matrices[m_model_matrices_lookup[p_entity.id()]] =
+                    model;
             });
 
             m_object_model_uniforms.transfer<glm::mat4>(std::span<glm::mat4>(
